@@ -14,9 +14,12 @@ import UIKit
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
 
-    let registrar = engineBridge.pluginRegistry.registrar(
+    guard let registrar = engineBridge.pluginRegistry.registrar(
       forPlugin: "RepCounterVideoFrames"
-    )
+    ) else {
+      assertionFailure("Unable to create Flutter plugin registrar for RepCounterVideoFrames")
+      return
+    }
     let channel = FlutterMethodChannel(
       name: "rep_counter/video_frames",
       binaryMessenger: registrar.messenger()

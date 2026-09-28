@@ -68,7 +68,6 @@ jobs:
   ios-build-video-test:
     name: Apple Silicon iOS build + video replay
     needs: quality
-    if: github.event_name != 'pull_request'
     runs-on: macos-26
     timeout-minutes: 60
     env:
