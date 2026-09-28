@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -8,6 +10,7 @@ import 'theme/app_theme.dart';
 import 'app/app_shell.dart';
 import 'app/route_observer.dart';
 import 'features/legal/onboarding_page.dart';
+import 'local_video_test_page.dart';
 
 void main() => runApp(const RepCounterApp());
 
@@ -56,7 +59,11 @@ class _RepCounterAppState extends State<RepCounterApp> {
             darkTheme: RepCoachTheme.dark(),
             themeMode: ThemeMode.dark,
             navigatorObservers: [appRouteObserver],
-            home: _onboarded == null
+            home: (Platform.environment['REPCOACH_CI_VIDEO_PATH'] ?? '').isNotEmpty
+                ? LocalVideoTestPage(
+                    autoVideoPath: Platform.environment['REPCOACH_CI_VIDEO_PATH'],
+                  )
+                : _onboarded == null
                 ? const Scaffold(
                     body: Center(child: CircularProgressIndicator()))
                 : _onboarded!
