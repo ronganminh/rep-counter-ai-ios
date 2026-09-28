@@ -1,0 +1,1 @@
+Temporary connector capability probe. Removed during final import.
