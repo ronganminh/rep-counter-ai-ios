@@ -100,8 +100,19 @@ jobs:
 
       - name: Resolve dependencies
         run: |
+          flutter config --no-enable-swift-package-manager
+          flutter clean
           flutter precache --ios
           flutter pub get
+
+      - name: Rebuild CocoaPods integration
+        run: |
+          cd ios
+          pod deintegrate
+          rm -rf Pods
+          pod install --repo-update
+          cd ..
+          test -f ios/Pods/Target\ Support\ Files/Pods-Runner/Pods-Runner.debug.xcconfig
 
       - name: Reuse or download CI fixture video once
         id: fixture
@@ -253,6 +264,7 @@ jobs:
             ci-artifacts/input-video.sha256
             ci-artifacts/input-video.txt
             ci-artifacts/simulator-udid.txt
+            rep-counter-ai-main/rep_counter_app/ios/Podfile.lock
             rep-counter-ai-main/rep_counter_app/build/ios/iphoneos/Runner.app
           if-no-files-found: warn
           retention-days: 30
