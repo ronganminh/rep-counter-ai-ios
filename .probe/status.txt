@@ -1,0 +1,1 @@
+Connector write access confirmed. This directory is removed by the source import workflow.
