@@ -24,7 +24,9 @@ class _VideoPoseFrame {
 }
 
 class LocalVideoTestPage extends StatefulWidget {
-  const LocalVideoTestPage({super.key});
+  const LocalVideoTestPage({super.key, this.autoVideoPath});
+
+  final String? autoVideoPath;
 
   @override
   State<LocalVideoTestPage> createState() => _LocalVideoTestPageState();
@@ -62,11 +64,18 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
   String _message = 'Chọn video push-up từ điện thoại';
   final List<double> _trace = [];
   double _flash = 0;
+  bool _reportedResult = false;
 
   @override
   void initState() {
     super.initState();
     _resetCounter();
+    final path = widget.autoVideoPath;
+    if (path != null && path.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_analyzePath(path));
+      });
+    }
   }
 
   void _resetCounter() {
@@ -81,12 +90,23 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
     _frameIndex = -1;
     _consumedIndex = -1;
     _trace.clear();
+    _reportedResult = false;
   }
 
   Future<void> _pickAndAnalyze() async {
     final result = await FilePicker.pickFiles(type: FileType.video);
     final path = result.isEmpty ? null : result.first.path;
     if (path == null || !mounted) return;
+    await _analyzePath(path);
+  }
+
+  Future<void> _analyzePath(String path) async {
+    final input = File(path);
+    if (!await input.exists()) {
+      debugPrint('[CI_VIDEO_ERROR] missing_file path=$path');
+      if (mounted) setState(() => _message = 'Không tìm thấy video: $path');
+      return;
+    }
     await _video?.dispose();
     final controller = VideoPlayerController.file(File(path));
     await controller.initialize();
@@ -149,6 +169,7 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
       });
       await _replay();
     } catch (error) {
+      debugPrint('[CI_VIDEO_ERROR] analyze_failed error=$error');
       if (mounted) {
         setState(() {
           _analyzing = false;
@@ -184,6 +205,15 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
     }
     if (_frameIndex == _frames.length - 1 && video.value.isPlaying) {
       unawaited(video.pause());
+      if (!_reportedResult) {
+        _reportedResult = true;
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          final durationMs = video.value.duration.inMilliseconds;
+          debugPrint(
+            '[CI_VIDEO_RESULT] frames=${_frames.length} reps=${_counter.count} duration_ms=$durationMs',
+          );
+        });
+      }
     }
   }
 
