@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html{background:#1A1A1C}body{margin:0;background:#1A1A1C;color:#F4F4F0;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#C8FF2E}a:hover{color:#F4F4F0}
+*{box-sizing:border-box}
+@keyframes rc-shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+@keyframes rc-spin{to{transform:rotate(360deg)}}
+.rc-scroll::-webkit-scrollbar{display:none}
+</style>
+</helmet>
+<div style="min-height:100vh;display:flex;flex-wrap:wrap;gap:40px;justify-content:center;align-items:flex-start;padding:32px 24px">
+  <div style="display:flex;flex-direction:column;align-items:center;gap:14px">
+    <div style="width:{{ frameW }};height:{{ frameH }};position:relative">
+      <div style="position:absolute;left:0;top:0;width:393px;height:852px;transform:scale({{ scale }});transform-origin:0 0;border-radius:56px;box-shadow:0 0 0 1px rgba(255,255,255,0.12),0 40px 80px rgba(0,0,0,0.55);overflow:hidden;background:#0B0B0C">
+        {{ viewer }}
+        <sc-if value="{{ loading }}" hint-placeholder-val="{{ true }}">
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:10px;font:500 14px Inter;color:#A1A1A6"><span style="width:16px;height:16px;border-radius:999px;border:2px solid #C8FF2E;border-right-color:transparent;animation:rc-spin 0.8s linear infinite"></span>Đang tải màn hình…</div>
+        </sc-if>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:8px">
+      <button onClick="{{ prev }}" aria-label="Màn trước" style="width:48px;height:48px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);background:#202023;color:#F4F4F0;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"></path></svg></button>
+      <span style="min-width:72px;text-align:center;font:600 14px Inter;color:#A1A1A6;font-variant-numeric:tabular-nums">{{ counter }}</span>
+      <button onClick="{{ next }}" aria-label="Màn sau" style="width:48px;height:48px;border-radius:999px;border:none;background:#C8FF2E;color:#0B0B0C;display:flex;align-items:center;justify-content:center;cursor:pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+    </div>
+  </div>
+  <div style="width:340px;max-width:100%;display:flex;flex-direction:column;gap:20px;padding-top:8px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <span style="display:inline-flex;align-items:center;gap:0.35em;font:800 22px 'Barlow Condensed';letter-spacing:0.02em;text-transform:uppercase"><svg width="1.3em" height="1.3em" viewBox="0 0 100 100" style="flex:none;display:block" aria-hidden="true"><rect width="100" height="100" rx="22.37" fill="#141416"></rect><rect x="0.5" y="0.5" width="99" height="99" rx="22" fill="none" stroke="rgba(255,255,255,0.10)"></rect><path d="M50 20 A30 30 0 1 1 24.02 35" stroke="#C8FF2E" stroke-width="10" stroke-linecap="round" fill="none"></path><circle cx="24.02" cy="35" r="9" fill="#C8FF2E" stroke="#141416" stroke-width="3.5"></circle></svg><span>RepCoach<span style="color:#C8FF2E;margin-left:0.2em">AI</span></span></span>
+      <h1 style="margin:0;font:800 44px/0.95 'Barlow Condensed';text-transform:uppercase">Flow tổng</h1>
+      <p style="margin:0;font:400 14px/1.5 Inter;color:#A1A1A6;text-wrap:pretty">Bấm các nút trên màn hình để đi tiếp. Màn camera và màn chuyển tiếp tự chạy. Phím ← → cũng dùng được.</p>
+    </div>
+    <div style="padding:14px 16px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:4px">
+      <span style="font:600 11px Inter;letter-spacing:0.06em;text-transform:uppercase;color:#7C7C82">Đang xem</span>
+      <span style="font:700 18px Inter">{{ curName }}</span>
+      <span style="font:500 13px/1.45 Inter;color:#C8FF2E">{{ curHint }}</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:2px">
+      <sc-for list="{{ steps }}" as="s" hint-placeholder-count="12">
+        <div style="display:flex;flex-direction:column">
+          <sc-if value="{{ s.showGroup }}" hint-placeholder-val="{{ false }}">
+            <span style="font:600 11px Inter;letter-spacing:0.06em;text-transform:uppercase;color:#7C7C82;padding:14px 10px 6px">{{ s.group }}</span>
+          </sc-if>
+          <button onClick="{{ s.go }}" style="height:40px;display:flex;align-items:center;gap:10px;padding:0 10px;border:none;border-radius:10px;background:{{ s.bg }};color:{{ s.fg }};font:500 14px Inter;text-align:left;cursor:pointer"><span style="width:22px;font:700 12px ui-monospace,Menlo,monospace;color:{{ s.num }}">{{ s.idx }}</span>{{ s.name }}</button>
+        </div>
+      </sc-for>
+    </div>
+    <p style="margin:0;font:400 12px/1.5 Inter;color:#7C7C82">Màn được lấy trực tiếp từ các file thiết kế, sửa ở file gốc thì flow tự cập nhật.</p>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = { i: 0, html: {}, loading: true, h: 900 };
+  flow() {
+    const O = 'onboarding.dc.html', H = 'home.dc.html', C = 'camera.dc.html', U = 'hud.dc.html', R = 'results.dc.html', S = 'history-settings.dc.html';
+    return [
+      { id: 'ob1', group: 'Onboarding', name: 'Đếm rep + AI', file: O, sel: '[data-screen-label="A1 Đếm rep"]', links: { 'Tiếp tục': '+1', 'Bỏ qua': 'home' }, hint: 'Bấm “Tiếp tục”' },
+      { id: 'ob2', group: 'Onboarding', name: 'Đặt máy trước mặt', file: O, sel: '[data-screen-label="A2 Đặt máy"]', links: { 'Tiếp tục': '+1', 'Bỏ qua': 'home' }, hint: 'Bấm “Tiếp tục”' },
+      { id: 'ob3', group: 'Onboarding', name: 'Riêng tư', file: O, sel: '[data-screen-label="A3 Riêng tư"]', links: { 'Bắt đầu tập': 'home' }, hint: 'Bấm “Bắt đầu tập”' },
+      { id: 'home', group: 'Home', name: 'Home · tab Tập', file: H, sel: '#A1 [data-screen-label]', links: { 'TẬP NGAY': 'plan', 'Bài đang chọn': 'pick', 'Lịch sử': 'history', 'Cài đặt': 'settings' }, hint: 'Bấm “TẬP NGAY”, pill “Hít đất” hoặc tab Lịch sử' },
+      { id: 'pick', group: 'Chọn bài', name: 'Chọn bài tập', file: H, sel: '#A0 [data-screen-label]', links: { 'Chọn Hít đất': 'home', 'Quay lại': 'home' }, hint: 'Bấm “Chọn Hít đất”' },
+      { id: 'plan', group: 'Kế hoạch hôm nay', name: 'Sheet mục tiêu', file: H, sel: '#B1 [data-screen-label]', links: { 'BẮT ĐẦU': 'perm', 'Tập tự do': 'perm', 'Đóng': 'home' }, hint: 'Bấm “BẮT ĐẦU”' },
+      { id: 'perm', group: 'Camera', name: 'Xin quyền camera', file: O, sel: '[data-screen-label="B1 Pre-permission"]', links: { 'Tiếp tục': 'cam1', 'Để sau': 'home' }, hint: 'Bấm “Tiếp tục”' },
+      { id: 'cam1', group: 'Camera', name: 'Căn khung', file: C, sel: '#C1 [data-screen-label]', auto: 2600, links: { 'Đóng': 'home' }, hint: 'Tự chuyển · chạm để bỏ qua' },
+      { id: 'cam2', group: 'Camera', name: 'Sẵn sàng', file: C, sel: '#C2 [data-screen-label]', auto: 1800, links: { 'Đóng': 'home' }, hint: 'Tự chuyển' },
+      { id: 'cam3', group: 'Camera', name: 'Hiệu chỉnh lần đầu', file: C, sel: '#C3 [data-screen-label]', auto: 2600, links: { 'Đóng': 'home' }, hint: 'Tự chuyển' },
+      { id: 'cam4', group: 'Camera', name: 'Đếm ngược', file: C, sel: '#C4 [data-screen-label]', auto: 1600, links: { 'Đóng': 'home' }, hint: 'Tự chuyển' },
+      { id: 'hud', group: 'Tập', name: 'HUD đang tập', file: U, sel: '#A1 [data-screen-label]', tapAny: 'goal', links: { 'Giữ để kết thúc': 'saved', 'Tạm dừng': 'paused' }, hint: 'Chạm màn hình để tới mục tiêu · nút vuông để kết thúc' },
+      { id: 'paused', group: 'Tập', name: 'Tạm dừng', file: U, sel: '#C1 [data-screen-label]', links: { 'TIẾP TỤC': 'hud', 'Kết thúc buổi tập': 'saved' }, hint: 'Bấm “Tiếp tục”' },
+      { id: 'goal', group: 'Tập', name: 'Đạt mục tiêu', file: U, sel: '#D1 [data-screen-label]', links: { 'Tập thêm': 'extra', 'Kết thúc': 'saved' }, hint: 'Bấm “Kết thúc” hoặc “Tập thêm”' },
+      { id: 'extra', group: 'Tập', name: 'Vượt mục tiêu', file: U, sel: '#E1 [data-screen-label]', links: { 'Giữ để kết thúc': 'saved', 'Tạm dừng': 'paused' }, hint: 'Bấm nút vuông để kết thúc' },
+      { id: 'saved', group: 'Kết quả', name: 'Đã lưu · AI đang nhận xét', file: U, sel: '#F1 [data-screen-label]', auto: 2200, links: {}, hint: 'Tự chuyển' },
+      { id: 'consent', group: 'Kết quả', name: 'Consent AI (lần đầu)', file: S, sel: '#C1 [data-screen-label]', links: { 'Bật nhận xét AI': 'results', 'Để sau': 'results' }, hint: 'Bấm “Bật nhận xét AI”' },
+      { id: 'results', group: 'Kết quả', name: 'Kết quả buổi tập', file: R, sel: '#R1 [data-screen-label]', links: { 'Xong': 'history', 'Đóng': 'home' }, hint: 'Cuộn xem, bấm “Xong”' },
+      { id: 'history', group: 'Lịch sử', name: 'Lịch sử', file: S, sel: '#H1 [data-screen-label]', links: { detail: 'detail', home: 'home', settings: 'settings' }, hint: 'Bấm một buổi tập để xem chi tiết' },
+      { id: 'detail', group: 'Lịch sử', name: 'Chi tiết buổi tập', file: S, sel: '#H2 [data-screen-label]', links: { history: 'history', 'Quay lại': 'history' }, hint: 'Bấm ‹ để quay lại' },
+      { id: 'settings', group: 'Cài đặt', name: 'Cài đặt', file: S, sel: '#S1 [data-screen-label]', links: { home: 'home', history: 'history', calib: 'calib', delete: 'delete' }, hint: 'Thử “Hiệu chỉnh” hoặc “Xóa toàn bộ lịch sử”' },
+      { id: 'calib', group: 'Cài đặt', name: 'Hiệu chỉnh biên độ', file: S, sel: '#S2 [data-screen-label]', links: { settings: 'settings' }, hint: 'Bấm ‹ Cài đặt' },
+      { id: 'delete', group: 'Cài đặt', name: 'Xác nhận xóa', file: S, sel: '#S3b [data-screen-label]', links: { 'Hủy': 'settings', 'Xóa vĩnh viễn': 'settings' }, hint: 'Bấm “Hủy”' }
+    ];
+  }
+  componentDidMount() {
+    this.F = this.flow();
+    const saved = parseInt(localStorage.getItem('repcoach-flow-step') || '0', 10);
+    if (saved >= 0 && saved < this.F.length) this.setState({ i: saved });
+    this.onResize = () => this.setState({ h: window.innerHeight });
+    this.onResize();
+    window.addEventListener('resize', this.onResize);
+    this.onKey = e => { if (e.key === 'ArrowRight') this.go(this.state.i + 1); if (e.key === 'ArrowLeft') this.go(this.state.i - 1); };
+    window.addEventListener('keydown', this.onKey);
+    this.load();
+  }
+  componentWillUnmount() { window.removeEventListener('resize', this.onResize); window.removeEventListener('keydown', this.onKey); clearTimeout(this.t); }
+  componentDidUpdate(pp, ps) { if (ps.i !== this.state.i || ps.loading !== this.state.loading) this.arm(); }
+  async load() {
+    const F = this.F, open = '<x-' + 'dc>', close = '</x-' + 'dc>';
+    const files = [...new Set(F.map(s => s.file))];
+    const docs = {};
+    await Promise.all(files.map(async f => {
+      try {
+        const txt = await (await fetch(encodeURI('./' + f))).text();
+        const a = txt.indexOf(open), b = txt.indexOf(close);
+        docs[f] = new DOMParser().parseFromString(a >= 0 ? txt.slice(a + open.length, b) : txt, 'text/html');
+      } catch (e) { docs[f] = null; }
+    }));
+    const html = {};
+    F.forEach(s => {
+      const el = docs[s.file] && docs[s.file].querySelector(s.sel);
+      if (!el) { html[s.id] = '<div style="padding:120px 32px;font:500 14px Inter;color:#FF5A5F">Không tìm thấy màn “' + s.name + '”</div>'; return; }
+      const c = el.cloneNode(true);
+      c.querySelectorAll('div').forEach(d => { const st = d.getAttribute('style') || ''; if (st.includes('top:852px') && st.includes('dashed')) d.remove(); });
+      c.style.borderRadius = '0'; c.style.boxShadow = 'none';
+      html[s.id] = c.outerHTML;
+    });
+    this.setState({ html, loading: false });
+  }
+  arm() {
+    clearTimeout(this.t);
+    const s = this.F[this.state.i];
+    if (s.auto && !this.state.loading) this.t = setTimeout(() => this.go(this.state.i + 1), s.auto);
+    if (this.scroller) this.scroller.scrollTop = 0;
+  }
+  go(target) {
+    const F = this.F || this.flow();
+    let i = typeof target === 'number' ? target : F.findIndex(s => s.id === target);
+    if (i < 0) return;
+    i = Math.max(0, Math.min(F.length - 1, i));
+    localStorage.setItem('repcoach-flow-step', String(i));
+    this.setState({ i });
+  }
+  handleClick(e) {
+    const s = this.F[this.state.i];
+    let el = e.target;
+    for (let n = 0; el && n < 6; n++, el = el.parentElement) {
+      if (!el.getAttribute) continue;
+      const cands = [el.getAttribute('data-go'), el.getAttribute('aria-label'), (el.textContent || '').trim()].filter(Boolean);
+      for (const k of cands) {
+        if (k.length > 48) continue;
+        const hit = Object.keys(s.links).find(l => k === l || k.includes(l));
+        if (hit) { const to = s.links[hit]; this.go(to === '+1' ? this.state.i + 1 : to); return; }
+      }
+    }
+    if (s.tapAny) this.go(s.tapAny); else if (s.auto) this.go(this.state.i + 1);
+  }
+  renderVals() {
+    const F = this.F || this.flow();
+    const { i, html, loading, h } = this.state;
+    const s = F[i];
+    const scale = Math.min(1, Math.max(0.5, (h - 130) / 852));
+    let lastGroup = null;
+    const steps = F.map((st, k) => {
+      const showGroup = st.group !== lastGroup; lastGroup = st.group;
+      const on = k === i;
+      return { idx: String(k + 1).padStart(2, '0'), name: st.name, group: st.group, showGroup, go: () => this.go(k), bg: on ? 'rgba(200,255,46,0.12)' : 'transparent', fg: on ? '#C8FF2E' : '#F4F4F0', num: on ? '#C8FF2E' : '#5C5C62' };
+    });
+    const viewer = loading ? null : React.createElement('div', {
+      key: s.id,
+      ref: r => { this.scroller = r; },
+      className: 'rc-scroll',
+      onClick: e => this.handleClick(e),
+      style: { position: 'absolute', inset: 0, overflowY: 'auto', overflowX: 'hidden', scrollbarWidth: 'none', cursor: 'pointer' },
+      dangerouslySetInnerHTML: { __html: html[s.id] || '' }
+    });
+    return {
+      viewer, loading, steps, scale,
+      frameW: Math.round(393 * scale) + 'px', frameH: Math.round(852 * scale) + 'px',
+      counter: (i + 1) + ' / ' + F.length,
+      curName: s.name, curHint: s.hint,
+      prev: () => this.go(i - 1), next: () => this.go(i + 1)
+    };
+  }
+}
+</script>
+</body>
+</html>

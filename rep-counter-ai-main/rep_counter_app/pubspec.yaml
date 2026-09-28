@@ -1,1 +1,58 @@
-name: import_probe_should_never_be_created
+name: rep_counter_app
+description: Đếm rep tập luyện thời gian thực bằng camera và MediaPipe Pose.
+publish_to: "none"
+version: 1.0.0+2
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  camera: ^0.11.0
+  google_mlkit_pose_detection: ^0.14.0
+  permission_handler: ^11.3.1
+  file_picker: ^12.2.0
+  image: ^4.3.0
+  video_player: ^2.9.2
+  shared_preferences: ^2.3.3
+  http: ^1.2.2
+  lucide_icons_flutter: ^3.1.20
+  flutter_tts: ^4.2.5
+  share_plus: ^13.3.0
+  gal: ^2.3.3
+  url_launcher: ^6.3.2
+  audioplayers: ^6.8.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  camera_platform_interface: ^2.14.0
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.14.4
+
+flutter:
+  config:
+    enable-swift-package-manager: false
+  uses-material-design: true
+  assets:
+    - assets/audio/
+  fonts:
+    - family: Inter
+      fonts:
+        - asset: assets/fonts/Inter.ttf
+    - family: Barlow Condensed
+      fonts:
+        - asset: assets/fonts/BarlowCondensed-ExtraBold.ttf
+          weight: 800
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/branding/app-icon-1024.png
+  adaptive_icon_background: assets/branding/ic_launcher_background.png
+  adaptive_icon_foreground: assets/branding/ic_launcher_foreground.png
+  adaptive_icon_monochrome: assets/branding/ic_launcher_monochrome.png
+  min_sdk_android: 21
+
+# Test đọc test/rep_vector.json bằng dart:io nên không cần khai báo asset.

@@ -1,0 +1,157 @@
+<!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tải bản thử — RepCoach AI</title><meta name="robots" content="noindex,nofollow"><link rel="icon" href="assets/app-icon.png"><link rel="stylesheet" href="styles.css"><style>
+.pick{border:1px solid var(--line);border-radius:22px;background:var(--panel);padding:22px;margin:26px 0}
+.pick h2{font-size:20px}
+.guess{color:var(--brand);font-weight:800}
+.dl{display:flex;align-items:center;gap:14px;padding:15px 18px;border:1px solid var(--line);border-radius:16px;text-decoration:none;margin:10px 0;background:#0b1c13}
+.dl:hover{border-color:var(--brand)}
+.dl.main{background:var(--brand);color:var(--ink);border-color:var(--brand)}
+.dl .n{font-weight:850}
+.dl .s{color:var(--muted);font-size:13px}
+.dl.main .s{color:#0b1c13;opacity:.75}
+.dl .arrow{margin-left:auto;font-weight:850}
+.others{margin-top:18px}
+.others summary{cursor:pointer;color:var(--muted)}
+.sums{font:12px/1.8 ui-monospace,SFMono-Regular,Consolas,monospace;color:var(--muted);word-break:break-all}
+ol{color:var(--muted)}ol li{margin:7px 0}
+.q{border-left:4px solid var(--brand);padding:13px 17px;background:#61e78612;border-radius:0 12px 12px 0;margin:18px 0}
+</style></head><body>
+<header><nav class="wrap"><a class="brand" href="index.html"><img src="assets/app-icon.png" alt=""><span>RepCoach AI</span></a><div class="links"><a href="privacy-policy.html">Privacy</a><a href="terms.html">Terms</a><a href="support.html">Support</a></div></nav></header>
+
+<main class="wrap document">
+<div class="eyebrow">Bản thử nghiệm</div>
+<h1>Tải RepCoach AI</h1>
+<p>Phiên bản 1.0.0 · Android 5.0 trở lên · Chưa phát hành trên Google Play.</p>
+
+<div class="pick">
+  <h2 id="head">Đang xem bạn dùng máy gì…</h2>
+  <p id="why" class="s" style="color:var(--muted);margin-top:-2px"></p>
+  <div id="links"></div>
+  <details class="others"><summary>Các bản khác</summary><div id="all"></div></details>
+</div>
+
+<h2>Cách cài</h2>
+<ol>
+  <li>Tải file <code>.apk</code> ở trên về điện thoại.</li>
+  <li>Mở file. Android sẽ hỏi có cho phép cài từ nguồn này không — bật lên.</li>
+  <li>Máy Xiaomi/Redmi: tắt <em>Quét ứng dụng bằng MIUI</em> trong lúc cài.
+      Samsung có thể cảnh báo Play Protect, chọn <em>Cài đặt dù sao</em>.</li>
+  <li>Mở app. Có 3 màn giới thiệu rồi mới xin quyền camera.</li>
+</ol>
+<p>Cài nhầm bản thì máy chỉ báo “không tương thích”, không hỏng gì. Lúc đó tải
+bản <strong>universal</strong> trong mục “Các bản khác”.</p>
+
+<h2>Cách thử cho đúng</h2>
+<p>Đặt điện thoại thấp phía trước, dựng thật chắc. Hít đất sao cho khung xương
+trên màn hình trùng với hình mẫu; khi hiện <em>Sẵn sàng</em> mới bắt đầu đếm.</p>
+<p><strong>Quay từ bên hông, ngang tầm hông là chuẩn nhất.</strong> Quay trực
+diện vẫn chạy nhưng kém chính xác hơn — nếu bạn quay trực diện rồi thấy đếm
+sai, sẽ không biết là do thuật toán hay do góc máy.</p>
+<p>Đổi ngôn ngữ Việt / English trong Cài đặt, biểu tượng bánh răng góc trên phải.</p>
+
+<div class="q">
+  <strong>Nhờ bạn trả lời giúp 5 câu:</strong>
+  <ol style="margin-bottom:0">
+    <li>Khung xương vẽ trên màn hình có <strong>trùng với người thật</strong> không, hay lệch?</li>
+    <li>Số rep app đếm so với số bạn tự đếm — <strong>lệch bao nhiêu</strong>?</li>
+    <li>Có đứng hình, giật hay nóng máy không?</li>
+    <li>Nhận xét AI cuối buổi có ra đúng ngôn ngữ đang chọn không?</li>
+    <li>Máy gì, Android mấy?</li>
+  </ol>
+  Câu 1 và 2 quan trọng nhất. Nếu đếm sai, cho xin số rep bạn tự đếm và video
+  quay lại buổi đó thì mới tìm được nguyên nhân.
+</div>
+
+<h2>App làm gì với dữ liệu của bạn</h2>
+<p>Camera xử lý hoàn toàn trên máy, không quay lại, không gửi đi đâu. Chỉ khi
+bạn tự bấm “Nhận nhận xét từ Gemini” thì mới gửi các con số (số rep, thời
+lượng, điểm chất lượng) lên máy chủ — không gửi ảnh hay video. Chi tiết trong
+<a href="privacy-policy.html">chính sách quyền riêng tư</a>.</p>
+<p>Đây là công cụ hỗ trợ tập luyện, <strong>không phải thiết bị y tế</strong>.</p>
+
+<h2>Kiểm tra file tải về</h2>
+<p class="sums">
+package <strong>com.ronganminh.repcoach</strong> · ký bởi CN=RONG AN MINH<br>
+chữ ký SHA-256 &nbsp;ea376d6d6adbf74f44b1642e56e6ef0c25626dcb87c0d6a10700c04bcd366f2e<br><br>
+<span id="sums"></span>
+</p>
+</main>
+
+<footer><div class="wrap">© 2026 RỒNG ẨN MÌNH</div></footer>
+
+<script>
+// Trinh duyet KHONG cho biet ABI cua may Android. Cai duy nhat doc duoc chac
+// chan la he dieu hanh. Vi vay: nhan dung he dieu hanh, con ABI thi DOAN
+// arm64 (dung voi hau het may tu 2017), va luon chua san ban universal.
+var FILES = {
+  arm64:     {n:'RepCoach-AI-1.0.0-arm64.apk',     mb:'41,5 MB', sha:'1f4d2632edfd3d87574285f4aa4bbb2395170ad5ba958d21ca74366cd4e767c0'},
+  arm32:     {n:'RepCoach-AI-1.0.0-arm32.apk',     mb:'35,6 MB', sha:'bd9ff19738a98ffb9f42ed976a1639b55a55937026ba64946df2038cd29333de'},
+  universal: {n:'RepCoach-AI-1.0.0-universal.apk', mb:'91,7 MB', sha:'c70b1cebf27c9bb7a98ebba93ea6fbd1c767f8d0c801c3b4168ded4eb4b9ae86'}
+};
+var LABEL = {
+  arm64:     ['Bản arm64', 'hầu hết điện thoại từ 2017 trở đi'],
+  arm32:     ['Bản arm32', 'máy cũ hoặc máy phổ thông đời thấp'],
+  universal: ['Bản universal', 'chạy trên mọi máy, nặng hơn']
+};
+
+function row(key, main) {
+  var f = FILES[key], l = LABEL[key];
+  return '<a class="dl' + (main ? ' main' : '') + '" href="apk/' + f.n + '" download>' +
+         '<span><span class="n">' + l[0] + '</span> · <span class="s">' + f.mb + '</span>' +
+         '<br><span class="s">' + l[1] + '</span></span>' +
+         '<span class="arrow">Tải ↓</span></a>';
+}
+
+function sums() {
+  var out = '';
+  for (var k in FILES) out += FILES[k].n + '<br>&nbsp;&nbsp;' + FILES[k].sha + '<br><br>';
+  return out;
+}
+
+(async function () {
+  var ua = navigator.userAgent, head = document.getElementById('head'),
+      why = document.getElementById('why'), links = document.getElementById('links');
+
+  document.getElementById('sums').innerHTML = sums();
+  document.getElementById('all').innerHTML =
+    row('arm64') + row('arm32') + row('universal');
+
+  if (/iPhone|iPad|iPod/i.test(ua)) {
+    head.textContent = 'Bản này chưa có cho iPhone';
+    why.textContent = 'RepCoach AI hiện chỉ chạy trên Android. Mở lại trang này bằng điện thoại Android nhé.';
+    return;
+  }
+  if (!/Android/i.test(ua)) {
+    head.textContent = 'Bạn đang dùng máy tính';
+    why.textContent = 'Tải file về rồi chuyển sang điện thoại Android để cài. Không rõ máy đó loại gì thì lấy bản universal.';
+    links.innerHTML = row('universal', true) + row('arm64');
+    return;
+  }
+
+  // Thu doc kien truc qua User-Agent Client Hints. Chi Chromium moi co, va
+  // tren Android thuong tra ve chuoi rong -> coi nhu khong biet.
+  var arch = '', bits = '';
+  try {
+    if (navigator.userAgentData && navigator.userAgentData.getHighEntropyValues) {
+      var d = await navigator.userAgentData.getHighEntropyValues(['architecture', 'bitness']);
+      arch = d.architecture || ''; bits = d.bitness || '';
+    }
+  } catch (e) { /* khong doc duoc thi thoi */ }
+
+  var key = 'arm64', note = 'Chúng tôi đoán vậy vì gần như mọi điện thoại Android từ 2017 đến nay đều là arm64. Trình duyệt không cho biết chính xác loại CPU.';
+
+  if (/x86_64|x86-64|Win64|WOW64/i.test(ua) || arch === 'x86') {
+    key = 'universal';
+    note = 'Máy bạn có vẻ dùng chip Intel/AMD (máy ảo hoặc Chromebook), nên lấy bản universal cho chắc.';
+  } else if (bits === '32' || /armv7|armv6/i.test(ua)) {
+    key = 'arm32';
+    note = 'Trình duyệt báo hệ thống 32-bit, nên bản arm32 là đúng.';
+  } else if (bits === '64') {
+    note = 'Trình duyệt xác nhận hệ thống 64-bit, nên bản arm64 là đúng.';
+  }
+
+  head.innerHTML = 'Máy Android — nên dùng <span class="guess">' + LABEL[key][0].toLowerCase() + '</span>';
+  why.textContent = note + ' Cài không được thì lấy bản universal ở dưới.';
+  links.innerHTML = row(key, true);
+})();
+</script>
+</body></html>

@@ -1,0 +1,158 @@
+name: RepCoach CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "rep-counter-ai-main/rep_counter_app/**"
+      - ".github/workflows/ios-ci.yml"
+  pull_request:
+    paths:
+      - "rep-counter-ai-main/rep_counter_app/**"
+      - ".github/workflows/ios-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repcoach-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+
+jobs:
+  quality:
+    name: Analyze and Flutter tests
+    runs-on: ubuntu-26.04
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Show tool versions
+        run: flutter --version
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Static analysis
+        run: flutter analyze --fatal-infos
+
+      - name: Unit and widget tests
+        run: flutter test --coverage --reporter expanded
+
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: flutter-coverage
+          path: rep-counter-ai-main/rep_counter_app/coverage/lcov.info
+          if-no-files-found: warn
+          retention-days: 14
+
+  ios-build-smoke:
+    name: iOS build and simulator smoke test
+    needs: quality
+    runs-on: macos-26-intel
+    timeout-minutes: 50
+    env:
+      DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Show Apple and Flutter tool versions
+        run: |
+          flutter --version
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          pod --version
+
+      - name: Precache iOS artifacts
+        run: flutter precache --ios
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Build debug app for iOS Simulator
+        run: |
+          chmod +x tool/build_ios.sh
+          ./tool/build_ios.sh --simulator --debug --no-pub
+
+      - name: Boot simulator and launch app
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$GITHUB_WORKSPACE/ci-artifacts"
+
+          simulator_udid="$(xcrun simctl list devices available -j | jq -r '
+            [
+              .devices[][]
+              | select(.isAvailable == true)
+              | select(.name == "iPhone 17 Pro")
+            ][0].udid // empty
+          ')"
+
+          if [[ -z "$simulator_udid" ]]; then
+            simulator_udid="$(xcrun simctl list devices available -j | jq -r '
+              [
+                .devices[][]
+                | select(.isAvailable == true)
+                | select(.name | startswith("iPhone"))
+              ][0].udid // empty
+            ')"
+          fi
+
+          if [[ -z "$simulator_udid" ]]; then
+            echo "No available iPhone simulator was found." >&2
+            exit 1
+          fi
+
+          xcrun simctl boot "$simulator_udid" 2>/dev/null || true
+          xcrun simctl bootstatus "$simulator_udid" -b
+          xcrun simctl install             "$simulator_udid"             build/ios/iphonesimulator/Runner.app
+          xcrun simctl launch             "$simulator_udid"             com.ronganminh.repCounterApp
+
+          sleep 8
+          xcrun simctl io             "$simulator_udid"             screenshot             "$GITHUB_WORKSPACE/ci-artifacts/ios-launch.png"
+
+          xcrun simctl spawn "$simulator_udid" log show             --last 2m             --style compact             --predicate 'process == "Runner"'             > "$GITHUB_WORKSPACE/ci-artifacts/runner.log" || true
+
+      - name: Build unsigned iPhone release
+        run: ./tool/build_ios.sh --release --no-codesign --no-pub
+
+      - name: Upload iOS smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: ios-smoke-evidence
+          path: |
+            ci-artifacts/ios-launch.png
+            ci-artifacts/runner.log
+            rep-counter-ai-main/rep_counter_app/build/ios/iphoneos/Runner.app
+          if-no-files-found: warn
+          retention-days: 14

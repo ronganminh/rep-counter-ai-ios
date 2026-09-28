@@ -1,0 +1,117 @@
+# ============================================================
+# Video tập luyện — TUYỆT ĐỐI không đưa lên
+# ============================================================
+# Đây là dữ liệu cá nhân nhạy cảm, và IMPLEMENTATION_PLAN §18 cấm upload video
+# lên dịch vụ bên ngoài. Chặn theo cả thư mục lẫn đuôi file để một file quay
+# thêm sau này không lọt qua.
+push_up/
+*.MOV
+*.mov
+*.mp4
+*.avi
+*.mkv
+*.m4v
+*.webm
+
+# Dữ liệu trung gian sinh từ video (landmark, keypoint) — file lớn, tái tạo được
+*.npz
+*.npy
+
+# ============================================================
+# Flutter / Dart
+# ============================================================
+**/build/
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+**/doc/api/
+**/ios/Flutter/.last_build_id
+
+# Cấu hình theo máy — chứa đường dẫn tuyệt đối của máy dev
+**/android/local.properties
+**/android/key.properties
+**/android/.gradle/
+**/android/captures/
+**/android/app/debug/
+**/android/app/profile/
+**/android/app/release/
+*.iml
+inst_user_settings.tmp
+
+# ============================================================
+# Bí mật — không bao giờ commit
+# ============================================================
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.pem
+service-account*.json
+google-services.json
+GoogleService-Info.plist
+
+# ============================================================
+# IDE
+# ============================================================
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# ============================================================
+# Python (notebook phân tích)
+# ============================================================
+__pycache__/
+*.py[cod]
+.ipynb_checkpoints/
+venv/
+.venv/
+
+# Ảnh/biểu đồ sinh ra khi chạy notebook — có thể chứa hình người tập.
+# Chặn rộng rồi mở ngoại lệ cho các thư mục tài sản CÓ CHỦ ĐÍCH: luật `*.png`
+# ban đầu chặn nhầm cả icon app và ảnh store, làm người clone repo về không
+# build được icon.
+*.jpg
+*.jpeg
+*.png
+!docs/**/*.png
+# UI evidence intentionally maintained as project documentation.
+!rep_counter_app/docs/**/*.png
+# Ngoại lệ phải hẹp: `!rep_counter_app/assets/**` từng mở đường cho cả một video
+# debug 17 MB lọt vào commit. Chỉ mở đúng loại ảnh cần cho build và cho store.
+!rep_counter_app/assets/branding/*.png
+!store_listing/assets/**/*.png
+# Captured room/camera images are local diagnostic evidence, not public assets.
+store_listing/assets/screenshots/rieng-tu-khong-dung/
+# Icon launcher Android: sinh từ assets/branding bằng flutter_launcher_icons,
+# nhưng phải có sẵn trong repo thì máy mới clone về là build được ngay.
+!rep_counter_app/android/app/src/main/res/**/*.png
+# Native iOS assets referenced by the Xcode asset catalogs.
+!rep_counter_app/ios/Runner/Assets.xcassets/**/*.png
+
+# Video/dữ liệu debug đóng gói trong app: nặng, là dữ liệu cá nhân, và chỉ dùng
+# cho màn hình kiểm thử vốn đã bị ẩn khỏi bản phát hành.
+rep_counter_app/assets/debug/
+
+# File nén sao lưu: `android.zip` (gói để chuyển máy) chứa cả key.properties
+# lẫn upload-keystore.jks — chặn theo đuôi để không bao giờ lọt lên GitHub.
+*.zip
+*.7z
+*.rar
+
+# Rác từ lệnh curl thử nghiệm
+infinity-cookies.txt
+infinity-home.html
+
+# ============================================================
+# File cai dat da build - khong bao gio commit
+# ============================================================
+# APK/AAB nang hang chuc MB va build lai duoc bat cu luc nao. Ban thu duoc
+# dat thang len VPS tu thu muc build, khong di qua repo.
+*.apk
+*.aab
+docs/apk/

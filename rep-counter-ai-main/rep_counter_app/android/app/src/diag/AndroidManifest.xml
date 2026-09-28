@@ -1,0 +1,27 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- ================================================================
+         CHỈ có trong biến thể `diag`. Bản lên Google Play không có gì ở đây.
+         ================================================================ -->
+
+    <!-- MediaProjection phải chạy trong foreground service. Từ Android 14
+         (API 34) còn bắt buộc thêm quyền theo kiểu dịch vụ. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission
+        android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <!-- Thông báo "đang ghi màn hình" cần quyền này từ Android 13. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Ghi de nhan cua manifest chinh de nguoi test phan biet duoc hai ban
+         khi cai song song. -->
+    <application
+        android:label="RepCoach DIAG"
+        tools:replace="android:label">
+
+        <service
+            android:name=".DiagRecorderService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+    </application>
+</manifest>

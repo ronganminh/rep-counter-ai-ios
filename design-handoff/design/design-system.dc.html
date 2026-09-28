@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html{background:#0B0B0C}body{margin:0;background:#0B0B0C;color:#F4F4F0;font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+a{color:#C8FF2E}a:hover{color:#F4F4F0}
+*{box-sizing:border-box}
+@keyframes pp-pulse{0%{transform:scale(1)}40%{transform:scale(var(--pp-s,1.08))}100%{transform:scale(1)}}
+@keyframes pp-toast{0%{transform:translate(-50%,24px);opacity:0}100%{transform:translate(-50%,0);opacity:1}}
+</style>
+</helmet>
+
+<div style="max-width:1200px;margin:0 auto;padding:48px 32px 120px">
+
+<header style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:32px;padding-bottom:48px">
+  <div style="display:flex;flex-direction:column;gap:12px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;letter-spacing:0.08em;color:#7C7C82;text-transform:uppercase">Design System · v0.2 · iOS / Android · đa bài tập</span>
+    <h1 style="margin:0;display:flex;align-items:center;gap:0.25em;font:800 96px/0.85 'Barlow Condensed',sans-serif;letter-spacing:-0.01em;text-transform:uppercase"><svg width="1.3em" height="1.3em" viewBox="0 0 100 100" style="flex:none;display:block" aria-hidden="true"><rect width="100" height="100" rx="22.37" fill="#141416"></rect><rect x="0.5" y="0.5" width="99" height="99" rx="22" fill="none" stroke="rgba(255,255,255,0.10)"></rect><path d="M50 20 A30 30 0 1 1 24.02 35" stroke="#C8FF2E" stroke-width="10" stroke-linecap="round" fill="none"></path><circle cx="24.02" cy="35" r="9" fill="#C8FF2E" stroke="#141416" stroke-width="3.5"></circle></svg><span>RepCoach<span style="color:#C8FF2E;margin-left:0.2em">AI</span></span></h1>
+    <p style="margin:0;font:500 20px/1.4 Inter,sans-serif;color:#A1A1A6">Một bài. Đếm chuẩn. Hiểu mình tiến bộ.</p>
+  </div>
+  <div style="display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 14px 0 10px;border-radius:999px;background:rgba(61,220,151,0.10);border:1px solid rgba(61,220,151,0.28);color:#3DDC97;font:600 14px Inter,sans-serif">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>
+    Xử lý trên máy
+  </div>
+</header>
+
+<!-- 01 COLOR -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">01</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Màu sắc</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6;max-width:520px;text-wrap:pretty">Tỷ lệ tương phản đo trên nền #0B0B0C. Chỉ một màu nhấn. Màu trạng thái luôn đi kèm icon và chữ.</p>
+  </div>
+
+  <div style="font:600 12px Inter,sans-serif;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px">Nền & bề mặt</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:32px">
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:88px;background:#0B0B0C"></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font:600 14px Inter">Nền</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">bg · #0B0B0C</span></div>
+    </div>
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:88px;background:#161618;border-bottom:1px solid rgba(255,255,255,0.08)"></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font:600 14px Inter">Bề mặt</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">surface · #161618</span></div>
+    </div>
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:88px;background:#202023"></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font:600 14px Inter">Bề mặt 2</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">surface-2 · #202023</span></div>
+    </div>
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:88px;background:#0B0B0C;display:flex;align-items:center;justify-content:center"><div style="width:120px;height:48px;border-radius:12px;border:1px solid rgba(255,255,255,0.08)"></div></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:4px"><span style="font:600 14px Inter">Viền</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">border · rgba(255,255,255,.08)</span></div>
+    </div>
+  </div>
+
+  <div style="font:600 12px Inter,sans-serif;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px">Nhấn & trạng thái</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:32px">
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:112px;background:#C8FF2E;padding:12px 14px;display:flex;align-items:flex-end;justify-content:space-between;color:#0B0B0C"><span style="font:800 40px/0.9 'Barlow Condensed'">Aa</span><span style="font:600 12px Inter">16.6:1 chữ đen</span></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 14px Inter">Chanh điện</span><span style="font:700 11px Inter;padding:2px 6px;border-radius:4px;background:rgba(200,255,46,0.14);color:#C8FF2E">16.6:1 AAA</span></div>
+        <span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">accent · #C8FF2E</span>
+        <span style="font:400 12px/1.4 Inter;color:#7C7C82">Số rep, nút chính, tiến độ</span>
+      </div>
+    </div>
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:112px;background:#3DDC97;padding:12px 14px;display:flex;align-items:flex-end;justify-content:space-between;color:#0B0B0C"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg><span style="font:600 12px Inter">11.1:1 chữ đen</span></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 14px Inter">Xanh ngọc</span><span style="font:700 11px Inter;padding:2px 6px;border-radius:4px;background:rgba(61,220,151,0.14);color:#3DDC97">11.1:1 AAA</span></div>
+        <span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">success · #3DDC97</span>
+        <span style="font:400 12px/1.4 Inter;color:#7C7C82">Sẵn sàng, đạt mục tiêu</span>
+      </div>
+    </div>
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:112px;background:#FF8A3D;padding:12px 14px;display:flex;align-items:flex-end;justify-content:space-between;color:#0B0B0C"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span style="font:600 12px Inter">8.4:1 chữ đen</span></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 14px Inter">Cam</span><span style="font:700 11px Inter;padding:2px 6px;border-radius:4px;background:rgba(255,138,61,0.14);color:#FF8A3D">8.4:1 AAA</span></div>
+        <span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">warning · #FF8A3D</span>
+        <span style="font:400 12px/1.4 Inter;color:#7C7C82">Cảnh báo tư thế</span>
+      </div>
+    </div>
+    <div style="border-radius:16px;border:1px solid rgba(255,255,255,0.08);overflow:hidden;background:#161618">
+      <div style="height:112px;background:#FF5A5F;padding:12px 14px;display:flex;align-items:flex-end;justify-content:space-between;color:#0B0B0C"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg><span style="font:600 12px Inter">6.4:1 chữ đen</span></div>
+      <div style="padding:12px 14px;display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 14px Inter">San hô</span><span style="font:700 11px Inter;padding:2px 6px;border-radius:4px;background:rgba(255,90,95,0.14);color:#FF5A5F">6.4:1 AA</span></div>
+        <span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">danger · #FF5A5F</span>
+        <span style="font:400 12px/1.4 Inter;color:#7C7C82">Lỗi, xóa dữ liệu</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="font:600 12px Inter,sans-serif;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px">Chữ</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px">
+    <div style="padding:16px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 16px Inter;color:#F4F4F0">Chữ chính</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">text · #F4F4F0</span></div><span style="font:700 11px Inter;padding:2px 6px;border-radius:4px;background:#202023;color:#F4F4F0">17.8:1 AAA</span></div>
+    <div style="padding:16px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 16px Inter;color:#A1A1A6">Chữ phụ</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">text-2 · #A1A1A6</span></div><span style="font:700 11px Inter;padding:2px 6px;border-radius:4px;background:#202023;color:#F4F4F0">7.6:1 AAA</span></div>
+    <div style="padding:16px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;justify-content:space-between;align-items:center;gap:12px"><div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 16px Inter;color:#7C7C82">Chữ mờ</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">text-3 · #7C7C82</span></div><span style="font:700 11px Inter;padding:2px 6px;border-radius:4px;background:#202023;color:#F4F4F0">4.7:1 AA</span></div>
+  </div>
+</section>
+
+<!-- 02 TYPE -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">02</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Thang chữ</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6;max-width:520px;text-wrap:pretty">Barlow Condensed 800 cho số, luôn tabular-nums. Inter cho giao diện, đủ dấu tiếng Việt.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:end;padding:24px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">Hero · Số rep</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Barlow Condensed 800 · 160–220pt · lh .85 · tnum</span></div>
+    <div style="font:800 200px/0.85 'Barlow Condensed',sans-serif;color:#C8FF2E;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">128</div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">64 · Chỉ số</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Barlow Condensed 800 · lh 1.0 · tnum</span></div>
+    <div style="font:800 64px/1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums">3 × 25 rep</div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">40 · Tiêu đề lớn</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Barlow Condensed 700 · UPPERCASE · lh 1.0</span></div>
+    <div style="font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Buổi tập hoàn thành</div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">28 · Tiêu đề</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Inter 700 · lh 1.2 · -0.01em</span></div>
+    <div style="font:700 28px/1.2 Inter;letter-spacing:-0.01em">Tiến độ tuần này</div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">20 · Tiêu đề nhỏ</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Inter 600 · lh 1.3</span></div>
+    <div style="font:600 20px/1.3 Inter">Dựng điện thoại trước mặt</div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">16 · Nội dung</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Inter 400 · lh 1.5</span></div>
+    <div style="font:400 16px/1.5 Inter;color:#F4F4F0;text-wrap:pretty">Giữ lưng thẳng từ vai đến gót chân. Hạ ngực đến khi khuỷu tay gập khoảng 90°, rồi đẩy lên dứt khoát.</div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:baseline;padding:20px 0;border-bottom:1px solid rgba(255,255,255,0.08)">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">14 · Nội dung nhỏ</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Inter 500 · lh 1.45</span></div>
+    <div style="font:500 14px/1.45 Inter;color:#A1A1A6">Nhịp trung bình 1,8 giây mỗi rep · tốt hơn tuần trước</div>
+  </div>
+  <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:24px;align-items:baseline;padding:20px 0">
+    <div style="display:flex;flex-direction:column;gap:6px"><span style="font:600 14px Inter">12 · Chú thích</span><span style="font:400 12px ui-monospace,Menlo,monospace;color:#7C7C82">Inter 600 · UPPERCASE · +0.06em</span></div>
+    <div style="font:600 12px/1.4 Inter;letter-spacing:0.06em;text-transform:uppercase;color:#7C7C82">Thứ Năm, 24 tháng 9</div>
+  </div>
+</section>
+
+<!-- 03 FOUNDATIONS -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">03</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Khoảng cách, bo góc, chuyển động</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px">
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:14px">
+      <span style="font:600 14px Inter">Lưới 4pt</span>
+      <div style="display:flex;align-items:center;gap:12px"><div style="width:4px;height:16px;background:#C8FF2E;border-radius:1px"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">space-1 · 4</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><div style="width:8px;height:16px;background:#C8FF2E;border-radius:1px"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">space-2 · 8</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><div style="width:12px;height:16px;background:#C8FF2E;border-radius:1px"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">space-3 · 12</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><div style="width:16px;height:16px;background:#C8FF2E;border-radius:1px"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">space-4 · 16</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><div style="width:24px;height:16px;background:#C8FF2E;border-radius:1px"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">space-6 · 24</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><div style="width:32px;height:16px;background:#C8FF2E;border-radius:1px"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">space-8 · 32</span></div>
+      <div style="display:flex;align-items:center;gap:12px"><div style="width:48px;height:16px;background:#C8FF2E;border-radius:1px"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">space-12 · 48 · vùng chạm tối thiểu</span></div>
+    </div>
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:14px">
+      <span style="font:600 14px Inter">Bo góc</span>
+      <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px">
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="height:64px;border-radius:8px;background:#202023;border:1px solid rgba(255,255,255,0.08)"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">8 · chip, badge nhỏ</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="height:64px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.08)"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">16 · card, toast</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="height:64px;border-radius:28px 28px 0 0;background:#202023;border:1px solid rgba(255,255,255,0.08)"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">28 · bottom sheet</span></div>
+        <div style="display:flex;flex-direction:column;gap:8px"><div style="height:56px;border-radius:999px;background:#C8FF2E"></div><span style="font:400 12px ui-monospace,Menlo,monospace;color:#A1A1A6">pill · nút cao 56</span></div>
+      </div>
+    </div>
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 14px Inter">Chuyển động</span>
+      <div style="display:flex;flex-direction:column;gap:8px;font:400 12px/1.5 ui-monospace,Menlo,monospace;color:#A1A1A6">
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>rep-pulse</span><span style="color:#F4F4F0">scale 1 → 1.08 → 1 · 240ms</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>spring-fast</span><span style="color:#F4F4F0">stiffness 500 · damping 30</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>sheet</span><span style="color:#F4F4F0">spring 380 / 36 · ~320ms</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>fade</span><span style="color:#F4F4F0">160ms ease-out</span></div>
+        <div style="display:flex;justify-content:space-between;gap:12px"><span>easing CSS</span><span style="color:#F4F4F0">cubic-bezier(.34,1.56,.64,1)</span></div>
+      </div>
+      <p style="margin:4px 0 0;font:400 12px/1.5 Inter;color:#7C7C82;text-wrap:pretty">Tôn trọng Giảm chuyển động: tắt pulse, giữ đổi số tức thì và rung nhẹ (haptic).</p>
+    </div>
+  </div>
+</section>
+
+<!-- 04 BUTTONS -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">04</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Nút</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6">Pill cao 56 (mặc định) và 48 (nhỏ). Nhấn: scale .97.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px">
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Primary</span>
+      <button style="height:56px;border:none;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:transform 120ms" style-hover="background:#D6FF5C" style-active="transform:scale(0.97)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>Bắt đầu tập</button>
+      <button style="height:48px;border:none;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 14px Inter;cursor:pointer" style-active="transform:scale(0.97)">Lưu buổi tập</button>
+      <button disabled="" style="height:56px;border:none;border-radius:999px;background:#202023;color:#7C7C82;font:700 16px Inter;cursor:not-allowed">Đang hiệu chỉnh…</button>
+    </div>
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Secondary</span>
+      <button style="height:56px;border:1px solid rgba(255,255,255,0.12);border-radius:999px;background:#202023;color:#F4F4F0;font:600 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:#2A2A2E" style-active="transform:scale(0.97)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Kiểm tra camera</button>
+      <button style="height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:999px;background:#202023;color:#F4F4F0;font:600 14px Inter;cursor:pointer" style-active="transform:scale(0.97)">Xem lịch sử</button>
+    </div>
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Ghost</span>
+      <button style="height:56px;border:none;border-radius:999px;background:transparent;color:#F4F4F0;font:600 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:rgba(255,255,255,0.06)" style-active="transform:scale(0.97)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>Đếm lại từ đầu</button>
+      <button style="height:48px;border:none;border-radius:999px;background:transparent;color:#C8FF2E;font:600 14px Inter;display:flex;align-items:center;justify-content:center;gap:4px;cursor:pointer" style-hover="background:rgba(200,255,46,0.08)">Xem hướng dẫn<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg></button>
+    </div>
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Destructive</span>
+      <button style="height:56px;border:1px solid rgba(255,90,95,0.32);border-radius:999px;background:rgba(255,90,95,0.12);color:#FF5A5F;font:600 16px Inter;display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer" style-hover="background:rgba(255,90,95,0.2)" style-active="transform:scale(0.97)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>Xóa buổi tập</button>
+      <button style="height:56px;border:none;border-radius:999px;background:#FF5A5F;color:#0B0B0C;font:700 16px Inter;cursor:pointer" style-active="transform:scale(0.97)">Xóa toàn bộ dữ liệu</button>
+    </div>
+  </div>
+</section>
+
+<!-- 05 STEPPER + CHIPS -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">05</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Stepper & chip gợi ý</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6">Tương tác thật: đổi mục tiêu ở đây, vòng tiến độ bên dưới cập nhật theo.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px">
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Mục tiêu buổi tập</span><span style="font:400 14px Inter;color:#A1A1A6">Giữ để tăng nhanh · bước 1</span></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px">
+        <button onClick="{{ dec }}" aria-label="Giảm" style="width:56px;height:56px;flex:none;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:#202023;color:#F4F4F0;display:flex;align-items:center;justify-content:center;cursor:pointer" style-hover="background:#2A2A2E" style-active="transform:scale(0.94)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path></svg></button>
+        <div style="display:flex;align-items:baseline;gap:8px"><span style="font:800 88px/0.9 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums;min-width:2.2ch;text-align:center">{{ target }}</span><span style="font:600 16px Inter;color:#A1A1A6">rep</span></div>
+        <button onClick="{{ inc }}" aria-label="Tăng" style="width:56px;height:56px;flex:none;border-radius:999px;border:none;background:#C8FF2E;color:#0B0B0C;display:flex;align-items:center;justify-content:center;cursor:pointer" style-active="transform:scale(0.94)"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></button>
+      </div>
+    </div>
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:20px">
+      <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Chip gợi ý</span><span style="font:400 14px Inter;color:#A1A1A6">Cao 40, vùng chạm mở rộng 48</span></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <sc-for list="{{ chips }}" as="c" hint-placeholder-count="5">
+          <button onClick="{{ c.pick }}" style="height:40px;padding:0 16px;border-radius:999px;border:1px solid {{ c.border }};background:{{ c.bg }};color:{{ c.fg }};font:600 14px Inter;display:flex;align-items:center;gap:6px;cursor:pointer;font-variant-numeric:tabular-nums">{{ c.label }}</button>
+        </sc-for>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="height:40px;padding:0 14px 0 12px;border-radius:999px;background:#202023;border:1px solid rgba(255,255,255,0.08);color:#F4F4F0;font:500 14px Inter;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#C8FF2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>Thử 22 rep, hơn lần trước 2</span>
+        <span style="height:40px;padding:0 14px 0 12px;border-radius:999px;background:#202023;border:1px solid rgba(255,255,255,0.08);color:#F4F4F0;font:500 14px Inter;display:flex;align-items:center;gap:6px"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A1A1A6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M12 16v-4"></path><path d="M12 8h.01"></path></svg>Nghỉ 60 giây giữa hiệp</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 06 PROGRESS + MOTION -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">06</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Số rep & tiến độ</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6">Bấm “+1 rep” để xem nhịp đập của số đếm.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px">
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;align-items:center;gap:20px">
+      <div style="align-self:stretch;display:flex;justify-content:space-between;align-items:center">
+        <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Bộ đếm hero</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;background:rgba(200,255,46,0.12);color:#C8FF2E;font:600 12px Inter"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>Đang đếm</span>
+      </div>
+      <div style="height:190px;display:flex;align-items:center;justify-content:center">{{ repHero }}</div>
+      <span style="font:500 14px Inter;color:#A1A1A6;font-variant-numeric:tabular-nums">trên mục tiêu {{ target }} rep</span>
+      <div style="align-self:stretch;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+        <button onClick="{{ reset }}" style="height:48px;border:1px solid rgba(255,255,255,0.12);border-radius:999px;background:#202023;color:#F4F4F0;font:600 14px Inter;cursor:pointer" style-active="transform:scale(0.97)">Đặt lại</button>
+        <button onClick="{{ addRep }}" style="height:48px;border:none;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 14px Inter;cursor:pointer" style-active="transform:scale(0.97)">+1 rep</button>
+      </div>
+    </div>
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:24px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Progress ring</span>
+      <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap">
+        <div style="position:relative;width:132px;height:132px;flex:none">
+          <svg width="132" height="132" viewBox="0 0 132 132" style="transform:rotate(-90deg)"><circle cx="66" cy="66" r="56" fill="none" stroke="#202023" stroke-width="12"></circle><circle cx="66" cy="66" r="56" fill="none" stroke="{{ ringColor }}" stroke-width="12" stroke-linecap="round" stroke-dasharray="{{ ringC }}" stroke-dashoffset="{{ ringOffset }}" style="transition:stroke-dashoffset 320ms cubic-bezier(.34,1.3,.64,1)"></circle></svg>
+          <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center"><span style="font:800 40px/1 'Barlow Condensed';font-variant-numeric:tabular-nums">{{ pctLabel }}</span><span style="font:500 12px Inter;color:#A1A1A6">hoàn thành</span></div>
+        </div>
+        <div style="display:flex;gap:16px;align-items:center">
+          <div style="position:relative;width:64px;height:64px"><svg width="64" height="64" viewBox="0 0 64 64" style="transform:rotate(-90deg)"><circle cx="32" cy="32" r="27" fill="none" stroke="#202023" stroke-width="6"></circle><circle cx="32" cy="32" r="27" fill="none" stroke="#C8FF2E" stroke-width="6" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="67.8"></circle></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:800 20px 'Barlow Condensed'">3/5</div></div>
+          <div style="position:relative;width:64px;height:64px"><svg width="64" height="64" viewBox="0 0 64 64" style="transform:rotate(-90deg)"><circle cx="32" cy="32" r="27" fill="none" stroke="#202023" stroke-width="6"></circle><circle cx="32" cy="32" r="27" fill="none" stroke="#3DDC97" stroke-width="6" stroke-linecap="round" stroke-dasharray="169.6" stroke-dashoffset="0"></circle></svg><div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#3DDC97"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div></div>
+        </div>
+      </div>
+      <p style="margin:0;font:400 12px/1.5 Inter;color:#7C7C82;text-wrap:pretty">Đạt 100%: vòng chuyển xanh ngọc kèm dấu tích và chữ “Đạt mục tiêu”.</p>
+    </div>
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:24px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Progress bar</span>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;font:500 14px Inter"><span>Buổi tập hiện tại</span><span style="font-variant-numeric:tabular-nums;color:#A1A1A6">{{ reps }} / {{ target }}</span></div>
+        <div style="height:8px;border-radius:999px;background:#202023;overflow:hidden"><div style="height:100%;width:{{ barPct }};background:{{ ringColor }};border-radius:999px;transition:width 320ms cubic-bezier(.34,1.3,.64,1)"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;font:500 14px Inter"><span>Mục tiêu tuần</span><span style="font-variant-numeric:tabular-nums;color:#A1A1A6">3 / 5 buổi</span></div>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:4px"><div style="height:8px;border-radius:999px;background:#C8FF2E"></div><div style="height:8px;border-radius:999px;background:#C8FF2E"></div><div style="height:8px;border-radius:999px;background:#C8FF2E"></div><div style="height:8px;border-radius:999px;background:#202023"></div><div style="height:8px;border-radius:999px;background:#202023"></div></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;font:500 14px Inter"><span>Hiệu chỉnh tư thế</span><span style="color:#A1A1A6">Đang dò khung xương…</span></div>
+        <div style="height:4px;border-radius:999px;background:#202023;overflow:hidden"><div style="height:100%;width:62%;background:#F4F4F0;border-radius:999px"></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 07 BADGES + PRIVACY -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">07</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Badge trạng thái & quyền riêng tư</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px">
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Badge · icon + chữ bắt buộc</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:8px;background:rgba(61,220,151,0.12);color:#3DDC97;font:600 14px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>Sẵn sàng</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:8px;background:rgba(200,255,46,0.12);color:#C8FF2E;font:600 14px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"></path></svg>Đang đếm</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:8px;background:rgba(255,138,61,0.12);color:#FF8A3D;font:600 14px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>Hông bị võng</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:8px;background:rgba(255,90,95,0.12);color:#FF5A5F;font:600 14px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>Ra khỏi khung hình</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:8px;background:#202023;color:#A1A1A6;font:600 14px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M10 15V9"></path><path d="M14 15V9"></path></svg>Tạm dừng</span>
+      </div>
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em;margin-top:8px">Trên camera · nền mờ</span>
+      <div style="position:relative;height:120px;border-radius:12px;overflow:hidden;background:repeating-linear-gradient(135deg,#1a1a1c 0 10px,#151517 10px 20px);display:flex;align-items:flex-start;justify-content:center;padding-top:16px">
+        <span style="position:absolute;bottom:10px;left:12px;font:400 11px ui-monospace,Menlo,monospace;color:#7C7C82">khung camera trực tiếp</span>
+        <span style="display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px 0 12px;border-radius:999px;background:rgba(11,11,12,0.72);backdrop-filter:blur(12px);border:1px solid rgba(255,138,61,0.4);color:#FF8A3D;font:600 14px Inter"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>Hạ thấp hơn, chưa đủ sâu</span>
+      </div>
+    </div>
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Privacy badge</span>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:center">
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;background:rgba(61,220,151,0.10);border:1px solid rgba(61,220,151,0.28);color:#3DDC97;font:600 13px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Xử lý trên máy</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;background:rgba(11,11,12,0.72);border:1px solid rgba(255,255,255,0.12);color:#F4F4F0;font:600 13px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Xử lý trên máy</span>
+      </div>
+      <div style="display:flex;gap:14px;padding:16px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.08)">
+        <div style="width:48px;height:48px;flex:none;border-radius:999px;background:rgba(61,220,151,0.12);color:#3DDC97;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
+        <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 16px Inter">Xử lý trên máy</span><span style="font:400 14px/1.45 Inter;color:#A1A1A6;text-wrap:pretty">Hình ảnh camera không rời khỏi điện thoại. AI chỉ nhận số liệu tổng hợp sau buổi tập, và bạn có thể tắt.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 CARDS -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">08</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Card</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6">Surface #161618, bo 16, padding 20, viền 1px. Không đổ bóng trên nền tối.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Hôm nay</span><span style="display:inline-flex;align-items:center;gap:4px;font:600 13px Inter;color:#3DDC97"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"></polyline><polyline points="16 7 22 7 22 13"></polyline></svg>+12%</span></div>
+      <div style="display:flex;align-items:baseline;gap:8px"><span style="font:800 64px/0.9 'Barlow Condensed';color:#C8FF2E;font-variant-numeric:tabular-nums">48</span><span style="font:600 16px Inter;color:#A1A1A6">rep</span></div>
+      <div style="display:flex;align-items:flex-end;gap:6px;height:48px">
+        <div style="flex:1;height:40%;border-radius:3px;background:#202023"></div><div style="flex:1;height:55%;border-radius:3px;background:#202023"></div><div style="flex:1;height:35%;border-radius:3px;background:#202023"></div><div style="flex:1;height:70%;border-radius:3px;background:#202023"></div><div style="flex:1;height:60%;border-radius:3px;background:#202023"></div><div style="flex:1;height:80%;border-radius:3px;background:#202023"></div><div style="flex:1;height:100%;border-radius:3px;background:#C8FF2E"></div>
+      </div>
+      <span style="font:400 13px Inter;color:#A1A1A6">So với trung bình 7 ngày</span>
+    </div>
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px;cursor:pointer" style-hover="background:#1B1B1E">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px">
+        <div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 16px Inter">Hít đất · Buổi sáng</span><span style="font:400 13px Inter;color:#A1A1A6">Thứ Năm, 24/9 · 06:42</span></div>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C7C82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"></path></svg>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.08)">
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font:800 28px/1 'Barlow Condensed';font-variant-numeric:tabular-nums">75</span><span style="font:500 12px Inter;color:#7C7C82">Tổng rep</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font:800 28px/1 'Barlow Condensed';font-variant-numeric:tabular-nums">3</span><span style="font:500 12px Inter;color:#7C7C82">Hiệp</span></div>
+        <div style="display:flex;flex-direction:column;gap:2px"><span style="font:800 28px/1 'Barlow Condensed';font-variant-numeric:tabular-nums">94%</span><span style="font:500 12px Inter;color:#7C7C82">Đúng tư thế</span></div>
+      </div>
+    </div>
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Kỷ lục · Hít đất</span>
+      <div style="display:flex;justify-content:space-between;align-items:center;height:48px;border-bottom:1px solid rgba(255,255,255,0.08)"><span style="font:500 14px Inter;color:#A1A1A6">Một hiệp</span><span style="font:800 28px 'Barlow Condensed';font-variant-numeric:tabular-nums">42</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;height:48px;border-bottom:1px solid rgba(255,255,255,0.08)"><span style="font:500 14px Inter;color:#A1A1A6">Một ngày</span><span style="font:800 28px 'Barlow Condensed';font-variant-numeric:tabular-nums">120</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;height:48px"><span style="font:500 14px Inter;color:#A1A1A6">Chuỗi ngày tập</span><span style="font:800 28px 'Barlow Condensed';font-variant-numeric:tabular-nums">9</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 TOAST + SHEET + EMPTY -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">09</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Toast, bottom sheet, empty state</h2>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start">
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Toast · tự ẩn sau 2,6 giây</span>
+      <div style="display:flex;align-items:center;gap:12px;min-height:56px;padding:12px 16px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg><span style="font:500 14px Inter;flex:1">Đã lưu buổi tập · 75 rep</span></div>
+      <div style="display:flex;align-items:center;gap:12px;min-height:56px;padding:12px 16px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF8A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span style="font:500 14px Inter;flex:1">Ánh sáng yếu, độ chính xác có thể giảm</span></div>
+      <div style="display:flex;align-items:center;gap:12px;min-height:56px;padding:12px 8px 12px 16px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.08)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF5A5F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg><span style="font:500 14px Inter;flex:1">Không mở được camera</span><button style="height:40px;padding:0 12px;border:none;border-radius:999px;background:transparent;color:#C8FF2E;font:600 14px Inter;cursor:pointer">Cấp quyền</button></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+        <button onClick="{{ toastOk }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#F4F4F0;font:600 13px Inter;cursor:pointer">Thử: thành công</button>
+        <button onClick="{{ toastWarn }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#F4F4F0;font:600 13px Inter;cursor:pointer">Thử: cảnh báo</button>
+        <button onClick="{{ toastErr }}" style="height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#F4F4F0;font:600 13px Inter;cursor:pointer">Thử: lỗi</button>
+      </div>
+    </div>
+
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Bottom sheet · bo 28</span><button onClick="{{ toggleSheet }}" style="height:36px;padding:0 12px;border-radius:999px;border:1px solid rgba(255,255,255,0.12);background:transparent;color:#F4F4F0;font:600 13px Inter;cursor:pointer">{{ sheetBtn }}</button></div>
+      <div style="position:relative;height:520px;border-radius:24px;overflow:hidden;background:repeating-linear-gradient(135deg,#131315 0 10px,#0F0F11 10px 20px);border:1px solid rgba(255,255,255,0.08)">
+        <span style="position:absolute;top:16px;left:16px;font:400 11px ui-monospace,Menlo,monospace;color:#7C7C82">màn hình tập</span>
+        <div onClick="{{ toggleSheet }}" style="position:absolute;inset:0;background:rgba(0,0,0,0.55);opacity:{{ scrimOpacity }};pointer-events:{{ scrimEvents }};transition:opacity 200ms"></div>
+        <div style="position:absolute;left:0;right:0;bottom:0;transform:translateY({{ sheetY }});transition:transform 320ms cubic-bezier(.32,1.2,.5,1);background:#161618;border-top:1px solid rgba(255,255,255,0.08);border-radius:28px 28px 0 0;padding:8px 20px 24px;display:flex;flex-direction:column;gap:20px">
+          <div style="align-self:center;width:36px;height:5px;border-radius:999px;background:rgba(255,255,255,0.2)"></div>
+          <div style="display:flex;flex-direction:column;gap:6px"><span style="font:700 20px/1.3 Inter">Kết thúc buổi tập?</span><span style="font:400 14px/1.45 Inter;color:#A1A1A6">Bạn đã hoàn thành 2 trên 3 hiệp.</span></div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+            <div style="padding:14px;border-radius:16px;background:#202023;display:flex;flex-direction:column;gap:2px"><span style="font:800 40px/1 'Barlow Condensed';color:#C8FF2E;font-variant-numeric:tabular-nums">50</span><span style="font:500 12px Inter;color:#A1A1A6">Rep</span></div>
+            <div style="padding:14px;border-radius:16px;background:#202023;display:flex;flex-direction:column;gap:2px"><span style="font:800 40px/1 'Barlow Condensed';font-variant-numeric:tabular-nums">04:12</span><span style="font:500 12px Inter;color:#A1A1A6">Thời gian</span></div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button onClick="{{ toggleSheet }}" style="height:56px;border:none;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 16px Inter;cursor:pointer" style-active="transform:scale(0.97)">Lưu và kết thúc</button>
+            <button onClick="{{ toggleSheet }}" style="height:48px;border:none;border-radius:999px;background:transparent;color:#F4F4F0;font:600 16px Inter;cursor:pointer">Tập tiếp</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:24px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Empty state</span>
+      <div style="padding:48px 24px 32px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:16px">
+        <div style="width:72px;height:72px;border-radius:999px;background:#202023;border:1px solid rgba(255,255,255,0.08);color:#C8FF2E;display:flex;align-items:center;justify-content:center"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="4" rx="2"></rect><path d="M16 2v4"></path><path d="M8 2v4"></path><path d="M3 10h18"></path></svg></div>
+        <div style="display:flex;flex-direction:column;gap:8px;max-width:280px"><span style="font:700 20px/1.3 Inter">Chưa có buổi tập nào</span><span style="font:400 14px/1.5 Inter;color:#A1A1A6;text-wrap:pretty">Chọn một bài tập, dựng điện thoại dọc trước mặt rồi bắt đầu buổi đầu tiên.</span></div>
+        <button style="height:56px;padding:0 28px;border:none;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 16px Inter;display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:8px" style-active="transform:scale(0.97)"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 3 20 12 6 21 6 3"></polygon></svg>Bắt đầu tập</button>
+        <span style="display:inline-flex;align-items:center;gap:6px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Xử lý trên máy · không cần tài khoản</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 EXERCISES -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">10</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Bài tập</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6;max-width:560px;text-wrap:pretty">Mỗi bài có icon dáng người (nét 2.5, cùng ngôn ngữ skeleton), trạng thái và góc camera khuyến nghị. Bài “Sắp ra mắt” vẫn hiện để người dùng biết lộ trình.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:16px;align-items:start">
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Exercise card</span>
+      <div style="display:flex;align-items:center;gap:14px;min-height:80px;padding:12px 14px 12px 12px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);cursor:pointer" style-hover="background:#1B1B1E">
+  <div style="width:56px;height:56px;flex:none;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 48 48" fill="none" stroke="#C8FF2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="3.5"></circle><path d="M13 23 L41 31 M16 24 L16 35 M41 31 L44 35"></path></svg></div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font:600 16px Inter;color:#F4F4F0">Hít đất</span><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:rgba(61,220,151,0.12);color:#3DDC97;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>Có sẵn</span></div><span style="display:flex;align-items:center;gap:6px;font:500 13px Inter;color:#A1A1A6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Trước mặt · máy dọc · 1–1,5 m</span></div>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C7C82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m9 18 6-6-6-6"></path></svg></div>
+      <div style="display:flex;align-items:center;gap:14px;min-height:80px;padding:12px 14px 12px 12px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);cursor:pointer" style-hover="background:#1B1B1E">
+  <div style="width:56px;height:56px;flex:none;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 48 48" fill="none" stroke="#7C7C82" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="8" r="3.5"></circle><path d="M24 12 L21 25 L32 27 L30 39 M23 16 L36 17"></path></svg></div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font:600 16px Inter;color:#A1A1A6">Squat</span><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:#202023;color:#A1A1A6;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Sắp ra mắt</span></div><span style="display:flex;align-items:center;gap:6px;font:500 13px Inter;color:#A1A1A6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Trước mặt · máy dọc · 2 m</span></div>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C7C82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m9 18 6-6-6-6"></path></svg></div>
+      <div style="display:flex;align-items:center;gap:14px;min-height:80px;padding:12px 14px 12px 12px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);cursor:pointer" style-hover="background:#1B1B1E">
+  <div style="width:56px;height:56px;flex:none;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center"><svg width="34" height="34" viewBox="0 0 48 48" fill="none" stroke="#7C7C82" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="20" r="3.5"></circle><path d="M15 23 L24 34 L32 24 L40 34"></path></svg></div>
+  <div style="flex:1;display:flex;flex-direction:column;gap:6px;min-width:0"><div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span style="font:600 16px Inter;color:#A1A1A6">Gập bụng</span><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:#202023;color:#A1A1A6;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Sắp ra mắt</span></div><span style="display:flex;align-items:center;gap:6px;font:500 13px Inter;color:#A1A1A6"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Bên hông · máy ngang · 1,5 m</span></div>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C7C82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="m9 18 6-6-6-6"></path></svg></div>
+      <span style="font:400 12px/1.5 Inter;color:#7C7C82">Cao tối thiểu 80, cả card là vùng chạm. Chữ và icon bài “Sắp ra mắt” chuyển sang text-2 / text-3, không giảm opacity cả card.</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <span style="font:600 12px Inter;color:#7C7C82;text-transform:uppercase;letter-spacing:0.06em">Exercise picker · lưới 2 cột</span>
+      <div style="padding:20px;border-radius:28px;background:#0B0B0C;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px;max-width:393px">
+        <div style="display:flex;flex-direction:column;gap:4px"><span style="font:700 28px/1.2 Inter;letter-spacing:-0.01em">Chọn bài tập</span><span style="font:400 14px Inter;color:#A1A1A6">1 bài có sẵn · 5 bài sắp ra mắt</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div style="position:relative;padding:14px;border-radius:16px;background:rgba(200,255,46,0.06);border:2px solid #C8FF2E;display:flex;flex-direction:column;gap:10px;min-height:156px;cursor:pointer">
+  <div style="position:absolute;top:10px;right:10px;width:24px;height:24px;border-radius:999px;background:#C8FF2E;color:#0B0B0C;display:flex;align-items:center;justify-content:center"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg></div>
+  <div style="width:52px;height:52px;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center;opacity:1"><svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#C8FF2E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="3.5"></circle><path d="M13 23 L41 31 M16 24 L16 35 M41 31 L44 35"></path></svg></div>
+  <div style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font:600 16px Inter;color:#F4F4F0">Hít đất</span><span style="display:flex;align-items:center;gap:5px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Trước mặt · 1–1,5 m</span></div>
+  
+</div>
+          <div style="position:relative;padding:14px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:10px;min-height:156px;cursor:default">
+  
+  <div style="width:52px;height:52px;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center;opacity:0.6"><svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#A1A1A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="8" r="3.5"></circle><path d="M24 12 L21 25 L32 27 L30 39 M23 16 L36 17"></path></svg></div>
+  <div style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font:600 16px Inter;color:#A1A1A6">Squat</span><span style="display:flex;align-items:center;gap:5px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Trước mặt · 2 m</span></div>
+  <div><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:#202023;color:#A1A1A6;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Sắp ra mắt</span></div>
+</div>
+          <div style="position:relative;padding:14px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:10px;min-height:156px;cursor:default">
+  
+  <div style="width:52px;height:52px;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center;opacity:0.6"><svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#A1A1A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="20" r="3.5"></circle><path d="M15 23 L24 34 L32 24 L40 34"></path></svg></div>
+  <div style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font:600 16px Inter;color:#A1A1A6">Gập bụng</span><span style="display:flex;align-items:center;gap:5px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Bên hông · 1,5 m</span></div>
+  <div><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:#202023;color:#A1A1A6;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Sắp ra mắt</span></div>
+</div>
+          <div style="position:relative;padding:14px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:10px;min-height:156px;cursor:default">
+  
+  <div style="width:52px;height:52px;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center;opacity:0.6"><svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#A1A1A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="22" cy="8" r="3.5"></circle><path d="M22 12 L22 28 L18 42 M22 28 L26 42 M22 15 L29 22 L31 14 M28 12 L34 12"></path></svg></div>
+  <div style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font:600 16px Inter;color:#A1A1A6">Curl tạ</span><span style="display:flex;align-items:center;gap:5px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Trước mặt · 1,5 m</span></div>
+  <div><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:#202023;color:#A1A1A6;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Sắp ra mắt</span></div>
+</div>
+          <div style="position:relative;padding:14px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:10px;min-height:156px;cursor:default">
+  
+  <div style="width:52px;height:52px;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center;opacity:0.6"><svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#A1A1A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="8" r="3.5"></circle><path d="M24 12 L24 28 M24 15 L14 6 M24 15 L34 6 M24 28 L15 42 M24 28 L33 42"></path></svg></div>
+  <div style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font:600 16px Inter;color:#A1A1A6">Jumping jack</span><span style="display:flex;align-items:center;gap:5px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Trước mặt · 2,5 m</span></div>
+  <div><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:#202023;color:#A1A1A6;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Sắp ra mắt</span></div>
+</div>
+          <div style="position:relative;padding:14px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:10px;min-height:156px;cursor:default">
+  
+  <div style="width:52px;height:52px;border-radius:14px;background:#202023;display:flex;align-items:center;justify-content:center;opacity:0.6"><svg width="32" height="32" viewBox="0 0 48 48" fill="none" stroke="#A1A1A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="24" cy="8" r="3.5"></circle><path d="M24 12 L24 27 L14 32 L14 42 M24 27 L34 36 L40 42"></path></svg></div>
+  <div style="display:flex;flex-direction:column;gap:4px;flex:1"><span style="font:600 16px Inter;color:#A1A1A6">Chùng chân</span><span style="display:flex;align-items:center;gap:5px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"></path><circle cx="12" cy="13" r="3"></circle></svg>Bên hông · 2 m</span></div>
+  <div><span style="display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px 0 6px;border-radius:6px;background:#202023;color:#A1A1A6;font:600 12px Inter;white-space:nowrap"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>Sắp ra mắt</span></div>
+</div>
+        </div>
+        <button style="height:56px;border:none;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 16px Inter;cursor:pointer" style-active="transform:scale(0.97)">Tiếp tục với Hít đất</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 11 AI FEEDBACK -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">11</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">AI nhận xét</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6;max-width:560px;text-wrap:pretty">Hiện ở màn kết quả ngay sau buổi tập. Chỉ số liệu tổng hợp được gửi đi; card luôn ghi rõ điều đó ở chân.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start">
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8FF2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg><span style="font:600 14px Inter;flex:1">AI nhận xét</span><span style="font:500 12px Inter;color:#7C7C82">Hít đất · 75 rep</span></div>
+      <p style="margin:0;font:400 16px/1.5 Inter;text-wrap:pretty">Buổi tốt nhất tuần này. Nhịp đều ở hai hiệp đầu, hiệp 3 chậm dần từ rep 18.</p>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg><span style="font:500 14px/1.45 Inter"><span style="color:#3DDC97">Tốt:</span> 94% số rep đạt độ sâu chuẩn.</span></div>
+        <div style="display:flex;gap:10px;align-items:flex-start"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none;margin-top:2px"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span style="font:500 14px/1.45 Inter"><span style="color:#FF8A3D">Cần chỉnh:</span> hông hơi võng cuối hiệp 3. Thử nghỉ 90 giây thay vì 60.</span></div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;border-radius:12px;background:rgba(200,255,46,0.08);border:1px solid rgba(200,255,46,0.24)"><span style="font:500 14px Inter;color:#A1A1A6">Lần tới</span><span style="font:800 24px/1 'Barlow Condensed';color:#C8FF2E;font-variant-numeric:tabular-nums">3 × 26 rep</span></div>
+      <span style="display:flex;align-items:center;gap:6px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Nhận xét từ số liệu tổng hợp · video không rời máy</span>
+    </div>
+    <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#C8FF2E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg><span style="font:600 14px Inter;flex:1">AI nhận xét</span><span style="font:500 12px Inter;color:#7C7C82">Đang tải</span></div>
+      <div style="display:flex;flex-direction:column;gap:10px"><div style="height:12px;width:92%;border-radius:6px;background:#202023"></div><div style="height:12px;width:78%;border-radius:6px;background:#202023"></div><div style="height:12px;width:60%;border-radius:6px;background:#202023"></div></div>
+      <span style="font:500 14px Inter;color:#A1A1A6">AI đang đọc số liệu buổi tập…</span>
+      <span style="display:flex;align-items:center;gap:6px;font:500 12px Inter;color:#7C7C82"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Chỉ gửi số liệu tổng hợp</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px">
+      <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C7C82" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"></path></svg><span style="font:600 14px Inter;color:#A1A1A6">AI nhận xét đang tắt</span></div>
+        <span style="font:400 14px/1.45 Inter;color:#A1A1A6">Số liệu buổi tập chỉ lưu trên máy.</span>
+        <button style="align-self:flex-start;height:40px;padding:0 4px;border:none;background:transparent;color:#C8FF2E;font:600 14px Inter;cursor:pointer">Bật trong Cài đặt</button>
+      </div>
+      <div style="padding:20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:12px">
+        <div style="display:flex;align-items:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#FF8A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex:none"><path d="M12 20h.01"></path><path d="M8.5 16.429a5 5 0 0 1 7 0"></path><path d="M5 12.859a10 10 0 0 1 5.17-2.69"></path><path d="M19 12.859a10 10 0 0 0-2.007-1.523"></path><path d="M2 8.82a15 15 0 0 1 4.177-2.643"></path><path d="M22 8.82a15 15 0 0 0-11.288-3.764"></path><path d="m2 2 20 20"></path></svg><span style="font:600 14px Inter;color:#FF8A3D">Chưa có mạng</span></div>
+        <span style="font:400 14px/1.45 Inter;color:#A1A1A6">Buổi tập đã lưu. AI sẽ nhận xét khi có kết nối.</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 WORKOUT LAYOUT -->
+<section style="padding:56px 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">12</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Bố cục màn tập</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6;max-width:560px;text-wrap:pretty">Người tập đối diện camera trước, điện thoại dựng dọc cách 1–1,5 m. Số rep nằm ở phần trên màn hình, gần camera nhất, nên nhìn từ sàn lên vẫn đọc được. Mỗi rep có giọng đọc số.</p>
+  </div>
+  <div style="display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start">
+    <div data-screen-label="Màn tập" style="position:relative;width:393px;height:852px;flex:none;border-radius:56px;overflow:hidden;background:#0B0B0C;box-shadow:0 0 0 1px rgba(255,255,255,0.1);display:flex;flex-direction:column">
+      <div style="height:54px;flex:none;position:relative;display:flex;align-items:center;justify-content:space-between;padding:0 32px 0 44px"><span style="font:600 17px Inter">9:41</span><div style="position:absolute;left:50%;top:11px;transform:translateX(-50%);width:126px;height:37px;border-radius:999px;background:#000"></div><div style="display:flex;align-items:center;gap:6px"><div style="display:flex;align-items:flex-end;gap:2px"><div style="width:3px;height:4px;background:#F4F4F0;border-radius:1px"></div><div style="width:3px;height:6px;background:#F4F4F0;border-radius:1px"></div><div style="width:3px;height:8px;background:#F4F4F0;border-radius:1px"></div><div style="width:3px;height:10px;background:#F4F4F0;border-radius:1px"></div></div><div style="width:25px;height:12px;border-radius:4px;border:1px solid rgba(244,244,240,0.5);padding:1px"><div style="width:80%;height:100%;background:#F4F4F0;border-radius:2px"></div></div></div></div>
+      <div style="height:56px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:0 12px">
+        <button aria-label="Đóng" style="width:48px;height:48px;border:none;border-radius:999px;background:transparent;color:#F4F4F0;display:flex;align-items:center;justify-content:center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button>
+        <span style="font:600 14px Inter;color:#A1A1A6">Hít đất · Hiệp 2/3</span>
+        <button aria-label="Giọng đọc: bật" style="width:48px;height:48px;border:none;border-radius:999px;background:rgba(200,255,46,0.12);color:#C8FF2E;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z"></path><path d="M16 9a5 5 0 0 1 0 6"></path><path d="M19.364 18.364a9 9 0 0 0 0-12.728"></path></svg></button>
+      </div>
+      <div style="flex:none;display:flex;flex-direction:column;align-items:center;gap:10px;padding-top:4px">
+        <span style="font:800 220px/0.82 'Barlow Condensed',sans-serif;color:#C8FF2E;font-variant-numeric:tabular-nums;letter-spacing:-0.02em">12</span>
+        <div style="display:flex;align-items:center;gap:10px"><span style="font:600 16px Inter;color:#A1A1A6;font-variant-numeric:tabular-nums">/ 20 rep</span><span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:999px;background:#161618;border:1px solid rgba(255,255,255,0.08);font:500 13px Inter;color:#A1A1A6">“Mười hai”</span></div>
+        <div style="width:345px;height:6px;border-radius:999px;background:#202023;overflow:hidden;margin-top:6px"><div style="width:60%;height:100%;background:#C8FF2E;border-radius:999px"></div></div>
+      </div>
+      <div style="flex:1;position:relative;margin:16px 12px 0;border-radius:28px;overflow:hidden;background:repeating-linear-gradient(135deg,#141416 0 12px,#101012 12px 24px);display:flex;align-items:flex-end;justify-content:center;padding-bottom:12px">
+        <span style="position:absolute;top:14px;left:14px;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;background:rgba(11,11,12,0.72);border:1px solid rgba(61,220,151,0.35);color:#3DDC97;font:600 13px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>Đúng tư thế</span>
+        <span style="position:absolute;top:18px;right:16px;font:400 11px ui-monospace,Menlo,monospace;color:#7C7C82">camera trước</span>
+        <svg width="300" height="209" viewBox="0 0 345 240" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path d="M152 92 L162 60 M193 92 L183 60" stroke="rgba(244,244,240,0.12)" stroke-width="14"></path>
+  <polygon points="122,125 223,125 193,92 152,92" fill="rgba(244,244,240,0.12)" stroke="rgba(244,244,240,0.12)" stroke-width="10"></polygon>
+  <path d="M122 125 L88 175 L95 228 M223 125 L257 175 L250 228" stroke="rgba(244,244,240,0.12)" stroke-width="24"></path>
+  <circle cx="172" cy="120" r="27" fill="rgba(244,244,240,0.16)"></circle>
+  <path d="M122 125 L223 125 M122 125 L88 175 L95 228 M223 125 L257 175 L250 228 M122 125 L152 92 M223 125 L193 92 M152 92 L193 92" stroke="#C8FF2E" stroke-width="3"></path>
+  <circle cx="122" cy="125" r="6" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle><circle cx="223" cy="125" r="6" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle><circle cx="88" cy="175" r="6" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle><circle cx="257" cy="175" r="6" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle><circle cx="95" cy="228" r="6" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle><circle cx="250" cy="228" r="6" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle><circle cx="152" cy="92" r="5" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle><circle cx="193" cy="92" r="5" fill="#C8FF2E" stroke="#0B0B0C" stroke-width="2"></circle>
+</svg>
+      </div>
+      <div style="flex:none;display:flex;align-items:center;justify-content:center;gap:12px;padding:16px 24px 42px">
+        <button aria-label="Tạm dừng" style="width:64px;height:56px;border:1px solid rgba(255,255,255,0.12);border-radius:999px;background:#202023;color:#F4F4F0;display:flex;align-items:center;justify-content:center"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" stroke="none"><rect x="6" y="4" width="4" height="16" rx="1"></rect><rect x="14" y="4" width="4" height="16" rx="1"></rect></svg></button>
+        <button style="flex:1;height:56px;border:1px solid rgba(255,90,95,0.32);border-radius:999px;background:rgba(255,90,95,0.12);color:#FF5A5F;font:600 16px Inter">Kết thúc hiệp</button>
+      </div>
+      <div style="position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;border-radius:999px;background:#F4F4F0"></div>
+    </div>
+    <div style="flex:1;min-width:280px;max-width:460px;display:flex;flex-direction:column;gap:12px">
+      <div style="padding:16px 18px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px"><span style="font:600 16px Inter">Số rep ở 1/3 trên</span><span style="font:400 14px/1.5 Inter;color:#A1A1A6;text-wrap:pretty">Hero 200–220pt, ngay dưới camera trước. Mắt người tập hướng về camera nên không phải liếc xuống. Nhịp đập scale 1 → 1.08 → 1 mỗi rep.</span></div>
+      <div style="padding:16px 18px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px"><span style="font:600 16px Inter">Giọng đọc số</span><span style="font:400 14px/1.5 Inter;color:#A1A1A6;text-wrap:pretty">Đọc số mỗi rep bằng tiếng Việt, kèm nhắc tư thế ngắn (“Hạ thấp hơn”). Nút loa góc phải bật/tắt, trạng thái bật dùng nền chanh nhạt.</span></div>
+      <div style="padding:16px 18px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px"><span style="font:600 16px Inter">Camera để căn khung</span><span style="font:400 14px/1.5 Inter;color:#A1A1A6;text-wrap:pretty">Khung camera là lớp phụ: hiện skeleton vai–khuỷu–cổ tay–hông với chấm xanh chanh ở khớp, cùng badge trạng thái có icon và chữ.</span></div>
+      <div style="padding:16px 18px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px"><span style="font:600 16px Inter">Nút lớn, ít chạm</span><span style="font:400 14px/1.5 Inter;color:#A1A1A6;text-wrap:pretty">Hiệp tự kết thúc khi đạt mục tiêu hoặc đứng yên 5 giây. Nút điều khiển cao 56, đặt ở đáy.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 10 LIGHT MODE -->
+<section style="padding:56px 0 0;border-top:1px solid rgba(255,255,255,0.08)">
+  <div style="display:flex;flex-wrap:wrap;gap:12px 24px;align-items:baseline;margin-bottom:32px">
+    <span style="font:500 12px ui-monospace,Menlo,monospace;color:#7C7C82">13</span>
+    <h2 style="margin:0;font:700 40px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Light mode</h2>
+    <p style="margin:0;font:400 14px/1.5 Inter,sans-serif;color:#A1A1A6;max-width:560px;text-wrap:pretty">Chanh điện trên nền sáng chỉ đạt 1.1:1, nên chỉ dùng làm nền (chữ đen). Số rep và chữ nhấn dùng accent-ink #4A6B00. Trạng thái được làm tối lại để đạt AA.</p>
+  </div>
+  <div style="padding:32px;border-radius:28px;background:#F6F6F3;color:#111112;display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px">
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:12px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08)"><div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:6px;background:#F6F6F3;border:1px solid rgba(0,0,0,0.12)"></div><span style="font:500 13px ui-monospace,Menlo,monospace">bg #F6F6F3 · surface #FFFFFF</span></div></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:12px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08)"><div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:6px;background:#111112"></div><span style="font:500 13px ui-monospace,Menlo,monospace">text #111112</span></div><span style="font:700 11px Inter;color:#111112">18.2:1</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:12px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08)"><div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:6px;background:#5C5C62"></div><span style="font:500 13px ui-monospace,Menlo,monospace">text-2 #5C5C62</span></div><span style="font:700 11px Inter;color:#111112">6.1:1</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:12px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08)"><div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:6px;background:#4A6B00"></div><span style="font:500 13px ui-monospace,Menlo,monospace">accent-ink #4A6B00</span></div><span style="font:700 11px Inter;color:#111112">5.7:1</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:12px 14px;border-radius:12px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08)"><div style="display:flex;align-items:center;gap:10px"><div style="width:20px;height:20px;border-radius:6px;background:#0F7A4F"></div><div style="width:20px;height:20px;border-radius:6px;background:#B24A00"></div><div style="width:20px;height:20px;border-radius:6px;background:#C8323A"></div><span style="font:500 13px ui-monospace,Menlo,monospace">trạng thái</span></div><span style="font:700 11px Inter;color:#111112">≥4.9:1</span></div>
+    </div>
+    <div style="padding:20px;border-radius:16px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center"><span style="font:600 12px Inter;color:#5C5C62;text-transform:uppercase;letter-spacing:0.06em">Hôm nay</span><span style="display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 10px;border-radius:8px;background:rgba(15,122,79,0.1);color:#0F7A4F;font:600 12px Inter"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>Đạt mục tiêu</span></div>
+      <div style="display:flex;align-items:baseline;gap:8px"><span style="font:800 88px/0.85 'Barlow Condensed';color:#4A6B00;font-variant-numeric:tabular-nums">48</span><span style="font:600 16px Inter;color:#5C5C62">rep</span></div>
+      <div style="height:8px;border-radius:999px;background:#EDEDEA;overflow:hidden"><div style="height:100%;width:100%;background:#C8FF2E;box-shadow:inset 0 0 0 1px rgba(74,107,0,0.25);border-radius:999px"></div></div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px">
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:8px;background:rgba(178,74,0,0.1);color:#B24A00;font:600 13px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg>Hông bị võng</span>
+        <span style="display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:8px;background:rgba(200,50,58,0.1);color:#C8323A;font:600 13px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>Ra khỏi khung hình</span>
+      </div>
+    </div>
+    <div style="padding:20px;border-radius:16px;background:#FFFFFF;border:1px solid rgba(0,0,0,0.08);display:flex;flex-direction:column;gap:12px">
+      <button style="height:56px;border:none;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 16px Inter;cursor:pointer;box-shadow:inset 0 0 0 1px rgba(74,107,0,0.2)">Bắt đầu tập</button>
+      <button style="height:56px;border:1px solid rgba(0,0,0,0.12);border-radius:999px;background:#EDEDEA;color:#111112;font:600 16px Inter;cursor:pointer">Kiểm tra camera</button>
+      <button style="height:56px;border:none;border-radius:999px;background:transparent;color:#111112;font:600 16px Inter;cursor:pointer">Đếm lại từ đầu</button>
+      <button style="height:56px;border:1px solid rgba(200,50,58,0.3);border-radius:999px;background:rgba(200,50,58,0.08);color:#C8323A;font:600 16px Inter;cursor:pointer">Xóa buổi tập</button>
+      <span style="align-self:flex-start;display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px 0 10px;border-radius:999px;background:rgba(15,122,79,0.08);border:1px solid rgba(15,122,79,0.25);color:#0F7A4F;font:600 13px Inter"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"></path><path d="m9 12 2 2 4-4"></path></svg>Xử lý trên máy</span>
+    </div>
+  </div>
+</section>
+
+</div>
+
+<sc-if value="{{ toastOkOn }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:32px;transform:translateX(-50%);animation:pp-toast 260ms cubic-bezier(.34,1.4,.64,1) both;z-index:50;display:flex;align-items:center;gap:12px;min-height:56px;min-width:320px;padding:12px 16px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.12);box-shadow:0 12px 32px rgba(0,0,0,0.5)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#3DDC97" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg><span style="font:500 14px Inter">Đã lưu buổi tập · {{ reps }} rep</span></div>
+</sc-if>
+<sc-if value="{{ toastWarnOn }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:32px;transform:translateX(-50%);animation:pp-toast 260ms cubic-bezier(.34,1.4,.64,1) both;z-index:50;display:flex;align-items:center;gap:12px;min-height:56px;min-width:320px;padding:12px 16px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.12);box-shadow:0 12px 32px rgba(0,0,0,0.5)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF8A3D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span style="font:500 14px Inter">Ánh sáng yếu, độ chính xác có thể giảm</span></div>
+</sc-if>
+<sc-if value="{{ toastErrOn }}" hint-placeholder-val="{{ false }}">
+  <div style="position:fixed;left:50%;bottom:32px;transform:translateX(-50%);animation:pp-toast 260ms cubic-bezier(.34,1.4,.64,1) both;z-index:50;display:flex;align-items:center;gap:12px;min-height:56px;min-width:320px;padding:12px 16px;border-radius:16px;background:#202023;border:1px solid rgba(255,255,255,0.12);box-shadow:0 12px 32px rgba(0,0,0,0.5)"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#FF5A5F" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg><span style="font:500 14px Inter">Không mở được camera</span></div>
+</sc-if>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;repFont&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Barlow Condensed&quot;,&quot;Oswald&quot;],&quot;default&quot;:&quot;Barlow Condensed&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Số rep&quot;},&quot;pulseScale&quot;:{&quot;editor&quot;:&quot;range&quot;,&quot;min&quot;:1,&quot;max&quot;:1.2,&quot;step&quot;:0.01,&quot;default&quot;:1.08,&quot;tsType&quot;:&quot;number&quot;,&quot;section&quot;:&quot;Số rep&quot;}}">
+class Component extends DCLogic {
+  state = { reps: 12, target: 20, k: 0, toast: null, sheet: true };
+  componentWillUnmount() { clearTimeout(this.t); }
+  showToast(type) {
+    clearTimeout(this.t);
+    this.setState({ toast: null }, () => this.setState({ toast: type }));
+    this.t = setTimeout(() => this.setState({ toast: null }), 2600);
+  }
+  renderVals() {
+    const { reps, target, k, toast, sheet } = this.state;
+    const font = this.props.repFont ?? 'Barlow Condensed';
+    const scale = this.props.pulseScale ?? 1.08;
+    const pct = Math.min(1, reps / target);
+    const C = 2 * Math.PI * 56;
+    const done = pct >= 1;
+    const setTarget = t => this.setState({ target: Math.max(1, Math.min(300, t)) });
+    const repHero = React.createElement('span', {
+      key: k,
+      style: {
+        display: 'inline-block', fontFamily: `'${font}', sans-serif`, fontWeight: 800,
+        fontSize: 200, lineHeight: 0.85, letterSpacing: '-0.02em',
+        color: done ? '#3DDC97' : '#C8FF2E', fontVariantNumeric: 'tabular-nums',
+        animation: k ? 'pp-pulse 240ms cubic-bezier(.34,1.56,.64,1)' : 'none',
+        '--pp-s': scale
+      }
+    }, String(reps));
+    const chips = [10, 20, 30, 50].map(v => {
+      const on = v === target;
+      return {
+        label: v + ' rep',
+        pick: () => setTarget(v),
+        border: on ? '#C8FF2E' : 'rgba(255,255,255,0.12)',
+        bg: on ? 'rgba(200,255,46,0.12)' : 'transparent',
+        fg: on ? '#C8FF2E' : '#F4F4F0'
+      };
+    });
+    return {
+      reps, target, repHero, chips,
+      inc: () => setTarget(target + 1),
+      dec: () => setTarget(target - 1),
+      addRep: () => this.setState(s => ({ reps: s.reps + 1, k: s.k + 1 })),
+      reset: () => this.setState({ reps: 0, k: 0 }),
+      ringC: C.toFixed(1),
+      ringOffset: (C * (1 - pct)).toFixed(1),
+      ringColor: done ? '#3DDC97' : '#C8FF2E',
+      pctLabel: Math.round(pct * 100) + '%',
+      barPct: (pct * 100).toFixed(1) + '%',
+      toastOk: () => this.showToast('ok'),
+      toastWarn: () => this.showToast('warn'),
+      toastErr: () => this.showToast('err'),
+      toastOkOn: toast === 'ok', toastWarnOn: toast === 'warn', toastErrOn: toast === 'err',
+      toggleSheet: () => this.setState(s => ({ sheet: !s.sheet })),
+      sheetBtn: sheet ? 'Đóng' : 'Mở sheet',
+      sheetY: sheet ? '0%' : '100%',
+      scrimOpacity: sheet ? 1 : 0,
+      scrimEvents: sheet ? 'auto' : 'none'
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+# RepCoach AI splash — glyph centred on #0B0B0C.
+# Run: dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#0B0B0C"
+  image: assets/brand/splash.png
+  android_12:
+    color: "#0B0B0C"
+    image: assets/brand/splash.png

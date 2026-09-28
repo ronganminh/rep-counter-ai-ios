@@ -1,0 +1,19 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Chỉ áp dụng cho bản RELEASE.
+
+         file_picker kéo theo quyền bộ nhớ, nhưng nó chỉ phục vụ màn hình
+         "Kiểm thử bằng video có sẵn" vốn đã bị ẩn khỏi bản phát hành. Giữ quyền
+         này lại sẽ buộc phải khai báo trong Data safety một thứ app không dùng.
+
+         Vẫn để nguyên ở bản debug để màn hình kiểm thử còn chạy được. -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"
+        tools:node="remove" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"
+        tools:node="remove" />
+</manifest>

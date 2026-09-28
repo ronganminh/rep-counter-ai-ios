@@ -1,0 +1,95 @@
+{
+  "source": "rep_counter_app\\assets\\debug\\100pushup.mp4",
+  "fps": 30.0,
+  "guide_support_frames": 48,
+  "windows": [
+    {
+      "start_s": 16.6,
+      "end_s": 20.05,
+      "expected_reps": 3,
+      "fixed_threshold_reps": 3,
+      "data_threshold_reps": 3,
+      "rep_times_s": [
+        16.733,
+        17.933,
+        19.067
+      ],
+      "pose_detection_rate": 0.9528,
+      "finite_signal_rate": 0.9528,
+      "angle_p10": 48.33,
+      "angle_p90": 158.2
+    },
+    {
+      "start_s": 160.3,
+      "end_s": 165.4,
+      "expected_reps": 5,
+      "fixed_threshold_reps": 5,
+      "data_threshold_reps": 5,
+      "rep_times_s": [
+        160.7,
+        161.7,
+        162.7,
+        163.7,
+        164.7
+      ],
+      "pose_detection_rate": 1.0,
+      "finite_signal_rate": 1.0,
+      "angle_p10": 84.88,
+      "angle_p90": 169.35
+    }
+  ],
+  "median_guide_normalized": {
+    "nose": {
+      "x": 0.49185,
+      "y": 0.41466
+    },
+    "left_shoulder": {
+      "x": 0.76944,
+      "y": 0.40329
+    },
+    "right_shoulder": {
+      "x": 0.27251,
+      "y": 0.41364
+    },
+    "left_elbow": {
+      "x": 0.91482,
+      "y": 0.58191
+    },
+    "right_elbow": {
+      "x": 0.12618,
+      "y": 0.58393
+    },
+    "left_wrist": {
+      "x": 0.96406,
+      "y": 0.76603
+    },
+    "right_wrist": {
+      "x": 0.10021,
+      "y": 0.75967
+    },
+    "left_hip": {
+      "x": 0.61231,
+      "y": 0.57161
+    },
+    "right_hip": {
+      "x": 0.42627,
+      "y": 0.57354
+    },
+    "left_knee": {
+      "x": 0.58572,
+      "y": 0.6432
+    },
+    "right_knee": {
+      "x": 0.45724,
+      "y": 0.64276
+    },
+    "left_ankle": {
+      "x": 0.5585,
+      "y": 0.68766
+    },
+    "right_ankle": {
+      "x": 0.4862,
+      "y": 0.69638
+    }
+  }
+}
