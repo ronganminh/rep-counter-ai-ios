@@ -1,0 +1,201 @@
+name: Import Rep Counter AI source
+
+on:
+  push:
+    paths:
+      - .github/workflows/import-source.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: import-rep-counter-source
+  cancel-in-progress: false
+
+jobs:
+  import:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Check out destination repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+
+      - name: Locate the project source repository
+        id: source
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          candidates=(
+            "https://github.com/Juliolayme/rep-counter-ai-ios.git"
+            "https://github.com/Juliolayme/rep-counter-ai.git"
+          )
+
+          selected=""
+          for url in "${candidates[@]}"; do
+            rm -rf /tmp/rep-counter-source
+            if git clone --depth 1 "$url" /tmp/rep-counter-source; then
+              if [[ -f /tmp/rep-counter-source/rep-counter-ai-main/rep_counter_app/pubspec.yaml ]] \
+                && [[ -f /tmp/rep-counter-source/rep-counter-ai-main/rep_counter_app/lib/core/i18n/locale_controller.dart ]] \
+                && [[ -f /tmp/rep-counter-source/rep-counter-ai-main/rep_counter_app/ios/Runner/Info.plist ]]; then
+                selected="$url"
+                break
+              fi
+
+              if [[ -f /tmp/rep-counter-source/rep_counter_app/pubspec.yaml ]] \
+                && [[ -f /tmp/rep-counter-source/rep_counter_app/lib/core/i18n/locale_controller.dart ]] \
+                && [[ -f /tmp/rep-counter-source/rep_counter_app/ios/Runner/Info.plist ]]; then
+                mkdir -p /tmp/normalized-source/rep-counter-ai-main
+                cp -a /tmp/rep-counter-source/rep_counter_app /tmp/normalized-source/rep-counter-ai-main/
+                find /tmp/rep-counter-source -mindepth 1 -maxdepth 1 ! -name .git ! -name rep_counter_app \
+                  -exec cp -a {} /tmp/normalized-source/ \;
+                rm -rf /tmp/rep-counter-source
+                mv /tmp/normalized-source /tmp/rep-counter-source
+                selected="$url"
+                break
+              fi
+            fi
+          done
+
+          if [[ -z "$selected" ]]; then
+            echo "No accessible source repository contains the expected Flutter/iOS project." >&2
+            exit 1
+          fi
+
+          echo "Selected source: $selected"
+          echo "url=$selected" >> "$GITHUB_OUTPUT"
+
+      - name: Replace staging tree with project source
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          rsync -a --exclude=.git /tmp/rep-counter-source/ ./
+
+          app="rep-counter-ai-main/rep_counter_app"
+          test -f "$app/pubspec.yaml"
+          test -f "$app/lib/main.dart"
+          test -f "$app/lib/core/i18n/locale_controller.dart"
+          test -f "$app/ios/Runner/Info.plist"
+          test -f "$app/android/app/build.gradle.kts" || test -f "$app/android/app/build.gradle"
+
+          grep -q "com.ronganminh.repCounterApp" "$app/ios/Runner.xcodeproj/project.pbxproj"
+
+      - name: Install repository CI
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .github/workflows
+          mkdir -p .github/workflows
+
+          cat > .github/workflows/ios-ci.yml <<'YAML'
+          name: Flutter iOS CI
+
+          on:
+            push:
+              branches: [main]
+            pull_request:
+              branches: [main]
+            workflow_dispatch:
+
+          permissions:
+            contents: read
+
+          concurrency:
+            group: ios-ci-${{ github.ref }}
+            cancel-in-progress: true
+
+          defaults:
+            run:
+              working-directory: rep-counter-ai-main/rep_counter_app
+
+          jobs:
+            quality:
+              name: Analyze and test
+              runs-on: ubuntu-latest
+              timeout-minutes: 20
+              steps:
+                - uses: actions/checkout@v7
+                - uses: subosito/flutter-action@v2.23.0
+                  with:
+                    flutter-version: 3.47.5
+                    channel: stable
+                    cache: true
+                - run: flutter pub get
+                - run: flutter analyze --fatal-infos
+                - run: flutter test --coverage
+                - uses: actions/upload-artifact@v7
+                  if: always()
+                  with:
+                    name: flutter-coverage
+                    path: rep-counter-ai-main/rep_counter_app/coverage
+                    if-no-files-found: ignore
+                    retention-days: 14
+
+            ios-build-smoke:
+              name: iOS build and simulator smoke test
+              runs-on: macos-26
+              timeout-minutes: 45
+              steps:
+                - uses: actions/checkout@v7
+                - uses: subosito/flutter-action@v2.23.0
+                  with:
+                    flutter-version: 3.47.5
+                    channel: stable
+                    cache: true
+                - run: flutter pub get
+                - name: Install CocoaPods dependencies
+                  run: |
+                    cd ios
+                    pod install --repo-update
+                - name: Build simulator application
+                  run: flutter build ios --simulator --debug --no-codesign
+                - name: Boot simulator and launch application
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    device="$(xcrun simctl list devices available -j | python3 -c 'import json,sys; d=json.load(sys.stdin)["devices"]; names=("iPhone 17 Pro","iPhone 17","iPhone 16 Pro","iPhone 16"); print(next(x["udid"] for n in names for values in d.values() for x in values if x["name"]==n))')"
+                    xcrun simctl boot "$device" || true
+                    open -a Simulator
+                    xcrun simctl bootstatus "$device" -b
+                    app="build/ios/iphonesimulator/Runner.app"
+                    xcrun simctl install "$device" "$app"
+                    xcrun simctl launch --console-pty "$device" com.ronganminh.repCounterApp > runner.log 2>&1 &
+                    launch_pid=$!
+                    sleep 12
+                    xcrun simctl io "$device" screenshot ios-launch.png
+                    kill "$launch_pid" 2>/dev/null || true
+                - name: Build unsigned device release
+                  run: flutter build ios --release --no-codesign
+                - uses: actions/upload-artifact@v7
+                  if: always()
+                  with:
+                    name: ios-smoke-artifacts
+                    path: |
+                      rep-counter-ai-main/rep_counter_app/ios-launch.png
+                      rep-counter-ai-main/rep_counter_app/runner.log
+                      rep-counter-ai-main/rep_counter_app/build/ios/iphoneos/Runner.app
+                    if-no-files-found: warn
+                    retention-days: 14
+          YAML
+
+      - name: Create clean main branch commit
+        shell: bash
+        env:
+          SOURCE_URL: ${{ steps.source.outputs.url }}
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git checkout --orphan clean-main
+          git add -A
+          git commit -m "feat: import Rep Counter AI iOS source and CI"
+          git push --force origin clean-main:main
+
+          echo "Imported source from $SOURCE_URL"
