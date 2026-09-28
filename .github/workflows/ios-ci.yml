@@ -13,7 +13,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 concurrency:
   group: repcoach-ci-${{ github.workflow }}-${{ github.ref }}
@@ -21,6 +21,8 @@ concurrency:
 
 env:
   FLUTTER_VERSION: "3.47.5"
+  TEST_VIDEO_ID: "13TwRvZQAXsm0-Gl7d_GmPV1T75B8QFf8"
+  TEST_VIDEO_ASSET: "pushup-test.mp4"
 
 jobs:
   quality:
@@ -63,13 +65,15 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
-  ios-build-smoke:
-    name: iOS build and simulator smoke test
+  ios-build-video-test:
+    name: Apple Silicon iOS build + video replay
     needs: quality
-    runs-on: macos-26-intel
-    timeout-minutes: 50
+    if: github.event_name != 'pull_request'
+    runs-on: macos-26
+    timeout-minutes: 60
     env:
       DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+      GH_TOKEN: ${{ github.token }}
     defaults:
       run:
         working-directory: rep-counter-ai-main/rep_counter_app
@@ -85,29 +89,65 @@ jobs:
           channel: stable
           cache: true
 
-      - name: Show Apple and Flutter tool versions
+      - name: Show Apple Silicon and tool versions
         run: |
+          uname -m
+          sysctl -n machdep.cpu.brand_string || true
           flutter --version
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-version
           pod --version
 
-      - name: Precache iOS artifacts
-        run: flutter precache --ios
-
       - name: Resolve dependencies
-        run: flutter pub get
+        run: |
+          flutter precache --ios
+          flutter pub get
+
+      - name: Reuse or download CI fixture video once
+        id: fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          fixture_dir="$RUNNER_TEMP/repcoach-ci-fixtures"
+          fixture="$fixture_dir/$TEST_VIDEO_ASSET"
+          mkdir -p "$fixture_dir" "$GITHUB_WORKSPACE/ci-artifacts"
+
+          if gh release download ci-fixtures               --repo "$GITHUB_REPOSITORY"               --pattern "$TEST_VIDEO_ASSET"               --dir "$fixture_dir" >/dev/null 2>&1; then
+            echo "fixture_source=github-release" | tee -a "$GITHUB_OUTPUT"
+          else
+            echo "CI fixture is not in GitHub Release yet; downloading Google Drive once."
+            python3 -m pip install --quiet --user gdown
+            python3 -m gdown               "https://drive.google.com/uc?id=$TEST_VIDEO_ID"               -O "$fixture"
+
+            test -s "$fixture"
+            gh release view ci-fixtures --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||               gh release create ci-fixtures                 --repo "$GITHUB_REPOSITORY"                 --title "RepCoach CI fixtures"                 --notes "Private reusable test fixtures used by GitHub Actions."
+
+            gh release upload ci-fixtures               --repo "$GITHUB_REPOSITORY"               "$fixture#$TEST_VIDEO_ASSET"               --clobber
+
+            echo "fixture_source=google-drive-then-github-release" | tee -a "$GITHUB_OUTPUT"
+          fi
+
+          test -s "$fixture"
+          shasum -a 256 "$fixture" | tee "$GITHUB_WORKSPACE/ci-artifacts/input-video.sha256"
+          file "$fixture" | tee "$GITHUB_WORKSPACE/ci-artifacts/input-video.txt"
+          ls -lh "$fixture" | tee -a "$GITHUB_WORKSPACE/ci-artifacts/input-video.txt"
+          echo "fixture_path=$fixture" >> "$GITHUB_OUTPUT"
 
       - name: Build debug app for iOS Simulator
         run: |
           chmod +x tool/build_ios.sh
           ./tool/build_ios.sh --simulator --debug --no-pub
 
-      - name: Boot simulator and launch app
+      - name: Replay fixture, record screen, and collect debug logs
         shell: bash
+        env:
+          FIXTURE_PATH: ${{ steps.fixture.outputs.fixture_path }}
         run: |
           set -euo pipefail
-          mkdir -p "$GITHUB_WORKSPACE/ci-artifacts"
+
+          artifact_dir="$GITHUB_WORKSPACE/ci-artifacts"
+          mkdir -p "$artifact_dir"
 
           simulator_udid="$(xcrun simctl list devices available -j | jq -r '
             [
@@ -132,27 +172,84 @@ jobs:
             exit 1
           fi
 
+          echo "$simulator_udid" > "$artifact_dir/simulator-udid.txt"
           xcrun simctl boot "$simulator_udid" 2>/dev/null || true
           xcrun simctl bootstatus "$simulator_udid" -b
-          xcrun simctl install             "$simulator_udid"             build/ios/iphonesimulator/Runner.app
-          xcrun simctl launch             "$simulator_udid"             com.ronganminh.repCounterApp
 
-          sleep 8
-          xcrun simctl io             "$simulator_udid"             screenshot             "$GITHUB_WORKSPACE/ci-artifacts/ios-launch.png"
+          app_path="build/ios/iphonesimulator/Runner.app"
+          bundle_id="com.ronganminh.repCounterApp"
+          xcrun simctl install "$simulator_udid" "$app_path"
 
-          xcrun simctl spawn "$simulator_udid" log show             --last 2m             --style compact             --predicate 'process == "Runner"'             > "$GITHUB_WORKSPACE/ci-artifacts/runner.log" || true
+          data_dir="$(xcrun simctl get_app_container "$simulator_udid" "$bundle_id" data)"
+          app_video="$data_dir/Documents/$TEST_VIDEO_ASSET"
+          cp "$FIXTURE_PATH" "$app_video"
+
+          screen_video="$artifact_dir/ios-video-replay.mp4"
+          xcrun simctl io "$simulator_udid" recordVideo             --codec=h264             --force             "$screen_video"             >"$artifact_dir/record-video.log" 2>&1 &
+          recorder_pid=$!
+
+          cleanup() {
+            kill -INT "$recorder_pid" 2>/dev/null || true
+            wait "$recorder_pid" 2>/dev/null || true
+          }
+          trap cleanup EXIT
+
+          sleep 2
+
+          stdout_log="$artifact_dir/runner.stdout.log"
+          stderr_log="$artifact_dir/runner.stderr.log"
+
+          SIMCTL_CHILD_REPCOACH_CI_VIDEO_PATH="$app_video"             xcrun simctl launch               --terminate-running-process               --stdout="$stdout_log"               --stderr="$stderr_log"               "$simulator_udid"               "$bundle_id"
+
+          result_found=0
+          for _ in $(seq 1 180); do
+            if grep -q "\[CI_VIDEO_RESULT\]" "$stdout_log" "$stderr_log" 2>/dev/null; then
+              result_found=1
+              break
+            fi
+
+            if grep -q "\[CI_VIDEO_ERROR\]" "$stdout_log" "$stderr_log" 2>/dev/null; then
+              cat "$stdout_log" "$stderr_log"
+              grep "\[CI_VIDEO_ERROR\]" "$stdout_log" "$stderr_log"                 | tee "$artifact_dir/ci-video-result.txt"
+              exit 1
+            fi
+
+            sleep 5
+          done
+
+          xcrun simctl io "$simulator_udid" screenshot "$artifact_dir/ios-video-result.png"
+
+          xcrun simctl spawn "$simulator_udid" log show             --last 20m             --style compact             --predicate 'process == "Runner"'             > "$artifact_dir/runner-system.log" || true
+
+          if [[ "$result_found" != "1" ]]; then
+            echo "Timed out waiting for CI video result." | tee "$artifact_dir/ci-video-result.txt"
+            exit 1
+          fi
+
+          grep "\[CI_VIDEO_RESULT\]" "$stdout_log" "$stderr_log"             | tail -1             | tee "$artifact_dir/ci-video-result.txt"
+
+          cleanup
+          trap - EXIT
 
       - name: Build unsigned iPhone release
         run: ./tool/build_ios.sh --release --no-codesign --no-pub
 
-      - name: Upload iOS smoke evidence
+      - name: Upload iOS video-test evidence
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: ios-smoke-evidence
+          name: ios-video-test-evidence
           path: |
-            ci-artifacts/ios-launch.png
-            ci-artifacts/runner.log
+            ci-artifacts/ios-video-replay.mp4
+            ci-artifacts/ios-video-result.png
+            ci-artifacts/ci-video-result.txt
+            ci-artifacts/runner.stdout.log
+            ci-artifacts/runner.stderr.log
+            ci-artifacts/runner-system.log
+            ci-artifacts/record-video.log
+            ci-artifacts/input-video.sha256
+            ci-artifacts/input-video.txt
+            ci-artifacts/simulator-udid.txt
             rep-counter-ai-main/rep_counter_app/build/ios/iphoneos/Runner.app
           if-no-files-found: warn
-          retention-days: 14
+          retention-days: 30
