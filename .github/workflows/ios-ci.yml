@@ -117,8 +117,11 @@ jobs:
             echo "fixture_source=github-release" | tee -a "$GITHUB_OUTPUT"
           else
             echo "CI fixture is not in GitHub Release yet; downloading Google Drive once."
-            python3 -m pip install --quiet --user gdown
-            python3 -m gdown               "https://drive.google.com/uc?id=$TEST_VIDEO_ID"               -O "$fixture"
+            gdown_venv="$RUNNER_TEMP/gdown-venv"
+            python3 -m venv "$gdown_venv"
+            "$gdown_venv/bin/python" -m pip install --quiet --upgrade pip
+            "$gdown_venv/bin/python" -m pip install --quiet gdown
+            "$gdown_venv/bin/python" -m gdown "https://drive.google.com/uc?id=$TEST_VIDEO_ID" -O "$fixture"
 
             test -s "$fixture"
             gh release view ci-fixtures --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||               gh release create ci-fixtures                 --repo "$GITHUB_REPOSITORY"                 --title "RepCoach CI fixtures"                 --notes "Private reusable test fixtures used by GitHub Actions."
