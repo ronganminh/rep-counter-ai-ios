@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter/foundation.dart';
 
 import '../../../exercise.dart';
@@ -52,8 +50,10 @@ class WorkoutController extends ChangeNotifier {
         _now = now ?? DateTime.now,
         _saveRecord = saveRecord ?? WorkoutHistoryStore().save,
         _session = SessionTracker(minReps: profile.minRepsPerSet),
-        _aggregator = WorkoutAggregator(
-            minRepsPerSet: math.min(2, profile.minRepsPerSet)) {
+        _aggregator = const WorkoutAggregator(
+          setGap: Duration(seconds: 6),
+          minRepsPerSet: 1,
+        ) {
     _startedAt = _now();
   }
 
