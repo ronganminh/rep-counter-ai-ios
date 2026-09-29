@@ -211,14 +211,15 @@ void main() {
       expect(sets[1].reps.every((r) => r.setIndex == 2), isTrue);
     });
 
-    test('nhịp đơn độc bị loại', () {
+    test('set grouping không loại rep đã được xác nhận', () {
       final sets = agg.groupIntoSets([
         rep(1, atMs: 0),
         rep(2, atMs: 1500),
-        rep(3, atMs: 60000), // đứng một mình
+        rep(3, atMs: 60000), // set một rep vẫn là rep hợp lệ
       ]);
-      expect(sets.length, 1);
-      expect(sets.first.reps.length, 2);
+      expect(sets.length, 2);
+      expect(sets.expand((s) => s.reps).length, 3);
+      expect(sets.last.reps.single.index, 3);
     });
 
     test('đặt minRepsPerSet = 1 thì giữ cả nhịp đơn độc', () {
