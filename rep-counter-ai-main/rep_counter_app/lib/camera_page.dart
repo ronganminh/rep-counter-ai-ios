@@ -604,13 +604,29 @@ class _CameraPageState extends State<CameraPage>
   }
 
   void _consume(Pose? pose, CameraImage image) {
+    final camera = _cam;
+    if (camera == null) return;
+    _consumePose(
+      pose,
+      rawImageSize: Size(image.width.toDouble(), image.height.toDouble()),
+      rotationDegrees: camera.description.sensorOrientation,
+      mirror: camera.description.lensDirection == CameraLensDirection.front,
+    );
+  }
+
+  void _consumePose(
+    Pose? pose, {
+    required Size rawImageSize,
+    required int rotationDegrees,
+    required bool mirror,
+  }) {
     final view = context.size ?? MediaQuery.sizeOf(context);
     // PoseMapper tự hoán đổi rộng/cao theo góc xoay — đừng xoay sẵn ở đây nữa.
     final mapper = PoseMapper(
-      rawImageSize: Size(image.width.toDouble(), image.height.toDouble()),
+      rawImageSize: rawImageSize,
       viewSize: view,
-      rotationDegrees: _cam!.description.sensorOrientation,
-      mirror: _cam!.description.lensDirection == CameraLensDirection.front,
+      rotationDegrees: rotationDegrees,
+      mirror: mirror,
     );
     final lm = pose == null ? null : remapPose(pose, mapper);
 
