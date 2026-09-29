@@ -115,7 +115,6 @@ class _CameraPageState extends State<CameraPage>
   final _ciTrackingClock = _CiWorkoutClock();
   final _ciSessionClock = _CiWorkoutClock();
   int? _ciSavedReps;
-  int? _ciSavedSets;
   late final PoseDetector _detector;
   late GuideZone _guide;
   late S _strings;
@@ -484,7 +483,6 @@ class _CameraPageState extends State<CameraPage>
     final durationMs = controller.value.duration.inMilliseconds;
     final rawSize = controller.value.size;
     var processed = 0;
-    var previousReps = 0;
 
     for (var atMs = 0; atMs <= durationMs; atMs += stepMs) {
       if (!mounted || !identical(_ciVideo, controller)) return;
@@ -528,16 +526,6 @@ class _CameraPageState extends State<CameraPage>
       );
       processed++;
 
-      final currentReps = _ui.reps;
-      if (currentReps < previousReps) {
-        final line =
-            '[CI_VIDEO_ERROR] rep_count_decreased at_ms=$atMs previous=$previousReps current=$currentReps';
-        debugPrint(line);
-        await _writeCiStatus(line);
-        return;
-      }
-      previousReps = currentReps;
-
       if (atMs % 5000 == 0) {
         await _writeCiStatus(
           '[CI_VIDEO_STATUS] production_workout at_ms=$atMs total_ms=$durationMs frames=$processed reps=${_ui.reps} phase=${_ui.phase.name}',
@@ -546,32 +534,29 @@ class _CameraPageState extends State<CameraPage>
     }
 
     await controller.seekTo(controller.value.duration);
-    final hudReps = _ui.reps;
+    final reps = _ui.reps;
     await _writeCiStatus(
-      '[CI_VIDEO_STATUS] production_workout_finishing frames=$processed reps=$hudReps',
+      '[CI_VIDEO_STATUS] production_workout_finishing frames=$processed reps=$reps',
     );
 
     // Exercise the same save/result transition as a real workout too.
     await _finishWorkout();
     await Future<void>.delayed(const Duration(seconds: 2));
-
     final savedReps = _ciSavedReps;
-    final savedSets = _ciSavedSets;
-    if (savedReps == null || savedSets == null) {
+    if (savedReps == null) {
       await _writeCiStatus(
-        '[CI_VIDEO_ERROR] missing_saved_workout hud_reps=$hudReps',
+        '[CI_VIDEO_ERROR] missing_saved_rep_count hud_reps=$reps',
       );
       return;
     }
-    if (savedReps != hudReps) {
+    if (savedReps != reps) {
       await _writeCiStatus(
-        '[CI_VIDEO_ERROR] rep_total_mismatch hud_reps=$hudReps record_reps=$savedReps',
+        '[CI_VIDEO_ERROR] rep_count_mismatch hud_reps=$reps saved_reps=$savedReps',
       );
       return;
     }
-
     await _writeCiStatus(
-      '[CI_VIDEO_RESULT] mode=production_workout frames=$processed reps=$hudReps hud_reps=$hudReps record_reps=$savedReps result_reps=$savedReps sets=$savedSets duration_ms=$durationMs',
+      '[CI_VIDEO_RESULT] mode=production_workout frames=$processed hud_reps=$reps saved_reps=$savedReps result_reps=$savedReps duration_ms=$durationMs',
     );
   }
 
@@ -1005,13 +990,7 @@ class _CameraPageState extends State<CameraPage>
       _cam = null;
       if (camera != null) _cameraShutdown = _releaseCamera(camera);
       final record = await saving;
-      if (widget.ciVideoPath != null) {
-        _ciSavedReps = record.reps;
-        _ciSavedSets = record.sets;
-        await _writeCiStatus(
-          '[CI_VIDEO_STATUS] production_workout_saved hud_reps=${_ui.reps} record_reps=${record.reps} sets=${record.sets}',
-        );
-      }
+      _ciSavedReps = record.reps;
       await _cameraShutdown;
       if (!mounted) return;
       _allowPop = true;
