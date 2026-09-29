@@ -109,13 +109,17 @@ void main() {
       expect(s.totalReps, 5);
     });
 
-    test('set quá ít rep bị loại và trả lại số đếm', () {
-      final s = SessionTracker(restTimeout: const Duration(seconds: 6), minReps: 3);
+    test('rep đã xác nhận không giảm khi chốt set ngắn', () {
+      final s =
+          SessionTracker(restTimeout: const Duration(seconds: 6), minReps: 3);
       s.onRep(Duration.zero);
       s.onRep(const Duration(seconds: 1));
+      expect(s.totalReps, 2);
       s.tick(const Duration(seconds: 8));
-      expect(s.sets, isEmpty);
-      expect(s.totalReps, 0, reason: 'nhịp lẻ không được cộng vào tổng');
+      expect(s.sets.length, 1);
+      expect(s.sets.single.reps, 2);
+      expect(s.totalReps, 2,
+          reason: 'accepted rep là nguồn sự thật và phải tăng đơn điệu');
     });
   });
 
