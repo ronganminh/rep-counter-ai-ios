@@ -4,6 +4,13 @@ import UIKit
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+  private let videoFrameQueue = DispatchQueue(
+    label: "rep_counter.video_frames",
+    qos: .userInitiated
+  )
+  private var cachedVideoPath: String?
+  private var cachedMaxWidth: CGFloat = 0
+  private var cachedFrameGenerator: AVAssetImageGenerator?
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -46,12 +53,25 @@ import UIKit
       let timeMs = (args["timeMs"] as? NSNumber)?.int64Value ?? 0
       let maxWidth = CGFloat((args["maxWidth"] as? NSNumber)?.doubleValue ?? 480)
 
-      DispatchQueue.global(qos: .userInitiated).async {
+      self.videoFrameQueue.async {
         do {
-          let asset = AVURLAsset(url: URL(fileURLWithPath: path))
-          let generator = AVAssetImageGenerator(asset: asset)
-          generator.appliesPreferredTrackTransform = true
-          generator.maximumSize = CGSize(width: maxWidth, height: maxWidth * 3)
+          let generator: AVAssetImageGenerator
+          if
+            self.cachedVideoPath == path,
+            abs(self.cachedMaxWidth - maxWidth) < 0.5,
+            let cached = self.cachedFrameGenerator
+          {
+            generator = cached
+          } else {
+            let asset = AVURLAsset(url: URL(fileURLWithPath: path))
+            let fresh = AVAssetImageGenerator(asset: asset)
+            fresh.appliesPreferredTrackTransform = true
+            fresh.maximumSize = CGSize(width: maxWidth, height: maxWidth * 3)
+            self.cachedVideoPath = path
+            self.cachedMaxWidth = maxWidth
+            self.cachedFrameGenerator = fresh
+            generator = fresh
+          }
 
           let time = CMTime(value: timeMs, timescale: 1000)
           var actualTime = CMTime.zero
