@@ -4,6 +4,7 @@ import '../../../../core/i18n/locale_controller.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../widgets/product_ui.dart';
 import '../../../ai/ai_feedback_service.dart';
+import '../../../ai/presentation/ai_consent.dart';
 import '../../application/result_controller.dart';
 import '../feedback_card.dart';
 
@@ -12,6 +13,13 @@ class ResultFeedbackCard extends StatelessWidget {
       {super.key, required this.controller, this.allowRefresh = true});
   final ResultController controller;
   final bool allowRefresh;
+
+  Future<void> _requestWithConsent(BuildContext context) async {
+    if (controller.busy) return;
+    final allowed = await requestManualAiConsent(context);
+    if (!allowed || !context.mounted || controller.busy) return;
+    await controller.request(context.language);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +136,7 @@ class ResultFeedbackCard extends StatelessWidget {
           const SizedBox(height: 16),
           OutlinedButton.icon(
               key: const Key('ask-result-ai'),
-              onPressed: c.busy ? null : () => c.request(context.language),
+              onPressed: c.busy ? null : () => _requestWithConsent(context),
               icon: Icon(
                   hasError ? LucideIcons.refreshCw : LucideIcons.sparkles,
                   size: 18),
