@@ -2,7 +2,7 @@
 library;
 
 import 'dart:async';
-import 'dart:io' show File, Platform;
+import 'dart:io' show Directory, File, Platform;
 import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
@@ -424,6 +424,118 @@ class _CameraPageState extends State<CameraPage>
       return;
     }
     if (mounted) await _start();
+  }
+
+  String get _ciResultPath =>
+      '${Directory.systemTemp.path}/ci-video-result.txt';
+
+  Future<void> _writeCiStatus(String line) async {
+    if (widget.ciVideoPath == null) return;
+    try {
+      await File(_ciResultPath).writeAsString('$line\n', flush: true);
+    } catch (error) {
+      debugPrint('[CI_VIDEO_ERROR] status_write_failed error=$error');
+    }
+  }
+
+  Future<void> _startCiVideo() async {
+    final path = widget.ciVideoPath;
+    if (path == null || path.isEmpty) return;
+    final input = File(path);
+    if (!await input.exists()) {
+      final line = '[CI_VIDEO_ERROR] missing_file path=$path';
+      debugPrint(line);
+      await _writeCiStatus(line);
+      if (mounted) setState(() => _cameraState = _CameraState.unavailable);
+      return;
+    }
+
+    VideoPlayerController? controller;
+    try {
+      controller = VideoPlayerController.file(input);
+      await controller.initialize();
+      if (!mounted) {
+        await controller.dispose();
+        return;
+      }
+
+      _ciVideo = controller;
+      _workout.cameraStarted();
+      _workout.requestStart();
+      setState(() => _cameraState = _CameraState.ready);
+      await _writeCiStatus(
+        '[CI_VIDEO_STATUS] production_workout_started duration_ms=${controller.value.duration.inMilliseconds}',
+      );
+      await _runCiVideo(controller, path);
+    } catch (error) {
+      final line = '[CI_VIDEO_ERROR] production_workout_failed error=$error';
+      debugPrint(line);
+      await _writeCiStatus(line);
+      if (mounted) setState(() => _cameraState = _CameraState.unavailable);
+    }
+  }
+
+  Future<void> _runCiVideo(
+      VideoPlayerController controller, String path) async {
+    const stepMs = 200;
+    final durationMs = controller.value.duration.inMilliseconds;
+    final rawSize = controller.value.size;
+    var processed = 0;
+
+    for (var atMs = 0; atMs <= durationMs; atMs += stepMs) {
+      if (!mounted || !identical(_ciVideo, controller)) return;
+      final at = Duration(milliseconds: atMs);
+      _ciTrackingClock.elapsed = at;
+      _ciSessionClock.elapsed = at;
+
+      // Keep the production workout UI visually attached to the same source.
+      // Updating preview once per second avoids doubling the cost of pose
+      // extraction while the overlay still updates at 5 FPS.
+      if (atMs % 1000 == 0) {
+        await controller.seekTo(at);
+      }
+
+      final thumbnail = await _videoFrames.invokeMethod<String>('frame', {
+        'path': path,
+        'timeMs': atMs,
+        'maxWidth': 480,
+      });
+
+      Pose? pose;
+      if (thumbnail != null) {
+        final poses =
+            await _detector.processImage(InputImage.fromFilePath(thumbnail));
+        if (poses.isNotEmpty) pose = poses.first;
+      }
+
+      if (!mounted || !identical(_ciVideo, controller)) return;
+      _consumePose(
+        pose,
+        rawImageSize: rawSize,
+        rotationDegrees: 0,
+        mirror: false,
+      );
+      processed++;
+
+      if (atMs % 5000 == 0) {
+        await _writeCiStatus(
+          '[CI_VIDEO_STATUS] production_workout at_ms=$atMs total_ms=$durationMs frames=$processed reps=${_ui.reps} phase=${_ui.phase.name}',
+        );
+      }
+    }
+
+    await controller.seekTo(controller.value.duration);
+    final reps = _ui.reps;
+    await _writeCiStatus(
+      '[CI_VIDEO_STATUS] production_workout_finishing frames=$processed reps=$reps',
+    );
+
+    // Exercise the same save/result transition as a real workout too.
+    await _finishWorkout();
+    await Future<void>.delayed(const Duration(seconds: 2));
+    await _writeCiStatus(
+      '[CI_VIDEO_RESULT] mode=production_workout frames=$processed reps=$reps duration_ms=$durationMs',
+    );
   }
 
   @override
