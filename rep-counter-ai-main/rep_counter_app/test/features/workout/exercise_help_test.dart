@@ -84,12 +84,14 @@ void main() {
       return t;
     }
 
-    test('hít đất giữ quy tắc 3 rep: set 2 rep bị trừ hết', () {
-      expect(pushUp.minRepsPerSet, 3);
-      expect(run(pushUp.minRepsPerSet).totalReps, 0);
+    test('hít đất giữ mọi rep đã xác nhận qua quãng nghỉ', () {
+      expect(pushUp.minRepsPerSet, 1);
+      final t = run(pushUp.minRepsPerSet);
+      expect(t.totalReps, 4);
+      expect(t.sets.length, 2);
     });
 
-    test('kéo xà giữ set 2 rep', () {
+    test('kéo xà giữ mọi rep đã xác nhận qua quãng nghỉ', () {
       expect(pullUp.minRepsPerSet, 1);
       final t = run(pullUp.minRepsPerSet);
       expect(t.totalReps, 4);
