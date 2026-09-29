@@ -182,9 +182,9 @@ class SetSummary {
 /// Quy tắc: có rep -> đang tập. Quá [restTimeout] không có rep nào -> chốt set
 /// và chuyển sang nghỉ.
 ///
-/// Một rep đã được engine xác nhận là nguồn sự thật và KHÔNG được trừ ngược
-/// khỏi [totalReps]. Set chỉ dùng để nhóm rep theo quãng nghỉ. [minReps] được
-/// giữ lại để tương thích API cũ nhưng không còn thay đổi tổng rep.
+/// Rep đã được engine xác nhận là nguồn sự thật và KHÔNG BAO GIỜ bị trừ lại.
+/// [minReps] được giữ để tương thích API cũ; việc lọc rep ma phải xảy ra trước
+/// [SessionTracker], ở placement/count gate/RepTracker, không phải lúc chia set.
 class SessionTracker {
   SessionTracker({
     this.restTimeout = const Duration(seconds: 6),
