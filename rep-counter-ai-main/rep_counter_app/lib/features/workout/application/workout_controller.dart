@@ -49,11 +49,10 @@ class WorkoutController extends ChangeNotifier {
         _clock = clock ?? StopwatchWorkoutClock(),
         _now = now ?? DateTime.now,
         _saveRecord = saveRecord ?? WorkoutHistoryStore().save,
-        _session = SessionTracker(minReps: profile.minRepsPerSet),
+        _session = SessionTracker(
+            restTimeout: const Duration(seconds: 6), minReps: 1),
         _aggregator = const WorkoutAggregator(
-          setGap: Duration(seconds: 6),
-          minRepsPerSet: 1,
-        ) {
+            setGap: Duration(seconds: 6), minRepsPerSet: 1) {
     _startedAt = _now();
   }
 
