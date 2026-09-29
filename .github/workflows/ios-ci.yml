@@ -79,7 +79,7 @@ jobs:
             video_id: "1m7rKK5_Mtfe1NaFCXSTVdg_lzywoDWf0"
             asset: "pushup-test-2.mp4"
     runs-on: macos-15
-    timeout-minutes: 60
+    timeout-minutes: 75
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
       GH_TOKEN: ${{ github.token }}
@@ -290,7 +290,9 @@ jobs:
             "$bundle_id"
 
           result_found=0
-          for _ in $(seq 1 360); do
+          last_status=""
+          stalled_checks=0
+          for _ in $(seq 1 660); do
             if grep -Eq "F0000|Check failed:|Abort trap|Terminated due to signal" "$stderr_log" 2>/dev/null; then
               cat "$stderr_log"
               echo "[CI_VIDEO_ERROR] native_mlkit_crash" \
@@ -299,7 +301,8 @@ jobs:
             fi
 
             if [[ -s "$result_file" ]]; then
-              cat "$result_file" | tee "$artifact_dir/ci-video-result.txt"
+              current_status="$(cat "$result_file")"
+              printf '%s\n' "$current_status" | tee "$artifact_dir/ci-video-result.txt"
 
               if grep -q "\[CI_VIDEO_RESULT\]" "$result_file"; then
                 result_found=1
@@ -307,6 +310,19 @@ jobs:
               fi
 
               if grep -q "\[CI_VIDEO_ERROR\]" "$result_file"; then
+                exit 1
+              fi
+
+              if [[ "$current_status" == "$last_status" ]]; then
+                stalled_checks=$((stalled_checks + 1))
+              else
+                last_status="$current_status"
+                stalled_checks=0
+              fi
+
+              if (( stalled_checks >= 60 )); then
+                echo "[CI_VIDEO_ERROR] replay_stalled_for_5_minutes" \
+                  | tee "$artifact_dir/ci-video-result.txt"
                 exit 1
               fi
             fi
