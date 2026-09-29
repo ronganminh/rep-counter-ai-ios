@@ -69,11 +69,12 @@ jobs:
     name: Apple Silicon iOS build + video replay
     needs: quality
     if: github.event_name != 'pull_request'
-    runs-on: macos-26
+    runs-on: macos-15
     timeout-minutes: 60
     env:
-      DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
       GH_TOKEN: ${{ github.token }}
+      REPCOACH_CI_X64_SIM: "1"
     defaults:
       run:
         working-directory: rep-counter-ai-main/rep_counter_app
@@ -93,9 +94,12 @@ jobs:
         run: |
           uname -m
           sysctl -n machdep.cpu.brand_string || true
+          sudo /usr/sbin/softwareupdate --install-rosetta --agree-to-license || true
+          arch -x86_64 /usr/bin/true
           flutter --version
           xcodebuild -version
           xcrun --sdk iphoneos --show-sdk-version
+          xcrun --sdk iphonesimulator --show-sdk-version
           pod --version
 
       - name: Resolve dependencies
@@ -157,6 +161,11 @@ jobs:
             --no-pub \
             --dart-define=REPCOACH_CI_VIDEO_ASSET="$TEST_VIDEO_ASSET"
 
+          lipo -info build/ios/iphonesimulator/Runner.app/Runner \
+            | tee "$GITHUB_WORKSPACE/ci-artifacts/runner-binary-arch.txt"
+          grep -i "EXCLUDED_ARCHS" ios/Flutter/Generated.xcconfig \
+            | tee "$GITHUB_WORKSPACE/ci-artifacts/generated-xcconfig-arch.txt" || true
+
       - name: Replay fixture, record screen, and collect debug logs
         shell: bash
         env:
@@ -169,16 +178,22 @@ jobs:
 
           simulator_udid="$(xcrun simctl list devices available -j | jq -r '
             [
-              .devices[][]
+              .devices
+              | to_entries[]
+              | select(.key | contains("iOS-18-5"))
+              | .value[]
               | select(.isAvailable == true)
-              | select(.name == "iPhone 17 Pro")
+              | select(.name == "iPhone 16 Pro")
             ][0].udid // empty
           ')"
 
           if [[ -z "$simulator_udid" ]]; then
             simulator_udid="$(xcrun simctl list devices available -j | jq -r '
               [
-                .devices[][]
+                .devices
+                | to_entries[]
+                | select(.key | contains("iOS-18-5"))
+                | .value[]
                 | select(.isAvailable == true)
                 | select(.name | startswith("iPhone"))
               ][0].udid // empty
@@ -228,6 +243,13 @@ jobs:
 
           result_found=0
           for _ in $(seq 1 360); do
+            if grep -Eq "F0000|Check failed:|Abort trap|Terminated due to signal" "$stderr_log" 2>/dev/null; then
+              cat "$stderr_log"
+              echo "[CI_VIDEO_ERROR] native_mlkit_crash" \
+                | tee "$artifact_dir/ci-video-result.txt"
+              exit 1
+            fi
+
             if [[ -s "$result_file" ]]; then
               cat "$result_file" | tee "$artifact_dir/ci-video-result.txt"
 
@@ -277,6 +299,8 @@ jobs:
             ci-artifacts/input-video.sha256
             ci-artifacts/input-video.txt
             ci-artifacts/simulator-udid.txt
+            ci-artifacts/runner-binary-arch.txt
+            ci-artifacts/generated-xcconfig-arch.txt
             rep-counter-ai-main/rep_counter_app/ios/Podfile.lock
             rep-counter-ai-main/rep_counter_app/build/ios/iphoneos/Runner.app
           if-no-files-found: warn
