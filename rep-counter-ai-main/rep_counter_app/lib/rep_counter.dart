@@ -180,7 +180,11 @@ class SetSummary {
 /// Theo dõi set theo thời gian thực — bản nhân quả của `group_sets`.
 ///
 /// Quy tắc: có rep -> đang tập. Quá [restTimeout] không có rep nào -> chốt set
-/// và chuyển sang nghỉ. Set ít hơn [minReps] rep bị bỏ (nhấc tay lẻ, chỉnh tư thế).
+/// và chuyển sang nghỉ.
+///
+/// Một rep đã được engine xác nhận là nguồn sự thật và KHÔNG được trừ ngược
+/// khỏi [totalReps]. Set chỉ dùng để nhóm rep theo quãng nghỉ. [minReps] được
+/// giữ lại để tương thích API cũ nhưng không còn thay đổi tổng rep.
 class SessionTracker {
   SessionTracker({
     this.restTimeout = const Duration(seconds: 6),
@@ -229,7 +233,7 @@ class SessionTracker {
 
   void _closeSet() {
     if (state == SessionState.working &&
-        repsInCurrentSet >= minReps &&
+        repsInCurrentSet > 0 &&
         _setStart != null &&
         _lastRepAt != null) {
       sets.add(SetSummary(
@@ -238,9 +242,6 @@ class SessionTracker {
         start: _setStart!,
         end: _lastRepAt!,
       ));
-    } else {
-      // set quá ngắn -> không tính vào tổng, trả lại số rep đã cộng
-      totalReps -= repsInCurrentSet;
     }
     state = SessionState.resting;
     repsInCurrentSet = 0;
