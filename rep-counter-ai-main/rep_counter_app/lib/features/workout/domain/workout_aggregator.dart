@@ -13,20 +13,19 @@ import 'workout_summary.dart';
 
 class WorkoutAggregator {
   const WorkoutAggregator({
-    this.setGap = const Duration(seconds: 4),
-    this.minRepsPerSet = 2,
+    this.setGap = const Duration(seconds: 6),
+    this.minRepsPerSet = 1,
     this.minRepsForScore = 3,
   });
 
   /// Hai rep cách nhau lâu hơn mức này thuộc hai set khác nhau.
   ///
-  /// 4 giây lấy từ ADR 0002, đo trên 7 video thật.
+  /// Dùng cùng mốc 6 giây với SessionTracker để HUD và bản ghi chia set nhất quán.
   final Duration setGap;
 
-  /// Nhóm ít rep hơn mức này bị loại — gần như luôn là lúc chống tay xuống sàn
-  /// để vào tư thế, không phải rep (ADR 0002, đã kiểm bằng mắt).
-  ///
-  /// Đặt 1 để tắt bộ lọc.
+  /// Mặc định là 1: set grouping chỉ chia nhóm, không được xóa rep đã được
+  /// production counter xác nhận. Tham số được giữ cho tương thích với các
+  /// phân tích ngoại tuyến cũ.
   final int minRepsPerSet;
 
   /// Dưới mức này thì `QualityScore.hasEnoughData = false`.
