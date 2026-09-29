@@ -1,6 +1,7 @@
 platform :ios, '15.5'
 
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
+$repcoachCiX64Simulator = ENV['REPCOACH_CI_X64_SIM'] == '1'
 
 project 'Runner', {
   'Debug' => :debug,
@@ -44,6 +45,10 @@ post_install do |installer|
   installer.pods_project.build_configurations.each do |config|
     config.build_settings['EXCLUDED_ARCHS[sdk=*]'] = 'armv7'
     config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = $iOSVersion
+    if $repcoachCiX64Simulator
+      config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+      config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+    end
   end
 
   installer.pods_project.targets.each do |target|
@@ -58,8 +63,16 @@ post_install do |installer|
       definitions = config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] || ['$(inherited)']
       definitions << 'PERMISSION_CAMERA=1' unless definitions.include?('PERMISSION_CAMERA=1')
       config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] = definitions
+      if $repcoachCiX64Simulator
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = 'arm64'
+        config.build_settings['ONLY_ACTIVE_ARCH'] = 'YES'
+      end
     end
   end
 
-  mlkit_apple_silicon_simulator_patch(installer)
+  if $repcoachCiX64Simulator
+    Pod::UI.puts '[RepCoach CI] Using ML Kit native x86_64 simulator slices under Rosetta.'
+  else
+    mlkit_apple_silicon_simulator_patch(installer)
+  end
 end
