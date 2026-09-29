@@ -141,22 +141,57 @@ jobs:
           mkdir -p "$fixture_dir" "$GITHUB_WORKSPACE/ci-artifacts"
           echo "$TEST_VIDEO_KEY" > "$GITHUB_WORKSPACE/ci-artifacts/fixture-key.txt"
 
-          if gh release download ci-fixtures               --repo "$GITHUB_REPOSITORY"               --pattern "$TEST_VIDEO_ASSET"               --dir "$fixture_dir" >/dev/null 2>&1; then
+          parts_dir="$fixture_dir/parts"
+          mkdir -p "$parts_dir"
+
+          if gh release download ci-fixtures \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern "$TEST_VIDEO_ASSET" \
+              --dir "$fixture_dir" >/dev/null 2>&1; then
             echo "fixture_source=github-release" | tee -a "$GITHUB_OUTPUT"
+          elif gh release download ci-fixtures \
+              --repo "$GITHUB_REPOSITORY" \
+              --pattern "$TEST_VIDEO_ASSET.part.*" \
+              --dir "$parts_dir" >/dev/null 2>&1; then
+            cat "$parts_dir"/"$TEST_VIDEO_ASSET".part.* > "$fixture"
+            echo "fixture_source=github-release-chunks" | tee -a "$GITHUB_OUTPUT"
           else
             echo "CI fixture is not in GitHub Release yet; downloading Google Drive once."
             gdown_venv="$RUNNER_TEMP/gdown-venv"
             python3 -m venv "$gdown_venv"
             "$gdown_venv/bin/python" -m pip install --quiet --upgrade pip
             "$gdown_venv/bin/python" -m pip install --quiet gdown
-            "$gdown_venv/bin/python" -m gdown "https://drive.google.com/uc?id=$TEST_VIDEO_ID" -O "$fixture"
+            "$gdown_venv/bin/python" -m gdown \
+              "https://drive.google.com/uc?id=$TEST_VIDEO_ID" \
+              -O "$fixture"
 
             test -s "$fixture"
-            gh release view ci-fixtures --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 ||               gh release create ci-fixtures                 --repo "$GITHUB_REPOSITORY"                 --title "RepCoach CI fixtures"                 --notes "Private reusable test fixtures used by GitHub Actions."
+            gh release view ci-fixtures --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 || \
+              gh release create ci-fixtures \
+                --repo "$GITHUB_REPOSITORY" \
+                --title "RepCoach CI fixtures" \
+                --notes "Private reusable test fixtures used by GitHub Actions."
 
-            gh release upload ci-fixtures               --repo "$GITHUB_REPOSITORY"               "$fixture#$TEST_VIDEO_ASSET"               --clobber
-
-            echo "fixture_source=google-drive-then-github-release" | tee -a "$GITHUB_OUTPUT"
+            fixture_bytes="$(stat -f%z "$fixture")"
+            if (( fixture_bytes > 1900000000 )); then
+              echo "Fixture is $fixture_bytes bytes; caching as <2 GB release chunks."
+              rm -rf "$parts_dir"
+              mkdir -p "$parts_dir"
+              split -b 1800m "$fixture" "$parts_dir/$TEST_VIDEO_ASSET.part."
+              for part in "$parts_dir"/"$TEST_VIDEO_ASSET".part.*; do
+                gh release upload ci-fixtures \
+                  --repo "$GITHUB_REPOSITORY" \
+                  "$part" \
+                  --clobber
+              done
+              echo "fixture_source=google-drive-then-github-release-chunks" | tee -a "$GITHUB_OUTPUT"
+            else
+              gh release upload ci-fixtures \
+                --repo "$GITHUB_REPOSITORY" \
+                "$fixture" \
+                --clobber
+              echo "fixture_source=google-drive-then-github-release" | tee -a "$GITHUB_OUTPUT"
+            fi
           fi
 
           test -s "$fixture"
