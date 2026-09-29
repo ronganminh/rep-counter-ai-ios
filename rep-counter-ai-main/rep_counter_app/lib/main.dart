@@ -10,7 +10,8 @@ import 'theme/app_theme.dart';
 import 'app/app_shell.dart';
 import 'app/route_observer.dart';
 import 'features/legal/onboarding_page.dart';
-import 'local_video_test_page.dart';
+import 'camera_page.dart';
+import 'exercise.dart';
 
 const _ciVideoAsset = String.fromEnvironment('REPCOACH_CI_VIDEO_ASSET');
 
@@ -62,8 +63,9 @@ class _RepCounterAppState extends State<RepCounterApp> {
             themeMode: ThemeMode.dark,
             navigatorObservers: [appRouteObserver],
             home: _ciVideoAsset.isNotEmpty
-                ? LocalVideoTestPage(
-                    autoVideoPath:
+                ? CameraPage(
+                    profile: pushUp,
+                    ciVideoPath:
                         '${Directory.systemTemp.path}/$_ciVideoAsset',
                   )
                 : _onboarded == null
