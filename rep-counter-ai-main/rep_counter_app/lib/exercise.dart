@@ -173,7 +173,7 @@ class ExerciseProfile {
     this.smoothWindow = 5,
     this.startFromTop = false,
     this.countGate,
-    this.minRepsPerSet = 3,
+    this.minRepsPerSet = 1,
   });
 
   final String id;
@@ -221,11 +221,10 @@ class ExerciseProfile {
   /// xuống duỗi thẳng — đủ một vòng để bị tính rep.
   final CountGate? countGate;
 
-  /// Set ít rep hơn mức này bị trừ khỏi tổng khi nghỉ quá 6 s.
+  /// Ngưỡng nhóm set cũ, giữ lại để tương thích cấu hình.
   ///
-  /// Hít đất cần 3: một hai lần gập tay lẻ gần như luôn là lúc chống tay vào tư
-  /// thế. Kéo xà thì set 1–2 rep là bình thường (video quay lưng: 15 set × 2
-  /// rep — với mức 3 cả buổi bị trừ về 0), còn rep ma đã bị [countGate] chặn.
+  /// Rep đã được engine xác nhận không còn bị trừ theo độ dài set; set chỉ dùng
+  /// để nhóm lịch sử/nhịp tập. Giá trị mặc định vì vậy là 1.
   final int minRepsPerSet;
 }
 
