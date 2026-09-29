@@ -44,7 +44,7 @@ const exerciseHelpVi = <String, ExerciseHelp>{
     notCounted: [
       'Mất dấu người, hoặc rời tư thế quá 2 giây.',
       'Làm quá nhanh: hai lần đẩy lên sát nhau dưới 0,7 giây.',
-      'Set chỉ có 1–2 rep rồi nghỉ: app coi đó là chỉnh tư thế và trừ lại.',
+      'Rep chỉ được cộng sau khi hoàn tất đủ biên độ; nghỉ giữa các rep không làm mất số đã đếm.',
     ],
   ),
   'pull_up': ExerciseHelp(
@@ -92,7 +92,7 @@ const exerciseHelpEn = <String, ExerciseHelp>{
     notCounted: [
       'The app loses track of you, or you leave the position for more than 2 seconds.',
       'Going too fast: two push-ups finishing less than 0.7 s apart.',
-      'A set of only 1–2 reps followed by a rest: treated as getting into position and taken back off.',
+      'A rep is only added after a full valid cycle; resting later never removes reps already counted.',
     ],
   ),
   'pull_up': ExerciseHelp(
