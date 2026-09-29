@@ -2,13 +2,15 @@
 library;
 
 import 'dart:async';
-import 'dart:io' show Platform;
+import 'dart:io' show File, Platform;
 import 'dart:math' as math;
 
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:video_player/video_player.dart';
 
 import 'core/i18n/app_strings.dart';
 import 'core/services/training_preferences.dart';
@@ -48,11 +50,39 @@ Landmarks remapPose(Pose pose, PoseMapper mapper) {
   return Landmarks(out);
 }
 
+class _CiWorkoutClock implements WorkoutClock {
+  Duration _elapsed = Duration.zero;
+  bool _running = false;
+
+  set elapsed(Duration value) {
+    if (_running) _elapsed = value;
+  }
+
+  @override
+  Duration get elapsed => _elapsed;
+  @override
+  bool get isRunning => _running;
+  @override
+  void start() => _running = true;
+  @override
+  void stop() => _running = false;
+}
+
 class CameraPage extends StatefulWidget {
-  const CameraPage({super.key, required this.profile, this.targetReps});
+  const CameraPage({
+    super.key,
+    required this.profile,
+    this.targetReps,
+    this.ciVideoPath,
+  });
 
   final ExerciseProfile profile;
   final int? targetReps;
+
+  /// CI-only camera substitute. When set, the production workout screen and
+  /// production rep pipeline stay intact; only the camera image source is
+  /// replaced by a prerecorded video from the app sandbox.
+  final String? ciVideoPath;
 
   @override
   State<CameraPage> createState() => _CameraPageState();
@@ -77,7 +107,12 @@ enum _CameraState {
 
 class _CameraPageState extends State<CameraPage>
     with WidgetsBindingObserver {
+  static const _videoFrames = MethodChannel('rep_counter/video_frames');
+
   CameraController? _cam;
+  VideoPlayerController? _ciVideo;
+  final _ciTrackingClock = _CiWorkoutClock();
+  final _ciSessionClock = _CiWorkoutClock();
   late final PoseDetector _detector;
   late GuideZone _guide;
   late S _strings;
@@ -164,18 +199,33 @@ class _CameraPageState extends State<CameraPage>
         'A matching voice is unavailable on this device. On-screen counting still works.')); }
     });
     _loadTrainingPreferences();
-    _workout = WorkoutController(profile: p, targetReps: widget.targetReps)
-      ..addListener(_workoutChanged);
+    _workout = WorkoutController(
+      profile: p,
+      targetReps: widget.targetReps,
+      trackingClock: widget.ciVideoPath == null ? null : _ciTrackingClock,
+      clock: widget.ciVideoPath == null ? null : _ciSessionClock,
+    )..addListener(_workoutChanged);
     // Ban store tra ve false ngay, nen nut ghi khong bao gio hien o ban do.
     DiagRecorder.instance.available.then((ok) {
       if (mounted && ok) setState(() => _diagAvailable = true);
     });
     _detector = PoseDetector(
       options: PoseDetectorOptions(
-          mode: PoseDetectionMode.stream, model: PoseDetectionModel.base),
+        mode: widget.ciVideoPath == null
+            ? PoseDetectionMode.stream
+            : PoseDetectionMode.single,
+        model: PoseDetectionModel.base,
+      ),
     );
     _buildCounters(p.repHi, p.repLo, p.minAmplitude);
-    _skipConsentIfAlreadyGranted();
+    if (widget.ciVideoPath != null) {
+      _cameraState = _CameraState.initializing;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) unawaited(_startCiVideo());
+      });
+    } else {
+      _skipConsentIfAlreadyGranted();
+    }
   }
 
   Future<void> _loadTrainingPreferences() async {
