@@ -114,6 +114,7 @@ class _CameraPageState extends State<CameraPage>
   VideoPlayerController? _ciVideo;
   final _ciTrackingClock = _CiWorkoutClock();
   final _ciSessionClock = _CiWorkoutClock();
+  int? _ciSavedReps;
   late final PoseDetector _detector;
   late GuideZone _guide;
   late S _strings;
@@ -541,8 +542,21 @@ class _CameraPageState extends State<CameraPage>
     // Exercise the same save/result transition as a real workout too.
     await _finishWorkout();
     await Future<void>.delayed(const Duration(seconds: 2));
+    final savedReps = _ciSavedReps;
+    if (savedReps == null) {
+      await _writeCiStatus(
+        '[CI_VIDEO_ERROR] missing_saved_rep_count hud_reps=$reps',
+      );
+      return;
+    }
+    if (savedReps != reps) {
+      await _writeCiStatus(
+        '[CI_VIDEO_ERROR] rep_count_mismatch hud_reps=$reps saved_reps=$savedReps',
+      );
+      return;
+    }
     await _writeCiStatus(
-      '[CI_VIDEO_RESULT] mode=production_workout frames=$processed reps=$reps duration_ms=$durationMs',
+      '[CI_VIDEO_RESULT] mode=production_workout frames=$processed hud_reps=$reps saved_reps=$savedReps result_reps=$savedReps duration_ms=$durationMs',
     );
   }
 
@@ -976,6 +990,7 @@ class _CameraPageState extends State<CameraPage>
       _cam = null;
       if (camera != null) _cameraShutdown = _releaseCamera(camera);
       final record = await saving;
+      _ciSavedReps = record.reps;
       await _cameraShutdown;
       if (!mounted) return;
       _allowPop = true;
