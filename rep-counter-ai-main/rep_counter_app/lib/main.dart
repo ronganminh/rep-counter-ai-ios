@@ -12,6 +12,8 @@ import 'app/route_observer.dart';
 import 'features/legal/onboarding_page.dart';
 import 'local_video_test_page.dart';
 
+const _ciVideoAsset = String.fromEnvironment('REPCOACH_CI_VIDEO_ASSET');
+
 void main() => runApp(const RepCounterApp());
 
 class RepCounterApp extends StatefulWidget {
@@ -59,9 +61,10 @@ class _RepCounterAppState extends State<RepCounterApp> {
             darkTheme: RepCoachTheme.dark(),
             themeMode: ThemeMode.dark,
             navigatorObservers: [appRouteObserver],
-            home: (Platform.environment['REPCOACH_CI_VIDEO_PATH'] ?? '').isNotEmpty
+            home: _ciVideoAsset.isNotEmpty
                 ? LocalVideoTestPage(
-                    autoVideoPath: Platform.environment['REPCOACH_CI_VIDEO_PATH'],
+                    autoVideoPath:
+                        '${Directory.systemTemp.path}/$_ciVideoAsset',
                   )
                 : _onboarded == null
                 ? const Scaffold(
