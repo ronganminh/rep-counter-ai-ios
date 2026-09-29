@@ -361,6 +361,43 @@ void main() {
     });
   }
 
+  testWidgets('manual AI request requires explicit per-request consent',
+      (tester) async {
+    var requests = 0;
+    await pump(
+        tester,
+        ResultPage(
+            record: record(),
+            aiConfigured: true,
+            analyze: (_, __) async {
+              requests++;
+              return 'Consent-approved feedback';
+            },
+            saveFeedback: (_, __) async {}));
+
+    await tester.ensureVisible(find.byKey(const Key('ask-result-ai')));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.byKey(const Key('ask-result-ai')));
+    await tester.pumpAndSettle();
+    expect(requests, 0);
+    expect(find.text('Gửi số liệu buổi tập cho AI?'), findsOneWidget);
+    expect(find.byKey(const Key('accept-manual-ai')), findsOneWidget);
+
+    await tester.tap(find.byKey(const Key('cancel-manual-ai')));
+    await tester.pumpAndSettle();
+    expect(requests, 0);
+
+    await tester.tap(find.byKey(const Key('ask-result-ai')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('accept-manual-ai')));
+    await tester.pumpAndSettle();
+
+    expect(requests, 1);
+    expect(find.text('Consent-approved feedback'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
   testWidgets(
       'page retry saves received text, no automatic request or duplicate call',
       (tester) async {
@@ -382,6 +419,10 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('ask-result-ai')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('ask-result-ai')));
+    await tester.pumpAndSettle();
+    expect(requests, 0);
+    expect(find.byKey(const Key('accept-manual-ai')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('accept-manual-ai')));
     await tester.pump();
     expect(
         tester
@@ -419,6 +460,9 @@ void main() {
     await tester.ensureVisible(find.byKey(const Key('ask-result-ai')));
     await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('ask-result-ai')));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('accept-manual-ai')), findsOneWidget);
+    await tester.tap(find.byKey(const Key('accept-manual-ai')));
     await tester.pump();
     expect(find.byKey(const Key('ai-loading')), findsOneWidget);
     selected.value = record(id: 'new', reps: 18);
