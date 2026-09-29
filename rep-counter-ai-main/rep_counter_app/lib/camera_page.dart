@@ -937,7 +937,9 @@ class _CameraPageState extends State<CameraPage>
   Future<void> _resumeWorkout() async {
     _pauseTimer?.cancel();
     _manualPaused = false;
-    if (_cam == null) {
+    if (_ciVideo != null) {
+      _workout.cameraStarted();
+    } else if (_cam == null) {
       await _resumeCamera();
     } else {
       _workout.cameraStarted();
@@ -974,7 +976,9 @@ class _CameraPageState extends State<CameraPage>
       if (!mounted) return;
       _notify(context.tr('Chưa lưu được buổi tập. Bạn có thể thử lại.',
           'Could not save your workout. You can retry.'));
-      if (!_inBackground && _cam == null) await _resumeCamera();
+      if (widget.ciVideoPath == null && !_inBackground && _cam == null) {
+        await _resumeCamera();
+      }
     }
   }
 
@@ -1093,6 +1097,8 @@ class _CameraPageState extends State<CameraPage>
     if (_diagRecording) DiagRecorder.instance.stop();
     final cam = _cam;
     if (cam != null) unawaited(_releaseCamera(cam));
+    final ciVideo = _ciVideo;
+    if (ciVideo != null) unawaited(ciVideo.dispose());
     unawaited(_detector.close().catchError((Object error) {
       debugPrint('pose detector close: $error');
     }));
@@ -1108,10 +1114,12 @@ class _CameraPageState extends State<CameraPage>
       ])));
     }
     final cam = _cam;
-    if (_manualPaused && cam == null) {
+    final ciVideo = _ciVideo;
+    final ciVideoReady = ciVideo?.value.isInitialized == true;
+    if (_manualPaused && cam == null && !ciVideoReady) {
       return Scaffold(body: SafeArea(child: _hud()));
     }
-    if (cam == null || !cam.value.isInitialized) {
+    if (!ciVideoReady && (cam == null || !cam.value.isInitialized)) {
       return _cameraGate();
     }
     return PopScope(
@@ -1124,14 +1132,23 @@ class _CameraPageState extends State<CameraPage>
         body: Stack(
           fit: StackFit.expand,
           children: [
-          FittedBox(
-            fit: BoxFit.cover,
-            child: SizedBox(
-              width: cam.value.previewSize!.height,
-              height: cam.value.previewSize!.width,
-              child: CameraPreview(cam),
+          if (ciVideoReady)
+            FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox.fromSize(
+                size: ciVideo!.value.size,
+                child: VideoPlayer(ciVideo),
+              ),
+            )
+          else
+            FittedBox(
+              fit: BoxFit.cover,
+              child: SizedBox(
+                width: cam!.value.previewSize!.height,
+                height: cam.value.previewSize!.width,
+                child: CameraPreview(cam),
+              ),
             ),
-          ),
           CustomPaint(
             painter: PoseOverlayPainter(
               profile: p,
