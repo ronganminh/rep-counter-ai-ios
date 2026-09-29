@@ -175,6 +175,11 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
         if (atMs % 1000 == 0 && mounted) {
           setState(() => _progress = analyzeMs == 0 ? 1 : atMs / analyzeMs);
         }
+        if (atMs % 5000 == 0) {
+          await _writeCiStatus(
+            '[CI_VIDEO_STATUS] analyzing at_ms=$atMs total_ms=$analyzeMs frames=${output.length}',
+          );
+        }
       }
       if (!mounted || _video != controller) return;
       setState(() {
