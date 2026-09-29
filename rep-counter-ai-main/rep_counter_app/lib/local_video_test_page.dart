@@ -66,6 +66,19 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
   double _flash = 0;
   bool _reportedResult = false;
 
+  String get _ciResultPath =>
+      '${Directory.systemTemp.path}/ci-video-result.txt';
+
+  Future<void> _writeCiStatus(String line) async {
+    final path = widget.autoVideoPath;
+    if (path == null || path.isEmpty) return;
+    try {
+      await File(_ciResultPath).writeAsString('$line\n', flush: true);
+    } catch (error) {
+      debugPrint('[CI_VIDEO_ERROR] status_write_failed error=$error');
+    }
+  }
+
   @override
   void initState() {
     super.initState();
@@ -103,10 +116,13 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
   Future<void> _analyzePath(String path) async {
     final input = File(path);
     if (!await input.exists()) {
-      debugPrint('[CI_VIDEO_ERROR] missing_file path=$path');
+      final line = '[CI_VIDEO_ERROR] missing_file path=$path';
+      debugPrint(line);
+      await _writeCiStatus(line);
       if (mounted) setState(() => _message = 'Không tìm thấy video: $path');
       return;
     }
+    await _writeCiStatus('[CI_VIDEO_STATUS] analyzing path=$path');
     await _video?.dispose();
     final controller = VideoPlayerController.file(File(path));
     await controller.initialize();
@@ -169,7 +185,9 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
       });
       await _replay();
     } catch (error) {
-      debugPrint('[CI_VIDEO_ERROR] analyze_failed error=$error');
+      final line = '[CI_VIDEO_ERROR] analyze_failed error=$error';
+      debugPrint(line);
+      await _writeCiStatus(line);
       if (mounted) {
         setState(() {
           _analyzing = false;
@@ -209,9 +227,10 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
         _reportedResult = true;
         WidgetsBinding.instance.addPostFrameCallback((_) {
           final durationMs = video.value.duration.inMilliseconds;
-          debugPrint(
-            '[CI_VIDEO_RESULT] frames=${_frames.length} reps=${_counter.count} duration_ms=$durationMs',
-          );
+          final line =
+              '[CI_VIDEO_RESULT] frames=${_frames.length} reps=${_counter.count} duration_ms=$durationMs';
+          debugPrint(line);
+          unawaited(_writeCiStatus(line));
         });
       }
     }
