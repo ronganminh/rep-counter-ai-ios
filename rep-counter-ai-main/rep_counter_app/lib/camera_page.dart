@@ -9,6 +9,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
+import 'package:image/image.dart' as img;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
@@ -502,7 +503,14 @@ class _CameraPageState extends State<CameraPage>
       });
 
       Pose? pose;
+      var poseImageSize = rawSize;
       if (thumbnail != null) {
+        final bytes = await File(thumbnail).readAsBytes();
+        final decoded = img.decodeImage(bytes);
+        if (decoded != null) {
+          poseImageSize =
+              Size(decoded.width.toDouble(), decoded.height.toDouble());
+        }
         final poses =
             await _detector.processImage(InputImage.fromFilePath(thumbnail));
         if (poses.isNotEmpty) pose = poses.first;
@@ -511,7 +519,7 @@ class _CameraPageState extends State<CameraPage>
       if (!mounted || !identical(_ciVideo, controller)) return;
       _consumePose(
         pose,
-        rawImageSize: rawSize,
+        rawImageSize: poseImageSize,
         rotationDegrees: 0,
         mirror: false,
       );
