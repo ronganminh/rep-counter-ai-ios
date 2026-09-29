@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:math' as math;
-
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rep_counter_app/exercise.dart';
 import 'package:rep_counter_app/placement.dart';
@@ -98,6 +96,35 @@ void main() {
     expect(controller.state.goalProgress, 1);
     expect(controller.state.goalReachedOnce, isTrue);
     expect(controller.state.phase, WorkoutUiPhase.active);
+  });
+
+  test('HUD reps never decrease and saved record keeps the same total',
+      () async {
+    controller.cameraStarted();
+    frame(controller);
+
+    clock.elapsed = const Duration(seconds: 2);
+    controller.acceptRep(observation(2), clock.elapsed);
+    expect(controller.state.reps, 1);
+
+    clock.elapsed = const Duration(seconds: 4);
+    controller.acceptRep(observation(4), clock.elapsed);
+    expect(controller.state.reps, 2);
+
+    clock.elapsed = const Duration(seconds: 11);
+    frame(controller);
+    expect(controller.state.reps, 2,
+        reason: 'rest may close a set but must never subtract accepted reps');
+
+    clock.elapsed = const Duration(seconds: 13);
+    controller.acceptRep(observation(13), clock.elapsed);
+    expect(controller.state.reps, 3);
+
+    final hudReps = controller.state.reps;
+    final record = await controller.finish(calibration: calibration);
+    expect(record.reps, hudReps);
+    expect(record.reps, 3);
+    expect(record.sets, 2);
   });
 
   test('camera restart keeps start time and excludes background time',
@@ -279,8 +306,10 @@ void main() {
       expect(c.state.completedSets, legacySession.sets.length);
       expect(c.state.sessionState, legacySession.state);
       final summary =
-          WorkoutAggregator(minRepsPerSet: math.min(2, profile.minRepsPerSet))
-              .build(
+          const WorkoutAggregator(
+            setGap: Duration(seconds: 6),
+            minRepsPerSet: 1,
+          ).build(
                   id: now.microsecondsSinceEpoch.toString(),
                   exerciseId: profile.id,
                   startedAt: now,
