@@ -621,7 +621,7 @@ class S {
     cameraOpening: 'Đang mở camera…',
     cameraOpeningBody: 'Quá trình này có thể mất vài giây.',
     cameraDeniedBody:
-        'Hãy cấp quyền Camera trong cài đặt Android rồi quay lại ứng dụng.',
+        'Hãy cấp quyền Camera trong cài đặt thiết bị rồi quay lại ứng dụng.',
     cameraUnavailableBody:
         'Camera có thể đang được ứng dụng khác sử dụng hoặc thiết bị không hỗ trợ định dạng cần thiết.',
     cameraReady: 'Camera sẵn sàng',
@@ -865,7 +865,7 @@ class S {
     cameraOpening: 'Opening the camera…',
     cameraOpeningBody: 'This can take a few seconds.',
     cameraDeniedBody:
-        'Grant the Camera permission in Android settings, then come back to the app.',
+        'Grant Camera permission in your device settings, then come back to the app.',
     cameraUnavailableBody:
         'The camera may be in use by another app, or this device does not support the required format.',
     cameraReady: 'Camera ready',
