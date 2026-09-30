@@ -13,7 +13,7 @@ MAX_PROVIDER_RESPONSE_BYTES = 65_536
 MAX_FEEDBACK_CHARS = 2_000
 PROVIDER_CONNECT_TIMEOUT_SECONDS = 5
 PROVIDER_RESPONSE_TIMEOUT_SECONDS = 15
-SUPPORTED_GEMINI_SERVICE_MODES = {"unpaid", "billing_enabled"}
+SUPPORTED_GEMINI_SERVICE_MODES = {"billing_enabled"}\n# RepCoach production privacy contract: never send workout summaries through\n# Gemini Unpaid Services. The exact Google project must still be verified in\n# AI Studio before GEMINI_SERVICE_MODE=billing_enabled is configured.
 
 PROMPT_FIELDS = (
     "exercise",
