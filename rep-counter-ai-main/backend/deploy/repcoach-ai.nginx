@@ -30,6 +30,12 @@ server {
     error_page 413 = @invalid_request_body;
     error_page 429 = @rate_limited;
 
+    location = /privacy-policy.html {
+        alias /home/nduythanh/apps/repcoach-backend/static/privacy-policy.html;
+        default_type text/html;
+        charset utf-8;
+    }
+
     location @method_not_allowed {
         default_type application/json;
         add_header Allow "POST" always;
