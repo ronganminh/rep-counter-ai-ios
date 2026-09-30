@@ -168,13 +168,27 @@ Commit: `902b6ab1acfe6f72f5d8f4676afa9bd1c1d53d61`
   - HUD reps: 28
   - saved reps: 28
   - result reps: 28
-- pushup-2 production replay: **INCONCLUSIVE / TIMEOUT**
+- pushup-2 production replay, attempt 1: **INCONCLUSIVE / POLL TIMEOUT**
   - fixture loaded successfully;
   - build/replay started;
-  - workflow timed out before `CI_VIDEO_RESULT`;
+  - polling ended before `CI_VIDEO_RESULT`;
   - there is no logged count mismatch to justify a re-baseline.
+- pushup-2 production replay, attempt 2: **CANCELLED BY JOB TIME LIMIT**
+  - analyze/tests and pushup-1 remained green;
+  - replay continued making forward progress and did not hit the five-minute stall detector;
+  - last recorded status before cancellation:
+    - `at_ms=1550000` of `total_ms=1801219`;
+    - `frames=7751`;
+    - `reps=65`;
+    - `phase=active`;
+  - the job then ended with `The operation was canceled.`;
+  - the workflow config sets `timeout-minutes: 75` for this iOS replay job, so the
+    observed cancellation is consistent with infrastructure timeout rather than a
+    rep-count mismatch.
 
-Therefore current `main` is not a fully green two-video run.
+Therefore current `main` still does not have a completed green pushup-2 result. The
+evidence points to insufficient CI time budget, not to a demonstrated engine regression.
+Do not change the 67 baseline to make CI green.
 
 ### Last complete green two-video run — GitHub Actions run #23
 
