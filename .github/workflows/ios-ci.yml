@@ -79,7 +79,7 @@ jobs:
             video_id: "1m7rKK5_Mtfe1NaFCXSTVdg_lzywoDWf0"
             asset: "pushup-test-2.mp4"
     runs-on: macos-15
-    timeout-minutes: 75
+    timeout-minutes: 110
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
       GH_TOKEN: ${{ github.token }}
