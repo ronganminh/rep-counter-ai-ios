@@ -54,13 +54,19 @@ class ApiSecurityTests(unittest.TestCase):
 
     def setUp(self):
         self.old_key = os.environ.get("GEMINI_API_KEY")
+        self.old_mode = os.environ.get("GEMINI_SERVICE_MODE")
         os.environ["GEMINI_API_KEY"] = "TEST_API_KEY_SENTINEL"
+        os.environ["GEMINI_SERVICE_MODE"] = "billing_enabled"
 
     def tearDown(self):
         if self.old_key is None:
             os.environ.pop("GEMINI_API_KEY", None)
         else:
             os.environ["GEMINI_API_KEY"] = self.old_key
+        if self.old_mode is None:
+            os.environ.pop("GEMINI_SERVICE_MODE", None)
+        else:
+            os.environ["GEMINI_SERVICE_MODE"] = self.old_mode
 
     def request(self, method="POST", body=None, headers=None):
         conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=3)
@@ -150,6 +156,12 @@ class ApiSecurityTests(unittest.TestCase):
         status, _, body = self.request(body=valid_v2())
         self.assertEqual((status, body), (503, {"error": "AI_UNAVAILABLE"}))
         self.assertNotIn("GEMINI_API_KEY", json.dumps(body))
+
+    def test_missing_service_mode_does_not_expose_configuration(self):
+        os.environ.pop("GEMINI_SERVICE_MODE", None)
+        status, _, body = self.request(body=valid_v2())
+        self.assertEqual((status, body), (503, {"error": "AI_UNAVAILABLE"}))
+        self.assertNotIn("GEMINI_SERVICE_MODE", json.dumps(body))
 
     def test_malformed_json_is_invalid_request(self):
         status, _, body = self.request(body='{"reps":')
