@@ -16,9 +16,39 @@ server {
     ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
 
     client_max_body_size 16k;
+    limit_req_status 429;
+    limit_req_log_level warn;
+
+    access_log /var/log/nginx/repcoach-ai.access.log repcoach_meta;
+    error_log /var/log/nginx/repcoach-ai.error.log warn;
+
     add_header Strict-Transport-Security "max-age=31536000" always;
     add_header X-Content-Type-Options nosniff always;
     add_header Cache-Control "no-store" always;
+
+    error_page 405 = @method_not_allowed;
+    error_page 413 = @invalid_request_body;
+    error_page 429 = @rate_limited;
+
+    location @method_not_allowed {
+        default_type application/json;
+        add_header Allow "POST" always;
+        add_header Cache-Control "no-store" always;
+        return 405 '{"error":"INVALID_REQUEST"}';
+    }
+
+    location @invalid_request_body {
+        default_type application/json;
+        add_header Cache-Control "no-store" always;
+        return 413 '{"error":"INVALID_REQUEST"}';
+    }
+
+    location @rate_limited {
+        default_type application/json;
+        add_header Retry-After "60" always;
+        add_header Cache-Control "no-store" always;
+        return 429 '{"error":"RATE_LIMITED"}';
+    }
 
     location = /health {
         limit_req zone=repcoach_api burst=10 nodelay;
@@ -26,18 +56,22 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 5s;
     }
 
     location = /v1/workout-feedback {
+        if ($request_method != POST) { return 405; }
+
         limit_req zone=repcoach_api burst=5 nodelay;
-        limit_except POST { deny all; }
         proxy_pass http://127.0.0.1:8787;
         proxy_http_version 1.1;
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_connect_timeout 5s;
-        proxy_read_timeout 30s;
+        proxy_connect_timeout 2s;
+        proxy_send_timeout 5s;
+        proxy_read_timeout 22s;
     }
 
     location / {
