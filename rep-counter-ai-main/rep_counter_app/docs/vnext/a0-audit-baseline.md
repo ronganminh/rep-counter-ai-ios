@@ -240,6 +240,19 @@ human annotation must remain separately measurable.
 A0 must not be reported as fully green while the current-main pushup-2 replay remains
 inconclusive. Do not change 67 merely to make CI green.
 
+## 8. CI timeout remediation
+
+The infrastructure timeout identified during A0 was fixed on `main` without touching
+the rep engine:
+
+- commit: `9bfc57057fb03c7ba671c72b2a3136c3ef3fcd7e`
+- change: iOS replay job `timeout-minutes` increased from `75` to `110`
+- new validation run: GitHub Actions run `36756011685` (run #25)
+- baseline remains `pushup-a = 28`, `pushup-b = 67`
+
+This is an infrastructure-only remediation. A0 is fully green only after run #25
+finishes with both production replay fixtures matching their frozen engine baselines.
+
 ## 8. Stop boundary
 
 No A1 implementation is included in this branch.
