@@ -688,22 +688,22 @@ class S {
     legalEffective: 'Có hiệu lực',
     legalDate: LegalConfig.effectiveDate,
     privacyIntroBody:
-        'tôn trọng quyền riêng tư. Chính sách này mô tả dữ liệu được xử lý khi bạn dùng ứng dụng.',
+        'tôn trọng quyền riêng tư. Bộ đếm rep chạy trên thiết bị; nhận xét AI là tùy chọn và chỉ gửi bản tóm tắt giới hạn khi bạn đồng ý.',
     privCameraTitle: 'Camera và video',
     privCameraBody:
-        'Ứng dụng dùng camera để nhận diện tư thế và đếm số lần lặp động tác. Khung hình camera, video bạn tự chọn để kiểm thử và landmark tư thế đều được xử lý trên thiết bị. Ứng dụng không tải những hình ảnh hay video này lên máy chủ.',
+        'Ứng dụng dùng camera để nhận diện tư thế và đếm rep. Khung hình camera trực tiếp và landmark dùng cho việc đếm được xử lý trên thiết bị. Ảnh camera, video buổi tập và tọa độ landmark thô không được gửi tới backend để đếm rep hoặc nhận xét AI.',
     privWorkoutTitle: 'Dữ liệu buổi tập',
     privWorkoutBody:
-        'Số rep, thời lượng, mục tiêu buổi tập và các chỉ số chất lượng động tác được lưu cục bộ trên thiết bị để hiển thị lịch sử tập.',
+        'Lịch sử tập được lưu cục bộ trên thiết bị và có thể gồm rep, set, thời lượng, mục tiêu, thống kê pose/chất lượng, chi tiết từng rep, hiệu chỉnh và nhận xét AI đã trả về. Kho lịch sử giữ tối đa 100 bản ghi đọc được gần nhất.',
     privAiTitle: 'Nhận xét AI',
     privAiBody:
-        'Khi bạn chủ động yêu cầu hoặc đã đồng ý bật nhận xét AI tự động, ứng dụng gửi bản tóm tắt buổi tập đến máy chủ do nhà phát triển vận hành và Google Gemini. Bản tóm tắt có thể gồm số rep, thời lượng, mục tiêu và các chỉ số chất lượng động tác. Nó không chứa hình ảnh, video hay landmark tư thế thô.',
+        'Khi bạn chủ động yêu cầu hoặc đã đồng ý bật AI tự động, app gửi bản tóm tắt giới hạn gồm bài tập, mục tiêu, rep/set, thời lượng, thống kê pose và chỉ số chất lượng tới backend RepCoach AI. Production chỉ cho phép gửi tiếp tới project Gemini đã xác minh có billing. Không gửi ảnh, video, âm thanh hoặc tọa độ landmark thô.',
     privRetentionTitle: 'Lưu giữ và xóa dữ liệu',
     privRetentionBody:
-        'Lịch sử tập được giữ trên thiết bị cho đến khi bạn xóa trong ứng dụng, xóa dữ liệu ứng dụng trong cài đặt Android, hoặc gỡ cài đặt. Phiên bản này không tạo tài khoản người dùng. Bản tóm tắt gửi cho AI chỉ được xử lý để tạo phản hồi và không được máy chủ của ứng dụng lưu lại.',
+        'Lịch sử tập và nhận xét AI đã lưu nằm trên thiết bị cho đến khi bạn xóa trong app, xóa dữ liệu ứng dụng hoặc gỡ app. Backend không chủ ý lưu workout body/prompt/response thành lịch sử server. Nginx log xoay mỗi ngày, giữ log hiện tại cộng 14 bản xoay; metadata backend còn đi vào system journal theo cấu hình VPS.',
     privSecurityTitle: 'Bảo mật và bên xử lý',
     privSecurityBody:
-        'Dữ liệu gửi đi để lấy nhận xét AI được truyền qua HTTPS. Google xử lý các yêu cầu Gemini theo điều khoản và chính sách quyền riêng tư hiện hành của họ. Hạ tầng Internet có thể xử lý thông tin kỹ thuật như địa chỉ IP trong quá trình cung cấp dịch vụ.',
+        'Dữ liệu AI được truyền qua HTTPS. RepCoach production chỉ cho phép Gemini Paid Services. Theo điều khoản hiện hành của Google, prompt/response Paid Services không được dùng để cải thiện sản phẩm của Google nhưng có thể được log trong thời gian giới hạn để chống lạm dụng và đáp ứng yêu cầu pháp lý. RepCoach không tuyên bố zero-data-retention.',
     privContactTitle: 'Liên hệ',
     termsIntroPrefix: 'Khi sử dụng',
     termsIntroSuffix: ', bạn đồng ý với các điều khoản dưới đây.',
@@ -727,10 +727,10 @@ class S {
         'Các tính năng có thể thay đổi, bị gián đoạn hoặc ngừng cung cấp. Điều khoản có thể được cập nhật và ngày hiệu lực mới sẽ được công bố tại đây.',
     privChildrenTitle: 'Quyền riêng tư của trẻ em',
     privChildrenBody:
-        'Ứng dụng không hướng đến trẻ em dưới 13 tuổi, và chúng tôi không cố ý thu thập thông tin cá nhân của trẻ em dưới 13 tuổi.',
+        'Nhận xét AI dùng Gemini chỉ dành cho người từ 18 tuổi trở lên theo yêu cầu hiện hành của nhà cung cấp. RepCoach không được bật tính năng Gemini ở production nếu cách phân phối và kiểm soát đối tượng chưa đáp ứng các yêu cầu đó.',
     privChoicesTitle: 'Lựa chọn của bạn',
     privChoicesBody:
-        'Bạn có thể dùng bộ đếm rep chạy trên thiết bị mà không cần yêu cầu nhận xét AI. Bạn có thể thu hồi quyền camera bất cứ lúc nào trong cài đặt Android và xóa lịch sử tập lưu trên máy ngay trong ứng dụng.',
+        'Bạn có thể dùng bộ đếm rep trên thiết bị mà không bật AI. Bạn có thể thu hồi quyền camera trong cài đặt thiết bị, tắt AI tự động cho các yêu cầu tương lai và xóa lịch sử tập/hiệu chỉnh lưu trên máy trong ứng dụng. Việc tắt hoặc xóa cục bộ không thể thu hồi yêu cầu AI đã gửi.',
     privChangesTitle: 'Thay đổi và liên hệ',
     privChangesBody:
         'Chính sách này có thể được cập nhật. Ngày hiệu lực ở trên cho biết bản sửa đổi mới nhất. Mọi câu hỏi về quyền riêng tư xin gửi về địa chỉ dưới đây.',
@@ -932,22 +932,22 @@ class S {
     legalEffective: 'Effective',
     legalDate: LegalConfig.effectiveDateEn,
     privacyIntroBody:
-        'respects your privacy. This policy describes the data that is processed when you use the app.',
+        'respects your privacy. Rep counting runs on-device; AI feedback is optional and sends only a limited workout summary after consent.',
     privCameraTitle: 'Camera and video',
     privCameraBody:
-        'The app uses your camera to detect body pose and count exercise repetitions. Camera frames, videos that you select for testing, and pose landmarks are processed on your device. The app does not upload these images or videos to a server.',
+        'The app uses your camera to detect body pose and count repetitions. Live camera frames and landmarks used for counting are processed on-device. Camera images, workout video and raw landmark coordinates are not sent to the backend for rep counting or AI feedback.',
     privWorkoutTitle: 'Workout data',
     privWorkoutBody:
-        'Rep count, duration, workout goal, and movement-quality metrics are stored locally on your device to provide workout history.',
+        'Workout history is stored locally and can include reps, sets, duration, goals, pose/quality statistics, per-rep detail, calibration and returned AI feedback. The history store keeps up to the latest 100 readable workout records.',
     privAiTitle: 'AI feedback',
     privAiBody:
-        'When you explicitly request AI feedback or consent to automatic feedback, the app sends a workout summary to the server operated by the developer and to Google Gemini. The summary may contain rep count, duration, goal, and movement-quality metrics. It does not contain images, videos, or raw pose landmarks.',
+        'When you request AI feedback or opt in to automatic feedback, the app sends a limited summary including exercise, goal, reps/sets, duration, pose statistics and quality metrics to the RepCoach AI backend. Production only forwards requests to a verified billing-enabled Gemini project. No images, video, audio or raw landmark coordinates are sent.',
     privRetentionTitle: 'Data retention and deletion',
     privRetentionBody:
-        'Workout history remains on your device until you delete it in the app, clear the app data in Android settings, or uninstall the app. The current version does not provide user accounts. AI workout summaries are processed solely to generate a response and are not stored by the app backend.',
+        'Workout history and saved AI feedback remain on your device until deleted in the app, app storage is cleared, or the app is uninstalled. The backend does not intentionally keep workout bodies/prompts/responses as server history. Nginx logs rotate daily with the current log plus 14 rotations; backend metadata also enters the host system journal under VPS retention settings.',
     privSecurityTitle: 'Security and processors',
     privSecurityBody:
-        'Data sent for AI feedback is transmitted over HTTPS. Google processes Gemini requests under its applicable terms and privacy policies. Internet infrastructure may process technical information such as IP addresses as part of delivering the service.',
+        'AI data is sent over HTTPS. RepCoach production permits Gemini Paid Services only. Under Google\'s current terms, Paid Services prompts/responses are not used to improve Google products but may be logged for a limited period for abuse prevention and required legal disclosures. RepCoach does not claim zero data retention.',
     privContactTitle: 'Contact',
     termsIntroPrefix: 'By using',
     termsIntroSuffix: ', you agree to the terms below.',
@@ -971,10 +971,10 @@ class S {
         'Features may change, be interrupted, or be discontinued. We may update these terms, and a new effective date will be published here.',
     privChildrenTitle: 'Children and privacy',
     privChildrenBody:
-        'The app is not directed to children under 13, and we do not knowingly collect personal information from children under 13.',
+        'Gemini-backed AI feedback is for users aged 18 or older under the provider\'s current requirements. RepCoach must not enable Gemini in production unless product distribution and audience controls satisfy those requirements.',
     privChoicesTitle: 'Your choices',
     privChoicesBody:
-        'You can use the on-device rep counter without requesting AI feedback. You may revoke camera permission at any time in Android settings and delete locally stored workout history from within the app.',
+        'You can use the on-device rep counter without AI. You may revoke camera permission in your device settings, disable automatic AI for future requests, and delete locally stored workout history/calibration in the app. Disabling AI or deleting local data cannot recall an AI request already sent.',
     privChangesTitle: 'Changes and contact',
     privChangesBody:
         'We may update this policy. The effective date above identifies the latest revision. Send privacy questions to the address below.',
