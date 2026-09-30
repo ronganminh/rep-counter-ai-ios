@@ -61,7 +61,7 @@ vi
 en
 ```
 
-Validation includes required fields, strict primitive types, non-negative bounded numeric values, exercise/locale allowlists, `pose_lost_frames <= pose_frames`, `flagged_reps <= reps`, and strict unknown-field rejection.
+Validation includes required fields, JSON content type, strict primitive types, non-negative bounded numeric values, exercise/locale allowlists, `pose_lost_frames <= pose_frames`, `flagged_reps <= reps`, and strict unknown-field rejection.
 
 ### Success response
 
@@ -74,15 +74,80 @@ Validation includes required fields, strict primitive types, non-negative bounde
 
 Existing Flutter clients remain compatible because they already read the `feedback` field and ignore the added response metadata.
 
-Stable error-code work is intentionally deferred to Track B phase B2.
+## Stable failure contract
+
+The public endpoint does not return stack traces, API-key/configuration details, Gemini response bodies, or raw provider error bodies.
+
+| HTTP | error | Meaning |
+| --- | --- | --- |
+| 400 | `INVALID_REQUEST` | Malformed JSON, wrong content type, or validation failure |
+| 405 | `INVALID_REQUEST` | `/v1/workout-feedback` called with a non-POST method |
+| 413 | `INVALID_REQUEST` | Request body exceeds 16 KiB |
+| 429 | `RATE_LIMITED` | Nginx per-IP limit reached; response includes `Retry-After: 60` |
+| 502 | `AI_RESPONSE_INVALID` | Provider returned an unusable/malformed response |
+| 503 | `AI_UNAVAILABLE` | Provider/configuration/network unavailable |
+| 504 | `AI_TIMEOUT` | Provider exceeded the bounded timeout budget |
+| 500 | `SERVER_ERROR` | Unexpected server failure |
+
+## Timeout budget
+
+The layers are deliberately ordered so an inner layer fails before an outer caller gives up:
+
+```text
+Gemini connect timeout:   5 s
+Gemini response timeout: 15 s
+Backend total budget:    20 s
+Nginx backend read:      22 s
+Flutter request timeout: 25 s
+```
+
+The backend does not wait indefinitely for Gemini.
+
+## Privacy-safe operational logging
+
+Application logs contain operational metadata only:
+
+```text
+timestamp
+route
+method
+status
+latency_ms
+coarse request_size bucket
+error_code when present
+provider_status_class when present
+```
+
+Application logs never contain the workout body, Gemini prompt, Gemini response text, API key, secret headers, or stack traces.
+
+Nginx uses the `repcoach_meta` format and records only IP address plus request metadata required for operations/rate limiting: timestamp, method, URI path, status, response bytes, and request duration. It does not log request bodies, authorization headers, referrer, or user-agent in the RepCoach access log.
+
+The provided `deploy/repcoach-ai.logrotate` rotates RepCoach Nginx access/error logs daily and keeps 14 rotations with compression. The public Privacy Policy must be aligned with this actual metadata/retention behavior in Track B phase B4.
+
+## Rate limiting and request size
+
+- Nginx rate zone: `10r/m` per source IP.
+- Feedback burst: `5`, no delay.
+- Health burst: `10`, no delay.
+- Nginx and application body limit: 16 KiB.
+- Rate-limit response: HTTP 429 + `{"error":"RATE_LIMITED"}` + `Retry-After: 60`.
+- No account ID, device fingerprint, or workout identifier is introduced for rate limiting.
 
 ## Backend tests
 
-The contract/validation suite uses only the Python standard library and does not call Gemini:
+Tests use only the Python standard library and mocks; they do not call live Gemini:
 
 ```bash
 cd rep-counter-ai-main/backend
 python3 -m unittest discover -s tests -v
+```
+
+Coverage includes contract validation, request-size rejection, method rejection, timeout mapping, provider 4xx/5xx mapping, malformed provider responses, no-content logging checks, and deploy configuration checks.
+
+For an Nginx deployment, validate syntax before reload:
+
+```bash
+sudo nginx -t
 ```
 
 ## VPS layout
@@ -90,10 +155,27 @@ python3 -m unittest discover -s tests -v
 - Application: `/home/nduythanh/apps/repcoach-backend`
 - Service: `/etc/systemd/system/repcoach-backend.service`
 - Nginx site: `/etc/nginx/sites-available/repcoach-ai`
-- Rate limit: `/etc/nginx/conf.d/repcoach-rate-limit.conf`
+- Rate limit/log format: `/etc/nginx/conf.d/repcoach-rate-limit.conf`
+- Log rotation: `/etc/logrotate.d/repcoach-ai`
 - TLS certificate: `/etc/letsencrypt/live/repcoach-ai.duckdns.org/`
 
-The Python server listens only on `127.0.0.1:8787`. Nginx is the only public entry point and enforces HTTPS, a 16 KB body limit, request rate limiting, and security headers.
+The Python server listens only on `127.0.0.1:8787`. Nginx is the only public entry point and enforces HTTPS, the body limit, method restriction, rate limiting, bounded proxy timeouts, and security headers.
+
+## Deployment notes
+
+Install/update the three deployment files, then validate before reload:
+
+```bash
+sudo cp deploy/repcoach-ai.nginx /etc/nginx/sites-available/repcoach-ai
+sudo cp deploy/repcoach-rate-limit.conf /etc/nginx/conf.d/repcoach-rate-limit.conf
+sudo cp deploy/repcoach-ai.logrotate /etc/logrotate.d/repcoach-ai
+sudo nginx -t
+sudo logrotate -d /etc/logrotate.d/repcoach-ai
+sudo systemctl reload nginx
+sudo systemctl restart repcoach-backend
+```
+
+Do not deploy this branch merely by changing public Privacy Policy text first. Runtime behavior remains the source of truth.
 
 ## Operations
 
