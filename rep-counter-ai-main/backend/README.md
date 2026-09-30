@@ -1,11 +1,52 @@
 # RepCoach AI workout-feedback backend
 
-This service accepts a small JSON workout summary and forwards a constrained prompt to Google Gemini. Camera images, imported videos, audio, and raw pose landmarks are not accepted or transmitted.
+This service accepts a small JSON workout summary and forwards a constrained prompt to the configured AI provider. Camera images, imported videos, audio, and raw pose landmarks are not accepted or transmitted.
 
 ## Production endpoint
 
 - Health: `https://repcoach-ai.duckdns.org/health`
 - Feedback: `POST https://repcoach-ai.duckdns.org/v1/workout-feedback`
+
+## AI provider boundary
+
+The HTTP API depends on an `AiProvider` interface. Gemini-specific HTTP, prompt construction, response parsing, and provider timeout behavior live in `ai_provider.py`, not in the route handler.
+
+Current provider:
+
+```text
+AI_PROVIDER=gemini
+```
+
+Required Gemini settings:
+
+```text
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash-lite
+GEMINI_SERVICE_MODE=
+```
+
+`GEMINI_SERVICE_MODE` must be exactly one of:
+
+```text
+unpaid
+billing_enabled
+```
+
+This field is a runtime guard/documentation assertion only. It does not prove the Google project's actual billing state. The production operator must verify the exact project in Google AI Studio before setting it.
+
+See `docs/gemini-service-mode.md` for the official-terms verification record and the current production blocker.
+
+### Current production decision
+
+Do **not** infer that production is free or paid from the API key, model, source code, or `.env.example`. The repository does not contain the Google AI Studio billing state.
+
+As of the 2026-10-01 terms verification, the current Gemini Developer API terms also contain audience/use restrictions that matter to a consumer fitness app. A billing-enabled project changes prompt/response data-use treatment but does not by itself resolve those audience restrictions. Production deployment remains blocked until the exact project billing state and product/provider terms fit are verified.
+
+## Prompt/response constraints
+
+Only whitelisted aggregate workout-summary fields enter the provider prompt. The provider adapter excludes contract metadata and unrelated product data such as identity, routine libraries, full workout/PR history, badges/streaks, camera/video content, and raw landmarks.
+
+Gemini is instructed to return concise, non-medical workout feedback. Provider results are rejected when missing, malformed, empty, larger than the provider-response byte cap, or longer than 2,000 characters.
 
 ## Workout-feedback API contract
 
@@ -17,7 +58,7 @@ The endpoint temporarily accepts both the current v1 client contract and v2.
 - `schema_version: 1` remains accepted while the Flutter client is still on v1.
 - `schema_version: 2` requires `consent_version`.
 - Unknown fields are rejected instead of silently entering the contract.
-- `schema_version` and `consent_version` are contract/audit metadata and are not sent to Gemini.
+- `schema_version` and `consent_version` are contract/audit metadata and are not sent to the AI provider.
 
 ### v2 request example
 
@@ -84,7 +125,7 @@ The public endpoint does not return stack traces, API-key/configuration details,
 | 405 | `INVALID_REQUEST` | `/v1/workout-feedback` called with a non-POST method |
 | 413 | `INVALID_REQUEST` | Request body exceeds 16 KiB |
 | 429 | `RATE_LIMITED` | Nginx per-IP limit reached; response includes `Retry-After: 60` |
-| 502 | `AI_RESPONSE_INVALID` | Provider returned an unusable/malformed response |
+| 502 | `AI_RESPONSE_INVALID` | Provider returned an unusable/malformed/overlong response |
 | 503 | `AI_UNAVAILABLE` | Provider/configuration/network unavailable |
 | 504 | `AI_TIMEOUT` | Provider exceeded the bounded timeout budget |
 | 500 | `SERVER_ERROR` | Unexpected server failure |
@@ -101,7 +142,7 @@ Nginx backend read:      22 s
 Flutter request timeout: 25 s
 ```
 
-The backend does not wait indefinitely for Gemini.
+The backend does not wait indefinitely for the configured provider.
 
 ## Privacy-safe operational logging
 
@@ -118,7 +159,7 @@ error_code when present
 provider_status_class when present
 ```
 
-Application logs never contain the workout body, Gemini prompt, Gemini response text, API key, secret headers, or stack traces.
+Application logs never contain the workout body, AI prompt, AI response text, API key, secret headers, or stack traces.
 
 Nginx uses the `repcoach_meta` format and records only IP address plus request metadata required for operations/rate limiting: timestamp, method, URI path, status, response bytes, and request duration. It does not log request bodies, authorization headers, referrer, or user-agent in the RepCoach access log.
 
@@ -135,14 +176,14 @@ The provided `deploy/repcoach-ai.logrotate` rotates RepCoach Nginx access/error 
 
 ## Backend tests
 
-Tests use only the Python standard library and mocks; they do not call live Gemini:
+Tests use only the Python standard library, fakes, and mocks; they do not call live Gemini:
 
 ```bash
 cd rep-counter-ai-main/backend
 python3 -m unittest discover -s tests -v
 ```
 
-Coverage includes contract validation, request-size rejection, method rejection, timeout mapping, provider 4xx/5xx mapping, malformed provider responses, no-content logging checks, and deploy configuration checks.
+Coverage includes contract validation, request-size rejection, method rejection, timeout/error mapping, provider adapter swapping, required service-mode guards, prompt minimization, empty/invalid/overlong provider responses, no-content logging checks, and deploy configuration checks.
 
 For an Nginx deployment, validate syntax before reload:
 
@@ -163,7 +204,7 @@ The Python server listens only on `127.0.0.1:8787`. Nginx is the only public ent
 
 ## Deployment notes
 
-Install/update the three deployment files, then validate before reload:
+Install/update the deployment files, then validate before reload:
 
 ```bash
 sudo cp deploy/repcoach-ai.nginx /etc/nginx/sites-available/repcoach-ai
@@ -175,7 +216,9 @@ sudo systemctl reload nginx
 sudo systemctl restart repcoach-backend
 ```
 
-Do not deploy this branch merely by changing public Privacy Policy text first. Runtime behavior remains the source of truth.
+Before restarting with B3, the server-side `.env` must include an explicitly verified `GEMINI_SERVICE_MODE`. A missing/invalid value intentionally makes AI feedback return the generic `AI_UNAVAILABLE` error rather than silently assuming a billing mode.
+
+Do not deploy merely by changing public Privacy Policy text first. Runtime behavior and verified provider state remain the source of truth.
 
 ## Operations
 
