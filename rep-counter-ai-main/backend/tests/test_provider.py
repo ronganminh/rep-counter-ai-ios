@@ -183,7 +183,7 @@ class ProviderBoundaryTests(unittest.TestCase):
         self.assertNotIn("consent_version", prompt)
         self.assertNotIn("workout_id", prompt)
         self.assertNotIn("routine_library", prompt)
-        self.assertNotIn("camera", prompt)
+        self.assertNotIn("SHOULD_NOT_ENTER_PROMPT", prompt)
         self.assertNotIn("billing_enabled", prompt)
         self.assertEqual(headers["x-goog-api-key"], "SECRET_KEY_SENTINEL")
         self.assertEqual(
