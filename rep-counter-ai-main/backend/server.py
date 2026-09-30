@@ -1,21 +1,26 @@
-"""Minimal Gemini proxy with strict contracts and privacy-safe operations."""
+"""RepCoach workout-feedback API with strict contracts and swappable AI providers."""
 from __future__ import annotations
 
-import http.client
 import json
 import math
 import os
-import socket
 import time
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from ai_provider import (
+    ProviderConfigurationError,
+    ProviderResponseInvalidError,
+    ProviderTimeoutError,
+    ProviderUnavailableError,
+    build_provider_from_env,
+    parse_provider_response,
+    prompt_summary,
+)
+
 
 MAX_BODY_BYTES = 16_384
-MAX_PROVIDER_RESPONSE_BYTES = 65_536
-PROVIDER_CONNECT_TIMEOUT_SECONDS = 5
-PROVIDER_RESPONSE_TIMEOUT_SECONDS = 15
 TOTAL_REQUEST_BUDGET_SECONDS = 20
 RESPONSE_SCHEMA_VERSION = 1
 SUPPORTED_REQUEST_SCHEMA_VERSIONS = {1, 2}
@@ -43,68 +48,10 @@ QUALITY_FIELDS = {
     "quality_score",
     "has_enough_data",
 }
-PROMPT_FIELDS = (
-    "exercise",
-    "duration_seconds",
-    "reps",
-    "sets",
-    "target_reps",
-    "goal_reached",
-    "placement_score",
-    "pose_frames",
-    "pose_lost_frames",
-    "flagged_reps",
-    "avg_rep_sec",
-    "avg_amplitude",
-    "amplitude_drop_percent",
-    "left_right_diff_percent",
-    "quality_score",
-    "has_enough_data",
-)
-
-PROMPTS = {
-    "vi": (
-        "Bạn là HLV thể hình thân thiện. Nhận xét buổi hít đất bằng TIẾNG VIỆT, "
-        "2-4 câu, ngắn gọn và có một lời khuyên an toàn, khả thi cho buổi sau. "
-        "Không chẩn đoán y khoa, không khẳng định kỹ thuật hoàn hảo chỉ từ thống kê. "
-        "Chỉ dùng số liệu được cung cấp, không suy đoán lại số rep hay điểm số. "
-        "Nếu has_enough_data là false hoặc thiếu số liệu chất lượng, nói rõ chưa đủ "
-        "dữ liệu để đánh giá kỹ thuật thay vì đoán. "
-        "Nếu pose_lost_frames chiếm tỉ lệ lớn so với pose_frames, ưu tiên khuyên "
-        "chỉnh góc đặt camera thay vì phê bình kỹ thuật.\n"
-    ),
-    "en": (
-        "You are a friendly strength coach. Comment on this push-up session "
-        "in ENGLISH ONLY, 2-4 short sentences, ending with one safe, actionable "
-        "tip for next time. Do not diagnose or give medical advice, and do not "
-        "claim the form is perfect based on statistics alone. "
-        "Use only the numbers provided; never recompute or guess rep counts or "
-        "scores. If has_enough_data is false or quality numbers are missing, say "
-        "plainly that there is not enough data to judge technique. If "
-        "pose_lost_frames is a large share of pose_frames, prioritise advice about "
-        "camera placement over criticising technique.\n"
-    ),
-}
 
 
 class RequestValidationError(ValueError):
     """The client payload does not match a supported workout-feedback schema."""
-
-
-class ProviderTimeoutError(Exception):
-    """The provider exceeded the configured connect/response/total budget."""
-
-
-class ProviderUnavailableError(Exception):
-    """The provider could not service the request."""
-
-    def __init__(self, status_class: str = "network") -> None:
-        super().__init__(status_class)
-        self.status_class = status_class
-
-
-class ProviderResponseInvalidError(Exception):
-    """The provider returned a response that cannot be safely consumed."""
 
 
 def load_env() -> None:
@@ -247,10 +194,6 @@ def parse_workout_request(raw_body: bytes) -> dict:
     return normalize_workout_request(payload)
 
 
-def prompt_summary(workout: dict) -> dict:
-    return {key: workout[key] for key in PROMPT_FIELDS if key in workout}
-
-
 def feedback_response(feedback: str) -> dict:
     return {"schema_version": RESPONSE_SCHEMA_VERSION, "feedback": feedback}
 
@@ -259,72 +202,10 @@ def error_response(code: str) -> dict:
     return {"error": code}
 
 
-def _remaining_seconds(deadline: float, cap: int) -> float:
-    remaining = deadline - time.monotonic()
-    if remaining <= 0:
-        raise ProviderTimeoutError()
-    return min(float(cap), remaining)
-
-
-def parse_provider_response(raw: bytes) -> str:
-    if len(raw) > MAX_PROVIDER_RESPONSE_BYTES:
-        raise ProviderResponseInvalidError()
-    try:
-        result = json.loads(raw.decode("utf-8"))
-        feedback = result["candidates"][0]["content"]["parts"][0]["text"]
-    except (UnicodeDecodeError, json.JSONDecodeError, KeyError, IndexError, TypeError) as error:
-        raise ProviderResponseInvalidError() from error
-    if not isinstance(feedback, str) or not feedback.strip():
-        raise ProviderResponseInvalidError()
-    return feedback.strip()
-
-
-def generate_feedback(workout: dict, key: str, deadline: float) -> str:
-    """Call Gemini directly; B3 will move this behind a provider adapter."""
-    locale = workout["locale"]
-    prompt = PROMPTS[locale] + json.dumps(prompt_summary(workout), ensure_ascii=False)
-    model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
-    provider_payload = {
-        "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"temperature": 0.4, "maxOutputTokens": 220},
-    }
-    body = json.dumps(provider_payload).encode("utf-8")
-    path = f"/v1beta/models/{model}:generateContent"
-    connection = http.client.HTTPSConnection(
-        "generativelanguage.googleapis.com",
-        timeout=_remaining_seconds(deadline, PROVIDER_CONNECT_TIMEOUT_SECONDS),
-    )
-    try:
-        connection.connect()
-        if connection.sock is not None:
-            connection.sock.settimeout(
-                _remaining_seconds(deadline, PROVIDER_RESPONSE_TIMEOUT_SECONDS)
-            )
-        connection.request(
-            "POST",
-            path,
-            body=body,
-            headers={"content-type": "application/json", "x-goog-api-key": key},
-        )
-        response = connection.getresponse()
-        if response.status < 200 or response.status >= 300:
-            raise ProviderUnavailableError(f"{response.status // 100}xx")
-        raw = response.read(MAX_PROVIDER_RESPONSE_BYTES + 1)
-        if time.monotonic() > deadline:
-            raise ProviderTimeoutError()
-        return parse_provider_response(raw)
-    except (TimeoutError, socket.timeout) as error:
-        raise ProviderTimeoutError() from error
-    except ProviderUnavailableError:
-        raise
-    except ProviderTimeoutError:
-        raise
-    except ProviderResponseInvalidError:
-        raise
-    except (OSError, http.client.HTTPException) as error:
-        raise ProviderUnavailableError("network") from error
-    finally:
-        connection.close()
+def generate_feedback(workout: dict, deadline: float) -> str:
+    """Resolve the configured provider and generate feedback through its adapter."""
+    provider = build_provider_from_env()
+    return provider.generate_feedback(workout, deadline=deadline)
 
 
 def _request_size_bucket(length: int | None) -> str | None:
@@ -425,15 +306,14 @@ class Handler(BaseHTTPRequestHandler):
                 self.reply(413, error_response("INVALID_REQUEST"))
                 return
             workout = parse_workout_request(self.rfile.read(declared_length))
-            key = os.getenv("GEMINI_API_KEY", "").strip()
-            if not key:
-                self.reply(503, error_response("AI_UNAVAILABLE"))
-                return
             deadline = self._started_at + TOTAL_REQUEST_BUDGET_SECONDS
-            feedback = generate_feedback(workout, key, deadline)
+            feedback = generate_feedback(workout, deadline)
             self.reply(200, feedback_response(feedback))
         except RequestValidationError:
             self.reply(400, error_response("INVALID_REQUEST"))
+        except ProviderConfigurationError:
+            self._provider_status_class = "configuration"
+            self.reply(503, error_response("AI_UNAVAILABLE"))
         except ProviderTimeoutError:
             self._provider_status_class = "timeout"
             self.reply(504, error_response("AI_TIMEOUT"))
