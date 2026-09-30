@@ -25,22 +25,21 @@ GEMINI_MODEL=gemini-3.5-flash-lite
 GEMINI_SERVICE_MODE=
 ```
 
-`GEMINI_SERVICE_MODE` must be exactly one of:
+`GEMINI_SERVICE_MODE` must be exactly:
 
 ```text
-unpaid
 billing_enabled
 ```
 
-This field is a runtime guard/documentation assertion only. It does not prove the Google project's actual billing state. The production operator must verify the exact project in Google AI Studio before setting it.
+RepCoach's production privacy contract intentionally rejects Gemini Unpaid Services. This field is still only a runtime guard/documentation assertion: before setting it, the operator must verify the exact production project is on a Paid Tier in Google AI Studio.
 
 See `docs/gemini-service-mode.md` for the official-terms verification record and the current production blocker.
 
 ### Current production decision
 
-Do **not** infer that production is free or paid from the API key, model, source code, or `.env.example`. The repository does not contain the Google AI Studio billing state.
+Do **not** infer that production is paid from the API key, model, source code, or `.env.example`. The repository does not contain the Google AI Studio billing state. If the project cannot be independently verified as billing-enabled, AI feedback must remain unavailable.
 
-As of the 2026-10-01 terms verification, the current Gemini Developer API terms also contain audience/use restrictions that matter to a consumer fitness app. A billing-enabled project changes prompt/response data-use treatment but does not by itself resolve those audience restrictions. Production deployment remains blocked until the exact project billing state and product/provider terms fit are verified.
+As of the 2026-10-01 terms verification, the current Gemini Developer API terms also contain audience/use restrictions that matter to a consumer fitness app. Paid mode changes prompt/response data-use treatment but does not by itself resolve those audience restrictions. Production deployment remains blocked until both the exact project billing state and product/provider terms fit are verified.
 
 ## Prompt/response constraints
 
@@ -163,7 +162,32 @@ Application logs never contain the workout body, AI prompt, AI response text, AP
 
 Nginx uses the `repcoach_meta` format and records only IP address plus request metadata required for operations/rate limiting: timestamp, method, URI path, status, response bytes, and request duration. It does not log request bodies, authorization headers, referrer, or user-agent in the RepCoach access log.
 
-The provided `deploy/repcoach-ai.logrotate` rotates RepCoach Nginx access/error logs daily and keeps 14 rotations with compression. The public Privacy Policy must be aligned with this actual metadata/retention behavior in Track B phase B4.
+The provided `deploy/repcoach-ai.logrotate` rotates RepCoach Nginx access/error logs daily and keeps 14 rotations with compression. Backend structured metadata is emitted to the host system journal; its retention remains controlled by VPS journal settings.
+
+## Privacy Policy and AI consent
+
+The canonical public policy source is:
+
+```text
+backend/static/privacy-policy.html
+```
+
+Production serves it at:
+
+```text
+https://repcoach-ai.duckdns.org/privacy-policy.html
+```
+
+The B4 policy/consent contract is:
+
+- effective date: `2026-10-01`;
+- AI consent version: `2026-10-01`;
+- Gemini production mode: verified `billing_enabled` only;
+- automatic AI: off by default, opt-in, new workouts only;
+- manual AI: per-request confirmation;
+- older automatic-AI consent is invalidated by a new local preference key;
+- disabling AI affects future requests and cannot recall an already-sent request;
+- public policy is bilingual VI/EN and contains no Android-only settings instructions.
 
 ## Rate limiting and request size
 
@@ -207,6 +231,8 @@ The Python server listens only on `127.0.0.1:8787`. Nginx is the only public ent
 Install/update the deployment files, then validate before reload:
 
 ```bash
+sudo install -d -m 0755 /home/nduythanh/apps/repcoach-backend/static
+sudo cp static/privacy-policy.html /home/nduythanh/apps/repcoach-backend/static/privacy-policy.html
 sudo cp deploy/repcoach-ai.nginx /etc/nginx/sites-available/repcoach-ai
 sudo cp deploy/repcoach-rate-limit.conf /etc/nginx/conf.d/repcoach-rate-limit.conf
 sudo cp deploy/repcoach-ai.logrotate /etc/logrotate.d/repcoach-ai
@@ -216,9 +242,9 @@ sudo systemctl reload nginx
 sudo systemctl restart repcoach-backend
 ```
 
-Before restarting with B3, the server-side `.env` must include an explicitly verified `GEMINI_SERVICE_MODE`. A missing/invalid value intentionally makes AI feedback return the generic `AI_UNAVAILABLE` error rather than silently assuming a billing mode.
+Before restarting, the server-side `.env` must contain `GEMINI_SERVICE_MODE=billing_enabled`, and the exact production project must first be verified as a Paid Tier in Google AI Studio. Missing, unpaid, or invalid modes intentionally return the generic `AI_UNAVAILABLE` error.
 
-Do not deploy merely by changing public Privacy Policy text first. Runtime behavior and verified provider state remain the source of truth.
+After copying the policy, verify `GET /privacy-policy.html` over HTTPS returns 200 with a `text/html; charset=utf-8` content type. Do not deploy policy text without the matching runtime/provider configuration; runtime behavior and verified provider state remain the source of truth.
 
 ## Operations
 
