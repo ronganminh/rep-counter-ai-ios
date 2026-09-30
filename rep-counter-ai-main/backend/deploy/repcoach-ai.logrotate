@@ -1,0 +1,15 @@
+/var/log/nginx/repcoach-ai.access.log /var/log/nginx/repcoach-ai.error.log {
+    daily
+    rotate 14
+    missingok
+    compress
+    delaycompress
+    notifempty
+    create 0640 www-data adm
+    sharedscripts
+    postrotate
+        if [ -s /run/nginx.pid ]; then
+            kill -USR1 $(cat /run/nginx.pid)
+        fi
+    endscript
+}
