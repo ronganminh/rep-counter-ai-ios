@@ -13,11 +13,27 @@ This runbook prepares the RepCoach backend for App Store review traffic. It does
 | Flutter integration | PASS | B6 staging + full Flutter suite passed before merge |
 | Exact production Gemini project verified Paid Tier | **BLOCKED / admin action required** | Check the exact project in Google AI Studio Projects/Billing |
 | Gemini audience/use-case terms fit | **BLOCKED / product-legal decision required** | Current Gemini Additional Terms require users to be 18+ and state Gemini API is for professional/business purposes, not consumer use |
-| Production VPS updated to B7 source/config | **NOT VERIFIED** | Requires SSH/admin access to the VPS |
-| Public production smoke after deploy | **NOT VERIFIED** | Run tools/production_smoke.py after deployment |
+| Production VPS updated to B7 source/config | **FAIL / NOT DEPLOYED** | Public smoke shows the live host still exposes the pre-B5 health/API behavior |
+| Public production smoke after deploy | **FAIL (pre-deploy baseline)** | GitHub Actions run 36816755738 proves current live drift; rerun after deployment |
 | Safe production log sample checked by request ID | **NOT VERIFIED** | Requires SSH/admin access to journal/Nginx logs |
 
 Do not mark production ready until every blocking item is resolved.
+
+## Observed live production baseline before B7 deploy
+
+Public synthetic smoke from GitHub Actions on 2026-10-01 (run 36816755738) reached the real production hostname and found:
+
+- HTTP to HTTPS redirect: PASS (301).
+- TLS hostname validation: PASS.
+- certificate expiry observed by the smoke: 2026-12-06 06:21:29 GMT.
+- GET /health: FAIL for B7 contract; live body is the older `{"ok": true, "service": "repcoach-ai"}`.
+- GET /ready: FAIL; live route returns 404.
+- GET /privacy-policy.html: reachable, but FAIL for the B4 policy markers/effective date.
+- GET /v1/workout-feedback: FAIL; live Nginx returns 403 instead of the stable JSON 405 contract.
+- oversized POST: FAIL; live response is not the stable JSON 413 contract.
+- synthetic v2 feedback POST: the endpoint responds, but FAIL because the response lacks the required response `schema_version`.
+
+This evidence means the public host is still on an older backend/Nginx/privacy deployment. Do not interpret the working TLS or provider response as B7 readiness or as proof of Paid Tier.
 
 Official provider sources to re-check at release time:
 
