@@ -21,6 +21,8 @@ import 'core/i18n/locale_controller.dart';
 import 'exercise.dart';
 import 'features/pose/domain/pose_mapper.dart';
 import 'features/workout/data/calibration_store.dart';
+import 'features/routine/domain/routine_preset.dart';
+import 'features/routine/presentation/rest_overlay.dart';
 import 'features/workout/application/workout_controller.dart';
 import 'features/workout/application/workout_ui_state.dart';
 import 'features/workout/domain/quality_thresholds.dart';
@@ -77,6 +79,7 @@ class CameraPage extends StatefulWidget {
     this.targetReps,
     this.timedChallenge,
     this.challengeBestReps,
+    this.routine,
     this.ciVideoPath,
   });
 
@@ -84,6 +87,7 @@ class CameraPage extends StatefulWidget {
   final int? targetReps;
   final TimedChallengeConfig? timedChallenge;
   final int? challengeBestReps;
+  final RoutineSnapshot? routine;
 
   /// CI-only camera substitute. When set, the production workout screen and
   /// production rep pipeline stay intact; only the camera image source is
@@ -191,6 +195,8 @@ class _CameraPageState extends State<CameraPage>
   bool _allowPop = false;
   bool _manualPaused = false, _goalBanner = false;
   bool _challengeAutoFinishRequested = false;
+  bool _routineAutoFinishRequested = false;
+  bool _wasRoutineResting = false;
   int? _lastChallengeCountdownSecond;
   Timer? _pauseTimer, _goalTimer;
   _CameraState _cameraState = _CameraState.awaitingConsent;
@@ -198,6 +204,13 @@ class _CameraPageState extends State<CameraPage>
   ExerciseProfile get p => widget.profile;
   WorkoutUiState get _ui => _workout.state;
   bool get _finishing => _ui.isFinishing;
+  TrainingPreferences get _feedbackPreferences => TrainingPreferences(
+        voice: _preferences.voice &&
+            (widget.routine?.voiceCoachEnabled ?? true),
+        haptics: _preferences.haptics,
+        sound: _preferences.sound,
+        cues: _preferences.cues,
+      );
 
   @override
   void initState() {
@@ -212,6 +225,7 @@ class _CameraPageState extends State<CameraPage>
       profile: p,
       targetReps: widget.targetReps,
       timedChallenge: widget.timedChallenge,
+      routine: widget.routine,
       trackingClock: widget.ciVideoPath == null ? null : _ciTrackingClock,
       clock: widget.ciVideoPath == null ? null : _ciSessionClock,
     )..addListener(_workoutChanged);
@@ -242,7 +256,7 @@ class _CameraPageState extends State<CameraPage>
     try { _preferences = await TrainingPreferences.load(); } catch (_) { /* Defaults still work for this session. */ }
     if (!mounted) return;
     _preferencesLoaded = true;
-    _feedback.configure(_preferences, context.language);
+    _feedback.configure(_feedbackPreferences, context.language);
     setState(() {});
   }
 
@@ -252,7 +266,7 @@ class _CameraPageState extends State<CameraPage>
     try {
       _preferences = await _preferences.update(voice: !_preferences.voice);
       if (!mounted) return;
-      _feedback.configure(_preferences, context.language);
+      _feedback.configure(_feedbackPreferences, context.language);
     } catch (_) {
       if (mounted) _notify(context.tr('Chưa lưu được tùy chọn giọng đọc.', 'Could not save the voice preference.'));
     } finally { if (mounted) setState(() => _settingsBusy = false); }
@@ -277,8 +291,28 @@ class _CameraPageState extends State<CameraPage>
     }
     if (_ui.sessionState != _lastSetState) {
       _lastSetState = _ui.sessionState;
-      if (accepting && _lastSetState != SessionState.idle) {
+      if (_lastSetState != SessionState.idle &&
+          (accepting ||
+              _workout.isRoutineResting ||
+              _ui.routineComplete)) {
         _feedback.setBoundary(_lastSetState == SessionState.working);
+      }
+    }
+
+    final routineResting = _workout.isRoutineResting;
+    if (routineResting != _wasRoutineResting) {
+      _wasRoutineResting = routineResting;
+      final routine = _ui.routine;
+      if (routineResting && routine != null) {
+        _feedback.routineRest(
+          completedSet: _ui.completedSets,
+          restSeconds: routine.restSeconds,
+        );
+      } else if (_ui.isRoutine &&
+          !_ui.routineComplete &&
+          !_ui.isFinishing &&
+          _ui.completedSets > 0) {
+        _feedback.routineResume(_ui.completedSets + 1);
       }
     }
     final countdown = _ui.countdown;
@@ -303,6 +337,10 @@ class _CameraPageState extends State<CameraPage>
 
     if (_ui.challengeExpired && !_challengeAutoFinishRequested) {
       _challengeAutoFinishRequested = true;
+      unawaited(Future<void>.microtask(_finishWorkout));
+    }
+    if (_ui.routineComplete && !_routineAutoFinishRequested) {
+      _routineAutoFinishRequested = true;
       unawaited(Future<void>.microtask(_finishWorkout));
     }
     setState(() {});
@@ -1182,6 +1220,23 @@ class _CameraPageState extends State<CameraPage>
         Text(context.tr('Đang lưu buổi tập…', 'Saving your workout…')),
       ])));
     }
+    if (_ui.isRoutineResting) {
+      return PopScope(
+        canPop: _allowPop,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _confirmExit();
+        },
+        child: Scaffold(
+          body: RoutineRestOverlay(
+            state: _ui,
+            onSkip: _workout.skipRoutineRest,
+            onEnd: () {
+              unawaited(_finishWorkout());
+            },
+          ),
+        ),
+      );
+    }
     final cam = _cam;
     final ciVideo = _ciVideo;
     final ciVideoReady = ciVideo?.value.isInitialized == true;
@@ -1278,7 +1333,12 @@ class _CameraPageState extends State<CameraPage>
   Widget _hud() => WorkoutHud(
     state: _ui, onStart: _workout.requestStart,
     challengeBestReps: widget.challengeBestReps,
-    voiceEnabled: _preferences.voice, onToggleVoice: _preferencesLoaded && !_settingsBusy ? _toggleVoice : null,
+    voiceEnabled: _feedbackPreferences.voice,
+    onToggleVoice: _preferencesLoaded &&
+            !_settingsBusy &&
+            (widget.routine?.voiceCoachEnabled ?? true)
+        ? _toggleVoice
+        : null,
     exerciseName: p.localizedName(context.s), hint: p.localizedHint(context.s),
     onExit: _confirmExit, onPause: _pauseWorkout, onResume: _resumeWorkout,
     onFinish: _finishWorkout, onCalibrate: _toggleCalibration,
