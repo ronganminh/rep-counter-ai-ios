@@ -14,9 +14,6 @@ MAX_FEEDBACK_CHARS = 2_000
 PROVIDER_CONNECT_TIMEOUT_SECONDS = 5
 PROVIDER_RESPONSE_TIMEOUT_SECONDS = 15
 SUPPORTED_GEMINI_SERVICE_MODES = {"billing_enabled"}
-# RepCoach production privacy contract: never send workout summaries through
-# Gemini Unpaid Services. The exact Google project must still be verified in
-# AI Studio before GEMINI_SERVICE_MODE=billing_enabled is configured.
 
 PROMPT_FIELDS = (
     "exercise",
@@ -39,17 +36,17 @@ PROMPT_FIELDS = (
 
 PROMPTS = {
     "vi": (
-        "Bạn là HLV thể hình thân thiện. Nhận xét buổi hít đất bằng TIẾNG VIỆT, "
+        "Bạn là HLV thể hình thân thiện. Nhận xét buổi tập bằng TIẾNG VIỆT, "
         "2-4 câu, ngắn gọn và có một lời khuyên an toàn, khả thi cho buổi sau. "
         "Không chẩn đoán y khoa, không khẳng định kỹ thuật hoàn hảo chỉ từ thống kê. "
         "Chỉ dùng số liệu được cung cấp, không suy đoán lại số rep hay điểm số. "
         "Nếu has_enough_data là false hoặc thiếu số liệu chất lượng, nói rõ chưa đủ "
         "dữ liệu để đánh giá kỹ thuật thay vì đoán. "
         "Nếu pose_lost_frames chiếm tỉ lệ lớn so với pose_frames, ưu tiên khuyên "
-        "chỉnh góc đặt camera thay vì phê bình kỹ thuật.\n"
+        "chỉnh góc đặt camera thay vì phê bình kỹ thuật."
     ),
     "en": (
-        "You are a friendly strength coach. Comment on this push-up session "
+        "You are a friendly strength coach. Comment on this workout "
         "in ENGLISH ONLY, 2-4 short sentences, ending with one safe, actionable "
         "tip for next time. Do not diagnose or give medical advice, and do not "
         "claim the form is perfect based on statistics alone. "
@@ -57,7 +54,7 @@ PROMPTS = {
         "scores. If has_enough_data is false or quality numbers are missing, say "
         "plainly that there is not enough data to judge technique. If "
         "pose_lost_frames is a large share of pose_frames, prioritise advice about "
-        "camera placement over criticising technique.\n"
+        "camera placement over criticising technique."
     ),
 }
 
@@ -70,7 +67,7 @@ class AiProvider(Protocol):
 
 
 class ProviderConfigurationError(Exception):
-    """Provider configuration is missing, unsupported, or unverified."""
+    """Provider configuration is missing or unsupported."""
 
 
 class ProviderTimeoutError(Exception):
@@ -104,11 +101,24 @@ def validate_feedback_text(feedback: object) -> str:
 
 
 def parse_provider_response(raw: bytes) -> str:
+    """Parse the legacy Gemini response shape; kept for compatibility/tests."""
     if len(raw) > MAX_PROVIDER_RESPONSE_BYTES:
         raise ProviderResponseInvalidError()
     try:
         result = json.loads(raw.decode("utf-8"))
         feedback = result["candidates"][0]["content"]["parts"][0]["text"]
+    except (UnicodeDecodeError, json.JSONDecodeError, KeyError, IndexError, TypeError) as error:
+        raise ProviderResponseInvalidError() from error
+    return validate_feedback_text(feedback)
+
+
+def parse_groq_response(raw: bytes) -> str:
+    """Parse the OpenAI-compatible Groq chat-completions response."""
+    if len(raw) > MAX_PROVIDER_RESPONSE_BYTES:
+        raise ProviderResponseInvalidError()
+    try:
+        result = json.loads(raw.decode("utf-8"))
+        feedback = result["choices"][0]["message"]["content"]
     except (UnicodeDecodeError, json.JSONDecodeError, KeyError, IndexError, TypeError) as error:
         raise ProviderResponseInvalidError() from error
     return validate_feedback_text(feedback)
@@ -121,8 +131,81 @@ def _remaining_seconds(deadline: float, cap: int) -> float:
     return min(float(cap), remaining)
 
 
+class GroqProvider:
+    """GroqCloud OpenAI-compatible implementation behind AiProvider."""
+
+    name = "groq"
+
+    def __init__(
+        self,
+        *,
+        api_key: str,
+        model: str,
+        connection_factory: Callable[..., http.client.HTTPSConnection] = http.client.HTTPSConnection,
+    ) -> None:
+        if not api_key.strip():
+            raise ProviderConfigurationError()
+        if not model.strip():
+            raise ProviderConfigurationError()
+        self._api_key = api_key.strip()
+        self.model = model.strip()
+        self._connection_factory = connection_factory
+
+    def generate_feedback(self, request: dict, *, deadline: float) -> str:
+        locale = request["locale"]
+        summary = json.dumps(prompt_summary(request), ensure_ascii=False)
+        provider_payload = {
+            "model": self.model,
+            "messages": [
+                {"role": "system", "content": PROMPTS[locale]},
+                {"role": "user", "content": summary},
+            ],
+            "temperature": 0.4,
+            "max_tokens": 220,
+        }
+        body = json.dumps(provider_payload, ensure_ascii=False).encode("utf-8")
+        connection = self._connection_factory(
+            "api.groq.com",
+            timeout=_remaining_seconds(deadline, PROVIDER_CONNECT_TIMEOUT_SECONDS),
+        )
+        try:
+            connection.connect()
+            if connection.sock is not None:
+                connection.sock.settimeout(
+                    _remaining_seconds(deadline, PROVIDER_RESPONSE_TIMEOUT_SECONDS)
+                )
+            connection.request(
+                "POST",
+                "/openai/v1/chat/completions",
+                body=body,
+                headers={
+                    "content-type": "application/json",
+                    "authorization": f"Bearer {self._api_key}",
+                },
+            )
+            response = connection.getresponse()
+            if response.status < 200 or response.status >= 300:
+                raise ProviderUnavailableError(f"{response.status // 100}xx")
+            raw = response.read(MAX_PROVIDER_RESPONSE_BYTES + 1)
+            if time.monotonic() > deadline:
+                raise ProviderTimeoutError()
+            return parse_groq_response(raw)
+        except (TimeoutError, socket.timeout) as error:
+            raise ProviderTimeoutError() from error
+        except (
+            ProviderUnavailableError,
+            ProviderTimeoutError,
+            ProviderResponseInvalidError,
+        ):
+            raise
+        except (OSError, http.client.HTTPException) as error:
+            raise ProviderUnavailableError("network") from error
+        finally:
+            connection.close()
+
+
 class GeminiProvider:
-    """Gemini Developer API implementation behind the AiProvider boundary."""
+    """Legacy optional Gemini implementation behind AiProvider."""
 
     name = "gemini"
 
@@ -147,7 +230,9 @@ class GeminiProvider:
 
     def generate_feedback(self, request: dict, *, deadline: float) -> str:
         locale = request["locale"]
-        prompt = PROMPTS[locale] + json.dumps(prompt_summary(request), ensure_ascii=False)
+        prompt = PROMPTS[locale] + "\n" + json.dumps(
+            prompt_summary(request), ensure_ascii=False
+        )
         provider_payload = {
             "contents": [{"parts": [{"text": prompt}]}],
             "generationConfig": {"temperature": 0.4, "maxOutputTokens": 220},
@@ -195,13 +280,20 @@ class GeminiProvider:
 
 
 def build_provider_from_env() -> AiProvider:
-    """Build a provider only from explicit, source-independent deployment metadata."""
-    provider_name = os.getenv("AI_PROVIDER", "gemini").strip().lower()
-    if provider_name != "gemini":
-        raise ProviderConfigurationError()
+    """Build the configured provider from server-side environment settings."""
+    provider_name = os.getenv("AI_PROVIDER", "groq").strip().lower()
 
-    return GeminiProvider(
-        api_key=os.getenv("GEMINI_API_KEY", ""),
-        model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
-        service_mode=os.getenv("GEMINI_SERVICE_MODE", "").strip().lower(),
-    )
+    if provider_name == "groq":
+        return GroqProvider(
+            api_key=os.getenv("GROQ_API_KEY", ""),
+            model=os.getenv("GROQ_MODEL", "openai/gpt-oss-20b"),
+        )
+
+    if provider_name == "gemini":
+        return GeminiProvider(
+            api_key=os.getenv("GEMINI_API_KEY", ""),
+            model=os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite"),
+            service_mode=os.getenv("GEMINI_SERVICE_MODE", "").strip().lower(),
+        )
+
+    raise ProviderConfigurationError()
