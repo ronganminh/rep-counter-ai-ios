@@ -1,4 +1,5 @@
 import '../workout/data/workout_record.dart';
+import '../workout/domain/workout_mode.dart';
 import '../workout/domain/workout_personal_records.dart';
 
 enum ProgressRange {
@@ -86,11 +87,9 @@ class ProgressStatistics {
       .where((record) => record.targetReps != null && record.goalReached)
       .length;
 
-  Map<DateTime, int> get dailyReps =>
-      _aggregateInt((record) => record.reps);
+  Map<DateTime, int> get dailyReps => _aggregateInt((record) => record.reps);
 
-  Map<DateTime, int> get dailySessions =>
-      _aggregateInt((_) => 1);
+  Map<DateTime, int> get dailySessions => _aggregateInt((_) => 1);
 
   Map<DateTime, int> get dailyDurationSeconds =>
       _aggregateInt((record) => record.durationSeconds);
@@ -117,8 +116,11 @@ class ProgressStatistics {
     final result = <DateTime, int>{};
     for (final record in records) {
       final key = day(record.startedAt);
-      result.update(key, (value) => value + valueOf(record),
-          ifAbsent: () => valueOf(record));
+      result.update(
+        key,
+        (value) => value + valueOf(record),
+        ifAbsent: () => valueOf(record),
+      );
     }
     return result;
   }
@@ -126,10 +128,14 @@ class ProgressStatistics {
   int? get personalBestFree {
     final exercise = exerciseId;
     if (exercise == null) return null;
-    return WorkoutPersonalRecordStore.bestFreeRepsFrom(
-      exerciseRecords,
-      exerciseId: exercise,
-    );
+    int? best;
+    for (final record in exerciseRecords) {
+      if (record.exerciseId != exercise || record.mode != WorkoutMode.free) {
+        continue;
+      }
+      if (best == null || record.reps > best) best = record.reps;
+    }
+    return best;
   }
 
   int? personalBestTimed(int challengeSeconds) {
