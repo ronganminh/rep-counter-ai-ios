@@ -85,7 +85,7 @@ class PrivacyContractTests(unittest.TestCase):
     def test_policy_discloses_groq_data_treatment(self):
         self.assertIn("not retained by default", POLICY)
         self.assertIn("up to 30 days", POLICY)
-        self.assertIn("does not currently claim that ZDR is enabled", POLICY)
+        self.assertIn("does <strong>not</strong> currently claim that ZDR is enabled", POLICY)
         self.assertIn("không tuyên bố ZDR đã được bật", POLICY)
         self.assertIn("not used to train or fine-tune models", POLICY)
 
