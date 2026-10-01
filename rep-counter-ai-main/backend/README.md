@@ -268,6 +268,23 @@ sudo nginx -t
 
 The Python server listens only on `127.0.0.1:8787`. Nginx is the only public entry point and enforces HTTPS, the body limit, method restriction, rate limiting, bounded proxy timeouts, and security headers.
 
+## Production release
+
+The B7 production deployment, provider/billing gate, public smoke, safe-log verification and rollback procedure is documented in:
+
+```text
+docs/production-release.md
+```
+
+Public production smoke uses synthetic data only:
+
+```bash
+cd rep-counter-ai-main/backend
+python3 tools/production_smoke.py
+```
+
+Do not interpret a passing public smoke as proof of the Google project's Paid Tier. Billing must be verified independently in Google AI Studio for the exact production project.
+
 ## Deployment notes
 
 Install/update the deployment files, then validate before reload:
