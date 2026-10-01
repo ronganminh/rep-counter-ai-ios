@@ -23,7 +23,7 @@ class RepFeedbackPill extends StatelessWidget {
     return Semantics(
       container: true,
       liveRegion: true,
-      label: copy.status + '. ' + copy.message,
+      label: '${copy.status}. ${copy.message}',
       child: ExcludeSemantics(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
@@ -101,11 +101,7 @@ class RepFeedbackTransition extends StatelessWidget {
     final valueKey = feedback == null
         ? const ValueKey<String>('rep-feedback-empty')
         : ValueKey<String>(
-            feedback!.kind.name +
-                ':' +
-                (feedback!.repNumber?.toString() ?? '') +
-                ':' +
-                (feedback!.primaryFlag?.name ?? ''),
+            '${feedback!.kind.name}:${feedback!.repNumber?.toString() ?? ''}:${feedback!.primaryFlag?.name ?? ''}',
           );
 
     return AnimatedSwitcher(
