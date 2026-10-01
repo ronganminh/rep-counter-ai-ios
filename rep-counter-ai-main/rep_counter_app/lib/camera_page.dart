@@ -27,6 +27,7 @@ import 'features/workout/domain/quality_thresholds.dart';
 import 'features/workout/domain/rep_tracker.dart';
 import 'features/workout/domain/rep_quality_analyzer.dart';
 import 'features/workout/domain/rep_metric.dart';
+import 'features/workout/domain/workout_mode.dart';
 import 'widgets/product_ui.dart';
 import 'theme/app_colors.dart';
 import 'features/workout/presentation/widgets/workout_hud.dart';
@@ -74,11 +75,15 @@ class CameraPage extends StatefulWidget {
     super.key,
     required this.profile,
     this.targetReps,
+    this.timedChallenge,
+    this.challengeBestReps,
     this.ciVideoPath,
   });
 
   final ExerciseProfile profile;
   final int? targetReps;
+  final TimedChallengeConfig? timedChallenge;
+  final int? challengeBestReps;
 
   /// CI-only camera substitute. When set, the production workout screen and
   /// production rep pipeline stay intact; only the camera image source is
@@ -185,6 +190,8 @@ class _CameraPageState extends State<CameraPage>
   bool _repThisFrame = false;
   bool _allowPop = false;
   bool _manualPaused = false, _goalBanner = false;
+  bool _challengeAutoFinishRequested = false;
+  int? _lastChallengeCountdownSecond;
   Timer? _pauseTimer, _goalTimer;
   _CameraState _cameraState = _CameraState.awaitingConsent;
 
@@ -204,6 +211,7 @@ class _CameraPageState extends State<CameraPage>
     _workout = WorkoutController(
       profile: p,
       targetReps: widget.targetReps,
+      timedChallenge: widget.timedChallenge,
       trackingClock: widget.ciVideoPath == null ? null : _ciTrackingClock,
       clock: widget.ciVideoPath == null ? null : _ciSessionClock,
     )..addListener(_workoutChanged);
@@ -282,6 +290,20 @@ class _CameraPageState extends State<CameraPage>
     if (_ui.sessionStarted && !_sessionArmed) {
       _sessionArmed = true;
       _feedback.started();
+    }
+
+    final challengeSecond =
+        _ui.isFinalTenSeconds ? _ui.challengeRemainingSeconds : null;
+    if (challengeSecond != _lastChallengeCountdownSecond) {
+      _lastChallengeCountdownSecond = challengeSecond;
+      if (challengeSecond != null && challengeSecond > 0) {
+        _feedback.challengeCountdown(challengeSecond);
+      }
+    }
+
+    if (_ui.challengeExpired && !_challengeAutoFinishRequested) {
+      _challengeAutoFinishRequested = true;
+      unawaited(Future<void>.microtask(_finishWorkout));
     }
     setState(() {});
   }
@@ -964,7 +986,7 @@ class _CameraPageState extends State<CameraPage>
   }
 
   void _pauseWorkout() {
-    if (_finishing || _manualPaused) return;
+    if (_finishing || _manualPaused || _ui.challengeExpired) return;
     _manualPaused = true;
     _cameraEpoch++;
     _feedback.stop();
@@ -1255,6 +1277,7 @@ class _CameraPageState extends State<CameraPage>
 
   Widget _hud() => WorkoutHud(
     state: _ui, onStart: _workout.requestStart,
+    challengeBestReps: widget.challengeBestReps,
     voiceEnabled: _preferences.voice, onToggleVoice: _preferencesLoaded && !_settingsBusy ? _toggleVoice : null,
     exerciseName: p.localizedName(context.s), hint: p.localizedHint(context.s),
     onExit: _confirmExit, onPause: _pauseWorkout, onResume: _resumeWorkout,
