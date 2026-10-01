@@ -19,6 +19,8 @@ from urllib.parse import urlparse
 
 REQUEST_ID_RE = re.compile(r"^[0-9a-f]{32}$")
 FORBIDDEN_PUBLIC_MARKERS = (
+    "GROQ_API_KEY",
+    "api.groq.com",
     "GEMINI_API_KEY",
     "x-goog-api-key",
     "generativelanguage.googleapis.com",
@@ -158,7 +160,7 @@ def check_privacy(host: str, port: int) -> None:
     for marker in (
         "RepCoach AI",
         "October 1, 2026",
-        "2026-10-01",
+        "2026-10-01-groq",
         'id="en"',
         'id="vi"',
     ):
@@ -198,7 +200,7 @@ def check_body_limit(host: str, port: int) -> None:
 def check_feedback(host: str, port: int, fixture_path: Path) -> str:
     fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
     _assert(fixture.get("schema_version") == 2, "fixture must use schema v2")
-    _assert(fixture.get("consent_version") == "2026-10-01", "fixture consent version drift")
+    _assert(fixture.get("consent_version") == "2026-10-01-groq", "fixture consent version drift")
     body = json.dumps(fixture, separators=(",", ":")).encode("utf-8")
     status, headers, raw, elapsed = _request(
         host,
