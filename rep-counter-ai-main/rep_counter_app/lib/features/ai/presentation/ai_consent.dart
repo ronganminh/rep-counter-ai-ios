@@ -5,6 +5,12 @@ import '../../../core/legal/legal_config.dart';
 import '../../legal/legal_page.dart';
 import '../ai_preferences.dart';
 
+const _groqVi =
+    'RepCoach AI sẽ gửi bản tóm tắt giới hạn của buổi tập tới máy chủ RepCoach AI, sau đó máy chủ gửi prompt tối giản tới GroqCloud để tạo nhận xét. Dữ liệu có thể gồm tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng. Không gửi video, ảnh, âm thanh hoặc tọa độ landmark thô.\n\nTheo tài liệu GroqCloud hiện hành, dữ liệu inference không được lưu mặc định, ngoại trừ khi cần cho độ tin cậy hệ thống hoặc điều tra lạm dụng; trường hợp đó có thể được giữ tối đa 30 ngày. RepCoach hiện không tuyên bố Zero Data Retention. Lịch sử cũ không tự tải lên; tắt AI không thu hồi yêu cầu đã gửi. Workout vẫn lưu trên máy nếu AI lỗi.';
+
+const _groqEn =
+    'RepCoach AI sends a limited workout summary to the RepCoach AI server, which sends a minimized prompt to GroqCloud to generate feedback. Data can include the exercise, goal, reps/sets, duration, pose statistics and quality scores. No video, photos, audio or raw landmark coordinates are sent.\n\nUnder GroqCloud\'s current documentation, inference customer data is not retained by default except when needed for system reliability or abuse investigation; in those cases it may be retained for up to 30 days. RepCoach does not currently claim Zero Data Retention. Older history is not uploaded automatically; disabling AI cannot recall requests already sent. The workout remains saved on device if AI fails.';
+
 Future<bool> requestAutomaticAiConsent(BuildContext context) async {
   final consent = await showDialog<bool>(
       context: context,
@@ -16,9 +22,7 @@ Future<bool> requestAutomaticAiConsent(BuildContext context) async {
                       mainAxisSize: MainAxisSize.min,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                    Text(context.tr(
-                        'AI dùng Gemini chỉ dành cho người từ 18 tuổi trở lên. Sau khi lưu buổi tập mới, app sẽ gửi tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng tới máy chủ RepCoach AI. Máy chủ chỉ cho phép gửi tiếp tới Gemini khi project production đã được xác minh có billing. Không gửi video, ảnh, âm thanh hoặc tọa độ landmark thô.\n\nTheo điều khoản Paid Services hiện hành của Google, prompt/response không được dùng để cải thiện sản phẩm của Google, nhưng Google có thể log chúng trong một khoảng thời gian giới hạn để chống lạm dụng và đáp ứng yêu cầu pháp lý. Lịch sử cũ không tự tải lên. Bạn có thể tắt trong Cài đặt; việc tắt không thu hồi yêu cầu đã gửi. Workout vẫn lưu trên máy nếu AI lỗi.',
-                        'Gemini-backed AI is for users aged 18 or older. After a new workout is saved, the app sends the exercise, goal, reps/sets, duration, pose statistics and quality scores to the RepCoach AI server. The server only forwards the request to Gemini when the production project has been verified as billing-enabled. No video, photos, audio or raw landmark coordinates are sent.\n\nUnder Google\'s current Paid Services terms, prompts/responses are not used to improve Google products, but Google may log them for a limited period for abuse prevention and required legal disclosures. Older history is not uploaded automatically. You can turn this off in Settings; disabling it cannot recall requests already sent. The workout remains saved on device if AI fails.')),
+                    Text(context.tr(_groqVi, _groqEn)),
                     const SizedBox(height: 12),
                     Text(
                       context.tr(
@@ -50,7 +54,6 @@ Future<bool> requestAutomaticAiConsent(BuildContext context) async {
   return true;
 }
 
-
 Future<bool> requestManualAiConsent(BuildContext context) async {
   final consent = await showDialog<bool>(
     context: context,
@@ -65,8 +68,8 @@ Future<bool> requestManualAiConsent(BuildContext context) async {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(context.tr(
-              'AI dùng Gemini chỉ dành cho người từ 18 tuổi trở lên. RepCoach AI sẽ gửi bản tóm tắt buổi tập này gồm tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng qua máy chủ RepCoach AI. Máy chủ chỉ gửi tiếp tới Gemini khi project production đã được xác minh có billing. Không gửi video, ảnh, âm thanh hoặc tọa độ landmark thô.\n\nTheo điều khoản Paid Services hiện hành của Google, prompt/response không được dùng để cải thiện sản phẩm của Google, nhưng Google có thể log chúng trong một khoảng thời gian giới hạn để chống lạm dụng và đáp ứng yêu cầu pháp lý. Sự đồng ý này chỉ áp dụng cho yêu cầu bạn đang thực hiện.',
-              'Gemini-backed AI is for users aged 18 or older. RepCoach AI will send a summary of this workout, including the exercise, goal, reps/sets, duration, pose statistics and quality scores, to the RepCoach AI server. The server only forwards it to Gemini when the production project has been verified as billing-enabled. No video, photos, audio or raw landmark coordinates are sent.\n\nUnder Google\'s current Paid Services terms, prompts/responses are not used to improve Google products, but Google may log them for a limited period for abuse prevention and required legal disclosures. This consent applies only to the request you are making now.',
+              'RepCoach AI sẽ gửi bản tóm tắt giới hạn của buổi tập này tới máy chủ RepCoach AI, sau đó máy chủ gửi prompt tối giản tới GroqCloud để tạo nhận xét. Không gửi video, ảnh, âm thanh hoặc tọa độ landmark thô.\n\nTheo tài liệu GroqCloud hiện hành, dữ liệu inference không được lưu mặc định, ngoại trừ khi cần cho độ tin cậy hệ thống hoặc điều tra lạm dụng; trường hợp đó có thể được giữ tối đa 30 ngày. RepCoach hiện không tuyên bố Zero Data Retention. Sự đồng ý này chỉ áp dụng cho yêu cầu bạn đang thực hiện.',
+              'RepCoach AI sends a limited summary of this workout to the RepCoach AI server, which sends a minimized prompt to GroqCloud to generate feedback. No video, photos, audio or raw landmark coordinates are sent.\n\nUnder GroqCloud\'s current documentation, inference customer data is not retained by default except when needed for system reliability or abuse investigation; in those cases it may be retained for up to 30 days. RepCoach does not currently claim Zero Data Retention. This consent applies only to the request you are making now.',
             )),
             const SizedBox(height: 12),
             Text(
