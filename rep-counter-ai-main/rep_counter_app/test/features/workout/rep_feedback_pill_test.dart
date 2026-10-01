@@ -39,7 +39,7 @@ void main() {
     await tester.pumpWidget(_host(const RepFeedback.countedClean(3)));
     await tester.pumpAndSettle();
 
-    expect(find.text('ĐÃ TÍNH'), findsOneWidget);
+    expect(find.text('✓ ĐÃ TÍNH'), findsOneWidget);
     expect(find.text('Rep tốt'), findsOneWidget);
     expect(find.bySemanticsLabel('ĐÃ TÍNH. Rep tốt'), findsOneWidget);
   });
@@ -51,7 +51,7 @@ void main() {
     ));
     await tester.pumpAndSettle();
 
-    expect(find.text('COUNTED'), findsOneWidget);
+    expect(find.text('✓ COUNTED'), findsOneWidget);
     expect(find.text('Try a deeper range'), findsOneWidget);
     expect(
       find.bySemanticsLabel('COUNTED. Try a deeper range'),
