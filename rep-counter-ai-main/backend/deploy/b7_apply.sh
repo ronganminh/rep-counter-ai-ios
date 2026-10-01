@@ -80,13 +80,13 @@ sudo systemctl restart repcoach-backend
 sudo systemctl reload nginx
 
 sudo systemctl is-active --quiet repcoach-backend
-sudo ss -ltn | grep -q '127.0.0.1:8787'
-sudo nginx -T 2>/dev/null | grep -Fq 'client_max_body_size 16k;'
-sudo nginx -T 2>/dev/null | grep -Fq 'limit_req zone=repcoach_api'
-sudo nginx -T 2>/dev/null | grep -Fq 'proxy_read_timeout 22s;'
-sudo nginx -T 2>/dev/null | grep -Fq 'location = /privacy-policy.html'
-sudo nginx -T 2>/dev/null | grep -Fq 'location = /health'
-sudo nginx -T 2>/dev/null | grep -Fq 'location = /ready'
+sudo ss -ltn | grep -F '127.0.0.1:8787' >/dev/null
+sudo nginx -T 2>/dev/null | grep -F 'client_max_body_size 16k;' >/dev/null
+sudo nginx -T 2>/dev/null | grep -F 'limit_req zone=repcoach_api' >/dev/null
+sudo nginx -T 2>/dev/null | grep -F 'proxy_read_timeout 22s;' >/dev/null
+sudo nginx -T 2>/dev/null | grep -F 'location = /privacy-policy.html' >/dev/null
+sudo nginx -T 2>/dev/null | grep -F 'location = /health' >/dev/null
+sudo nginx -T 2>/dev/null | grep -F 'location = /ready' >/dev/null
 
 completed=1
 trap - EXIT
