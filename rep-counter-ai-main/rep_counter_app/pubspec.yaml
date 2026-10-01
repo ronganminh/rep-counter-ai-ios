@@ -37,6 +37,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/audio/
+    - assets/vnext/
   fonts:
     - family: Inter
       fonts:
