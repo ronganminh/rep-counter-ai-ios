@@ -29,7 +29,7 @@ class ProductionReleaseTests(unittest.TestCase):
 
     def test_runbook_does_not_claim_billing_is_verified(self):
         self.assertIn("BLOCKED / admin action required", RUNBOOK)
-        self.assertIn("must still be verified", README)
+        self.assertIn("Billing must be verified independently", README)
         self.assertIn("Google AI Studio", RUNBOOK)
         self.assertNotIn("billing verification: PASS", RUNBOOK)
 
