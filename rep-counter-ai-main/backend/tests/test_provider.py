@@ -15,7 +15,7 @@ import server
 def provider_request():
     return {
         "schema_version": 2,
-        "consent_version": "2026-10-01",
+        "consent_version": "2026-10-01-groq",
         "exercise": "push_up",
         "duration_seconds": 120,
         "reps": 20,
@@ -60,22 +60,21 @@ class FakeSocket:
 class FakeResponse:
     status = 200
 
-    def __init__(self, feedback="Useful feedback"):
-        self._body = json.dumps(
-            {"candidates": [{"content": {"parts": [{"text": feedback}]}}]}
-        ).encode()
+    def __init__(self, body):
+        self._body = body
 
     def read(self, _limit):
         return self._body
 
 
 class FakeConnection:
-    def __init__(self, host, timeout):
+    def __init__(self, host, timeout, response_body):
         self.host = host
         self.timeout = timeout
         self.sock = FakeSocket()
         self.request_args = None
         self.closed = False
+        self._response_body = response_body
 
     def connect(self):
         return None
@@ -84,7 +83,7 @@ class FakeConnection:
         self.request_args = (method, path, body, headers)
 
     def getresponse(self):
-        return FakeResponse()
+        return FakeResponse(self._response_body)
 
     def close(self):
         self.closed = True
@@ -99,19 +98,76 @@ class ProviderBoundaryTests(unittest.TestCase):
                 time.monotonic() + 5,
             )
         self.assertEqual(result, "Adapter works")
-        self.assertEqual(fake.requests[0][0]["exercise"], "push_up")
 
-    def test_provider_factory_requires_explicit_service_mode(self):
+    def test_provider_factory_defaults_to_groq(self):
         env = {
-            "AI_PROVIDER": "gemini",
-            "GEMINI_API_KEY": "test-key",
-            "GEMINI_MODEL": "test-model",
+            "GROQ_API_KEY": "test-key",
+            "GROQ_MODEL": "openai/gpt-oss-20b",
         }
         with patch.dict(os.environ, env, clear=True):
+            provider = ai_provider.build_provider_from_env()
+        self.assertIsInstance(provider, ai_provider.GroqProvider)
+
+    def test_groq_requires_api_key(self):
+        with patch.dict(os.environ, {"AI_PROVIDER": "groq"}, clear=True):
             with self.assertRaises(ai_provider.ProviderConfigurationError):
                 ai_provider.build_provider_from_env()
 
-    def test_provider_factory_accepts_billing_enabled_mode(self):
+    def test_groq_prompt_is_minimized_and_uses_bearer_auth(self):
+        response = json.dumps(
+            {"choices": [{"message": {"content": "Useful feedback"}}]}
+        ).encode()
+        connection = FakeConnection("unused", 1, response)
+
+        def factory(host, timeout):
+            connection.host = host
+            connection.timeout = timeout
+            return connection
+
+        provider = ai_provider.GroqProvider(
+            api_key="GROQ_SECRET_SENTINEL",
+            model="openai/gpt-oss-20b",
+            connection_factory=factory,
+        )
+        result = provider.generate_feedback(
+            provider_request(), deadline=time.monotonic() + 10
+        )
+        self.assertEqual(result, "Useful feedback")
+        _, path, raw_body, headers = connection.request_args
+        sent = json.loads(raw_body.decode())
+        prompt = sent["messages"][1]["content"]
+        self.assertIn('"exercise": "push_up"', prompt)
+        self.assertNotIn("schema_version", prompt)
+        self.assertNotIn("consent_version", prompt)
+        self.assertNotIn("workout_id", prompt)
+        self.assertNotIn("routine_library", prompt)
+        self.assertNotIn("SHOULD_NOT_ENTER_PROMPT", prompt)
+        self.assertEqual(
+            headers["authorization"], "Bearer GROQ_SECRET_SENTINEL"
+        )
+        self.assertEqual(connection.host, "api.groq.com")
+        self.assertEqual(path, "/openai/v1/chat/completions")
+        self.assertEqual(sent["model"], "openai/gpt-oss-20b")
+        self.assertEqual(sent["temperature"], 0.6)
+        self.assertEqual(sent["max_completion_tokens"], 512)
+        self.assertEqual(sent["reasoning_effort"], "low")
+        self.assertIs(sent["include_reasoning"], False)
+        self.assertNotIn("max_tokens", sent)
+        self.assertTrue(connection.closed)
+
+    def test_groq_empty_and_overlong_responses_are_rejected(self):
+        empty = json.dumps(
+            {"choices": [{"message": {"content": "   "}}]}
+        ).encode()
+        with self.assertRaises(ai_provider.ProviderResponseInvalidError):
+            ai_provider.parse_groq_response(empty)
+        overlong = json.dumps(
+            {"choices": [{"message": {"content": "x" * (ai_provider.MAX_FEEDBACK_CHARS + 1)}}]}
+        ).encode()
+        with self.assertRaises(ai_provider.ProviderResponseInvalidError):
+            ai_provider.parse_groq_response(overlong)
+
+    def test_legacy_gemini_still_requires_billing_enabled(self):
         env = {
             "AI_PROVIDER": "gemini",
             "GEMINI_API_KEY": "test-key",
@@ -121,91 +177,16 @@ class ProviderBoundaryTests(unittest.TestCase):
         with patch.dict(os.environ, env, clear=True):
             provider = ai_provider.build_provider_from_env()
         self.assertIsInstance(provider, ai_provider.GeminiProvider)
-        self.assertEqual(provider.service_mode, "billing_enabled")
 
-    def test_provider_factory_rejects_unpaid_mode(self):
-        env = {
-            "AI_PROVIDER": "gemini",
-            "GEMINI_API_KEY": "test-key",
-            "GEMINI_MODEL": "test-model",
-            "GEMINI_SERVICE_MODE": "unpaid",
-        }
+        env["GEMINI_SERVICE_MODE"] = "unpaid"
         with patch.dict(os.environ, env, clear=True):
             with self.assertRaises(ai_provider.ProviderConfigurationError):
                 ai_provider.build_provider_from_env()
 
-    def test_provider_factory_rejects_unknown_mode(self):
-        env = {
-            "AI_PROVIDER": "gemini",
-            "GEMINI_API_KEY": "test-key",
-            "GEMINI_MODEL": "test-model",
-            "GEMINI_SERVICE_MODE": "probably-paid",
-        }
-        with patch.dict(os.environ, env, clear=True):
+    def test_unknown_provider_is_rejected(self):
+        with patch.dict(os.environ, {"AI_PROVIDER": "other"}, clear=True):
             with self.assertRaises(ai_provider.ProviderConfigurationError):
                 ai_provider.build_provider_from_env()
-
-    def test_provider_factory_rejects_unknown_provider(self):
-        env = {
-            "AI_PROVIDER": "other",
-            "GEMINI_API_KEY": "test-key",
-            "GEMINI_SERVICE_MODE": "billing_enabled",
-        }
-        with patch.dict(os.environ, env, clear=True):
-            with self.assertRaises(ai_provider.ProviderConfigurationError):
-                ai_provider.build_provider_from_env()
-
-    def test_gemini_prompt_is_minimized(self):
-        connection = FakeConnection("unused", 1)
-
-        def factory(host, timeout):
-            connection.host = host
-            connection.timeout = timeout
-            return connection
-
-        provider = ai_provider.GeminiProvider(
-            api_key="SECRET_KEY_SENTINEL",
-            model="test-model",
-            service_mode="billing_enabled",
-            connection_factory=factory,
-        )
-        result = provider.generate_feedback(
-            provider_request(),
-            deadline=time.monotonic() + 10,
-        )
-
-        self.assertEqual(result, "Useful feedback")
-        _, path, raw_body, headers = connection.request_args
-        sent = json.loads(raw_body.decode())
-        prompt = sent["contents"][0]["parts"][0]["text"]
-        self.assertIn('"exercise": "push_up"', prompt)
-        self.assertNotIn("schema_version", prompt)
-        self.assertNotIn("consent_version", prompt)
-        self.assertNotIn("workout_id", prompt)
-        self.assertNotIn("routine_library", prompt)
-        self.assertNotIn("SHOULD_NOT_ENTER_PROMPT", prompt)
-        self.assertNotIn("billing_enabled", prompt)
-        self.assertEqual(headers["x-goog-api-key"], "SECRET_KEY_SENTINEL")
-        self.assertEqual(
-            connection.host, "generativelanguage.googleapis.com"
-        )
-        self.assertEqual(path, "/v1beta/models/test-model:generateContent")
-        self.assertTrue(connection.closed)
-
-    def test_overlong_feedback_is_rejected(self):
-        overlong = "x" * (ai_provider.MAX_FEEDBACK_CHARS + 1)
-        raw = json.dumps(
-            {"candidates": [{"content": {"parts": [{"text": overlong}]}}]}
-        ).encode()
-        with self.assertRaises(ai_provider.ProviderResponseInvalidError):
-            ai_provider.parse_provider_response(raw)
-
-    def test_empty_feedback_is_rejected(self):
-        raw = json.dumps(
-            {"candidates": [{"content": {"parts": [{"text": "   "}]}}]}
-        ).encode()
-        with self.assertRaises(ai_provider.ProviderResponseInvalidError):
-            ai_provider.parse_provider_response(raw)
 
 
 if __name__ == "__main__":

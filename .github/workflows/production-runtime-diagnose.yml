@@ -1,0 +1,76 @@
+name: RepCoach B7 Runtime Diagnose
+
+on:
+  push:
+    branches:
+      - feature/backend-b7-production
+    paths:
+      - ".github/workflows/production-runtime-diagnose.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  inspect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Prepare SSH
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        shell: bash
+        run: |
+          test -n "$VPS_SSH_KEY"
+          install -d -m 0700 "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_KEY" | tr -d '\r' > "$HOME/.ssh/repcoach_b7"
+          chmod 0600 "$HOME/.ssh/repcoach_b7"
+          cat > "$HOME/.ssh/known_hosts" <<'EOF'
+          14.225.207.90 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG3oPFCAMe0W1WRqT5OjOHZo8SKDe5tFPeW9VQOYVmzF
+          EOF
+          chmod 0600 "$HOME/.ssh/known_hosts"
+
+      - name: Diagnose backend runtime without sudo
+        shell: bash
+        run: |
+          ssh -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            nduythanh@14.225.207.90 '
+              set +e
+              echo "=== SYSTEMD SHOW ==="
+              systemctl show repcoach-backend \
+                -p ActiveState -p SubState -p Result -p MainPID \
+                -p ExecMainStatus -p ExecMainCode -p NRestarts \
+                -p FragmentPath -p WorkingDirectory -p EnvironmentFiles \
+                --no-pager
+              echo "=== SYSTEMD STATUS ==="
+              systemctl status repcoach-backend --no-pager -l 2>&1 || true
+              echo "=== PORT 8787 ==="
+              ss -ltnp 2>&1 | grep -E "(:8787|State)" || true
+              echo "=== PROCESS ==="
+              ps -ef | grep -E "[p]ython.*server.py|[r]epcoach" || true
+              echo "=== UNIT FILE ==="
+              systemctl cat repcoach-backend --no-pager 2>&1 || true
+              echo "=== SAFE ENV CHECK ==="
+              app=/home/nduythanh/apps/repcoach-backend
+              grep -E "^(AI_PROVIDER|GROQ_MODEL|BIND_HOST|PORT)=" "$app/.env" 2>/dev/null || true
+              if grep -q "^GROQ_API_KEY=." "$app/.env" 2>/dev/null; then
+                echo "GROQ_API_KEY=PRESENT"
+              else
+                echo "GROQ_API_KEY=MISSING"
+              fi
+              echo "=== PYTHON COMPILE ==="
+              python3 -m py_compile "$app/server.py" "$app/ai_provider.py" && echo "PY_COMPILE=PASS" || echo "PY_COMPILE=FAIL"
+              echo "=== LOCAL HEALTH ==="
+              curl -sv --max-time 3 http://127.0.0.1:8787/health 2>&1 || true
+              echo "=== JOURNAL ==="
+              journalctl -u repcoach-backend -n 80 --no-pager 2>&1 || true
+            '
+
+      - name: Clean runner SSH material
+        if: ${{ always() }}
+        run: rm -f "$HOME/.ssh/repcoach_b7"

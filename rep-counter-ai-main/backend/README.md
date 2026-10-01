@@ -16,7 +16,7 @@ This service accepts a small JSON workout summary and forwards a constrained pro
 {"status":"ok"}
 ```
 
-It does not resolve provider configuration and never calls Gemini.
+It does not resolve provider configuration and never calls the configured external provider.
 
 `GET /ready` validates that the required provider configuration can be constructed locally:
 
@@ -30,7 +30,7 @@ or, without exposing which secret/config value is missing:
 {"status":"not_ready"}
 ```
 
-Readiness does not call Gemini or consume provider quota.
+Readiness does not call Groq/Gemini or consume provider quota.
 
 Every backend JSON response includes `X-Request-ID`. Nginx generates a random request ID and forwards it to the backend; direct backend requests receive a server-generated random ID. Only bounded 32-character hexadecimal IDs are accepted from an upstream proxy, so arbitrary client tracking strings are not propagated. The same ID is present in structured backend logs for one-request debugging.
 
@@ -38,43 +38,31 @@ The mobile API does not enable browser CORS. `OPTIONS /v1/workout-feedback` is r
 
 ## AI provider boundary
 
-The HTTP API depends on an `AiProvider` interface. Gemini-specific HTTP, prompt construction, response parsing, and provider timeout behavior live in `ai_provider.py`, not in the route handler.
+The HTTP API depends on an `AiProvider` interface. Provider-specific HTTP, prompt construction, response parsing, and timeout behavior live in `ai_provider.py`, not in the route handler.
 
-Current provider:
-
-```text
-AI_PROVIDER=gemini
-```
-
-Required Gemini settings:
+Current production provider:
 
 ```text
-GEMINI_API_KEY=
-GEMINI_MODEL=gemini-3.5-flash-lite
-GEMINI_SERVICE_MODE=
+AI_PROVIDER=groq
+GROQ_API_KEY=
+GROQ_MODEL=openai/gpt-oss-20b
 ```
 
-`GEMINI_SERVICE_MODE` must be exactly:
+`openai/gpt-oss-20b` is the default Groq production model used by RepCoach. The legacy Gemini adapter remains available for a future separately approved deployment, but Gemini unpaid mode remains rejected and is not the current production path.
 
-```text
-billing_enabled
-```
+### Current Groq data contract
 
-RepCoach's production privacy contract intentionally rejects Gemini Unpaid Services. This field is still only a runtime guard/documentation assertion: before setting it, the operator must verify the exact production project is on a Paid Tier in Google AI Studio.
+RepCoach sends only the minimized aggregate workout prompt described below. According to GroqCloud's current data documentation, inference customer data is not retained by default except when needed for features that require retention or for platform reliability/abuse investigation; Groq documents up to 30 days for ordinary inference reliability/abuse monitoring. Groq offers Zero Data Retention controls, but RepCoach does not currently claim ZDR is enabled.
 
-See `docs/gemini-service-mode.md` for the official-terms verification record and the current production blocker.
+Groq's current Services Agreement allows a customer to integrate Groq APIs into a Customer Application and make AI services available to End Users. The developer remains responsible for applicable laws and the provider/model terms.
 
-### Current production decision
-
-Do **not** infer that production is paid from the API key, model, source code, or `.env.example`. The repository does not contain the Google AI Studio billing state. If the project cannot be independently verified as billing-enabled, AI feedback must remain unavailable.
-
-As of the 2026-10-01 terms verification, the current Gemini Developer API terms also contain audience/use restrictions that matter to a consumer fitness app. Paid mode changes prompt/response data-use treatment but does not by itself resolve those audience restrictions. Production deployment remains blocked until both the exact project billing state and product/provider terms fit are verified.
+See `docs/groq-provider.md` for the provider verification record.
 
 ## Prompt/response constraints
 
 Only whitelisted aggregate workout-summary fields enter the provider prompt. The provider adapter excludes contract metadata and unrelated product data such as identity, routine libraries, full workout/PR history, badges/streaks, camera/video content, and raw landmarks.
 
-Gemini is instructed to return concise, non-medical workout feedback. Provider results are rejected when missing, malformed, empty, larger than the provider-response byte cap, or longer than 2,000 characters.
+The provider is instructed to return concise, non-medical workout feedback. Provider results are rejected when missing, malformed, empty, larger than the provider-response byte cap, or longer than 2,000 characters.
 
 ## Workout-feedback API contract
 
@@ -93,7 +81,7 @@ The endpoint temporarily accepts both the current v1 client contract and v2.
 ```json
 {
   "schema_version": 2,
-  "consent_version": "2026-10-01",
+  "consent_version": "2026-10-01-groq",
   "exercise": "push_up",
   "duration_seconds": 780,
   "reps": 28,
@@ -145,7 +133,7 @@ Existing Flutter clients remain compatible because they already read the `feedba
 
 ## Stable failure contract
 
-The public endpoint does not return stack traces, API-key/configuration details, Gemini response bodies, or raw provider error bodies.
+The public endpoint does not return stack traces, API-key/configuration details, provider response bodies, or raw provider error bodies.
 
 | HTTP | error | Meaning |
 | --- | --- | --- |
@@ -163,8 +151,8 @@ The public endpoint does not return stack traces, API-key/configuration details,
 The layers are deliberately ordered so an inner layer fails before an outer caller gives up:
 
 ```text
-Gemini connect timeout:   5 s
-Gemini response timeout: 15 s
+Provider connect timeout:   5 s
+Provider response timeout: 15 s
 Backend total budget:    20 s
 Nginx backend read:      22 s
 Flutter request timeout: 25 s
@@ -210,14 +198,19 @@ Production serves it at:
 https://repcoach-ai.duckdns.org/privacy-policy.html
 ```
 
-The B4 policy/consent contract is:
+Nginx proxies this route to the backend. The backend reads the canonical
+`backend/static/privacy-policy.html` file as the RepCoach service user, so
+production does not need to make the private application/home directory
+traversable by the Nginx worker.
+
+The current policy/consent contract is:
 
 - effective date: `2026-10-01`;
-- AI consent version: `2026-10-01`;
-- Gemini production mode: verified `billing_enabled` only;
+- AI consent version: `2026-10-01-groq`;
+- production provider: GroqCloud;
 - automatic AI: off by default, opt-in, new workouts only;
 - manual AI: per-request confirmation;
-- older automatic-AI consent is invalidated by a new local preference key;
+- the Groq provider change invalidates the older automatic-AI consent key;
 - disabling AI affects future requests and cannot recall an already-sent request;
 - public policy is bilingual VI/EN and contains no Android-only settings instructions.
 
@@ -232,7 +225,7 @@ The B4 policy/consent contract is:
 
 ## Backend tests
 
-Tests use only the Python standard library, fakes, and mocks; they do not call live Gemini:
+Tests use only the Python standard library, fakes, and mocks; they do not call live external providers:
 
 ```bash
 cd rep-counter-ai-main/backend
@@ -268,6 +261,23 @@ sudo nginx -t
 
 The Python server listens only on `127.0.0.1:8787`. Nginx is the only public entry point and enforces HTTPS, the body limit, method restriction, rate limiting, bounded proxy timeouts, and security headers.
 
+## Production release
+
+The B7 production deployment, provider gate, public smoke, safe-log verification and rollback procedure is documented in:
+
+```text
+docs/production-release.md
+```
+
+Public production smoke uses synthetic data only:
+
+```bash
+cd rep-counter-ai-main/backend
+python3 tools/production_smoke.py
+```
+
+A passing smoke verifies the deployed API behavior, not the presence or value of the Groq secret. The deployment workflow checks that the production VPS is explicitly configured for `AI_PROVIDER=groq` and that a non-empty `GROQ_API_KEY` exists without printing it.
+
 ## Deployment notes
 
 Install/update the deployment files, then validate before reload:
@@ -284,9 +294,16 @@ sudo systemctl reload nginx
 sudo systemctl restart repcoach-backend
 ```
 
-Before restarting, the server-side `.env` must contain `GEMINI_SERVICE_MODE=billing_enabled`, and the exact production project must first be verified as a Paid Tier in Google AI Studio. Missing, unpaid, or invalid modes intentionally return the generic `AI_UNAVAILABLE` error.
+Before restarting, the production `.env` must contain:
 
-After copying the policy, verify `GET /privacy-policy.html` over HTTPS returns 200 with a `text/html; charset=utf-8` content type. Do not deploy policy text without the matching runtime/provider configuration; runtime behavior and verified provider state remain the source of truth.
+```text
+AI_PROVIDER=groq
+GROQ_API_KEY=<server secret>
+GROQ_MODEL=openai/gpt-oss-20b
+BIND_HOST=127.0.0.1
+```
+
+After copying the policy, verify `GET /privacy-policy.html` over HTTPS returns 200 with a `text/html; charset=utf-8` content type. Do not deploy policy text without the matching runtime/provider configuration.
 
 ## Operations
 

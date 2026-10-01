@@ -1,6 +1,4 @@
-import contextlib
 import http.client
-import io
 import json
 import re
 import sys
@@ -81,16 +79,29 @@ class ObservabilityHttpTests(unittest.TestCase):
         self.assertNotIn("GEMINI_API_KEY", serialized)
         self.assertNotIn("GEMINI_SERVICE_MODE", serialized)
 
+    def _request_with_captured_log(self, path, *, headers=None):
+        logged = []
+        log_ready = threading.Event()
+
+        def capture_print(*args, **kwargs):
+            del kwargs
+            if args:
+                logged.append(str(args[0]))
+                log_ready.set()
+
+        with patch("builtins.print", side_effect=capture_print):
+            response = self.request(path, headers=headers)
+            self.assertTrue(log_ready.wait(1), "backend log event was not emitted")
+        self.assertTrue(logged)
+        return response, json.loads(logged[-1])
+
     def test_request_id_is_generated_returned_and_logged(self):
-        stream = io.StringIO()
-        with contextlib.redirect_stdout(stream):
-            status, headers, body = self.request("/health")
+        (status, headers, body), event = self._request_with_captured_log("/health")
         self.assertEqual(status, 200)
         self.assertEqual(body, {"status": "ok"})
         request_id = headers["x-request-id"]
         self.assertRegex(request_id, REQUEST_ID_RE)
 
-        event = json.loads(stream.getvalue().strip().splitlines()[-1])
         self.assertEqual(event["request_id"], request_id)
         self.assertEqual(event["route"], "/health")
         self.assertEqual(event["status"], 200)
@@ -99,27 +110,22 @@ class ObservabilityHttpTests(unittest.TestCase):
 
     def test_valid_upstream_request_id_is_propagated(self):
         upstream = "a" * 32
-        stream = io.StringIO()
-        with contextlib.redirect_stdout(stream):
-            status, headers, _ = self.request(
-                "/health", headers={"X-Request-ID": upstream}
-            )
+        (status, headers, _), event = self._request_with_captured_log(
+            "/health", headers={"X-Request-ID": upstream}
+        )
         self.assertEqual(status, 200)
         self.assertEqual(headers["x-request-id"], upstream)
-        event = json.loads(stream.getvalue().strip().splitlines()[-1])
         self.assertEqual(event["request_id"], upstream)
 
     def test_invalid_request_id_is_replaced_not_logged(self):
         incoming = "USER_TRACKING_SENTINEL"
-        stream = io.StringIO()
-        with contextlib.redirect_stdout(stream):
-            status, headers, _ = self.request(
-                "/health", headers={"X-Request-ID": incoming}
-            )
+        (status, headers, _), event = self._request_with_captured_log(
+            "/health", headers={"X-Request-ID": incoming}
+        )
         self.assertEqual(status, 200)
         self.assertRegex(headers["x-request-id"], REQUEST_ID_RE)
         self.assertNotEqual(headers["x-request-id"], incoming)
-        self.assertNotIn(incoming, stream.getvalue())
+        self.assertNotIn(incoming, json.dumps(event))
 
     def test_options_has_no_cors_allow_origin(self):
         status, headers, body = self.request(

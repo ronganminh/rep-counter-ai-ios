@@ -11,7 +11,7 @@ AiFeedbackService sends POST /v1/workout-feedback with Content-Type application/
 The shipped client now sends request schema v2:
 
     schema_version = 2
-    consent_version = LegalConfig.aiConsentVersion = 2026-10-01
+    consent_version = LegalConfig.aiConsentVersion = 2026-10-01-groq
 
 The aggregate workout fields are defined by WorkoutRecord.toAiPayload(). Contract metadata is added by AiFeedbackService, not stored in the workout model.
 
@@ -75,7 +75,7 @@ The existing full Flutter test suite remains the regression guard for non-AI loc
 
 B6 adds a CI-only staging harness at backend/tools/fake_staging_server.py.
 
-It runs the real Python server.Handler and replaces only the provider call with deterministic synthetic feedback. It never calls Gemini and requires no provider secret.
+It runs the real Python server.Handler and replaces only the provider call with deterministic synthetic feedback. It never calls Groq or Gemini and requires no provider secret.
 
 The Flutter-side smoke client at rep_counter_app/tool/staging_contract_smoke.dart checks over real HTTP:
 
@@ -91,4 +91,4 @@ GitHub Actions workflow .github/workflows/staging-integration-ci.yml runs this c
 
 No dedicated remote staging hostname is defined in the repository. The smoke client accepts STAGING_BASE_URL so an operator can run the same synthetic request against an external staging deployment later.
 
-Do not use the production hostname merely to satisfy B6. Production still has the B3/B4 provider billing/audience gates and B7 deploy checks.
+Do not use the production hostname merely to satisfy B6. Production provider selection is now GroqCloud; B7 still requires VPS deployment, provider-config preflight and public smoke checks.

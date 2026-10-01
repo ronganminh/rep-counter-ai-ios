@@ -75,7 +75,7 @@
     <p class="muted">This page explains what stays on your device, what is sent when you choose AI feedback, and how RepCoach AI and its service provider process that limited data.</p>
     <div class="meta">
       <div><b>Effective date</b>October 1, 2026</div>
-      <div><b>AI consent version</b>2026-10-01</div>
+      <div><b>AI consent version</b>2026-10-01-groq</div>
       <div><b>Developer</b>RỒNG ẨN MÌNH</div>
       <div><b>Contact</b><a href="mailto:ronganminh221@gmail.com">ronganminh221@gmail.com</a></div>
     </div>
@@ -119,14 +119,14 @@
     <p>RepCoach Nginx access/error logs are configured to rotate daily, keeping the current log plus 14 rotated files; older rotations are removed by log rotation. The Python backend writes its metadata-only operational events to the host system journal. Journal retention is controlled by VPS administration settings and is not assigned a separate fixed duration by the app repository.</p>
     <p>Because RepCoach AI has no user account or server-side workout-history database, these operational logs are not organized as a user workout profile and the app does not provide an account-based delete-log control.</p>
 
-    <h3>7. Google Gemini paid service</h3>
-    <p>RepCoach's production privacy contract permits AI requests only when the backend is configured for a verified <strong>billing-enabled Gemini API project</strong>. The backend rejects the unpaid service mode rather than sending workout summaries through Gemini Unpaid Services.</p>
-    <p>Under Google's Gemini API Additional Terms for Paid Services checked for this policy, Google states that it does not use paid-service prompts or responses to improve its products. Google also states that it logs prompts and responses for a limited period for detecting/preventing prohibited-use violations and for required legal or regulatory disclosures. The official terms do not state one fixed general duration for ordinary paid <code>generateContent</code> abuse-monitoring logs, so RepCoach AI does not claim a specific Google retention period or zero-data-retention status.</p>
-    <p>Google may also process service/usage details needed to operate the paid service, which can include authentication and operational details, safety-filter triggers, errors/performance information and IP addresses under Google's applicable terms.</p>
-    <p>Official sources: <a href="https://ai.google.dev/gemini-api/terms" rel="noopener noreferrer">Gemini API Additional Terms</a>, <a href="https://ai.google.dev/gemini-api/docs/billing" rel="noopener noreferrer">Gemini API Billing</a>, and <a href="https://ai.google.dev/gemini-api/docs/zdr" rel="noopener noreferrer">Gemini Developer API data-retention documentation</a>.</p>
+    <h3>7. GroqCloud AI service</h3>
+    <p>RepCoach production uses GroqCloud as its AI inference provider. The backend sends only the minimized workout prompt described above and keeps the Groq API credential on the server. The current model is <code>openai/gpt-oss-20b</code>, a Groq production model.</p>
+    <p>According to GroqCloud's current data documentation, usage metadata is retained for service measurement and performance and does not contain customer inputs or outputs. Inference customer data is not retained by default, except when a feature requires retention or when data is needed for platform reliability, troubleshooting, or abuse investigation. For ordinary inference reliability/abuse monitoring, Groq documents a retention period of up to 30 days. Groq also offers Zero Data Retention controls, but RepCoach AI does <strong>not</strong> currently claim that ZDR is enabled.</p>
+    <p>Groq's current Services Agreement states that customer inputs and outputs are not used to train or fine-tune models unless the customer explicitly permits or instructs that use. The agreement also allows a customer to integrate Groq APIs into a Customer Application and make the AI services available to End Users.</p>
+    <p>Official sources: <a href="https://console.groq.com/docs/your-data" rel="noopener noreferrer">GroqCloud data documentation</a>, <a href="https://console.groq.com/docs/legal/services-agreement" rel="noopener noreferrer">Groq Services Agreement</a>, and <a href="https://console.groq.com/docs/models" rel="noopener noreferrer">Groq supported models</a>.</p>
 
-    <h3>8. Age and AI-provider restrictions</h3>
-    <p>Google's current Gemini API terms require API users to be at least 18 and restrict API Clients that are directed toward or likely to be accessed by people under 18. Accordingly, Gemini-backed AI feedback is for users aged 18 or older. RepCoach AI must not enable the Gemini-backed production feature unless the product's distribution and audience controls satisfy the provider's then-current terms.</p>
+    <h3>8. Age, end users and AI-provider restrictions</h3>
+    <p>Groq's account/cloud-services agreement requires the customer accessing the Cloud Services to be at least 18. It expressly allows AI services to be made available to End Users through a Customer Application. If a Customer Application is directed toward or likely to be accessed by people under the age of majority, Groq places responsibility on the customer to comply with applicable laws and regulations concerning minors and personal data.</p>
     <p>AI feedback is general workout information, not medical advice, diagnosis or treatment.</p>
 
     <h3>9. Automatic AI consent and control</h3>
@@ -191,14 +191,14 @@
     <p>Access/error log Nginx của RepCoach được cấu hình xoay vòng mỗi ngày, giữ log hiện tại cộng 14 file đã xoay vòng; bản cũ hơn bị xóa theo cấu hình logrotate. Backend Python ghi sự kiện vận hành chỉ-metadata vào system journal của máy chủ. Thời gian giữ journal do cấu hình quản trị VPS quyết định và repo ứng dụng hiện không đặt một thời hạn riêng cố định cho journal.</p>
     <p>Do RepCoach AI không có tài khoản người dùng hay cơ sở dữ liệu lịch sử tập phía server, các log vận hành này không được tổ chức thành hồ sơ lịch sử tập theo tài khoản và app không có nút xóa log theo tài khoản.</p>
 
-    <h3>7. Dịch vụ Google Gemini có tính phí</h3>
-    <p>Contract quyền riêng tư production của RepCoach chỉ cho phép gửi yêu cầu AI khi backend được cấu hình với một <strong>Google Gemini API project đã xác minh có billing</strong>. Backend từ chối mode unpaid thay vì gửi bản tóm tắt buổi tập qua Gemini Unpaid Services.</p>
-    <p>Theo Điều khoản bổ sung Gemini API dành cho Paid Services được kiểm tra cho phiên bản chính sách này, Google nêu rằng họ không dùng prompt hoặc response của Paid Services để cải thiện sản phẩm. Google cũng nêu rằng prompt và response được log trong một khoảng thời gian giới hạn để phát hiện/ngăn chặn vi phạm chính sách sử dụng bị cấm và cho các yêu cầu pháp lý/quy định bắt buộc. Điều khoản chính thức không nêu một thời lượng cố định duy nhất cho log giám sát lạm dụng của request <code>generateContent</code> trả phí thông thường, nên RepCoach AI không khẳng định một con số lưu giữ cụ thể của Google và không tuyên bố có trạng thái zero-data-retention.</p>
-    <p>Google cũng có thể xử lý chi tiết dịch vụ/sử dụng cần thiết để vận hành dịch vụ trả phí, có thể gồm thông tin xác thực/vận hành, trigger bộ lọc an toàn, lỗi/hiệu năng và địa chỉ IP theo các điều khoản hiện hành của Google.</p>
-    <p>Nguồn chính thức: <a href="https://ai.google.dev/gemini-api/terms?hl=vi" rel="noopener noreferrer">Điều khoản bổ sung Gemini API</a>, <a href="https://ai.google.dev/gemini-api/docs/billing?hl=vi" rel="noopener noreferrer">Billing Gemini API</a>, và <a href="https://ai.google.dev/gemini-api/docs/zdr?hl=vi" rel="noopener noreferrer">Tài liệu lưu giữ dữ liệu Gemini Developer API</a>.</p>
+    <h3>7. Dịch vụ AI GroqCloud</h3>
+    <p>RepCoach production dùng GroqCloud làm nhà cung cấp AI inference. Backend chỉ gửi prompt buổi tập đã tối giản như mô tả ở trên và giữ Groq API key trên máy chủ. Model hiện tại là <code>openai/gpt-oss-20b</code>, một production model của Groq.</p>
+    <p>Theo tài liệu dữ liệu GroqCloud hiện hành, usage metadata được giữ để đo lường hoạt động và hiệu năng dịch vụ và không chứa input/output của khách hàng. Dữ liệu khách hàng của inference mặc định không được lưu, ngoại trừ khi một tính năng cần lưu dữ liệu hoặc khi cần cho độ tin cậy nền tảng, khắc phục sự cố hay điều tra lạm dụng. Với giám sát reliability/abuse của inference thông thường, Groq công bố thời gian lưu tối đa 30 ngày. Groq có cung cấp Zero Data Retention, nhưng RepCoach AI hiện <strong>không</strong> tuyên bố ZDR đã được bật.</p>
+    <p>Services Agreement hiện hành của Groq nêu rằng input/output của khách hàng không được dùng để train hoặc fine-tune model trừ khi khách hàng cho phép hoặc chỉ thị rõ ràng. Thỏa thuận cũng cho phép khách hàng tích hợp Groq API vào Customer Application và cung cấp AI cho End Users.</p>
+    <p>Nguồn chính thức: <a href="https://console.groq.com/docs/your-data" rel="noopener noreferrer">Tài liệu dữ liệu GroqCloud</a>, <a href="https://console.groq.com/docs/legal/services-agreement" rel="noopener noreferrer">Groq Services Agreement</a>, và <a href="https://console.groq.com/docs/models" rel="noopener noreferrer">Danh sách model Groq</a>.</p>
 
-    <h3>8. Độ tuổi và giới hạn của nhà cung cấp AI</h3>
-    <p>Điều khoản Gemini API hiện tại của Google yêu cầu người dùng API từ 18 tuổi trở lên và hạn chế API Client hướng tới hoặc có khả năng được người dưới 18 tuổi truy cập. Vì vậy, nhận xét AI dùng Gemini chỉ dành cho người dùng từ 18 tuổi trở lên. RepCoach AI không được bật tính năng Gemini ở production nếu cách phân phối và kiểm soát đối tượng của sản phẩm chưa đáp ứng điều khoản nhà cung cấp hiện hành.</p>
+    <h3>8. Độ tuổi, người dùng cuối và giới hạn của nhà cung cấp AI</h3>
+    <p>Thỏa thuận Cloud Services của Groq yêu cầu khách hàng trực tiếp sử dụng Cloud Services phải từ 18 tuổi trở lên. Thỏa thuận cho phép cung cấp AI cho End Users thông qua Customer Application. Nếu ứng dụng hướng tới hoặc có khả năng được người chưa đủ tuổi trưởng thành truy cập, Groq đặt trách nhiệm tuân thủ các luật/quy định áp dụng về trẻ em và dữ liệu cá nhân lên phía khách hàng.</p>
     <p>Nhận xét AI chỉ là thông tin tập luyện chung, không phải lời khuyên y tế, chẩn đoán hoặc điều trị.</p>
 
     <h3>9. Đồng ý AI tự động và quyền kiểm soát</h3>
