@@ -29,14 +29,13 @@ class WorkoutStartConfig {
         timedChallenge = null,
         previousBestReps = null;
 
-  const WorkoutStartConfig.timed(
+  WorkoutStartConfig.timed(
     int seconds, {
-    int? previousBestReps,
+    this.previousBestReps,
   })  : assert(seconds > 0),
         mode = WorkoutMode.timed,
         targetReps = null,
-        timedChallenge = TimedChallengeConfig(durationSeconds: seconds),
-        previousBestReps = previousBestReps;
+        timedChallenge = TimedChallengeConfig(durationSeconds: seconds);
 
   final WorkoutMode mode;
   final int? targetReps;
