@@ -318,25 +318,42 @@ class FormScoreDetailsContent extends StatelessWidget {
               ),
               const SizedBox(height: 12),
             ],
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: Text(
-                    'FORM SCORE',
-                    style: AppTypography.caption12.copyWith(
-                      color: AppColors.text2,
-                    ),
+            LayoutBuilder(
+              builder: (context, constraints) {
+                final largeText =
+                    MediaQuery.textScalerOf(context).scale(16) > 24;
+                final label = Text(
+                  'FORM SCORE',
+                  style: AppTypography.caption12.copyWith(
+                    color: AppColors.text2,
                   ),
-                ),
-                Text(
+                );
+                final score = Text(
                   '${quality.qualityScore} / 100',
                   key: const Key('form-score-details-overall'),
                   style: AppTypography.metric40.copyWith(
                     color: AppColors.accent,
                   ),
-                ),
-              ],
+                );
+                if (largeText || constraints.maxWidth < 280) {
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      label,
+                      const SizedBox(height: 8),
+                      score,
+                    ],
+                  );
+                }
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Expanded(child: label),
+                    const SizedBox(width: 12),
+                    score,
+                  ],
+                );
+              },
             ),
             const SizedBox(height: 24),
             _MetricRow(
