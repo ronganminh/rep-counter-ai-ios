@@ -198,6 +198,11 @@ Production serves it at:
 https://repcoach-ai.duckdns.org/privacy-policy.html
 ```
 
+Nginx proxies this route to the backend. The backend reads the canonical
+`backend/static/privacy-policy.html` file as the RepCoach service user, so
+production does not need to make the private application/home directory
+traversable by the Nginx worker.
+
 The current policy/consent contract is:
 
 - effective date: `2026-10-01`;
