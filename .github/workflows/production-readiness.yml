@@ -1,0 +1,36 @@
+name: RepCoach Production Readiness
+
+on:
+  pull_request:
+    paths:
+      - "rep-counter-ai-main/backend/tools/production_smoke.py"
+      - "rep-counter-ai-main/backend/docs/production-release.md"
+      - "rep-counter-ai-main/contracts/workout_feedback_v2.json"
+      - ".github/workflows/production-readiness.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repcoach-production-readiness-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  public-production-smoke:
+    name: Public production smoke
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Run synthetic production smoke
+        working-directory: rep-counter-ai-main/backend
+        run: python tools/production_smoke.py
