@@ -1,0 +1,109 @@
+name: RepCoach Production Ops Check
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repcoach-production-ops-check
+  cancel-in-progress: true
+
+jobs:
+  inspect:
+    name: Read-only production verification
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+
+    steps:
+      - name: Check out reviewed source
+        uses: actions/checkout@v7
+
+      - name: Prepare pinned SSH connection
+        env:
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+        shell: bash
+        run: |
+          if [[ -z "$VPS_SSH_KEY" ]]; then
+            echo "Missing repository secret VPS_SSH_KEY." >&2
+            exit 1
+          fi
+          install -d -m 0700 "$HOME/.ssh"
+          printf '%s\n' "$VPS_SSH_KEY" | tr -d '\r' > "$HOME/.ssh/repcoach_ops"
+          chmod 0600 "$HOME/.ssh/repcoach_ops"
+          cat > "$HOME/.ssh/known_hosts" <<'EOF'
+          14.225.207.90 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG3oPFCAMe0W1WRqT5OjOHZo8SKDe5tFPeW9VQOYVmzF
+          EOF
+          chmod 0600 "$HOME/.ssh/known_hosts"
+
+      - name: Verify safe production configuration and liveness
+        shell: bash
+        run: |
+          ssh -i "$HOME/.ssh/repcoach_ops" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            nduythanh@14.225.207.90 '
+              set -eu
+              app=/home/nduythanh/apps/repcoach-backend
+              test -d "$app"
+              test -f "$app/.env"
+              grep -qx "AI_PROVIDER=groq" "$app/.env"
+              grep -q "^GROQ_API_KEY=." "$app/.env"
+              grep -qx "GROQ_MODEL=openai/gpt-oss-20b" "$app/.env"
+              grep -qx "BIND_HOST=127.0.0.1" "$app/.env"
+              systemctl is-active --quiet repcoach-backend
+              curl -fsS --max-time 5 http://127.0.0.1:8787/health |
+                grep -Fq ""status": "ok""
+              echo "VPS_CONFIG_AND_HEALTH=PASS"
+            '
+
+      - name: Compare deployed application hashes with reviewed source
+        shell: bash
+        run: |
+          app=/home/nduythanh/apps/repcoach-backend
+          remote_hashes="$(
+            ssh -i "$HOME/.ssh/repcoach_ops" \
+              -o IdentitiesOnly=yes \
+              -o BatchMode=yes \
+              -o StrictHostKeyChecking=yes \
+              nduythanh@14.225.207.90 "
+                set -eu
+                sha256sum \
+                  '$app/server.py' \
+                  '$app/ai_provider.py' \
+                  '$app/static/privacy-policy.html' |
+                  awk '{print \$1}'
+              "
+          )"
+
+          local_hashes="$(
+            sha256sum \
+              rep-counter-ai-main/backend/server.py \
+              rep-counter-ai-main/backend/ai_provider.py \
+              rep-counter-ai-main/backend/static/privacy-policy.html |
+              awk '{print $1}'
+          )"
+
+          if [[ "$remote_hashes" != "$local_hashes" ]]; then
+            echo "DEPLOYED_HASHES=DIFFERENT_FROM_CHECKED_OUT_SOURCE" >&2
+            exit 1
+          fi
+          echo "DEPLOYED_APP_HASHES=PASS"
+
+      - name: Verify public read-only routes
+        shell: bash
+        run: |
+          curl -fsS --max-time 10 https://repcoach-ai.duckdns.org/health |
+            grep -Fq '"status": "ok"'
+          curl -fsS --max-time 10 https://repcoach-ai.duckdns.org/ready |
+            grep -Fq '"status": "ready"'
+          curl -fsS --max-time 10 https://repcoach-ai.duckdns.org/privacy-policy.html |
+            grep -Fq '2026-10-01-groq'
+          echo "PUBLIC_READ_ONLY_ROUTES=PASS"
+
+      - name: Clean runner SSH material
+        if: ${{ always() }}
+        shell: bash
+        run: rm -f "$HOME/.ssh/repcoach_ops"
