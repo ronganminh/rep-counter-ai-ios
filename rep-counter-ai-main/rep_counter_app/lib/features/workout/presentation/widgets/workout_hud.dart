@@ -410,82 +410,121 @@ class _TimedChallengeHud extends StatelessWidget {
     final finalTen = state.isFinalTenSeconds;
     final placementColor =
         state.placementReady ? AppColors.success : AppColors.warning;
+    final compactHeader =
+        MediaQuery.textScalerOf(context).scale(14) > 20 ||
+            MediaQuery.sizeOf(context).width < 350;
 
     return Column(
       key: const Key('timed-challenge-hud'),
       children: [
         Padding(
           padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
-          child: Row(
+          child: Column(
             children: [
-              Container(
-                constraints: const BoxConstraints(minHeight: 38),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(19),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Icon(
-                      LucideIcons.shieldCheck,
-                      size: 15,
-                      color: AppColors.success,
+              Row(
+                children: [
+                  Semantics(
+                    label: context.tr('Xử lý trên máy', 'On-device'),
+                    child: ExcludeSemantics(
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: 38,
+                          minHeight: 38,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: compactHeader ? 10 : 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(19),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: compactHeader
+                            ? const Icon(
+                                LucideIcons.shieldCheck,
+                                size: 17,
+                                color: AppColors.success,
+                              )
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    LucideIcons.shieldCheck,
+                                    size: 15,
+                                    color: AppColors.success,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    context.tr(
+                                      'Xử lý trên máy',
+                                      'On-device',
+                                    ),
+                                    style: AppTypography.body14.copyWith(
+                                      color: AppColors.success,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
                     ),
-                    const SizedBox(width: 6),
-                    Text(
-                      context.tr('Xử lý trên máy', 'On-device'),
-                      style: AppTypography.body14.copyWith(
-                        color: AppColors.success,
+                  ),
+                  if (!compactHeader) ...[
+                    const Spacer(),
+                    Flexible(
+                      child: Text(
+                        exerciseName,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.body14,
                       ),
                     ),
                   ],
-                ),
+                  const Spacer(),
+                  if (diagnosticAction != null) diagnosticAction!,
+                  IconButton(
+                    key: const Key('toggle-timed-voice'),
+                    tooltip: context.tr(
+                      voiceEnabled ? 'Tắt giọng đọc' : 'Bật giọng đọc',
+                      voiceEnabled ? 'Mute voice' : 'Enable voice',
+                    ),
+                    onPressed: onToggleVoice,
+                    icon: Icon(
+                      voiceEnabled
+                          ? LucideIcons.volume2
+                          : LucideIcons.volumeX,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          'assets/vnext/time_challenge_close_ellipse.png',
+                          fit: BoxFit.contain,
+                        ),
+                        IconButton(
+                          key: const Key('close-timed-challenge'),
+                          tooltip: context.tr('Đóng', 'Close'),
+                          onPressed: onExit,
+                          icon: const Icon(LucideIcons.x),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              const Spacer(),
-              Flexible(
-                child: Text(
+              if (compactHeader) ...[
+                const SizedBox(height: 4),
+                Text(
                   exerciseName,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                   style: AppTypography.body14,
                 ),
-              ),
-              const Spacer(),
-              if (diagnosticAction != null) diagnosticAction!,
-              IconButton(
-                key: const Key('toggle-timed-voice'),
-                tooltip: context.tr(
-                  voiceEnabled ? 'Tắt giọng đọc' : 'Bật giọng đọc',
-                  voiceEnabled ? 'Mute voice' : 'Enable voice',
-                ),
-                onPressed: onToggleVoice,
-                icon: Icon(
-                  voiceEnabled ? LucideIcons.volume2 : LucideIcons.volumeX,
-                ),
-              ),
-              SizedBox(
-                width: 48,
-                height: 48,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    Image.asset(
-                      'assets/vnext/time_challenge_close_ellipse.png',
-                      fit: BoxFit.contain,
-                    ),
-                    IconButton(
-                      key: const Key('close-timed-challenge'),
-                      tooltip: context.tr('Đóng', 'Close'),
-                      onPressed: onExit,
-                      icon: const Icon(LucideIcons.x),
-                    ),
-                  ],
-                ),
-              ),
+              ],
             ],
           ),
         ),
@@ -694,16 +733,20 @@ class _TimedStatPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        height: 54,
+        constraints: const BoxConstraints(minHeight: 54),
         alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
         decoration: BoxDecoration(
           color: AppColors.surface,
           borderRadius: BorderRadius.circular(27),
         ),
-        child: Text(
-          label,
-          textAlign: TextAlign.center,
-          style: AppTypography.body16,
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: AppTypography.body16,
+          ),
         ),
       );
 }
