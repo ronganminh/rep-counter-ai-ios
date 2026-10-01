@@ -170,18 +170,30 @@ if [[ "$backend_ready" -ne 1 ]]; then
   exit 4
 fi
 
-sudo ss -ltn | grep -F '127.0.0.1:8787' >/dev/null
+if ! sudo ss -ltn | grep -Fq '127.0.0.1:8787'; then
+  echo "backend port 8787 is not listening after health passed" >&2
+  exit 5
+fi
+echo "POSTDEPLOY_BACKEND=PASS"
 
 # Capture nginx -T once. With pipefail enabled, piping nginx -T directly into
 # grep can produce a false failure when grep exits early and nginx receives
 # SIGPIPE.
 nginx_dump="$(sudo nginx -T 2>/dev/null)"
-grep -Fq 'client_max_body_size 16k;' <<<"$nginx_dump"
-grep -Fq 'limit_req zone=repcoach_api' <<<"$nginx_dump"
-grep -Fq 'proxy_read_timeout 22s;' <<<"$nginx_dump"
-grep -Fq 'location = /privacy-policy.html' <<<"$nginx_dump"
-grep -Fq 'location = /health' <<<"$nginx_dump"
-grep -Fq 'location = /ready' <<<"$nginx_dump"
+for required in \
+  'client_max_body_size 16k;' \
+  'limit_req zone=repcoach_api' \
+  'proxy_read_timeout 22s;' \
+  'location = /privacy-policy.html' \
+  'location = /health' \
+  'location = /ready'
+do
+  if ! grep -Fq "$required" <<<"$nginx_dump"; then
+    echo "nginx effective config missing: $required" >&2
+    exit 6
+  fi
+done
+echo "POSTDEPLOY_NGINX=PASS"
 
 completed=1
 trap - EXIT
