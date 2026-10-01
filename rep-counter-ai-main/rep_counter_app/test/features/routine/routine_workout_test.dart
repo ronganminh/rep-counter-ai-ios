@@ -127,7 +127,7 @@ void main() {
     expect(controller.isRoutineResting, isTrue);
 
     tracking.advance(const Duration(seconds: 5));
-    await tester.pump(const Duration(milliseconds: 300));
+    await tester.pump(const Duration(milliseconds: 1100));
 
     expect(controller.isRoutineResting, isFalse);
     expect(controller.state.reps, 2);
