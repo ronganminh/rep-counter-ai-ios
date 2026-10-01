@@ -1,0 +1,12 @@
+{
+  "pushup-a": {
+    "current_engine_count": 28,
+    "human_ground_truth": null,
+    "notes": "Regression baseline only; not yet human-verified"
+  },
+  "pushup-b": {
+    "current_engine_count": 67,
+    "human_ground_truth": null,
+    "notes": "Regression baseline only; not yet human-verified"
+  }
+}
