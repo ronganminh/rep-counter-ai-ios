@@ -9,21 +9,46 @@ case "$backup" in
   *) echo "refusing unexpected backup path" >&2; exit 2 ;;
 esac
 
-sudo -n true
 sudo test -d "$backup"
 
 sudo systemctl stop repcoach-backend || true
-[[ -f "$backup/app/server.py" ]] && install -m 0644 "$backup/app/server.py" "$app_dir/server.py"
-[[ -f "$backup/app/ai_provider.py" ]] && install -m 0644 "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"
-if sudo test -d "$backup/app/static"; then
+if sudo test -f "$backup/app/server.py.present"; then
+  install -m 0644 "$backup/app/server.py" "$app_dir/server.py"
+elif sudo test -f "$backup/app/server.py.absent"; then
+  rm -f "$app_dir/server.py"
+fi
+if sudo test -f "$backup/app/ai_provider.py.present"; then
+  install -m 0644 "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"
+elif sudo test -f "$backup/app/ai_provider.py.absent"; then
+  rm -f "$app_dir/ai_provider.py"
+fi
+if sudo test -f "$backup/app/static.present"; then
   rm -rf "$app_dir/static"
   cp -a "$backup/app/static" "$app_dir/static"
+elif sudo test -f "$backup/app/static.absent"; then
+  rm -rf "$app_dir/static"
 fi
 
-sudo test -f "$backup/system/repcoach-backend.service" && sudo cp -a "$backup/system/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service || true
-sudo test -f "$backup/system/nginx-site" && sudo cp -a "$backup/system/nginx-site" /etc/nginx/sites-available/repcoach-ai || true
-sudo test -f "$backup/system/rate-limit.conf" && sudo cp -a "$backup/system/rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf || true
-sudo test -f "$backup/system/logrotate" && sudo cp -a "$backup/system/logrotate" /etc/logrotate.d/repcoach-ai || true
+if sudo test -f "$backup/system/repcoach-backend.service.present"; then
+  sudo cp -a "$backup/system/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service
+elif sudo test -f "$backup/system/repcoach-backend.service.absent"; then
+  sudo rm -f /etc/systemd/system/repcoach-backend.service
+fi
+if sudo test -f "$backup/system/nginx-site.present"; then
+  sudo cp -a "$backup/system/nginx-site" /etc/nginx/sites-available/repcoach-ai
+elif sudo test -f "$backup/system/nginx-site.absent"; then
+  sudo rm -f /etc/nginx/sites-available/repcoach-ai
+fi
+if sudo test -f "$backup/system/rate-limit.conf.present"; then
+  sudo cp -a "$backup/system/rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf
+elif sudo test -f "$backup/system/rate-limit.conf.absent"; then
+  sudo rm -f /etc/nginx/conf.d/repcoach-rate-limit.conf
+fi
+if sudo test -f "$backup/system/logrotate.present"; then
+  sudo cp -a "$backup/system/logrotate" /etc/logrotate.d/repcoach-ai
+elif sudo test -f "$backup/system/logrotate.absent"; then
+  sudo rm -f /etc/logrotate.d/repcoach-ai
+fi
 
 sudo systemctl daemon-reload
 sudo nginx -t
