@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../placement.dart';
 import '../../../rep_counter.dart';
+import '../domain/workout_mode.dart';
 import 'rep_feedback.dart';
 
 /// Presentation phases, not a replacement for the legacy rep/set state machine.
@@ -44,6 +45,10 @@ class WorkoutUiState {
     this.countdown,
     this.sessionStarted = true,
     this.startRequested = false,
+    this.mode = WorkoutMode.free,
+    this.challengeSeconds,
+    this.challengeRemaining,
+    this.challengeExpired = false,
   });
 
   final WorkoutUiPhase phase;
@@ -63,6 +68,25 @@ class WorkoutUiState {
   final RepFeedback? repFeedback;
   final int? countdown;
   final bool sessionStarted, startRequested;
+  final WorkoutMode mode;
+  final int? challengeSeconds;
+  final Duration? challengeRemaining;
+  final bool challengeExpired;
+
+  bool get isTimedChallenge => mode == WorkoutMode.timed;
+  bool get isFinalTenSeconds =>
+      isTimedChallenge &&
+      !challengeExpired &&
+      challengeRemaining != null &&
+      challengeRemaining! > Duration.zero &&
+      challengeRemaining! <= const Duration(seconds: 10);
+
+  int? get challengeRemainingSeconds {
+    final remaining = challengeRemaining;
+    if (remaining == null) return null;
+    if (remaining <= Duration.zero) return 0;
+    return (remaining.inMilliseconds + 999) ~/ 1000;
+  }
 
   bool get isCalibrating => phase == WorkoutUiPhase.calibrating;
   bool get isFinishing =>
