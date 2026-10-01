@@ -160,8 +160,10 @@ class GroqProvider:
                 {"role": "system", "content": PROMPTS[locale]},
                 {"role": "user", "content": summary},
             ],
-            "temperature": 0.4,
-            "max_tokens": 220,
+            "temperature": 0.6,
+            "max_completion_tokens": 512,
+            "reasoning_effort": "low",
+            "include_reasoning": False,
         }
         body = json.dumps(provider_payload, ensure_ascii=False).encode("utf-8")
         connection = self._connection_factory(
