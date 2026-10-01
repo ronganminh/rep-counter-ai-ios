@@ -177,12 +177,13 @@ class _ExportDataSheetState extends State<ExportDataSheet> {
           onTap: () => setState(() => _format = WorkoutExportFormat.json),
         ),
         const SizedBox(height: 20),
-        Container(
-          decoration: BoxDecoration(
-            color: p.bg,
+        Material(
+          color: p.bg,
+          shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: p.borderStrong),
+            side: BorderSide(color: p.borderStrong),
           ),
+          clipBehavior: Clip.antiAlias,
           child: CheckboxListTile(
             key: const Key('export-include-ai'),
             value: _includeAi,
