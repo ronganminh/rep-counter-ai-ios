@@ -67,12 +67,14 @@ void main() {
       ),
     );
 
+    final explain = find.byKey(const Key('form-score-explain'));
     await tester.scrollUntilVisible(
-      find.byKey(const Key('form-score-explain')),
+      explain,
       250,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.tap(find.byKey(const Key('form-score-explain')));
+    await tester.pumpAndSettle();
+    tester.widget<TextButton>(explain).onPressed!();
     await tester.pumpAndSettle();
 
     expect(find.byKey(const Key('form-score-details')), findsOneWidget);
