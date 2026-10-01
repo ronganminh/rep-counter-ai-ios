@@ -2,44 +2,56 @@
 
 Status date: **2026-10-01**
 
-This runbook prepares the RepCoach backend for App Store review traffic. It does not treat source code, an API key, or a successful request as proof that the Google project is on a paid billing tier.
+This runbook prepares the RepCoach backend for App Store review traffic with **GroqCloud** as the current production AI provider. Source code, a successful request, or the presence of an API-key variable does not by itself prove the live VPS is running the reviewed release.
 
 ## Current release status
 
 | Gate | Status | Evidence / action |
 | --- | --- | --- |
-| B1-B6 merged to main | PASS | API contract, security, provider adapter, privacy, observability and staging integration are on main |
-| Backend CI | PASS | B6 backend suite passed before merge |
-| Flutter integration | PASS | B6 staging + full Flutter suite passed before merge |
-| Exact production Gemini project verified Paid Tier | **BLOCKED / admin action required** | Check the exact project in Google AI Studio Projects/Billing |
-| Gemini audience/use-case terms fit | **BLOCKED / product-legal decision required** | Current Gemini Additional Terms require users to be 18+ and state Gemini API is for professional/business purposes, not consumer use |
-| Production VPS updated to B7 source/config | **FAIL / NOT DEPLOYED** | Public smoke shows the live host still exposes the pre-B5 health/API behavior |
-| Public production smoke after deploy | **FAIL (pre-deploy baseline)** | GitHub Actions run 36816755738 proves current live drift; rerun after deployment |
-| Safe production log sample checked by request ID | **NOT VERIFIED** | Requires SSH/admin access to journal/Nginx logs |
+| B1-B6 merged to main | PASS | API contract, security, privacy, observability and staging integration are on main |
+| Groq provider adapter + policy/consent alignment | PASS on B7 branch | Current provider is `groq`; consent version is `2026-10-01-groq` |
+| Production Groq secret | OPERATOR REPORTED PRESENT | Deployment preflight verifies only that `GROQ_API_KEY` is non-empty; it never prints the key |
+| Production VPS updated to B7 source/config | NOT YET | Public smoke still shows the pre-B5 backend until deployment |
+| Public production smoke after deploy | NOT YET | Must pass after the reviewed release is installed |
+| Safe production log sample checked by request ID | NOT YET | Performed automatically by guarded deploy workflow |
+| Rollback path | PREPARED | Transactional apply + explicit rollback scripts |
 
-Do not mark production ready until every blocking item is resolved.
+Do not mark production ready until deployment, public smoke and safe-log verification pass.
+
+## Groq provider review
+
+Current provider:
+
+    AI_PROVIDER=groq
+    GROQ_MODEL=openai/gpt-oss-20b
+
+Official provider sources checked on 2026-10-01:
+
+- https://console.groq.com/docs/models
+- https://console.groq.com/docs/openai
+- https://console.groq.com/docs/your-data
+- https://console.groq.com/docs/legal/services-agreement
+- https://console.groq.com/docs/legal/ai-policy
+
+Groq documents `openai/gpt-oss-20b` as a production model and exposes an OpenAI-compatible API.
+
+Current Groq data documentation states that inference customer data is not retained by default, except when a feature requires retention or when needed for platform reliability/troubleshooting/abuse investigation. Ordinary inference reliability/abuse retention is documented as up to 30 days. Groq offers Zero Data Retention controls, but RepCoach does not currently claim ZDR is enabled.
+
+The current Groq Services Agreement says customer Inputs/Outputs are not used to train or fine-tune models unless the customer explicitly permits or instructs that use. It also allows API integration into a Customer Application and making AI Model Services available to End Users. The customer account holder must satisfy Groq's age requirement and remains responsible for applicable laws for minors/personal data. See `docs/groq-provider.md` for the complete provider record.
 
 ## Observed live production baseline before B7 deploy
 
-Public synthetic smoke from GitHub Actions on 2026-10-01 (run 36816755738) reached the real production hostname and found:
+A public synthetic smoke reached the real production hostname and found the live host was still on an older backend/Nginx/privacy deployment:
 
-- HTTP to HTTPS redirect: PASS (301).
+- HTTP to HTTPS redirect: PASS.
 - TLS hostname validation: PASS.
-- certificate expiry observed by the smoke: 2026-12-06 06:21:29 GMT.
-- GET /health: FAIL for B7 contract; live body is the older `{"ok": true, "service": "repcoach-ai"}`.
-- GET /ready: FAIL; live route returns 404.
-- GET /privacy-policy.html: reachable, but FAIL for the B4 policy markers/effective date.
-- GET /v1/workout-feedback: FAIL; live Nginx returns 403 instead of the stable JSON 405 contract.
-- oversized POST: FAIL; live response is not the stable JSON 413 contract.
-- synthetic v2 feedback POST: the endpoint responds, but FAIL because the response lacks the required response `schema_version`.
+- GET /health: old pre-B5 body.
+- GET /ready: 404.
+- Privacy Policy: stale.
+- feedback method/body error contract: stale.
+- synthetic v2 feedback: response missing the current response schema metadata.
 
-This evidence means the public host is still on an older backend/Nginx/privacy deployment. Do not interpret the working TLS or provider response as B7 readiness or as proof of Paid Tier.
-
-Official provider sources to re-check at release time:
-
-- https://ai.google.dev/gemini-api/terms
-- https://ai.google.dev/gemini-api/docs/billing
-- https://ai.google.dev/gemini-api/docs/zdr
+Working TLS or an AI response is not evidence that B7 is deployed.
 
 ## Production topology
 
@@ -53,40 +65,32 @@ Process:
       -> 127.0.0.1:8787
       -> repcoach-backend.service
       -> Python server.py
-      -> AiProvider / GeminiProvider
+      -> AiProvider
+      -> GroqProvider
+      -> api.groq.com
 
-The backend intentionally has no user-account database and no workout-history database. Do not introduce a cloud workout database as part of deployment.
+The backend has no user-account database and no workout-history database.
 
 ## Process management
 
-Service name:
+Service:
 
     repcoach-backend
 
-Systemd unit:
-
-    /etc/systemd/system/repcoach-backend.service
-
-Application working directory:
+Working directory:
 
     /home/nduythanh/apps/repcoach-backend
 
-Environment source:
+Environment file:
 
     /home/nduythanh/apps/repcoach-backend/.env
 
 The .env file is a server secret and must never be copied into Git, CI artifacts, screenshots, tickets, or release notes.
 
-Restart:
+Useful commands:
 
     sudo systemctl restart repcoach-backend
-
-Status:
-
     sudo systemctl status repcoach-backend --no-pager
-
-Application metadata logs:
-
     sudo journalctl -u repcoach-backend -n 100 --no-pager
 
 Nginx logs:
@@ -94,44 +98,59 @@ Nginx logs:
     /var/log/nginx/repcoach-ai.access.log
     /var/log/nginx/repcoach-ai.error.log
 
-The dedicated Nginx logs rotate daily and keep the current log plus 14 rotations under deploy/repcoach-ai.logrotate. System journal retention is controlled by the VPS journal configuration; do not claim a fixed journal duration unless the host configuration is separately verified.
+## Production environment preflight
 
-## Provider / billing release gate
+Required values:
 
-Before changing production files, an admin who can access the exact Google project used by the production API key must:
-
-1. Open Google AI Studio.
-2. Locate the exact project associated with the production API key.
-3. Verify its Billing Tier/Plan is a Paid Tier.
-4. Record the project name/identifier, observed tier, checker and timestamp in a private release record.
-5. Re-check the current Gemini API Additional Terms.
-6. Confirm the product/distribution plan satisfies the then-current audience/use restrictions.
-
-Do not put the project identifier, billing account ID, API key, payment data or screenshots containing secrets in this public repository.
-
-The server-side .env must include:
-
-    AI_PROVIDER=gemini
-    GEMINI_API_KEY=<server secret>
-    GEMINI_MODEL=<approved model>
-    GEMINI_SERVICE_MODE=billing_enabled
+    AI_PROVIDER=groq
+    GROQ_API_KEY=<server secret>
+    GROQ_MODEL=openai/gpt-oss-20b
     PORT=8787
     BIND_HOST=127.0.0.1
 
-The code rejects missing, unpaid or unknown service modes, but that guard is not proof of the Google project's actual billing state.
-
-Safe local configuration check on the VPS (prints no secret values):
+Safe manual check that does not print the API key:
 
     cd /home/nduythanh/apps/repcoach-backend
-    set -a
-    . ./.env
-    set +a
-    test "$AI_PROVIDER" = "gemini"
-    test -n "$GEMINI_API_KEY"
-    test "$GEMINI_SERVICE_MODE" = "billing_enabled"
-    test "$BIND_HOST" = "127.0.0.1"
 
-## Files deployed from the repository
+    grep -E '^(AI_PROVIDER|GROQ_MODEL|BIND_HOST)=' .env
+
+    grep -q '^GROQ_API_KEY=.' .env       && echo 'GROQ_API_KEY=PRESENT'       || echo 'GROQ_API_KEY=MISSING'
+
+The guarded CI deploy additionally requires non-interactive sudo. It never passes a sudo password through Actions.
+
+## Guarded GitHub Actions deployment
+
+Workflow:
+
+    .github/workflows/production-deploy.yml
+
+Production deployment is locked unless this reviewed marker exists:
+
+    rep-counter-ai-main/backend/deploy/B7_DEPLOY_APPROVED
+
+with exact content:
+
+    DEPLOY_B7_2026_10_01
+
+The workflow uses the repository secret:
+
+    VPS_SSH_KEY
+
+The private key must never be committed or pasted into issues/chat. SSH host-key checking is pinned to the ed25519 host key already trusted by the operator workstation.
+
+When approved, the workflow:
+
+1. validates the production Groq configuration without printing secrets;
+2. requires passwordless/non-interactive sudo;
+3. uploads only reviewed backend/config files;
+4. creates a pre-deploy backup;
+5. validates Python, Nginx and logrotate;
+6. restarts the service and reloads Nginx;
+7. runs synthetic public production smoke;
+8. verifies privacy-safe logs using the returned request ID;
+9. rolls back automatically when a post-deploy check fails.
+
+## Files deployed
 
 Application:
 
@@ -146,217 +165,96 @@ System configuration:
     backend/deploy/repcoach-rate-limit.conf
     backend/deploy/repcoach-ai.logrotate
 
-Do not replace the production .env from the repository.
+Deployment helpers:
 
-## Pre-deploy backup
+    backend/deploy/b7_apply.sh
+    backend/deploy/b7_rollback.sh
 
-Create a root-only backup of the files that B7 changes. The .env is deliberately not copied because deployment does not replace it.
-
-Example:
-
-    stamp="$(date -u +%Y%m%dT%H%M%SZ)"
-    backup="/var/backups/repcoach-b7/$stamp"
-
-    sudo install -d -m 0700 "$backup/app" "$backup/system"
-
-    sudo cp -a /home/nduythanh/apps/repcoach-backend/server.py "$backup/app/server.py" 2>/dev/null || true
-    sudo cp -a /home/nduythanh/apps/repcoach-backend/ai_provider.py "$backup/app/ai_provider.py" 2>/dev/null || true
-    sudo cp -a /home/nduythanh/apps/repcoach-backend/static "$backup/app/static" 2>/dev/null || true
-
-    sudo cp -a /etc/systemd/system/repcoach-backend.service "$backup/system/repcoach-backend.service" 2>/dev/null || true
-    sudo cp -a /etc/nginx/sites-available/repcoach-ai "$backup/system/nginx-site" 2>/dev/null || true
-    sudo cp -a /etc/nginx/conf.d/repcoach-rate-limit.conf "$backup/system/rate-limit.conf" 2>/dev/null || true
-    sudo cp -a /etc/logrotate.d/repcoach-ai "$backup/system/logrotate" 2>/dev/null || true
-
-Record only the backup path in the private release record.
-
-## Guarded GitHub Actions deployment
-
-The repository also contains a locked deployment workflow:
-
-    .github/workflows/production-deploy.yml
-
-It cannot deploy from ordinary B7 branch pushes unless the reviewed marker file exists with the exact approval token:
-
-    rep-counter-ai-main/backend/deploy/B7_DEPLOY_APPROVED
-    DEPLOY_B7_2026_10_01
-
-The workflow uses one repository secret named VPS_SSH_KEY. Never paste that private key into issues, commits or chat. The production host key is pinned to the ed25519 key already trusted by the operator workstation.
-
-Before the approval marker is created, the operator must independently verify the exact Google project is Paid Tier and ensure the production .env contains GEMINI_SERVICE_MODE=billing_enabled. The deploy also requires non-interactive sudo on the VPS; it refuses to pass a sudo password through CI.
-
-The workflow stages reviewed files, runs b7_apply.sh transactionally, executes public production smoke, checks privacy-safe logs by request ID, and runs b7_rollback.sh automatically when a post-deploy check fails.
-
-## Manual deploy
-
-From a checked-out copy of the release commit on the VPS, with the repository root as the current directory:
-
-    src="rep-counter-ai-main/backend"
-    app="/home/nduythanh/apps/repcoach-backend"
-
-    install -d -m 0755 "$app/static"
-    install -m 0644 "$src/server.py" "$app/server.py"
-    install -m 0644 "$src/ai_provider.py" "$app/ai_provider.py"
-    install -m 0644 "$src/static/privacy-policy.html" "$app/static/privacy-policy.html"
-
-    sudo install -m 0644 "$src/deploy/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service
-    sudo install -m 0644 "$src/deploy/repcoach-ai.nginx" /etc/nginx/sites-available/repcoach-ai
-    sudo install -m 0644 "$src/deploy/repcoach-rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf
-    sudo install -m 0644 "$src/deploy/repcoach-ai.logrotate" /etc/logrotate.d/repcoach-ai
-
-    sudo systemctl daemon-reload
-    sudo nginx -t
-    sudo logrotate -d /etc/logrotate.d/repcoach-ai
-
-Only continue if both validation commands succeed.
-
-Then:
-
-    sudo systemctl restart repcoach-backend
-    sudo systemctl reload nginx
-
-## Production configuration verification
-
-After restart:
-
-    sudo systemctl is-active repcoach-backend
-    sudo ss -ltnp | grep '127.0.0.1:8787'
-    sudo nginx -T | grep -F 'server_name repcoach-ai.duckdns.org'
-    sudo nginx -T | grep -F 'client_max_body_size 16k'
-    sudo nginx -T | grep -F 'limit_req zone=repcoach_api'
-    sudo nginx -T | grep -F 'proxy_read_timeout 22s'
-    sudo nginx -T | grep -F 'location = /privacy-policy.html'
-    sudo nginx -T | grep -F 'location = /health'
-    sudo nginx -T | grep -F 'location = /ready'
-
-TLS/certbot:
-
-    sudo certbot certificates
-    systemctl status certbot.timer --no-pager
-
-Required public behavior:
-
-- HTTP redirects to HTTPS.
-- HTTPS certificate validates for repcoach-ai.duckdns.org.
-- HSTS is present on HTTPS responses.
-- X-Content-Type-Options is nosniff.
-- Cache-Control is no-store.
-- request body limit is 16 KiB.
-- feedback endpoint is POST-only.
-- rate limit config is active.
-- backend read timeout is 22 seconds.
-- /health is process-only.
-- /ready validates local provider configuration without consuming Gemini quota.
-- /privacy-policy.html serves the B4 bilingual policy.
+The deployment never replaces the production .env.
 
 ## Public production smoke
 
-Use synthetic data only:
+After deployment:
 
     cd rep-counter-ai-main/backend
     python3 tools/production_smoke.py
 
-The smoke verifies:
+The smoke uses only the shared synthetic v2 fixture and verifies:
 
 - HTTP to HTTPS redirect;
 - TLS hostname validation;
 - GET /health;
 - GET /ready;
-- GET /privacy-policy.html;
+- current bilingual Privacy Policy and consent version;
 - POST-only method guard;
 - 16 KiB body-size enforcement;
-- POST /v1/workout-feedback with contracts/workout_feedback_v2.json;
-- response schema version;
+- POST /v1/workout-feedback;
+- response schema;
 - X-Request-ID;
-- feedback latency stays inside the 25 second Flutter budget;
-- obvious secret/upstream error markers are absent from public responses.
+- latency within the Flutter 25 second budget;
+- absence of obvious provider-secret/upstream markers.
 
 Do not use a real user workout for release testing.
 
 ## Safe-log verification
 
-The public smoke prints the feedback request ID. On the VPS, use only that request ID to verify logging behavior:
+The smoke prints the feedback request ID. The deploy workflow correlates that ID through Nginx and the backend journal.
 
-    request_id=<32-hex-id-from-smoke>
+Expected correlated logs contain only operational metadata. They must not contain:
 
-    sudo grep -F "request_id=$request_id" /var/log/nginx/repcoach-ai.access.log
-    sudo journalctl -u repcoach-backend --since "-10 min" --no-pager | grep -F "\"request_id\":\"$request_id\""
-
-Expected log data is operational metadata only. The lines must not contain:
-
-- the workout JSON body;
+- workout JSON;
 - consent_version;
 - exercise/reps/sets/quality values;
-- Gemini prompt;
-- Gemini response text;
-- GEMINI_API_KEY;
-- x-goog-api-key.
+- provider prompt;
+- provider response;
+- GROQ_API_KEY;
+- Authorization bearer value;
+- legacy Gemini secrets.
 
 Do not paste production log lines containing IP addresses into public issues or commits.
 
 ## Rollback
 
-If deployment validation or smoke fails, roll back immediately rather than debugging by editing production files in place.
+The transactional apply script creates a root-only backup under:
 
-Assuming backup points to the pre-deploy directory created above:
+    /var/backups/repcoach-b7/<UTC timestamp>
 
-    sudo systemctl stop repcoach-backend
+If apply itself fails after backup creation it attempts local rollback automatically.
 
-    sudo cp -a "$backup/app/server.py" /home/nduythanh/apps/repcoach-backend/server.py 2>/dev/null || true
-    sudo cp -a "$backup/app/ai_provider.py" /home/nduythanh/apps/repcoach-backend/ai_provider.py 2>/dev/null || true
-    if sudo test -d "$backup/app/static"; then
-      sudo rm -rf /home/nduythanh/apps/repcoach-backend/static
-      sudo cp -a "$backup/app/static" /home/nduythanh/apps/repcoach-backend/static
-    fi
+If public smoke or log verification fails after apply, the GitHub workflow calls:
 
-    sudo cp -a "$backup/system/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service 2>/dev/null || true
-    sudo cp -a "$backup/system/nginx-site" /etc/nginx/sites-available/repcoach-ai 2>/dev/null || true
-    sudo cp -a "$backup/system/rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf 2>/dev/null || true
-    sudo cp -a "$backup/system/logrotate" /etc/logrotate.d/repcoach-ai 2>/dev/null || true
+    backend/deploy/b7_rollback.sh
 
-    sudo systemctl daemon-reload
-    sudo nginx -t
-    sudo systemctl start repcoach-backend
-    sudo systemctl reload nginx
+Rollback restores the previous backend files and system configuration, validates Nginx, restarts the service and reloads Nginx.
 
-Re-run health/privacy smoke after rollback.
-
-### AI-unavailable fallback
-
-If the backend runtime is healthy but provider billing/terms/configuration cannot be approved, do not send requests to an unverified provider mode. Leave AI unavailable. Core workout counting/history remains local-first and B6 tests prove an AI failure does not destroy the local workout.
-
-A controlled AI-unavailable state is preferable to bypassing the paid-mode guard.
+If Groq is temporarily unavailable, keep the app local-first and let AI requests fail with the stable optional-AI error state rather than bypassing provider/configuration guards.
 
 ## Release evidence to retain privately
 
-Keep a private release note with:
+Keep:
 
 - release commit SHA;
 - deployment UTC timestamp;
 - operator;
-- pre-deploy backup path;
-- exact Google project name/identifier and observed Paid Tier;
-- billing verification timestamp;
-- provider terms review decision;
-- nginx -t result;
+- backup path;
+- Nginx validation result;
 - systemd active result;
 - public smoke result and latency;
 - feedback request ID;
 - safe-log verification result;
-- rollback outcome if rollback was used.
+- rollback result if used.
 
-Do not store API keys, billing account IDs, payment details, SSH private keys or raw production log dumps in that record.
+Do not retain API keys, SSH private keys, payment data or raw production log dumps in the repository.
 
 ## Acceptance
 
 B7 is complete only when:
 
-1. provider billing and terms gates are resolved;
-2. production files/config are deployed from the reviewed release commit;
-3. systemd/Nginx/TLS/logrotate checks pass;
-4. public production smoke passes using synthetic data;
-5. safe logs are verified by request ID;
-6. rollback path is confirmed;
-7. no secret is exposed.
-
-Until then, the backend is not considered ready for App Store review traffic.
+1. Groq provider/policy/consent tests pass;
+2. production .env is configured for Groq;
+3. production files/config are deployed from the reviewed release;
+4. systemd/Nginx/TLS/logrotate checks pass;
+5. public production smoke passes;
+6. safe logs are verified by request ID;
+7. rollback remains available;
+8. no secret is exposed.
