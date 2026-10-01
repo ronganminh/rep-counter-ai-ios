@@ -127,6 +127,27 @@ class ProductionReleaseTests(unittest.TestCase):
     def test_rollback_accepts_only_b7_backup_path(self):
         self.assertIn("/var/backups/repcoach-b7/*", ROLLBACK)
         self.assertIn("ROLLBACK_PASS", ROLLBACK)
+        self.assertNotIn("sudo -n true", ROLLBACK)
+
+    def test_backup_records_present_and_absent_state_for_exact_rollback(self):
+        for marker in (
+            "server.py.present",
+            "server.py.absent",
+            "static.present",
+            "static.absent",
+            "repcoach-backend.service.present",
+            "repcoach-backend.service.absent",
+            "nginx-site.present",
+            "nginx-site.absent",
+            "rate-limit.conf.present",
+            "rate-limit.conf.absent",
+            "logrotate.present",
+            "logrotate.absent",
+        ):
+            self.assertIn(marker, APPLY)
+            self.assertIn(marker, ROLLBACK)
+        self.assertIn("sudo rm -f /etc/nginx/conf.d/repcoach-rate-limit.conf", APPLY)
+        self.assertIn("sudo rm -f /etc/logrotate.d/repcoach-ai", APPLY)
 
     def test_runbook_documents_transactional_backup(self):
         self.assertIn("/var/backups/repcoach-b7/<UTC timestamp>", RUNBOOK)
