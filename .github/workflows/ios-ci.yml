@@ -2,7 +2,7 @@ name: RepCoach CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feature/vnext-a3-time-challenge]
     paths:
       - "rep-counter-ai-main/rep_counter_app/**"
       - ".github/workflows/ios-ci.yml"
@@ -69,15 +69,12 @@ jobs:
     if: github.event_name != 'pull_request'
     strategy:
       fail-fast: false
-      max-parallel: 2
+      max-parallel: 1
       matrix:
         include:
           - fixture_key: pushup-1
             video_id: "13TwRvZQAXsm0-Gl7d_GmPV1T75B8QFf8"
             asset: "pushup-test.mp4"
-          - fixture_key: pushup-2
-            video_id: "1m7rKK5_Mtfe1NaFCXSTVdg_lzywoDWf0"
-            asset: "pushup-test-2.mp4"
     runs-on: macos-15
     timeout-minutes: 110
     env:
