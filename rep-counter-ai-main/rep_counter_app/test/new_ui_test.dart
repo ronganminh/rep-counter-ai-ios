@@ -15,6 +15,7 @@ import 'package:rep_counter_app/features/workout/presentation/result_page.dart';
 import 'package:rep_counter_app/features/workout/presentation/widgets/workout_hud.dart';
 import 'package:rep_counter_app/features/workout/presentation/widgets/camera_permission_view.dart';
 import 'package:rep_counter_app/features/workout/data/workout_record.dart';
+import 'package:rep_counter_app/features/workout/domain/workout_mode.dart';
 import 'package:rep_counter_app/features/workout/application/workout_ui_state.dart';
 import 'package:rep_counter_app/placement.dart';
 import 'package:rep_counter_app/rep_counter.dart';
@@ -185,28 +186,39 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(LegalPage), findsOneWidget);
   });
-  testWidgets('plan maps preset custom and free goals', (tester) async {
-    final goals = <int?>[];
+  testWidgets('plan maps target free and timed modes', (tester) async {
+    final starts = <WorkoutStartConfig>[];
     await pump(
         tester,
         Scaffold(
             body: SingleChildScrollView(
-                child: GoalSetupContent(profile: pushUp, onStart: goals.add))));
-    await tester.tap(find.text('BẮT ĐẦU'));
-    expect(goals.last, 20);
-    await tester.enterText(find.byType(TextField), '37');
+                child: GoalSetupContent(
+                    profile: pushUp,
+                    onStart: starts.add,
+                    loadTimedBest: (_, __) async => 31))));
+    await tester.tap(find.byKey(const Key('start-target-workout')));
+    expect(starts.last.mode, WorkoutMode.targetReps);
+    expect(starts.last.targetReps, 20);
+
+    await tester.enterText(
+        find.byKey(const Key('custom-rep-goal')), '37');
     await tester.pumpAndSettle();
-    await tester.tap(find.text('BẮT ĐẦU'));
-    expect(goals.last, 37);
-    await tester.tap(find.byType(FilterChip));
+    await tester.tap(find.byKey(const Key('start-target-workout')));
+    expect(starts.last.targetReps, 37);
+
+    await tester.tap(find.byKey(const Key('mode-free')));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('BẮT ĐẦU'));
-    expect(goals.last, isNull);
-    await tester.tap(find.byType(FilterChip));
-    await tester.enterText(find.byType(TextField), '0');
+    await tester.tap(find.byKey(const Key('start-free-workout')));
+    expect(starts.last.mode, WorkoutMode.free);
+    expect(starts.last.targetReps, isNull);
+
+    await tester.tap(find.byKey(const Key('mode-timed')));
     await tester.pumpAndSettle();
-    expect(tester.widget<FilledButton>(find.byType(FilledButton)).onPressed,
-        isNull);
+    await tester.tap(find.byKey(const Key('start-time-challenge')));
+    await tester.pumpAndSettle();
+    expect(starts.last.mode, WorkoutMode.timed);
+    expect(starts.last.timedChallenge?.durationSeconds, 60);
+    expect(starts.last.previousBestReps, 31);
   });
   for (final scale in [1.0, 2.0]) {
     testWidgets('plan and picker support ${scale}x text', (tester) async {

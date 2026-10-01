@@ -6,12 +6,14 @@ import '../../../widgets/product_ui.dart';
 import '../application/result_controller.dart';
 import '../data/workout_record.dart';
 import '../data/workout_history_store.dart';
+import '../domain/workout_mode.dart';
 import 'widgets/rep_pace_chart.dart';
 import '../../share/story_page.dart';
 import '../../ai/ai_preferences.dart';
 import 'widgets/form_score_details.dart';
 import 'widgets/result_feedback_card.dart';
 import 'widgets/result_hero.dart';
+import 'widgets/timed_challenge_result.dart';
 
 class ResultPage extends StatefulWidget {
   const ResultPage(
@@ -22,6 +24,7 @@ class ResultPage extends StatefulWidget {
       this.saveFeedback,
       this.aiConfigured,
       this.historyStore,
+      this.timedBestLoader,
       this.offerAutomaticAi = false});
   final WorkoutRecord record;
   final bool readOnly;
@@ -29,6 +32,7 @@ class ResultPage extends StatefulWidget {
   final SaveFeedback? saveFeedback;
   final bool? aiConfigured;
   final WorkoutHistoryStore? historyStore;
+  final TimedPreviousBestLoader? timedBestLoader;
   final bool offerAutomaticAi;
   @override
   State<ResultPage> createState() => _ResultPageState();
@@ -132,6 +136,8 @@ class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
     final s = context.s, r = _controller.record;
+    final timed = r.mode == WorkoutMode.timed;
+    final challengeSeconds = r.challengeSeconds ?? r.durationSeconds;
     return PopScope(
         canPop: widget.readOnly && !_deleting,
         onPopInvokedWithResult: (didPop, _) {
@@ -149,9 +155,13 @@ class _ResultPageState extends State<ResultPage> {
                       ? LucideIcons.chevronLeft
                       : LucideIcons.x)),
               title: Text(
-                  widget.readOnly
-                      ? '${r.startedAt.day}/${r.startedAt.month}/${r.startedAt.year} · ${r.startedAt.hour.toString().padLeft(2, '0')}:${r.startedAt.minute.toString().padLeft(2, '0')}'
-                      : context.tr('Kết quả buổi tập', 'Workout results'),
+                  timed
+                      ? context.tr(
+                          'THỬ THÁCH $challengeSeconds GIÂY',
+                          '$challengeSeconds SEC CHALLENGE')
+                      : widget.readOnly
+                          ? '${r.startedAt.day}/${r.startedAt.month}/${r.startedAt.year} · ${r.startedAt.hour.toString().padLeft(2, '0')}:${r.startedAt.minute.toString().padLeft(2, '0')}'
+                          : context.tr('Kết quả buổi tập', 'Workout results'),
                   style: const TextStyle(fontSize: 16))),
           bottomNavigationBar: DecoratedBox(
               decoration: const BoxDecoration(
@@ -180,37 +190,59 @@ class _ResultPageState extends State<ResultPage> {
                               onPressed: _deleting ? null : _deleteRecord,
                               icon: const Icon(LucideIcons.trash2)),
                         ],
-                        const SizedBox(width: 8),
-                        IconButton.filledTonal(
-                            key: const Key('open-story'),
-                            tooltip: context.tr('Chia sẻ', 'Share'),
-                            onPressed: _deleting
-                                ? null
-                                : () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute<void>(
-                                        builder: (_) => StoryPage(
-                                            record: _controller.record))),
-                            icon: const Icon(LucideIcons.share2)),
+                        if (!timed || widget.readOnly) ...[
+                          const SizedBox(width: 8),
+                          IconButton.filledTonal(
+                              key: const Key('open-story'),
+                              tooltip: context.tr('Chia sẻ', 'Share'),
+                              onPressed: _deleting
+                                  ? null
+                                  : () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute<void>(
+                                          builder: (_) => StoryPage(
+                                              record: _controller.record))),
+                              icon: const Icon(LucideIcons.share2)),
+                        ],
                       ])))),
-          body: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
-              children: [
-                ResultHero(record: r),
-                const SizedBox(height: 28),
-                ResultFeedbackCard(
-                    controller: _controller, allowRefresh: !widget.readOnly),
-                const SizedBox(height: 24),
-                SectionLabel(context.tr('Điểm form', 'Form score')),
-                FormScoreSection(record: r),
-                const SizedBox(height: 24),
-                SectionLabel(context.tr('Nhịp từng rep', 'Rep pace')),
-                RepPaceChart(record: r),
-                const SizedBox(height: 24),
-                Text(s.resultDisclaimer,
-                    style: const TextStyle(
-                        fontSize: 12, color: AppColors.text3, height: 1.5)),
-              ]),
+          body: timed
+              ? ListView(
+                  padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
+                  children: [
+                    TimedChallengeResultSection(
+                      record: r,
+                      loadPreviousBest: widget.timedBestLoader,
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      s.resultDisclaimer,
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.text3,
+                        height: 1.5,
+                      ),
+                    ),
+                  ],
+                )
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
+                  children: [
+                    ResultHero(record: r),
+                    const SizedBox(height: 28),
+                    ResultFeedbackCard(
+                        controller: _controller, allowRefresh: !widget.readOnly),
+                    const SizedBox(height: 24),
+                    SectionLabel(context.tr('Điểm form', 'Form score')),
+                    FormScoreSection(record: r),
+                    const SizedBox(height: 24),
+                    SectionLabel(context.tr('Nhịp từng rep', 'Rep pace')),
+                    RepPaceChart(record: r),
+                    const SizedBox(height: 24),
+                    Text(s.resultDisclaimer,
+                        style: const TextStyle(
+                            fontSize: 12, color: AppColors.text3, height: 1.5)),
+                  ]),
         ));
   }
 }

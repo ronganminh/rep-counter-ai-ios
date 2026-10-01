@@ -16,12 +16,16 @@ Future<void> showPlanTodaySheet(
                   24, 8, 24, 28 + MediaQuery.viewInsetsOf(sheetContext).bottom),
               child: GoalSetupContent(
                   profile: profile,
-                  onStart: (goal) {
+                  onStart: (config) {
                     final navigator =
                         Navigator.of(context, rootNavigator: true);
                     Navigator.of(sheetContext).pop();
                     navigator.push(MaterialPageRoute(
-                        builder: (_) =>
-                            CameraPage(profile: profile, targetReps: goal)));
+                        builder: (_) => CameraPage(
+                              profile: profile,
+                              targetReps: config.targetReps,
+                              timedChallenge: config.timedChallenge,
+                              challengeBestReps: config.previousBestReps,
+                            )));
                   }),
             )));

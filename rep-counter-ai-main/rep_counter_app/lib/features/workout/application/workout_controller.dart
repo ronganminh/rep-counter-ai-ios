@@ -12,6 +12,7 @@ import '../domain/rep_quality_analyzer.dart';
 import '../domain/rep_tracker.dart';
 import '../domain/workout_aggregator.dart';
 import '../domain/workout_summary.dart';
+import '../domain/workout_mode.dart';
 import 'rep_feedback.dart';
 import 'workout_ui_state.dart';
 
@@ -42,13 +43,25 @@ class WorkoutController extends ChangeNotifier {
   WorkoutController({
     required this.profile,
     this.targetReps,
+    WorkoutMode? mode,
+    this.timedChallenge,
     this.requireCountdown = true,
     this.feedbackDuration = const Duration(milliseconds: 1600),
     WorkoutClock? trackingClock,
     WorkoutClock? clock,
     DateTime Function()? now,
     Future<void> Function(WorkoutRecord)? saveRecord,
-  })  : _trackingClock = trackingClock ?? StopwatchWorkoutClock(),
+  })  : assert(timedChallenge == null ||
+            mode == null ||
+            mode == WorkoutMode.timed),
+        assert(timedChallenge == null || targetReps == null),
+        mode = mode ??
+            (timedChallenge != null
+                ? WorkoutMode.timed
+                : targetReps != null
+                    ? WorkoutMode.targetReps
+                    : WorkoutMode.free),
+        _trackingClock = trackingClock ?? StopwatchWorkoutClock(),
         _clock = clock ?? StopwatchWorkoutClock(),
         _now = now ?? DateTime.now,
         _saveRecord = saveRecord ?? WorkoutHistoryStore().save,
@@ -61,6 +74,8 @@ class WorkoutController extends ChangeNotifier {
 
   final ExerciseProfile profile;
   final int? targetReps;
+  final WorkoutMode mode;
+  final TimedChallengeConfig? timedChallenge;
   final bool requireCountdown;
   final Duration feedbackDuration;
   final WorkoutClock _trackingClock;
@@ -78,6 +93,7 @@ class WorkoutController extends ChangeNotifier {
   final List<RepMetric> _reps = [];
   late DateTime _startedAt;
   bool _started = false, _paused = false, _disposed = false;
+  bool _challengeExpired = false;
   bool _calibrating = false, _calibrated = false, _goalReachedOnce = false;
   int _calibrationSamples = 0;
   int _poseFrames = 0, _readyFrames = 0, _lostFrames = 0;
@@ -90,13 +106,35 @@ class WorkoutController extends ChangeNotifier {
   Future<WorkoutRecord>? _finishFuture;
 
   bool get hasStarted => _started;
+  bool get isTimedChallenge => mode == WorkoutMode.timed;
+  bool get challengeExpired => _challengeExpired;
 
   /// Pose/placement time must advance while the workout timer is still stopped.
   Duration get frameTime => _trackingClock.elapsed;
-  bool get acceptsReps => acceptsFrames && _armed && !_calibrating;
   Duration get elapsed => _clock.elapsed;
+  Duration? get challengeRemaining {
+    final config = timedChallenge;
+    if (!isTimedChallenge || config == null) return null;
+    final left = Duration(seconds: config.durationSeconds) - elapsed;
+    return left.isNegative ? Duration.zero : left;
+  }
+
+  bool get _pastChallengeDeadline {
+    final config = timedChallenge;
+    return isTimedChallenge &&
+        config != null &&
+        _armed &&
+        elapsed > Duration(seconds: config.durationSeconds);
+  }
+
+  bool get acceptsReps =>
+      acceptsFrames && _armed && !_calibrating && !_pastChallengeDeadline;
   bool get acceptsFrames =>
-      !_disposed && _started && !_paused && _terminalPhase == null;
+      !_disposed &&
+      _started &&
+      !_paused &&
+      !_challengeExpired &&
+      _terminalPhase == null;
 
   WorkoutUiState get state => WorkoutUiState(
         phase: _terminalPhase ??
@@ -132,6 +170,10 @@ class WorkoutController extends ChangeNotifier {
         countdown: _countdown,
         sessionStarted: _armed,
         startRequested: _startRequested,
+        mode: mode,
+        challengeSeconds: timedChallenge?.durationSeconds,
+        challengeRemaining: challengeRemaining,
+        challengeExpired: _challengeExpired,
       );
 
   void _emit() {
@@ -148,7 +190,12 @@ class WorkoutController extends ChangeNotifier {
     }
     _paused = false;
     _trackingClock.start();
-    if (_armed && !_calibrating && !_clock.isRunning) _clock.start();
+    if (_armed &&
+        !_calibrating &&
+        !_challengeExpired &&
+        !_clock.isRunning) {
+      _clock.start();
+    }
     _emit();
   }
 
@@ -172,7 +219,10 @@ class WorkoutController extends ChangeNotifier {
     if (collecting) {
       _cancelCountdown();
       _clock.stop();
-    } else if (_calibrating && _armed && !_paused) {
+    } else if (_calibrating &&
+        _armed &&
+        !_paused &&
+        !_challengeExpired) {
       _clock.start();
     }
     _calibrating = collecting;
@@ -185,6 +235,12 @@ class WorkoutController extends ChangeNotifier {
   /// Returns true once when the existing session count reaches the goal.
   bool acceptRep(RepObservation observation, Duration at) {
     if (!acceptsReps) return false;
+    final challenge = timedChallenge;
+    if (isTimedChallenge &&
+        challenge != null &&
+        elapsed > Duration(seconds: challenge.durationSeconds)) {
+      return false;
+    }
     final flags = _analyzer.analyze(observation);
     _reps.add(RepMetric(
       index: _reps.length + 1,
@@ -264,6 +320,21 @@ class WorkoutController extends ChangeNotifier {
       _replaceRepFeedback(const RepFeedback.poseLost());
     }
     if (acceptsReps) _session.tick(at);
+
+    final challenge = timedChallenge;
+    if (_armed &&
+        isTimedChallenge &&
+        challenge != null &&
+        !_challengeExpired &&
+        elapsed >= Duration(seconds: challenge.durationSeconds)) {
+      // RepCompleted is handled before frameProcessed. Equality therefore
+      // counts, while any later rep is blocked by _pastChallengeDeadline.
+      _challengeExpired = true;
+      _clearRepFeedback();
+      _trackingClock.stop();
+      _clock.stop();
+    }
+
     if (!_armed && !_calibrating && _startRequested) {
       // Setup uses the actual stable status, not the workout's two-second grace.
       if (poseFound && status.canCount) {
@@ -355,11 +426,18 @@ class WorkoutController extends ChangeNotifier {
             poseLostFrames: _lostFrames),
         calibration: calibration,
       );
+      final durationSeconds = isTimedChallenge
+          ? (_challengeExpired
+              ? timedChallenge!.durationSeconds
+              : elapsed.inSeconds.clamp(0, 86400))
+          : elapsed.inSeconds.clamp(1, 86400);
       final record = WorkoutRecord.fromSummary(
         summary: summary,
         exerciseName: profile.name,
-        durationSeconds: elapsed.inSeconds.clamp(1, 86400),
+        durationSeconds: durationSeconds,
         targetReps: targetReps,
+        mode: mode,
+        challengeSeconds: timedChallenge?.durationSeconds,
         poseFrames: _poseFrames,
         readyFrames: _readyFrames,
         lostFrames: _lostFrames,

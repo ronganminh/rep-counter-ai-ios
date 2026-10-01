@@ -28,7 +28,8 @@ class WorkoutHud extends StatelessWidget {
       this.diagnosticAction,
       this.onStart,
       this.voiceEnabled = true,
-      this.onToggleVoice});
+      this.onToggleVoice,
+      this.challengeBestReps});
   final WorkoutUiState state;
   final String exerciseName, hint;
   final VoidCallback onExit,
@@ -42,9 +43,27 @@ class WorkoutHud extends StatelessWidget {
   final Widget? diagnosticAction;
   final VoidCallback? onStart, onToggleVoice;
   final bool voiceEnabled;
+  final int? challengeBestReps;
   @override
   Widget build(BuildContext context) {
     final paused = state.phase == WorkoutUiPhase.paused;
+    if (state.isTimedChallenge &&
+        state.sessionStarted &&
+        state.countdown == null &&
+        !state.isCalibrating) {
+      return _TimedChallengeHud(
+        state: state,
+        exerciseName: exerciseName,
+        voiceEnabled: voiceEnabled,
+        challengeBestReps: challengeBestReps,
+        diagnosticAction: diagnosticAction,
+        onToggleVoice: onToggleVoice,
+        onExit: onExit,
+        onPause: onPause,
+        onResume: onResume,
+        onFinish: onFinish,
+      );
+    }
     final positioning = !state.sessionStarted && !state.isCalibrating;
     final color = state.placementReady ? AppColors.success : AppColors.warning;
     return LayoutBuilder(
@@ -356,6 +375,380 @@ class WorkoutHud extends StatelessWidget {
                         ])),
             ]));
   }
+}
+
+class _TimedChallengeHud extends StatelessWidget {
+  const _TimedChallengeHud({
+    required this.state,
+    required this.exerciseName,
+    required this.voiceEnabled,
+    required this.onExit,
+    required this.onPause,
+    required this.onResume,
+    required this.onFinish,
+    this.challengeBestReps,
+    this.diagnosticAction,
+    this.onToggleVoice,
+  });
+
+  final WorkoutUiState state;
+  final String exerciseName;
+  final bool voiceEnabled;
+  final int? challengeBestReps;
+  final Widget? diagnosticAction;
+  final VoidCallback? onToggleVoice;
+  final VoidCallback onExit, onPause, onResume, onFinish;
+
+  String _remaining() {
+    final seconds = state.challengeRemainingSeconds ?? 0;
+    return '${(seconds ~/ 60).toString().padLeft(2, '0')}:${(seconds % 60).toString().padLeft(2, '0')}';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final paused = state.phase == WorkoutUiPhase.paused;
+    final finalTen = state.isFinalTenSeconds;
+    final placementColor =
+        state.placementReady ? AppColors.success : AppColors.warning;
+    final compactHeader =
+        MediaQuery.textScalerOf(context).scale(14) > 20 ||
+            MediaQuery.sizeOf(context).width < 350;
+
+    return Column(
+      key: const Key('timed-challenge-hud'),
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(14, 4, 14, 0),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Semantics(
+                    label: context.tr('Xử lý trên máy', 'On-device'),
+                    child: ExcludeSemantics(
+                      child: Container(
+                        constraints: const BoxConstraints(
+                          minWidth: 38,
+                          minHeight: 38,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: compactHeader ? 10 : 12,
+                          vertical: 8,
+                        ),
+                        decoration: BoxDecoration(
+                          color: AppColors.surface,
+                          borderRadius: BorderRadius.circular(19),
+                          border: Border.all(color: AppColors.border),
+                        ),
+                        child: compactHeader
+                            ? const Icon(
+                                LucideIcons.shieldCheck,
+                                size: 17,
+                                color: AppColors.success,
+                              )
+                            : Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(
+                                    LucideIcons.shieldCheck,
+                                    size: 15,
+                                    color: AppColors.success,
+                                  ),
+                                  const SizedBox(width: 6),
+                                  Text(
+                                    context.tr(
+                                      'Xử lý trên máy',
+                                      'On-device',
+                                    ),
+                                    style: AppTypography.body14.copyWith(
+                                      color: AppColors.success,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                      ),
+                    ),
+                  ),
+                  if (!compactHeader) ...[
+                    const Spacer(),
+                    Flexible(
+                      child: Text(
+                        exerciseName,
+                        overflow: TextOverflow.ellipsis,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.body14,
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  if (diagnosticAction != null) diagnosticAction!,
+                  IconButton(
+                    key: const Key('toggle-timed-voice'),
+                    tooltip: context.tr(
+                      voiceEnabled ? 'Tắt giọng đọc' : 'Bật giọng đọc',
+                      voiceEnabled ? 'Mute voice' : 'Enable voice',
+                    ),
+                    onPressed: onToggleVoice,
+                    icon: Icon(
+                      voiceEnabled
+                          ? LucideIcons.volume2
+                          : LucideIcons.volumeX,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 48,
+                    height: 48,
+                    child: Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset(
+                          'assets/vnext/time_challenge_close_ellipse.png',
+                          fit: BoxFit.contain,
+                        ),
+                        IconButton(
+                          key: const Key('close-timed-challenge'),
+                          tooltip: context.tr('Đóng', 'Close'),
+                          onPressed: onExit,
+                          icon: const Icon(LucideIcons.x),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              if (compactHeader) ...[
+                const SizedBox(height: 4),
+                Text(
+                  exerciseName,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.body14,
+                ),
+              ],
+            ],
+          ),
+        ),
+        Expanded(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 12),
+            child: Column(
+              children: [
+                AnimatedContainer(
+                  key: const Key('timed-challenge-hero'),
+                  duration: MediaQuery.disableAnimationsOf(context)
+                      ? Duration.zero
+                      : const Duration(milliseconds: 160),
+                  width: double.infinity,
+                  constraints: const BoxConstraints(minHeight: 210),
+                  padding: const EdgeInsets.fromLTRB(18, 10, 18, 12),
+                  decoration: BoxDecoration(
+                    color: AppColors.bg,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                      color:
+                          finalTen ? AppColors.accent : AppColors.borderStrong,
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (finalTen) ...[
+                        Text(
+                          context.tr('10 GIÂY CUỐI', 'FINAL 10 SECONDS'),
+                          key: const Key('timed-final-ten-label'),
+                          style: AppTypography.caption12.copyWith(
+                            color: AppColors.accent,
+                          ),
+                        ),
+                        const SizedBox(height: 8),
+                      ],
+                      Semantics(
+                        liveRegion: !voiceEnabled,
+                        label: context.tr(
+                          'Còn ${state.challengeRemainingSeconds ?? 0} giây',
+                          '${state.challengeRemainingSeconds ?? 0} seconds remaining',
+                        ),
+                        child: ExcludeSemantics(
+                          child: Text(
+                            _remaining(),
+                            key: const Key('timed-remaining'),
+                            textScaler: TextScaler.noScaling,
+                            style: AppTypography.display40.copyWith(
+                              color:
+                                  finalTen ? AppColors.accent : AppColors.text,
+                            ),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Semantics(
+                        label: '${state.reps} ${context.s.repsShort}',
+                        liveRegion: !voiceEnabled,
+                        child: ExcludeSemantics(
+                          child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              '${state.reps}',
+                              key: const Key('timed-reps'),
+                              textScaler: TextScaler.noScaling,
+                              style: AppTypography.hero.copyWith(
+                                fontSize: 180,
+                                color: AppColors.accent,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        'REPS',
+                        style: AppTypography.caption12.copyWith(
+                          color: AppColors.text2,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    const Expanded(
+                      child: _TimedStatPill(
+                        key: Key('timed-form-stat'),
+                        label: 'FORM —',
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _TimedStatPill(
+                        key: const Key('timed-best-stat'),
+                        label: challengeBestReps == null
+                            ? 'BEST —'
+                            : 'BEST $challengeBestReps',
+                      ),
+                    ),
+                  ],
+                ),
+                if (paused) ...[
+                  const SizedBox(height: 16),
+                  _Glass(
+                    child: Text(context.tr('Đã tạm dừng', 'Paused')),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                _Glass(
+                  color: placementColor.withValues(alpha: .15),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        state.placementReady
+                            ? LucideIcons.circleCheck
+                            : LucideIcons.scanLine,
+                        size: 20,
+                        color: placementColor,
+                      ),
+                      const SizedBox(width: 8),
+                      Flexible(
+                        child: Text(
+                          state.placementStatus.message(context.s),
+                          style: TextStyle(
+                            color: placementColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (!state.placementReady &&
+                    state.placementMessage.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                    state.placementMessage,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.body14.copyWith(
+                      color: AppColors.text2,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 16),
+                RepFeedbackTransition(feedback: state.repFeedback),
+              ],
+            ),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(24, 8, 24, 16),
+          child: Row(
+            children: [
+              Expanded(
+                child: SizedBox(
+                  height: 54,
+                  child: FilledButton.tonalIcon(
+                    key: Key(
+                      paused
+                          ? 'resume-timed-challenge'
+                          : 'pause-timed-challenge',
+                    ),
+                    onPressed: paused ? onResume : onPause,
+                    icon: Icon(
+                      paused ? LucideIcons.play : LucideIcons.pause,
+                      size: 20,
+                    ),
+                    label: Text(
+                      paused
+                          ? context.tr('Tiếp tục', 'Resume')
+                          : context.tr('Tạm dừng', 'Pause'),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 17),
+              Expanded(
+                child: SizedBox(
+                  height: 54,
+                  child: FilledButton.tonalIcon(
+                    key: const Key('finish-timed-challenge'),
+                    onPressed: onFinish,
+                    icon: const Icon(LucideIcons.square, size: 18),
+                    label: Text(context.tr('Kết thúc', 'Finish')),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TimedStatPill extends StatelessWidget {
+  const _TimedStatPill({
+    super.key,
+    required this.label,
+  });
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        constraints: const BoxConstraints(minHeight: 54),
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(27),
+        ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Text(
+            label,
+            textAlign: TextAlign.center,
+            style: AppTypography.body16,
+          ),
+        ),
+      );
 }
 
 class _Glass extends StatelessWidget {

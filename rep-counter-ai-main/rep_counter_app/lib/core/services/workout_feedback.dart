@@ -105,6 +105,14 @@ class WorkoutFeedback {
     _say(language == AppLanguage.vi ? 'Bắt đầu!' : 'Go!');
   }
 
+  /// Time-driven final countdown. Speech follows the existing voice setting;
+  /// haptics stay deliberately subtle and only mark the last three seconds.
+  void challengeCountdown(int seconds) {
+    if (_disposed || seconds < 1 || seconds > 10) return;
+    if (seconds <= 3) _vibrate(false);
+    _say('$seconds');
+  }
+
   bool _canCue(Duration at) {
     if (!preferences.voice || !preferences.cues || _disposed) return false;
     if (_lastCue != null && at - _lastCue! < const Duration(seconds: 8)) {
