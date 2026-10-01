@@ -1,6 +1,6 @@
 # RepCoach production deployment guide
 
-This document was refreshed for Track B phase B7 on 2026-10-01.
+This document reflects the post-B7 production state as of 2026-10-01.
 
 The authoritative backend deployment and rollback procedure is:
 
@@ -27,7 +27,7 @@ Canonical source:
 
     ../backend/static/privacy-policy.html
 
-Nginx serves that file directly at:
+Nginx proxies the public route to the backend, and the backend serves the canonical file at:
 
     https://repcoach-ai.duckdns.org/privacy-policy.html
 
@@ -97,7 +97,7 @@ Current production provider configuration is:
     GROQ_MODEL=openai/gpt-oss-20b
     GROQ_API_KEY=<server secret>
 
-The Groq API key stays only in the production VPS environment file. The deploy preflight verifies that the key is present without printing it. Provider data/terms notes are recorded in backend/docs/groq-provider.md. Core workouts remain local-first if the optional AI provider is unavailable.
+The Groq API key stays only in the production VPS environment file. Read-only production checks verify that the key is present without printing it. Privileged deployment remains manual because the VPS requires interactive sudo. Provider data/terms notes are recorded in backend/docs/groq-provider.md. Core workouts remain local-first if the optional AI provider is unavailable.
 
 ## Store URLs
 
@@ -108,3 +108,16 @@ The in-app Privacy Policy URL is:
 Any separate marketing/support/terms pages under docs/ are outside the B7 backend deployment contract unless a reviewed Nginx route explicitly serves them.
 
 Do not advertise an external store URL that has not been smoke-tested from the public internet.
+
+
+## Production verification workflows
+
+Manual read-only VPS verification:
+
+    .github/workflows/production-ops-check.yml
+
+Manual synthetic live production smoke:
+
+    .github/workflows/production-readiness.yml
+
+The first workflow does not use sudo, restart services or call Groq directly. The second runs the reviewed synthetic production smoke and therefore exercises the public AI route.

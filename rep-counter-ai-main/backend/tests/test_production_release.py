@@ -3,6 +3,8 @@ from pathlib import Path
 
 BACKEND = Path(__file__).resolve().parents[1]
 PROJECT = BACKEND.parent
+REPO = PROJECT.parent
+
 RUNBOOK = (BACKEND / "docs" / "production-release.md").read_text(encoding="utf-8")
 README = (BACKEND / "README.md").read_text(encoding="utf-8")
 GUIDE = (PROJECT / "docs" / "DEPLOY_GUIDE.md").read_text(encoding="utf-8")
@@ -13,30 +15,35 @@ ROTATE = (BACKEND / "deploy" / "repcoach-ai.logrotate").read_text(encoding="utf-
 SERVICE = (BACKEND / "deploy" / "repcoach-backend.service").read_text(encoding="utf-8")
 APPLY = (BACKEND / "deploy" / "b7_apply.sh").read_text(encoding="utf-8")
 ROLLBACK = (BACKEND / "deploy" / "b7_rollback.sh").read_text(encoding="utf-8")
-DEPLOY_WORKFLOW = (
-    PROJECT.parent / ".github" / "workflows" / "production-deploy.yml"
+OPS_WORKFLOW = (
+    REPO / ".github" / "workflows" / "production-ops-check.yml"
+).read_text(encoding="utf-8")
+SMOKE_WORKFLOW = (
+    REPO / ".github" / "workflows" / "production-readiness.yml"
 ).read_text(encoding="utf-8")
 
 
 class ProductionReleaseTests(unittest.TestCase):
-    def test_runbook_documents_required_process_management(self):
+    def test_runbook_documents_current_production_state(self):
         for value in (
             "repcoach-backend",
             "/home/nduythanh/apps/repcoach-backend",
             "/home/nduythanh/apps/repcoach-backend/.env",
-            "sudo systemctl restart repcoach-backend",
-            "sudo journalctl -u repcoach-backend",
             "/var/log/nginx/repcoach-ai.access.log",
-            "## Rollback",
+            "c5762d0f00acef641546d6a2e3ffb3d8d4ce7502",
+            "/var/backups/repcoach-b7/20261001T103658Z",
+            "Public production smoke | PASS",
+            "Safe-log correlation | PASS",
         ):
             self.assertIn(value, RUNBOOK)
+        self.assertNotIn("NOT YET", RUNBOOK)
 
     def test_runbook_uses_groq_provider_contract(self):
         self.assertIn("AI_PROVIDER=groq", RUNBOOK)
         self.assertIn("GROQ_API_KEY=<server secret>", RUNBOOK)
         self.assertIn("GROQ_MODEL=openai/gpt-oss-20b", RUNBOOK)
         self.assertIn("docs/groq-provider.md", RUNBOOK)
-        self.assertNotIn("Exact production Gemini project verified Paid Tier", RUNBOOK)
+        self.assertIn("Legacy non-production Gemini record", RUNBOOK)
 
     def test_runbook_keeps_secrets_out_of_repo(self):
         self.assertNotIn("BEGIN OPENSSH PRIVATE KEY", RUNBOOK)
@@ -77,7 +84,7 @@ class ProductionReleaseTests(unittest.TestCase):
         ):
             self.assertIn(value, SMOKE)
 
-    def test_deploy_files_cover_b7_runtime_controls(self):
+    def test_deploy_files_cover_runtime_controls(self):
         for value in (
             'Strict-Transport-Security "max-age=31536000"',
             "client_max_body_size 16k;",
@@ -88,28 +95,63 @@ class ProductionReleaseTests(unittest.TestCase):
             "location = /ready",
         ):
             self.assertIn(value, NGINX)
-        self.assertIn("rate=10r/m", RATE)
-        privacy_block = NGINX.split("location = /privacy-policy.html", 1)[1].split("}", 1)[0]
+
+        privacy_block = NGINX.split(
+            "location = /privacy-policy.html", 1
+        )[1].split("}", 1)[0]
         self.assertIn("proxy_pass http://127.0.0.1:8787;", privacy_block)
         self.assertNotIn("alias ", privacy_block)
+
+        self.assertIn("rate=10r/m", RATE)
         self.assertIn("rotate 14", ROTATE)
-        self.assertIn("WorkingDirectory=/home/nduythanh/apps/repcoach-backend", SERVICE)
+        self.assertIn(
+            "WorkingDirectory=/home/nduythanh/apps/repcoach-backend",
+            SERVICE,
+        )
         self.assertIn(
             "EnvironmentFile=/home/nduythanh/apps/repcoach-backend/.env",
             SERVICE,
         )
 
-    def test_deploy_workflow_is_locked_and_pins_host_key(self):
-        self.assertIn("B7_DEPLOY_APPROVED", DEPLOY_WORKFLOW)
-        self.assertIn("DEPLOY_B7_2026_10_01", DEPLOY_WORKFLOW)
-        self.assertIn("secrets.VPS_SSH_KEY", DEPLOY_WORKFLOW)
-        self.assertIn("StrictHostKeyChecking=yes", DEPLOY_WORKFLOW)
+    def test_ops_workflow_is_manual_read_only_and_pins_host_key(self):
+        self.assertIn("workflow_dispatch:", OPS_WORKFLOW)
+        self.assertNotIn("pull_request:", OPS_WORKFLOW)
+        self.assertNotIn("push:", OPS_WORKFLOW)
+        self.assertIn("secrets.VPS_SSH_KEY", OPS_WORKFLOW)
+        self.assertIn("StrictHostKeyChecking=yes", OPS_WORKFLOW)
         self.assertIn(
-            "14.225.207.90 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG3oPFCAMe0W1WRqT5OjOHZo8SKDe5tFPeW9VQOYVmzF",
-            DEPLOY_WORKFLOW,
+            "14.225.207.90 ssh-ed25519 "
+            "AAAAC3NzaC1lZDI1NTE5AAAAIG3oPFCAMe0W1WRqT5OjOHZo8SKDe5tFPeW9VQOYVmzF",
+            OPS_WORKFLOW,
         )
-        self.assertNotIn("StrictHostKeyChecking=no", DEPLOY_WORKFLOW)
-        self.assertIn("sudo -n true", DEPLOY_WORKFLOW)
+        self.assertNotIn("StrictHostKeyChecking=no", OPS_WORKFLOW)
+        self.assertNotIn("sudo ", OPS_WORKFLOW)
+        self.assertIn("DEPLOYED_APP_HASHES=PASS", OPS_WORKFLOW)
+        self.assertIn("PUBLIC_READ_ONLY_ROUTES=PASS", OPS_WORKFLOW)
+        self.assertNotIn("api.groq.com", OPS_WORKFLOW)
+
+    def test_live_production_smoke_is_manual_only(self):
+        self.assertIn("workflow_dispatch:", SMOKE_WORKFLOW)
+        self.assertNotIn("pull_request:", SMOKE_WORKFLOW)
+        self.assertNotIn("push:", SMOKE_WORKFLOW)
+        self.assertIn("python tools/production_smoke.py", SMOKE_WORKFLOW)
+
+    def test_temporary_b7_diagnostics_are_removed(self):
+        obsolete = (
+            REPO / ".github" / "workflows" / "production-deploy.yml",
+            REPO / ".github" / "workflows" / "production-vps-preflight.yml",
+            REPO / ".github" / "workflows" / "production-vps-recovery-check.yml",
+            REPO / ".github" / "workflows" / "production-runtime-diagnose.yml",
+            BACKEND / "tools" / "groq_shape_diagnose.py",
+        )
+        for path in obsolete:
+            self.assertFalse(path.exists(), str(path))
+
+    def test_ops_workflow_health_check_has_literal_json_marker(self):
+        self.assertIn(
+            'grep -Fq "\\"status\\": \\"ok\\""',
+            OPS_WORKFLOW,
+        )
 
     def test_apply_requires_groq_and_supports_manual_sudo(self):
         self.assertIn("AI_PROVIDER=groq", APPLY)
@@ -124,8 +166,14 @@ class ProductionReleaseTests(unittest.TestCase):
             APPLY.index('stamp="$(date -u +%Y%m%dT%H%M%SZ)"'),
         )
         self.assertIn("sudo nginx -t", APPLY)
-        self.assertIn("backend did not become healthy within 10 seconds", APPLY)
-        self.assertIn("curl -fsS --max-time 1 http://127.0.0.1:8787/health", APPLY)
+        self.assertIn(
+            "backend did not become healthy within 10 seconds",
+            APPLY,
+        )
+        self.assertIn(
+            "curl -fsS --max-time 1 http://127.0.0.1:8787/health",
+            APPLY,
+        )
         self.assertIn('nginx_dump="$(sudo nginx -T 2>/dev/null)"', APPLY)
         self.assertNotIn("sudo nginx -T 2>/dev/null | grep", APPLY)
         self.assertIn("POSTDEPLOY_BACKEND=PASS", APPLY)
@@ -156,15 +204,40 @@ class ProductionReleaseTests(unittest.TestCase):
         ):
             self.assertIn(marker, APPLY)
             self.assertIn(marker, ROLLBACK)
-        self.assertIn("sudo rm -f /etc/nginx/conf.d/repcoach-rate-limit.conf", APPLY)
-        self.assertIn("sudo rm -f /etc/logrotate.d/repcoach-ai", APPLY)
-        self.assertIn('sudo cp -a "$backup/app/server.py" "$app_dir/server.py"', APPLY)
-        self.assertIn('sudo cp -a "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"', APPLY)
-        self.assertIn('sudo cp -a "$backup/app/static" "$app_dir/static"', APPLY)
-        self.assertIn('sudo cp -a "$backup/app/server.py" "$app_dir/server.py"', ROLLBACK)
-        self.assertIn('sudo cp -a "$backup/app/static" "$app_dir/static"', ROLLBACK)
 
-    def test_runbook_documents_transactional_backup(self):
+        self.assertIn(
+            "sudo rm -f /etc/nginx/conf.d/repcoach-rate-limit.conf",
+            APPLY,
+        )
+        self.assertIn(
+            "sudo rm -f /etc/logrotate.d/repcoach-ai",
+            APPLY,
+        )
+        self.assertIn(
+            'sudo cp -a "$backup/app/server.py" "$app_dir/server.py"',
+            APPLY,
+        )
+        self.assertIn(
+            'sudo cp -a "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"',
+            APPLY,
+        )
+        self.assertIn(
+            'sudo cp -a "$backup/app/static" "$app_dir/static"',
+            APPLY,
+        )
+        self.assertIn(
+            'sudo cp -a "$backup/app/server.py" "$app_dir/server.py"',
+            ROLLBACK,
+        )
+        self.assertIn(
+            'sudo cp -a "$backup/app/static" "$app_dir/static"',
+            ROLLBACK,
+        )
+
+    def test_runbook_documents_manual_deploy_and_rollback(self):
+        self.assertIn("manual interactive-sudo operation", RUNBOOK)
+        self.assertIn("production-ops-check.yml", RUNBOOK)
+        self.assertIn("production-readiness.yml", RUNBOOK)
         self.assertIn("/var/backups/repcoach-b7/<UTC timestamp>", RUNBOOK)
         self.assertIn("b7_apply.sh", RUNBOOK)
         self.assertIn("b7_rollback.sh", RUNBOOK)
