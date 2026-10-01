@@ -128,6 +128,9 @@ class ProductionReleaseTests(unittest.TestCase):
         self.assertIn("curl -fsS --max-time 1 http://127.0.0.1:8787/health", APPLY)
         self.assertIn('nginx_dump="$(sudo nginx -T 2>/dev/null)"', APPLY)
         self.assertNotIn("sudo nginx -T 2>/dev/null | grep", APPLY)
+        self.assertIn("POSTDEPLOY_BACKEND=PASS", APPLY)
+        self.assertIn("POSTDEPLOY_NGINX=PASS", APPLY)
+        self.assertIn("nginx effective config missing:", APPLY)
         self.assertIn("BACKUP_PATH=", APPLY)
         self.assertIn("Deploy failed; restoring pre-deploy backup", APPLY)
 
