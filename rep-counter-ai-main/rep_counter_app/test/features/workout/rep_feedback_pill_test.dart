@@ -97,7 +97,20 @@ void main() {
     ));
     await tester.pump();
 
-    expect(find.byType(FadeTransition), findsWidgets);
-    expect(find.byType(ScaleTransition), findsNothing);
+    final transition = find.byType(RepFeedbackTransition);
+    expect(
+      find.descendant(
+        of: transition,
+        matching: find.byType(FadeTransition),
+      ),
+      findsWidgets,
+    );
+    expect(
+      find.descendant(
+        of: transition,
+        matching: find.byType(ScaleTransition),
+      ),
+      findsNothing,
+    );
   });
 }
