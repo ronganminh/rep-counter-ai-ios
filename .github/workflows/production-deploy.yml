@@ -63,11 +63,15 @@ jobs:
           EOF
           chmod 0600 "$HOME/.ssh/known_hosts"
 
-      - name: Preflight VPS and paid-mode configuration
+      - name: Preflight VPS Groq configuration
         if: ${{ steps.gate.outputs.approved == 'true' }}
         shell: bash
         run: |
-          ssh -i "$HOME/.ssh/repcoach_b7"             -o IdentitiesOnly=yes             -o BatchMode=yes             -o StrictHostKeyChecking=yes             nduythanh@14.225.207.90 '
+          ssh -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            nduythanh@14.225.207.90 '
               set -eu
               app=/home/nduythanh/apps/repcoach-backend
               test -d "$app"
@@ -85,13 +89,27 @@ jobs:
         if: ${{ steps.gate.outputs.approved == 'true' }}
         shell: bash
         run: |
-          tar -C rep-counter-ai-main/backend -czf /tmp/repcoach-b7.tgz             server.py             ai_provider.py             static/privacy-policy.html             deploy/repcoach-backend.service             deploy/repcoach-ai.nginx             deploy/repcoach-rate-limit.conf             deploy/repcoach-ai.logrotate             deploy/b7_apply.sh             deploy/b7_rollback.sh
+          tar -C rep-counter-ai-main/backend -czf /tmp/repcoach-b7.tgz \
+            server.py \
+            ai_provider.py \
+            static/privacy-policy.html \
+            deploy/repcoach-backend.service \
+            deploy/repcoach-ai.nginx \
+            deploy/repcoach-rate-limit.conf \
+            deploy/repcoach-ai.logrotate \
+            deploy/b7_apply.sh \
+            deploy/b7_rollback.sh
 
       - name: Upload release package
         if: ${{ steps.gate.outputs.approved == 'true' }}
         shell: bash
         run: |
-          scp -i "$HOME/.ssh/repcoach_b7"             -o IdentitiesOnly=yes             -o BatchMode=yes             -o StrictHostKeyChecking=yes             /tmp/repcoach-b7.tgz             nduythanh@14.225.207.90:/tmp/repcoach-b7.tgz
+          scp -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            /tmp/repcoach-b7.tgz \
+            nduythanh@14.225.207.90:/tmp/repcoach-b7.tgz
 
       - name: Apply release transactionally
         if: ${{ steps.gate.outputs.approved == 'true' }}
@@ -99,9 +117,13 @@ jobs:
         shell: bash
         run: |
           output="$(
-            ssh -i "$HOME/.ssh/repcoach_b7"               -o IdentitiesOnly=yes               -o BatchMode=yes               -o StrictHostKeyChecking=yes               nduythanh@14.225.207.90 '
+            ssh -i "$HOME/.ssh/repcoach_b7" \
+              -o IdentitiesOnly=yes \
+              -o BatchMode=yes \
+              -o StrictHostKeyChecking=yes \
+              nduythanh@14.225.207.90 '
                 set -eu
-                stage="/tmp/repcoach-b7-stage"
+                stage=/tmp/repcoach-b7-stage
                 rm -rf "$stage"
                 mkdir -p "$stage"
                 tar -xzf /tmp/repcoach-b7.tgz -C "$stage"
@@ -138,13 +160,20 @@ jobs:
           REQUEST_ID: ${{ steps.smoke.outputs.request_id }}
         shell: bash
         run: |
-          ssh -i "$HOME/.ssh/repcoach_b7"             -o IdentitiesOnly=yes             -o BatchMode=yes             -o StrictHostKeyChecking=yes             nduythanh@14.225.207.90 "
+          ssh -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            nduythanh@14.225.207.90 "
               set -eu
               rid='$REQUEST_ID'
               test -n \"$rid\"
-              sudo grep -Fq \"request_id=$rid\" /var/log/nginx/repcoach-ai.access.log
-              sudo journalctl -u repcoach-backend --since '-15 min' --no-pager | grep -Fq \"\\\"request_id\\\":\\\"$rid\\\"\"
-              if sudo journalctl -u repcoach-backend --since '-15 min' --no-pager | grep -F \"$rid\" | grep -E 'consent_version|GEMINI_API_KEY|x-goog-api-key|quality_score|\\\"reps\\\"|\\\"sets\\\"|\\\"exercise\\\"' >/dev/null; then
+              sudo grep -F \"request_id=$rid\" /var/log/nginx/repcoach-ai.access.log >/dev/null
+              sudo journalctl -u repcoach-backend --since '-15 min' --no-pager |
+                grep -F \"\\\"request_id\\\":\\\"$rid\\\"\" >/dev/null
+              if sudo journalctl -u repcoach-backend --since '-15 min' --no-pager |
+                grep -F \"$rid\" |
+                grep -E 'consent_version|GROQ_API_KEY|authorization|GEMINI_API_KEY|x-goog-api-key|quality_score|\\\"reps\\\"|\\\"sets\\\"|\\\"exercise\\\"' >/dev/null; then
                 echo 'Sensitive workout/provider content appeared in the correlated backend log line.' >&2
                 exit 1
               fi
@@ -158,7 +187,11 @@ jobs:
         shell: bash
         run: |
           echo "Post-deploy validation failed; rolling back."
-          ssh -i "$HOME/.ssh/repcoach_b7"             -o IdentitiesOnly=yes             -o BatchMode=yes             -o StrictHostKeyChecking=yes             nduythanh@14.225.207.90 "
+          ssh -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            nduythanh@14.225.207.90 "
               set -eu
               stage=/tmp/repcoach-b7-stage
               test -d \"$stage\"
