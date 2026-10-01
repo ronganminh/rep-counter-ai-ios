@@ -430,11 +430,12 @@ class _PersonalRecordsCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: p.borderStrong),
       ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Container(
-            width: 4,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Container(
+              width: 4,
             decoration: BoxDecoration(
               color: p.accent,
               borderRadius: const BorderRadius.horizontal(
@@ -479,8 +480,9 @@ class _PersonalRecordsCard extends StatelessWidget {
                 ],
               ),
             ),
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
