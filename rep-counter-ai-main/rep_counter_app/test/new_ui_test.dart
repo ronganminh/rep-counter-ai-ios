@@ -236,7 +236,9 @@ void main() {
       expect(find.text('88'), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (scale == 1) await screenshot(tester, 'result-detail');
-      await tester.pageBack();
+      Navigator.of(
+        tester.element(find.byKey(const Key('form-score-details'))),
+      ).pop();
       await tester.pumpAndSettle();
       await pump(
           tester, ResultPage(record: fixture(legacy: true), readOnly: true),
