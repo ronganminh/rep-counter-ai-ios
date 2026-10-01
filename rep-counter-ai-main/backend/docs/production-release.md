@@ -150,6 +150,18 @@ When approved and passwordless narrow sudo is available, the workflow:
 8. verifies privacy-safe logs using the returned request ID;
 9. rolls back automatically when a post-deploy check fails.
 
+## Host package prerequisites
+
+The deploy requires `nginx`, `logrotate`, `systemctl` and `ss` on the VPS. The apply script checks these dependencies before creating a release backup or replacing production files. On a minimized Ubuntu host, install a missing `logrotate` package before retrying:
+
+    sudo apt-get update
+    sudo apt-get install -y logrotate
+
+Then verify:
+
+    command -v logrotate
+    sudo logrotate -d /etc/logrotate.d/repcoach-ai
+
 ## Manual interactive-sudo deployment
 
 If `sudo -n` is unavailable, do not weaken the VPS to `NOPASSWD: ALL`. From an SSH terminal, check out the reviewed B7 commit, then run:
