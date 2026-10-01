@@ -114,6 +114,12 @@ class ProductionReleaseTests(unittest.TestCase):
         self.assertIn("GROQ_MODEL=openai/gpt-oss-20b", APPLY)
         self.assertNotIn("sudo -n true", APPLY)
         self.assertIn("python3 -m py_compile", APPLY)
+        self.assertIn("missing deployment dependency: $cmd", APPLY)
+        self.assertIn("for cmd in nginx logrotate systemctl ss", APPLY)
+        self.assertLess(
+            APPLY.index("for cmd in nginx logrotate systemctl ss"),
+            APPLY.index('stamp="$(date -u +%Y%m%dT%H%M%SZ)"'),
+        )
         self.assertIn("sudo nginx -t", APPLY)
         self.assertIn("BACKUP_PATH=", APPLY)
         self.assertIn("Deploy failed; restoring pre-deploy backup", APPLY)
