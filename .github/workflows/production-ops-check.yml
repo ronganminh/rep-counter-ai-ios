@@ -55,7 +55,7 @@ jobs:
               grep -qx "BIND_HOST=127.0.0.1" "$app/.env"
               systemctl is-active --quiet repcoach-backend
               curl -fsS --max-time 5 http://127.0.0.1:8787/health |
-                grep -Fq ""status": "ok""
+                grep -Fq "\"status\": \"ok\""
               echo "VPS_CONFIG_AND_HEALTH=PASS"
             '
 
