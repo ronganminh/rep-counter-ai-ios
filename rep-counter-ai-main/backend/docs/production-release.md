@@ -246,7 +246,7 @@ If public smoke or log verification fails after apply, the GitHub workflow calls
 
     backend/deploy/b7_rollback.sh
 
-Rollback restores the previous backend files and system configuration, validates Nginx, restarts the service and reloads Nginx.
+Rollback restores the previous backend files and system configuration, validates Nginx, restarts the service and reloads Nginx. Each backup records whether a managed file/directory was present or absent before deployment, so rollback also removes files that were newly created by a failed release instead of leaving partial configuration behind.
 
 If Groq is temporarily unavailable, keep the app local-first and let AI requests fail with the stable optional-AI error state rather than bypassing provider/configuration guards.
 
