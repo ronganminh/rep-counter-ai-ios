@@ -96,3 +96,105 @@ class SettingsRow extends StatelessWidget {
     });
   }
 }
+
+
+/// Shared single-choice pill from the vNext design system.
+///
+/// The widget only renders selection state; callers keep the group mutually
+/// exclusive in application state.
+class SegmentChip extends StatelessWidget {
+  const SegmentChip({
+    super.key,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Semantics(
+      button: true,
+      selected: selected,
+      label: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(999),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: MediaQuery.disableAnimationsOf(context)
+                ? Duration.zero
+                : const Duration(milliseconds: 140),
+            constraints: const BoxConstraints(minHeight: 36),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
+            decoration: BoxDecoration(
+              color: selected ? p.surface2 : p.surface2,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(
+                color: selected ? p.accent : Colors.transparent,
+              ),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              label,
+              textAlign: TextAlign.center,
+              style: AppTypography.body14.copyWith(
+                color: selected ? p.accentInk : p.text2,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Shared Progress summary card. Values are supplied by local analytics only.
+class MetricCard extends StatelessWidget {
+  const MetricCard({
+    super.key,
+    required this.label,
+    required this.value,
+  });
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = context.palette;
+    return Container(
+      constraints: const BoxConstraints(minHeight: 92),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: p.borderStrong),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            label.toUpperCase(),
+            style: AppTypography.caption12.copyWith(color: p.text3),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: AppTypography.metric40.copyWith(
+              color: p.accentInk,
+              fontSize: 30,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
