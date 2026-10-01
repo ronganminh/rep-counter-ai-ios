@@ -40,12 +40,14 @@ server {
         default_type application/json;
         add_header Allow "POST" always;
         add_header Cache-Control "no-store" always;
+        add_header X-Request-ID $request_id always;
         return 405 '{"error":"INVALID_REQUEST"}';
     }
 
     location @invalid_request_body {
         default_type application/json;
         add_header Cache-Control "no-store" always;
+        add_header X-Request-ID $request_id always;
         return 413 '{"error":"INVALID_REQUEST"}';
     }
 
@@ -53,6 +55,7 @@ server {
         default_type application/json;
         add_header Retry-After "60" always;
         add_header Cache-Control "no-store" always;
+        add_header X-Request-ID $request_id always;
         return 429 '{"error":"RATE_LIMITED"}';
     }
 
@@ -62,6 +65,18 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Request-ID $request_id;
+        proxy_connect_timeout 2s;
+        proxy_read_timeout 5s;
+    }
+
+    location = /ready {
+        limit_req zone=repcoach_api burst=10 nodelay;
+        proxy_pass http://127.0.0.1:8787;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Request-ID $request_id;
         proxy_connect_timeout 2s;
         proxy_read_timeout 5s;
     }
@@ -75,6 +90,7 @@ server {
         proxy_set_header Host $host;
         proxy_set_header X-Forwarded-Proto $scheme;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Request-ID $request_id;
         proxy_connect_timeout 2s;
         proxy_send_timeout 5s;
         proxy_read_timeout 22s;
