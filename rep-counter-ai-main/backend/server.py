@@ -4,6 +4,8 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
+import secrets
 import time
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -26,6 +28,7 @@ RESPONSE_SCHEMA_VERSION = 1
 SUPPORTED_REQUEST_SCHEMA_VERSIONS = {1, 2}
 SUPPORTED_EXERCISES = {"push_up", "pull_up", "curl", "overhead_extension"}
 SUPPORTED_LOCALES = {"vi", "en"}
+REQUEST_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{32}$")
 
 CORE_FIELDS = {
     "exercise",
@@ -202,6 +205,22 @@ def error_response(code: str) -> dict:
     return {"error": code}
 
 
+def normalize_request_id(value: object) -> str:
+    """Accept only the bounded Nginx request-id format; otherwise generate one."""
+    if isinstance(value, str) and REQUEST_ID_PATTERN.fullmatch(value):
+        return value.lower()
+    return secrets.token_hex(16)
+
+
+def provider_configuration_ready() -> bool:
+    """Validate required provider configuration without making an external AI call."""
+    try:
+        build_provider_from_env()
+    except ProviderConfigurationError:
+        return False
+    return True
+
+
 def generate_feedback(workout: dict, deadline: float) -> str:
     """Resolve the configured provider and generate feedback through its adapter."""
     provider = build_provider_from_env()
@@ -229,9 +248,16 @@ class Handler(BaseHTTPRequestHandler):
 
     def handle_one_request(self) -> None:
         self._started_at = time.monotonic()
+        self._request_id = None
         self._request_size_bucket = None
         self._provider_status_class = None
         super().handle_one_request()
+
+    def _ensure_request_id(self) -> str:
+        if self._request_id is None:
+            incoming = self.headers.get("x-request-id") if hasattr(self, "headers") else None
+            self._request_id = normalize_request_id(incoming)
+        return self._request_id
 
     def reply(
         self,
@@ -241,10 +267,12 @@ class Handler(BaseHTTPRequestHandler):
         headers: dict[str, str] | None = None,
     ) -> None:
         body = json.dumps(data, ensure_ascii=False).encode("utf-8")
+        request_id = self._ensure_request_id()
         self.send_response(status)
         self.send_header("content-type", "application/json; charset=utf-8")
         self.send_header("content-length", str(len(body)))
         self.send_header("cache-control", "no-store")
+        self.send_header("x-request-id", request_id)
         for name, value in (headers or {}).items():
             self.send_header(name, value)
         self.end_headers()
@@ -254,10 +282,11 @@ class Handler(BaseHTTPRequestHandler):
     def _log_response(self, status: int, error_code: object = None) -> None:
         event = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
+            "request_id": self._ensure_request_id(),
             "route": self.path.split("?", 1)[0],
             "method": self.command,
             "status": status,
-            "latency_ms": round((time.monotonic() - self._started_at) * 1000),
+            "duration_ms": round((time.monotonic() - self._started_at) * 1000),
         }
         if self._request_size_bucket is not None:
             event["request_size"] = self._request_size_bucket
@@ -276,7 +305,14 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self) -> None:
         route = self.path.split("?", 1)[0]
         if route == "/health":
-            self.reply(200, {"ok": True, "service": "repcoach-ai"})
+            self.reply(200, {"status": "ok"})
+            return
+        if route == "/ready":
+            if provider_configuration_ready():
+                self.reply(200, {"status": "ready"})
+            else:
+                self._provider_status_class = "configuration"
+                self.reply(503, {"status": "not_ready"})
             return
         if route == "/v1/workout-feedback":
             self._invalid_method()
