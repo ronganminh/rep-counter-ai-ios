@@ -86,7 +86,7 @@ class PrivacyContractTests(unittest.TestCase):
         self.assertIn("not retained by default", POLICY)
         self.assertIn("up to 30 days", POLICY)
         self.assertIn("does <strong>not</strong> currently claim that ZDR is enabled", POLICY)
-        self.assertIn("không tuyên bố ZDR đã được bật", POLICY)
+        self.assertIn("hiện <strong>không</strong> tuyên bố ZDR đã được bật", POLICY)
         self.assertIn("not used to train or fine-tune models", POLICY)
 
     def test_policy_and_consent_cover_ai_optionality(self):
