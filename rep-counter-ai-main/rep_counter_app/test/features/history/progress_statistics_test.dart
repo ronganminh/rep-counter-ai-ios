@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ui' show Tristate;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -285,7 +284,15 @@ void main() {
       final node = tester.getSemantics(
         find.byKey(const Key('progress-range-7D')),
       );
-      expect(node.flagsCollection.isSelected, Tristate.isTrue);
+      expect(
+        node,
+        matchesSemantics(
+          label: '7D',
+          isButton: true,
+          isSelected: true,
+          hasTapAction: true,
+        ),
+      );
     });
   });
 }
