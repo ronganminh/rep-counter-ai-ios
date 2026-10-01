@@ -20,10 +20,14 @@ class RepFeedbackPill extends StatelessWidget {
     final clean = feedback.kind == RepFeedbackKind.countedClean;
     final tone = clean ? AppColors.success : AppColors.warning;
 
+    final semanticsStatus = copy.status.startsWith('✓ ')
+        ? copy.status.substring(2)
+        : copy.status;
+
     return Semantics(
       container: true,
       liveRegion: true,
-      label: '${copy.status}. ${copy.message}',
+      label: '$semanticsStatus. ${copy.message}',
       child: ExcludeSemantics(
         child: ConstrainedBox(
           constraints: const BoxConstraints(
@@ -134,7 +138,7 @@ _FeedbackCopy _copy(BuildContext context, RepFeedback feedback) {
   switch (feedback.kind) {
     case RepFeedbackKind.countedClean:
       return _FeedbackCopy(
-        context.tr('ĐÃ TÍNH', 'COUNTED'),
+        context.tr('✓ ĐÃ TÍNH', '✓ COUNTED'),
         context.tr('Rep tốt', 'Good rep'),
       );
     case RepFeedbackKind.countedWarning:
