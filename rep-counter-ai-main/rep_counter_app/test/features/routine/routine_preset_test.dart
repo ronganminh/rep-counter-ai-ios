@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rep_counter_app/features/routine/data/routine_store.dart';
 import 'package:rep_counter_app/features/routine/domain/routine_preset.dart';
+import 'package:rep_counter_app/features/workout/data/workout_history_store.dart';
+import 'package:rep_counter_app/features/workout/data/workout_record.dart';
 
 RoutinePreset sample({
   String id = 'morning',
@@ -84,4 +86,32 @@ void main() {
     expect(edited.name, 'Tên mới');
     expect(edited.targetSets, 5);
   });
+  test('history keeps routine snapshot after preset deletion', () async {
+    final preset = sample();
+    await RoutineStore().save(preset);
+    await WorkoutHistoryStore().save(WorkoutRecord(
+      id: 'history-routine',
+      exerciseId: 'push_up',
+      exerciseName: 'Hít đất',
+      startedAt: DateTime(2026, 10, 2),
+      durationSeconds: 120,
+      reps: 30,
+      sets: 2,
+      targetReps: null,
+      poseFrames: 100,
+      readyFrames: 90,
+      lostFrames: 10,
+      routine: preset.toSnapshot(),
+    ));
+
+    await RoutineStore().delete(preset.id);
+    expect(await RoutineStore().load(), isEmpty);
+
+    final record = (await WorkoutHistoryStore().load()).single;
+    expect(record.routine?.id, preset.id);
+    expect(record.routine?.name, 'Hít đất buổi sáng');
+    expect(record.routine?.targetReps, 15);
+    expect(record.routine?.targetSets, 3);
+  });
+
 }
