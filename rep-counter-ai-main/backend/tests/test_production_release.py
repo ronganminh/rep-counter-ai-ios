@@ -118,12 +118,16 @@ class ProductionReleaseTests(unittest.TestCase):
         self.assertNotIn("sudo -n true", APPLY)
         self.assertIn("python3 -m py_compile", APPLY)
         self.assertIn("missing deployment dependency: $cmd", APPLY)
-        self.assertIn("for cmd in nginx logrotate systemctl ss", APPLY)
+        self.assertIn("for cmd in nginx logrotate systemctl ss curl", APPLY)
         self.assertLess(
-            APPLY.index("for cmd in nginx logrotate systemctl ss"),
+            APPLY.index("for cmd in nginx logrotate systemctl ss curl"),
             APPLY.index('stamp="$(date -u +%Y%m%dT%H%M%SZ)"'),
         )
         self.assertIn("sudo nginx -t", APPLY)
+        self.assertIn("backend did not become healthy within 10 seconds", APPLY)
+        self.assertIn("curl -fsS --max-time 1 http://127.0.0.1:8787/health", APPLY)
+        self.assertIn('nginx_dump="$(sudo nginx -T 2>/dev/null)"', APPLY)
+        self.assertNotIn("sudo nginx -T 2>/dev/null | grep", APPLY)
         self.assertIn("BACKUP_PATH=", APPLY)
         self.assertIn("Deploy failed; restoring pre-deploy backup", APPLY)
 
