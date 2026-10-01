@@ -106,13 +106,15 @@ class ProductionReleaseTests(unittest.TestCase):
             DEPLOY_WORKFLOW,
         )
         self.assertNotIn("StrictHostKeyChecking=no", DEPLOY_WORKFLOW)
+        self.assertIn("sudo -n true", DEPLOY_WORKFLOW)
 
-    def test_apply_requires_groq_and_noninteractive_sudo(self):
+    def test_apply_requires_groq_and_supports_manual_sudo(self):
         self.assertIn("AI_PROVIDER=groq", APPLY)
         self.assertIn("GROQ_API_KEY", APPLY)
         self.assertIn("GROQ_MODEL=openai/gpt-oss-20b", APPLY)
-        self.assertIn("sudo -n true", APPLY)
+        self.assertNotIn("sudo -n true", APPLY)
         self.assertIn("python3 -m py_compile", APPLY)
+        self.assertIn("sudo nginx -t", APPLY)
         self.assertIn("BACKUP_PATH=", APPLY)
         self.assertIn("Deploy failed; restoring pre-deploy backup", APPLY)
 
