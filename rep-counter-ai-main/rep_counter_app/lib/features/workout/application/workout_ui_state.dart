@@ -76,6 +76,7 @@ class WorkoutUiState {
   bool get isTimedChallenge => mode == WorkoutMode.timed;
   bool get isFinalTenSeconds =>
       isTimedChallenge &&
+      sessionStarted &&
       !challengeExpired &&
       challengeRemaining != null &&
       challengeRemaining! > Duration.zero &&
