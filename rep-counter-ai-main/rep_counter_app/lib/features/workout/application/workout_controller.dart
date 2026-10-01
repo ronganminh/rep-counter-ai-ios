@@ -258,6 +258,11 @@ class WorkoutController extends ChangeNotifier {
     _placementStatus = status;
     _placementMessage = message;
     _calibrationSamples = calibrationSamples;
+    if (acceptsReps &&
+        !poseFound &&
+        _repFeedback?.kind != RepFeedbackKind.poseLost) {
+      _replaceRepFeedback(const RepFeedback.poseLost());
+    }
     if (acceptsReps) _session.tick(at);
     if (!_armed && !_calibrating && _startRequested) {
       // Setup uses the actual stable status, not the workout's two-second grace.
