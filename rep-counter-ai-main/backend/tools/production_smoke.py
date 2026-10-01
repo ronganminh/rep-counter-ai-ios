@@ -252,15 +252,39 @@ def main() -> int:
     _assert(fixture_path.is_file(), f"fixture not found: {fixture_path}")
 
     print(f"RepCoach production smoke: https://{host}:{port}")
-    check_http_redirect(host)
-    check_tls(host, port)
-    check_health(host, port)
-    check_ready(host, port)
-    check_privacy(host, port)
-    check_method_guard(host, port)
-    check_body_limit(host, port)
-    request_id = check_feedback(host, port, fixture_path)
-    print(f"PRODUCTION_SMOKE_PASS feedback_request_id={request_id}")
+    failures: list[str] = []
+    feedback_request_id: str | None = None
+
+    checks = (
+        ("http_redirect", lambda: check_http_redirect(host)),
+        ("tls", lambda: check_tls(host, port)),
+        ("health", lambda: check_health(host, port)),
+        ("ready", lambda: check_ready(host, port)),
+        ("privacy", lambda: check_privacy(host, port)),
+        ("method_guard", lambda: check_method_guard(host, port)),
+        ("body_limit", lambda: check_body_limit(host, port)),
+    )
+
+    for name, check in checks:
+        try:
+            check()
+        except Exception as error:
+            failures.append(f"{name}: {error}")
+            print(f"FAIL {name}: {error}", file=sys.stderr)
+
+    try:
+        feedback_request_id = check_feedback(host, port, fixture_path)
+    except Exception as error:
+        failures.append(f"feedback: {error}")
+        print(f"FAIL feedback: {error}", file=sys.stderr)
+
+    if failures:
+        print("PRODUCTION_SMOKE_FAIL", file=sys.stderr)
+        for failure in failures:
+            print(f" - {failure}", file=sys.stderr)
+        return 1
+
+    print(f"PRODUCTION_SMOKE_PASS feedback_request_id={feedback_request_id}")
     return 0
 
 
