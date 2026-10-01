@@ -275,6 +275,17 @@ class _SettingsPageState extends State<SettingsPage> {
                           const LegalPage(kind: LegalKind.privacy)))),
             ]),
         SettingsGroup(title: context.tr('Dữ liệu', 'Data'), children: [
+          FutureBuilder<int>(
+              future: _count,
+              builder: (context, snapshot) => SettingsRow(
+                    icon: LucideIcons.trash2,
+                    title: s.clearHistory,
+                    destructive: true,
+                    subtitle: context.tr(
+                        '${snapshot.data ?? 0} buổi tập · bao gồm hiệu chỉnh đã lưu',
+                        '${snapshot.data ?? 0} sessions · includes saved calibration'),
+                    onTap: _deleteData,
+                  )),
           SettingsRow(
               icon: LucideIcons.download,
               title: context.tr(
@@ -287,17 +298,6 @@ class _SettingsPageState extends State<SettingsPage> {
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
                   builder: (_) => const ExportDataSheet())),
-          FutureBuilder<int>(
-              future: _count,
-              builder: (context, snapshot) => SettingsRow(
-                    icon: LucideIcons.trash2,
-                    title: s.clearHistory,
-                    destructive: true,
-                    subtitle: context.tr(
-                        '${snapshot.data ?? 0} buổi tập · bao gồm hiệu chỉnh đã lưu',
-                        '${snapshot.data ?? 0} sessions · includes saved calibration'),
-                    onTap: _deleteData,
-                  )),
         ]),
         SettingsGroup(title: context.tr('Về app', 'About'), children: [
           SettingsRow(
