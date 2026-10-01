@@ -152,7 +152,7 @@ When approved and passwordless narrow sudo is available, the workflow:
 
 ## Host package prerequisites
 
-The deploy requires `nginx`, `logrotate`, `systemctl` and `ss` on the VPS. The apply script checks these dependencies before creating a release backup or replacing production files. On a minimized Ubuntu host, install a missing `logrotate` package before retrying:
+The deploy requires `nginx`, `logrotate`, `systemctl`, `ss` and `curl` on the VPS. The apply script checks these dependencies before creating a release backup or replacing production files. On a minimized Ubuntu host, install a missing `logrotate` package before retrying:
 
     sudo apt-get update
     sudo apt-get install -y logrotate
@@ -240,7 +240,7 @@ The transactional apply script creates a root-only backup under:
 
     /var/backups/repcoach-b7/<UTC timestamp>
 
-If apply itself fails after backup creation it attempts local rollback automatically.
+If apply itself fails after backup creation it attempts local rollback automatically. After restart, the script waits up to 10 seconds for the local `/health` route so a normal Python bind/startup delay is not mistaken for a failed release. Nginx effective configuration is captured once before assertions to avoid pipefail/SIGPIPE false failures.
 
 If public smoke or log verification fails after apply, the GitHub workflow calls:
 
