@@ -29,7 +29,11 @@ Future<void> pumpCard(WidgetTester tester, ResultController controller) async {
       controller: locale,
       child: MaterialApp(
         theme: ThemeData.dark(),
-        home: Scaffold(body: ResultFeedbackCard(controller: controller)),
+        home: AnimatedBuilder(
+          animation: controller,
+          builder: (_, __) =>
+              Scaffold(body: ResultFeedbackCard(controller: controller)),
+        ),
       ),
     ),
   );
