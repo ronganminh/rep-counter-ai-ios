@@ -25,7 +25,8 @@ from ai_provider import (
 MAX_BODY_BYTES = 16_384
 TOTAL_REQUEST_BUDGET_SECONDS = 20
 RESPONSE_SCHEMA_VERSION = 1
-SUPPORTED_REQUEST_SCHEMA_VERSIONS = {1, 2}
+SUPPORTED_REQUEST_SCHEMA_VERSIONS = {2}
+CURRENT_AI_CONSENT_VERSION = "2026-10-01-groq"
 SUPPORTED_EXERCISES = {"push_up", "pull_up", "curl", "overhead_extension"}
 SUPPORTED_LOCALES = {"vi", "en"}
 REQUEST_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{32}$")
@@ -125,24 +126,24 @@ def _require_string(
 
 
 def normalize_workout_request(workout: object) -> dict:
-    """Validate v1/v2 payloads and normalize legacy unversioned payloads to v1."""
+    """Validate the current v2 consent-bound workout-feedback contract."""
     if not isinstance(workout, dict):
         raise RequestValidationError("json_object_required")
 
-    raw_version = workout.get("schema_version", 1)
+    raw_version = workout.get("schema_version")
     if type(raw_version) is not int or raw_version not in SUPPORTED_REQUEST_SCHEMA_VERSIONS:
         raise RequestValidationError("schema_version")
     schema_version = raw_version
 
-    allowed_fields = set(CORE_FIELDS | QUALITY_FIELDS | {"schema_version"})
-    if schema_version == 2:
-        allowed_fields.add("consent_version")
+    allowed_fields = set(
+        CORE_FIELDS | QUALITY_FIELDS | {"schema_version", "consent_version"}
+    )
     if set(workout) - allowed_fields:
         raise RequestValidationError("unknown_fields")
 
     if CORE_FIELDS - set(workout):
         raise RequestValidationError("missing_fields")
-    if schema_version == 2 and "consent_version" not in workout:
+    if "consent_version" not in workout:
         raise RequestValidationError("consent_version")
 
     exercise = _require_string(workout, "exercise", maximum_length=32)
@@ -183,10 +184,17 @@ def normalize_workout_request(workout: object) -> dict:
     if "has_enough_data" in workout:
         _require_bool(workout, "has_enough_data")
 
+    consent_version = _require_string(
+        workout,
+        "consent_version",
+        maximum_length=64,
+    )
+    if consent_version != CURRENT_AI_CONSENT_VERSION:
+        raise RequestValidationError("consent_version")
+
     normalized = dict(workout)
     normalized["schema_version"] = schema_version
-    if schema_version == 2:
-        _require_string(workout, "consent_version", maximum_length=64)
+    normalized["consent_version"] = consent_version
     return normalized
 
 
