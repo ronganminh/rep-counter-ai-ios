@@ -37,7 +37,9 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Future<void> _reload() async {
     final next = WorkoutHistoryStore().load();
-    setState(() => _records = next);
+    setState(() {
+      _records = next;
+    });
     await next;
   }
 
@@ -161,7 +163,17 @@ class _HistoryPageState extends State<HistoryPage> {
 
                   final source = snapshot.data ?? const <WorkoutRecord>[];
                   if (source.isEmpty) {
-                    return _ProgressEmptyState(onTrain: _startTraining);
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _ExerciseFilter(
+                          selected: _filter,
+                          onSelected: (value) => setState(() => _filter = value),
+                        ),
+                        const SizedBox(height: 18),
+                        _ProgressEmptyState(onTrain: _startTraining),
+                      ],
+                    );
                   }
 
                   return _buildProgress(context, source);
@@ -915,6 +927,15 @@ class _ProgressEmptyState extends StatelessWidget {
                 const SizedBox(height: 30),
                 Text(
                   context.tr(
+                    'Chưa có buổi tập nào',
+                    'No workouts yet',
+                  ),
+                  textAlign: TextAlign.center,
+                  style: AppTypography.title20,
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  context.tr(
                     'Tiến bộ của bạn bắt đầu từ buổi tập đầu tiên.',
                     'Your progress starts with your first workout.',
                   ),
@@ -1053,9 +1074,7 @@ class _SessionRow extends StatelessWidget {
           crossAxisAlignment: WrapCrossAlignment.center,
           children: [
             Text(
-              r.targetReps == null
-                  ? '${r.reps} rep'
-                  : '${r.reps}/${r.targetReps}',
+              '${r.reps} rep',
               style: AppTypography.metric40.copyWith(fontSize: 28),
             ),
             Text(
