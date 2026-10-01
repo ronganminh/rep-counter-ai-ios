@@ -242,7 +242,7 @@ Backend tests run in a dedicated GitHub Actions workflow, separate from expensiv
 .github/workflows/backend-ci.yml
 ```
 
-The workflow runs Python compile checks and the complete standard-library unittest suite for backend changes. It does not inject a Gemini API key and does not make live Gemini requests.
+The workflow runs Python compile checks and the complete standard-library unittest suite for backend changes. It does not inject production provider secrets and does not make live external-provider requests.
 
 For an Nginx deployment, validate syntax before reload:
 
@@ -263,38 +263,39 @@ The Python server listens only on `127.0.0.1:8787`. Nginx is the only public ent
 
 ## Production release
 
-The B7 production deployment, provider gate, public smoke, safe-log verification and rollback procedure is documented in:
+The authoritative production deployment, verification and rollback procedure is:
 
 ```text
 docs/production-release.md
 ```
 
-Public production smoke uses synthetic data only:
+The production VPS currently requires an interactive sudo password, so privileged deployment is intentionally manual from an SSH terminal. Do not weaken the host to `NOPASSWD: ALL` merely for CI.
+
+The transactional deploy entry point is:
+
+```bash
+bash rep-counter-ai-main/backend/deploy/b7_apply.sh \
+  rep-counter-ai-main/backend \
+  /home/nduythanh/apps/repcoach-backend
+```
+
+After deployment, run the synthetic production smoke manually:
 
 ```bash
 cd rep-counter-ai-main/backend
 python3 tools/production_smoke.py
 ```
 
-A passing smoke verifies the deployed API behavior, not the presence or value of the Groq secret. The deployment workflow checks that the production VPS is explicitly configured for `AI_PROVIDER=groq` and that a non-empty `GROQ_API_KEY` exists without printing it.
+GitHub Actions provides two production verification workflows:
 
-## Deployment notes
-
-Install/update the deployment files, then validate before reload:
-
-```bash
-sudo install -d -m 0755 /home/nduythanh/apps/repcoach-backend/static
-sudo cp static/privacy-policy.html /home/nduythanh/apps/repcoach-backend/static/privacy-policy.html
-sudo cp deploy/repcoach-ai.nginx /etc/nginx/sites-available/repcoach-ai
-sudo cp deploy/repcoach-rate-limit.conf /etc/nginx/conf.d/repcoach-rate-limit.conf
-sudo cp deploy/repcoach-ai.logrotate /etc/logrotate.d/repcoach-ai
-sudo nginx -t
-sudo logrotate -d /etc/logrotate.d/repcoach-ai
-sudo systemctl reload nginx
-sudo systemctl restart repcoach-backend
+```text
+.github/workflows/production-ops-check.yml
+.github/workflows/production-readiness.yml
 ```
 
-Before restarting, the production `.env` must contain:
+`production-ops-check.yml` is read-only: it checks safe provider configuration, service health, deployed application hashes and public read-only routes. `production-readiness.yml` is a manual live smoke that exercises the synthetic workout-feedback request.
+
+Before deployment, the production `.env` must contain:
 
 ```text
 AI_PROVIDER=groq
@@ -303,7 +304,7 @@ GROQ_MODEL=openai/gpt-oss-20b
 BIND_HOST=127.0.0.1
 ```
 
-After copying the policy, verify `GET /privacy-policy.html` over HTTPS returns 200 with a `text/html; charset=utf-8` content type. Do not deploy policy text without the matching runtime/provider configuration.
+Never print or copy the production API key into logs, screenshots, issues or repository files.
 
 ## Operations
 
