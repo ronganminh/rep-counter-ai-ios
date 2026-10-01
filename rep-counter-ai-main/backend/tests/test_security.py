@@ -53,20 +53,20 @@ class ApiSecurityTests(unittest.TestCase):
         cls.thread.join(timeout=2)
 
     def setUp(self):
-        self.old_key = os.environ.get("GEMINI_API_KEY")
-        self.old_mode = os.environ.get("GEMINI_SERVICE_MODE")
-        os.environ["GEMINI_API_KEY"] = "TEST_API_KEY_SENTINEL"
-        os.environ["GEMINI_SERVICE_MODE"] = "billing_enabled"
+        self.old_key = os.environ.get("GROQ_API_KEY")
+        self.old_mode = os.environ.get("AI_PROVIDER")
+        os.environ["GROQ_API_KEY"] = "TEST_API_KEY_SENTINEL"
+        os.environ["AI_PROVIDER"] = "groq"
 
     def tearDown(self):
         if self.old_key is None:
-            os.environ.pop("GEMINI_API_KEY", None)
+            os.environ.pop("GROQ_API_KEY", None)
         else:
-            os.environ["GEMINI_API_KEY"] = self.old_key
+            os.environ["GROQ_API_KEY"] = self.old_key
         if self.old_mode is None:
-            os.environ.pop("GEMINI_SERVICE_MODE", None)
+            os.environ.pop("AI_PROVIDER", None)
         else:
-            os.environ["GEMINI_SERVICE_MODE"] = self.old_mode
+            os.environ["AI_PROVIDER"] = self.old_mode
 
     def request(self, method="POST", body=None, headers=None):
         conn = http.client.HTTPConnection("127.0.0.1", self.port, timeout=3)
@@ -152,16 +152,16 @@ class ApiSecurityTests(unittest.TestCase):
         self.assertEqual((status, body), (502, {"error": "AI_RESPONSE_INVALID"}))
 
     def test_missing_key_does_not_expose_configuration(self):
-        os.environ.pop("GEMINI_API_KEY", None)
+        os.environ.pop("GROQ_API_KEY", None)
         status, _, body = self.request(body=valid_v2())
         self.assertEqual((status, body), (503, {"error": "AI_UNAVAILABLE"}))
-        self.assertNotIn("GEMINI_API_KEY", json.dumps(body))
+        self.assertNotIn("GROQ_API_KEY", json.dumps(body))
 
-    def test_missing_service_mode_does_not_expose_configuration(self):
-        os.environ.pop("GEMINI_SERVICE_MODE", None)
-        status, _, body = self.request(body=valid_v2())
-        self.assertEqual((status, body), (503, {"error": "AI_UNAVAILABLE"}))
-        self.assertNotIn("GEMINI_SERVICE_MODE", json.dumps(body))
+    def test_missing_provider_name_uses_groq_default(self):
+        os.environ.pop("AI_PROVIDER", None)
+        with patch.object(server, "generate_feedback", return_value="OK"):
+            status, _, body = self.request(body=valid_v2())
+        self.assertEqual((status, body), (200, {"schema_version": 1, "feedback": "OK"}))
 
     def test_malformed_json_is_invalid_request(self):
         status, _, body = self.request(body='{"reps":')
