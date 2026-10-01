@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../../placement.dart';
 import '../../../rep_counter.dart';
+import 'rep_feedback.dart';
 
 /// Presentation phases, not a replacement for the legacy rep/set state machine.
 /// Preparation/countdown never owns a second rep counter.
@@ -39,6 +40,7 @@ class WorkoutUiState {
     required this.calibrationSamples,
     required this.goalReachedOnce,
     required this.saveError,
+    this.repFeedback,
     this.countdown,
     this.sessionStarted = true,
     this.startRequested = false,
@@ -58,6 +60,7 @@ class WorkoutUiState {
   final int calibrationSamples;
   final bool goalReachedOnce;
   final String? saveError;
+  final RepFeedback? repFeedback;
   final int? countdown;
   final bool sessionStarted, startRequested;
 
