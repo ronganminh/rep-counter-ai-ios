@@ -1,4 +1,5 @@
 import '../domain/workout_summary.dart';
+import '../domain/workout_mode.dart';
 
 class WorkoutRecord {
   const WorkoutRecord({
@@ -13,10 +14,12 @@ class WorkoutRecord {
     required this.poseFrames,
     required this.readyFrames,
     required this.lostFrames,
+    WorkoutMode? mode,
+    this.challengeSeconds,
     this.aiFeedback,
     this.quality,
     this.repDetails,
-  });
+  }) : _mode = mode;
 
   /// Số liệu chất lượng lấy từ `WorkoutSummary`.
   ///
@@ -30,6 +33,8 @@ class WorkoutRecord {
     required int poseFrames,
     required int readyFrames,
     required int lostFrames,
+    WorkoutMode? mode,
+    int? challengeSeconds,
     String? aiFeedback,
   }) =>
       WorkoutRecord(
@@ -44,6 +49,8 @@ class WorkoutRecord {
         poseFrames: poseFrames,
         readyFrames: readyFrames,
         lostFrames: lostFrames,
+        mode: mode,
+        challengeSeconds: challengeSeconds,
         aiFeedback: aiFeedback,
         quality: WorkoutQuality.fromSummary(summary),
         repDetails: [
@@ -69,11 +76,27 @@ class WorkoutRecord {
   final int poseFrames;
   final int readyFrames;
   final int lostFrames;
+  final WorkoutMode? _mode;
+  final int? challengeSeconds;
   final String? aiFeedback;
   final WorkoutQuality? quality;
 
   /// Optional local-only timing detail; legacy records remain readable.
   final List<StoredRep>? repDetails;
+
+  /// Old records did not store a mode. Infer it from their existing goal fields
+  /// instead of rewriting history semantics.
+  WorkoutMode get mode => _mode ??
+      (challengeSeconds != null
+          ? WorkoutMode.timed
+          : targetReps != null
+              ? WorkoutMode.targetReps
+              : WorkoutMode.free);
+
+  bool get completedTimedChallenge =>
+      mode == WorkoutMode.timed &&
+      challengeSeconds != null &&
+      durationSeconds >= challengeSeconds!;
 
   bool get goalReached => targetReps != null && reps >= targetReps!;
   int get placementScore => poseFrames == 0
@@ -89,6 +112,8 @@ class WorkoutRecord {
         'reps': reps,
         'sets': sets,
         'target_reps': targetReps,
+        'mode': mode.name,
+        if (challengeSeconds != null) 'challenge_seconds': challengeSeconds,
         'pose_frames': poseFrames,
         'ready_frames': readyFrames,
         'lost_frames': lostFrames,
@@ -107,6 +132,8 @@ class WorkoutRecord {
         'reps': reps,
         'sets': sets,
         'target_reps': targetReps,
+        'mode': mode.name,
+        if (challengeSeconds != null) 'challenge_seconds': challengeSeconds,
         'goal_reached': goalReached,
         'placement_score': placementScore,
         'pose_frames': poseFrames,
@@ -129,27 +156,50 @@ class WorkoutRecord {
         poseFrames: poseFrames,
         readyFrames: readyFrames,
         lostFrames: lostFrames,
+        mode: mode,
+        challengeSeconds: challengeSeconds,
         aiFeedback: aiFeedback ?? this.aiFeedback,
         quality: quality,
         repDetails: repDetails,
       );
 
-  factory WorkoutRecord.fromJson(Map<String, dynamic> j) => WorkoutRecord(
-        id: j['id'] as String,
-        exerciseId: j['exercise_id'] as String,
-        exerciseName: j['exercise_name'] as String,
-        startedAt: DateTime.parse(j['started_at'] as String).toLocal(),
-        durationSeconds: j['duration_seconds'] as int,
-        reps: j['reps'] as int,
-        sets: j['sets'] as int,
-        targetReps: j['target_reps'] as int?,
-        poseFrames: j['pose_frames'] as int? ?? 0,
-        readyFrames: j['ready_frames'] as int? ?? 0,
-        lostFrames: j['lost_frames'] as int? ?? 0,
-        aiFeedback: j['ai_feedback'] as String?,
-        repDetails: _readRepDetails(j),
-        quality: _readQuality(j['quality']),
-      );
+  factory WorkoutRecord.fromJson(Map<String, dynamic> j) {
+    final target = (j['target_reps'] as num?)?.toInt();
+    final challenge = (j['challenge_seconds'] as num?)?.toInt();
+    return WorkoutRecord(
+      id: j['id'] as String,
+      exerciseId: j['exercise_id'] as String,
+      exerciseName: j['exercise_name'] as String,
+      startedAt: DateTime.parse(j['started_at'] as String).toLocal(),
+      durationSeconds: (j['duration_seconds'] as num).toInt(),
+      reps: (j['reps'] as num).toInt(),
+      sets: (j['sets'] as num).toInt(),
+      targetReps: target,
+      mode: _readMode(j['mode'], target, challenge),
+      challengeSeconds: challenge,
+      poseFrames: (j['pose_frames'] as num?)?.toInt() ?? 0,
+      readyFrames: (j['ready_frames'] as num?)?.toInt() ?? 0,
+      lostFrames: (j['lost_frames'] as num?)?.toInt() ?? 0,
+      aiFeedback: j['ai_feedback'] as String?,
+      repDetails: _readRepDetails(j),
+      quality: _readQuality(j['quality']),
+    );
+  }
+
+  static WorkoutMode? _readMode(
+    Object? value,
+    int? targetReps,
+    int? challengeSeconds,
+  ) {
+    if (value is String) {
+      for (final mode in WorkoutMode.values) {
+        if (mode.name == value) return mode;
+      }
+    }
+    if (challengeSeconds != null) return WorkoutMode.timed;
+    if (targetReps != null) return WorkoutMode.targetReps;
+    return null;
+  }
 
   static WorkoutQuality? _readQuality(Object? value) {
     try {
