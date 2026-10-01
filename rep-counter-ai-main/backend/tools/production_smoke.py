@@ -119,8 +119,9 @@ def check_tls(host: str, port: int) -> None:
         __import__("socket").create_connection((host, port), timeout=10),
         server_hostname=host,
     ) as sock:
+        # wrap_socket(..., server_hostname=host) performs certificate and
+        # hostname verification because the default context has check_hostname on.
         cert = sock.getpeercert()
-        ssl.match_hostname(cert, host)
         not_after = cert.get("notAfter")
     _assert(bool(not_after), "TLS certificate had no notAfter")
     print(f"PASS tls hostname={host} expires={not_after}")
