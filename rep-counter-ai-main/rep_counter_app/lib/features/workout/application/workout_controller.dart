@@ -9,8 +9,10 @@ import '../data/workout_record.dart';
 import '../domain/quality_thresholds.dart';
 import '../domain/rep_metric.dart';
 import '../domain/rep_quality_analyzer.dart';
+import '../domain/rep_tracker.dart';
 import '../domain/workout_aggregator.dart';
 import '../domain/workout_summary.dart';
+import 'rep_feedback.dart';
 import 'workout_ui_state.dart';
 
 /// Injectable monotonic time for lifecycle tests without a camera or timers.
@@ -41,6 +43,7 @@ class WorkoutController extends ChangeNotifier {
     required this.profile,
     this.targetReps,
     this.requireCountdown = true,
+    this.feedbackDuration = const Duration(milliseconds: 1600),
     WorkoutClock? trackingClock,
     WorkoutClock? clock,
     DateTime Function()? now,
@@ -59,10 +62,12 @@ class WorkoutController extends ChangeNotifier {
   final ExerciseProfile profile;
   final int? targetReps;
   final bool requireCountdown;
+  final Duration feedbackDuration;
   final WorkoutClock _trackingClock;
   bool _armed = false, _startRequested = false;
   Duration? _readySince, _lastReadyFrame;
   Timer? _countdownTimer;
+  Timer? _feedbackTimer;
   int? _countdown;
   final WorkoutClock _clock;
   final DateTime Function() _now;
@@ -80,6 +85,7 @@ class WorkoutController extends ChangeNotifier {
   PlacementStatus _placementStatus = PlacementStatus.noPose;
   String _placementMessage = '';
   String? _saveError;
+  RepFeedback? _repFeedback;
   WorkoutUiPhase? _terminalPhase;
   Future<WorkoutRecord>? _finishFuture;
 
@@ -122,6 +128,7 @@ class WorkoutController extends ChangeNotifier {
         calibrationSamples: _calibrationSamples,
         goalReachedOnce: _goalReachedOnce,
         saveError: _saveError,
+        repFeedback: _repFeedback,
         countdown: _countdown,
         sessionStarted: _armed,
         startRequested: _startRequested,
@@ -153,6 +160,7 @@ class WorkoutController extends ChangeNotifier {
     _clock.stop();
     _paused = true;
     _placementReady = false;
+    _clearRepFeedback();
     _emit();
   }
 
@@ -177,19 +185,59 @@ class WorkoutController extends ChangeNotifier {
   /// Returns true once when the existing session count reaches the goal.
   bool acceptRep(RepObservation observation, Duration at) {
     if (!acceptsReps) return false;
+    final flags = _analyzer.analyze(observation);
     _reps.add(RepMetric(
       index: _reps.length + 1,
       setIndex: 1,
       observation: observation,
-      flags: _analyzer.analyze(observation),
+      flags: flags,
     ));
     _session.onRep(at);
+    _replaceRepFeedback(
+        feedbackForCompletedRep(_session.totalReps, flags));
     final reached = targetReps != null &&
         _session.totalReps >= targetReps! &&
         !_goalReachedOnce;
     if (reached) _goalReachedOnce = true;
     _emit();
     return reached;
+  }
+
+  /// Presentation-only event from the existing tracker. It never changes the
+  /// accepted session total.
+  void reportRepAborted(RepAbortReason reason) {
+    if (!acceptsReps) return;
+    final feedback = feedbackForAbortedRep(reason);
+    if (feedback == null) return;
+    _replaceRepFeedback(feedback);
+    _emit();
+  }
+
+  /// Clears a persistent placement/pose interruption once a countable signal is
+  /// available again. Counted feedback expires independently on its timer.
+  void repSignalRestored() {
+    if (_repFeedback?.persistsUntilResolved != true) return;
+    _clearRepFeedback();
+    _emit();
+  }
+
+  void _replaceRepFeedback(RepFeedback feedback) {
+    _feedbackTimer?.cancel();
+    _feedbackTimer = null;
+    _repFeedback = feedback;
+    if (feedback.persistsUntilResolved) return;
+    _feedbackTimer = Timer(feedbackDuration, () {
+      if (_disposed || !identical(_repFeedback, feedback)) return;
+      _repFeedback = null;
+      _feedbackTimer = null;
+      _emit();
+    });
+  }
+
+  void _clearRepFeedback() {
+    _feedbackTimer?.cancel();
+    _feedbackTimer = null;
+    _repFeedback = null;
   }
 
   /// Called once per successfully processed camera frame, including no-pose.
@@ -278,6 +326,7 @@ class WorkoutController extends ChangeNotifier {
     _finishFuture = completer.future;
     final resumeOnFailure = _clock.isRunning;
     _cancelCountdown();
+    _clearRepFeedback();
     _clock.stop();
     _terminalPhase = WorkoutUiPhase.ending;
     _saveError = null;
@@ -329,6 +378,7 @@ class WorkoutController extends ChangeNotifier {
   void abort() {
     if (_disposed || _terminalPhase != null) return;
     _cancelCountdown();
+    _clearRepFeedback();
     _trackingClock.stop();
     _clock.stop();
     _terminalPhase = WorkoutUiPhase.aborted;
@@ -339,6 +389,7 @@ class WorkoutController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _cancelCountdown();
+    _clearRepFeedback();
     _trackingClock.stop();
     _clock.stop();
     super.dispose();
