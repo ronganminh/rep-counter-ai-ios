@@ -6,7 +6,7 @@ The authoritative backend deployment and rollback procedure is:
 
     ../backend/docs/production-release.md
 
-Use that runbook for App Store backend readiness, provider/billing gates, Nginx/systemd deployment, production smoke testing and rollback.
+Use that runbook for App Store backend readiness, Groq provider preflight, Nginx/systemd deployment, production smoke testing and rollback.
 
 ## Canonical production origin
 
@@ -91,9 +91,13 @@ Then use the returned request ID to verify safe logs on the VPS as documented in
 
 ## Provider gate
 
-Production AI must not be enabled merely because GEMINI_SERVICE_MODE says billing_enabled.
+Current production provider configuration is:
 
-An admin must independently verify the exact production project is on a Paid Tier in Google AI Studio and confirm the current provider terms fit the intended product audience/use case. If that cannot be established, leave AI unavailable; core workouts remain local-first.
+    AI_PROVIDER=groq
+    GROQ_MODEL=openai/gpt-oss-20b
+    GROQ_API_KEY=<server secret>
+
+The Groq API key stays only in the production VPS environment file. The deploy preflight verifies that the key is present without printing it. Provider data/terms notes are recorded in backend/docs/groq-provider.md. Core workouts remain local-first if the optional AI provider is unavailable.
 
 ## Store URLs
 
