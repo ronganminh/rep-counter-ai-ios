@@ -6,6 +6,7 @@ import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_typography.dart';
 import '../../../../widgets/product_ui.dart';
 import '../../application/workout_ui_state.dart';
+import 'rep_feedback_pill.dart';
 
 String workoutTime(Duration time) =>
     '${(time.inSeconds ~/ 60).toString().padLeft(2, '0')}:${(time.inSeconds % 60).toString().padLeft(2, '0')}';
@@ -234,6 +235,14 @@ class WorkoutHud extends StatelessWidget {
                                           '${(state.goal! - state.reps).clamp(0, state.goal!)} remaining'),
                               style: const TextStyle(
                                   fontSize: 18, color: AppColors.text2)),
+                        ],
+                        if (!paused &&
+                            !positioning &&
+                            !state.isCalibrating &&
+                            state.countdown == null) ...[
+                          const SizedBox(height: 18),
+                          RepFeedbackTransition(
+                              feedback: state.repFeedback),
                         ],
                         const SizedBox(height: 20),
                         if (paused) ...[
