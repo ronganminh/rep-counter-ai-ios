@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
-"""Read-only Groq response-shape diagnostic using synthetic data only."""
+"""Read-only Groq access/response diagnostic using synthetic data only."""
 from __future__ import annotations
 
+import http.client
 import json
-import urllib.error
-import urllib.request
 from pathlib import Path
 
 ENV_PATH = Path("/home/nduythanh/apps/repcoach-backend/.env")
+TARGET_MODEL = "openai/gpt-oss-20b"
 
 
 def load_env() -> dict[str, str]:
@@ -21,97 +21,111 @@ def load_env() -> dict[str, str]:
     return values
 
 
+def request_json(
+    method: str,
+    path: str,
+    key: str,
+    *,
+    payload: dict | None = None,
+) -> tuple[int, bytes]:
+    body = None if payload is None else json.dumps(payload).encode("utf-8")
+    headers = {"authorization": "Bearer " + key}
+    if body is not None:
+        headers["content-type"] = "application/json"
+
+    conn = http.client.HTTPSConnection("api.groq.com", timeout=20)
+    try:
+        conn.request(method, path, body=body, headers=headers)
+        response = conn.getresponse()
+        return response.status, response.read()
+    finally:
+        conn.close()
+
+
 def main() -> None:
     env = load_env()
     key = env.get("GROQ_API_KEY", "")
-    model = env.get("GROQ_MODEL", "openai/gpt-oss-20b")
+    model = env.get("GROQ_MODEL", TARGET_MODEL)
     if not key:
         print("GROQ_API_KEY=MISSING")
         return
+
+    try:
+        status, raw = request_json("GET", "/openai/v1/models", key)
+    except Exception as error:
+        print(f"MODELS_NETWORK_ERROR={type(error).__name__}")
+        return
+
+    print(f"MODELS_STATUS={status}")
+    model_visible = False
+    if 200 <= status < 300:
+        try:
+            data = json.loads(raw.decode("utf-8"))
+            models = data.get("data")
+            if isinstance(models, list):
+                model_visible = any(
+                    isinstance(item, dict) and item.get("id") == model
+                    for item in models
+                )
+        except Exception:
+            pass
+    print(f"TARGET_MODEL_VISIBLE={'YES' if model_visible else 'NO'}")
 
     payload = {
         "model": model,
         "messages": [
             {
-                "role": "system",
+                "role": "user",
                 "content": (
                     "Return two short English sentences of general workout "
-                    "feedback. No medical advice."
+                    "feedback for a synthetic push-up set: 20 reps, 2 sets, "
+                    "quality score 88. No medical advice."
                 ),
-            },
-            {
-                "role": "user",
-                "content": json.dumps(
-                    {
-                        "exercise": "push_up",
-                        "duration_seconds": 120,
-                        "reps": 20,
-                        "sets": 2,
-                        "quality_score": 88,
-                        "has_enough_data": True,
-                    }
-                ),
-            },
+            }
         ],
-        "temperature": 0.4,
-        "max_tokens": 220,
+        "temperature": 0.6,
+        "max_completion_tokens": 512,
+        "reasoning_effort": "low",
+        "include_reasoning": False,
     }
-    request = urllib.request.Request(
-        "https://api.groq.com/openai/v1/chat/completions",
-        data=json.dumps(payload).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {key}",
-            "Content-Type": "application/json",
-        },
-        method="POST",
-    )
 
     try:
-        with urllib.request.urlopen(request, timeout=20) as response:
-            raw = response.read()
-            status = response.status
-    except urllib.error.HTTPError as error:
-        raw = error.read()
-        status = error.code
+        status, raw = request_json(
+            "POST",
+            "/openai/v1/chat/completions",
+            key,
+            payload=payload,
+        )
     except Exception as error:
-        print(f"GROQ_NETWORK_ERROR={type(error).__name__}")
+        print(f"CHAT_NETWORK_ERROR={type(error).__name__}")
         return
 
-    print(f"GROQ_STATUS={status}")
-    print(f"RAW_BYTES={len(raw)}")
+    print(f"CHAT_STATUS={status}")
+    print(f"CHAT_BYTES={len(raw)}")
+    if not 200 <= status < 300:
+        return
+
     try:
         data = json.loads(raw.decode("utf-8"))
     except Exception as error:
-        print(f"JSON_PARSE=FAIL:{type(error).__name__}")
+        print(f"CHAT_JSON_PARSE=FAIL:{type(error).__name__}")
         return
 
-    print("TOP_KEYS=" + ",".join(sorted(data.keys())))
     choices = data.get("choices")
     print(f"CHOICES_TYPE={type(choices).__name__}")
     print(f"CHOICES_LEN={len(choices) if isinstance(choices, list) else -1}")
-
-    if isinstance(choices, list) and choices:
+    if isinstance(choices, list) and choices and isinstance(choices[0], dict):
         choice = choices[0]
-        if isinstance(choice, dict):
-            print("CHOICE_KEYS=" + ",".join(sorted(choice.keys())))
-            print(f"FINISH_REASON={choice.get('finish_reason')}")
-            message = choice.get("message")
-            print(f"MESSAGE_TYPE={type(message).__name__}")
-            if isinstance(message, dict):
-                print("MESSAGE_KEYS=" + ",".join(sorted(message.keys())))
-                content = message.get("content")
-                reasoning = message.get("reasoning")
-                print(f"CONTENT_TYPE={type(content).__name__}")
-                print(f"CONTENT_LEN={len(content) if isinstance(content, str) else -1}")
-                print(f"REASONING_TYPE={type(reasoning).__name__}")
-                print(
-                    f"REASONING_LEN={len(reasoning) if isinstance(reasoning, str) else -1}"
-                )
-
-    error = data.get("error")
-    if isinstance(error, dict):
-        print(f"ERROR_TYPE={error.get('type')}")
-        print(f"ERROR_CODE={error.get('code')}")
+        print(f"FINISH_REASON={choice.get('finish_reason')}")
+        message = choice.get("message")
+        print(f"MESSAGE_TYPE={type(message).__name__}")
+        if isinstance(message, dict):
+            content = message.get("content")
+            reasoning = message.get("reasoning")
+            print(f"CONTENT_TYPE={type(content).__name__}")
+            print(f"CONTENT_LEN={len(content) if isinstance(content, str) else -1}")
+            print(f"REASONING_TYPE={type(reasoning).__name__}")
+            print(f"REASONING_LEN={len(reasoning) if isinstance(reasoning, str) else -1}")
 
 
 if __name__ == "__main__":
