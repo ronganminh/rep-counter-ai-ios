@@ -107,7 +107,8 @@ class PrivacyContractTests(unittest.TestCase):
         self.assertNotIn("Gemini-backed AI", CONSENT)
 
     def test_automatic_consent_key_is_versioned(self):
-        self.assertIn("automatic_ai_consent_2026_10_01", PREFS)
+        self.assertIn("automatic_ai_consent_2026_10_01_groq", PREFS)
+        self.assertNotIn("automatic_ai_consent_2026_10_01';", PREFS)
         self.assertNotIn("automatic_ai_consent_v1", PREFS)
 
     def test_no_stale_android_only_instructions(self):
