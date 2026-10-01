@@ -148,6 +148,11 @@ class ProductionReleaseTests(unittest.TestCase):
             self.assertIn(marker, ROLLBACK)
         self.assertIn("sudo rm -f /etc/nginx/conf.d/repcoach-rate-limit.conf", APPLY)
         self.assertIn("sudo rm -f /etc/logrotate.d/repcoach-ai", APPLY)
+        self.assertIn('sudo cp -a "$backup/app/server.py" "$app_dir/server.py"', APPLY)
+        self.assertIn('sudo cp -a "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"', APPLY)
+        self.assertIn('sudo cp -a "$backup/app/static" "$app_dir/static"', APPLY)
+        self.assertIn('sudo cp -a "$backup/app/server.py" "$app_dir/server.py"', ROLLBACK)
+        self.assertIn('sudo cp -a "$backup/app/static" "$app_dir/static"', ROLLBACK)
 
     def test_runbook_documents_transactional_backup(self):
         self.assertIn("/var/backups/repcoach-b7/<UTC timestamp>", RUNBOOK)
