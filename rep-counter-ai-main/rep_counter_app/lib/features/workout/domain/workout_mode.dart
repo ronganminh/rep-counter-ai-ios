@@ -16,32 +16,27 @@ class TimedChallengeConfig {
 
 @immutable
 class WorkoutStartConfig {
-  const WorkoutStartConfig._({
-    required this.mode,
-    this.targetReps,
-    this.timedChallenge,
-    this.previousBestReps,
-  });
-
   const WorkoutStartConfig.free()
-      : this._(mode: WorkoutMode.free);
+      : mode = WorkoutMode.free,
+        targetReps = null,
+        timedChallenge = null,
+        previousBestReps = null;
 
   const WorkoutStartConfig.target(int reps)
       : assert(reps > 0),
-        this._(
-          mode: WorkoutMode.targetReps,
-          targetReps: reps,
-        );
+        mode = WorkoutMode.targetReps,
+        targetReps = reps,
+        timedChallenge = null,
+        previousBestReps = null;
 
   const WorkoutStartConfig.timed(
     int seconds, {
     int? previousBestReps,
   })  : assert(seconds > 0),
-        this._(
-          mode: WorkoutMode.timed,
-          timedChallenge: TimedChallengeConfig(durationSeconds: seconds),
-          previousBestReps: previousBestReps,
-        );
+        mode = WorkoutMode.timed,
+        targetReps = null,
+        timedChallenge = TimedChallengeConfig(durationSeconds: seconds),
+        previousBestReps = previousBestReps;
 
   final WorkoutMode mode;
   final int? targetReps;
