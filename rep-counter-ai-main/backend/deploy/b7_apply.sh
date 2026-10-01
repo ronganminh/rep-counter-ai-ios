@@ -14,9 +14,9 @@ if [[ ! -f "$app_dir/.env" ]]; then
 fi
 
 # Safe configuration assertions: never print secret values.
-grep -qx 'AI_PROVIDER=gemini' "$app_dir/.env"
-grep -q '^GEMINI_API_KEY=.' "$app_dir/.env"
-grep -qx 'GEMINI_SERVICE_MODE=billing_enabled' "$app_dir/.env"
+grep -qx 'AI_PROVIDER=groq' "$app_dir/.env"
+grep -q '^GROQ_API_KEY=.' "$app_dir/.env"
+grep -qx 'GROQ_MODEL=openai/gpt-oss-20b' "$app_dir/.env"
 grep -qx 'BIND_HOST=127.0.0.1' "$app_dir/.env"
 
 # Deployment must be non-interactive. Do not pass sudo passwords through CI.
