@@ -2,7 +2,7 @@ name: RepCoach CI
 
 on:
   push:
-    branches: [main, master]
+    branches: [main, master, feature/vnext-a2-transparent-form-score]
     paths:
       - "rep-counter-ai-main/rep_counter_app/**"
       - ".github/workflows/ios-ci.yml"
