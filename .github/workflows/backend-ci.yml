@@ -1,0 +1,49 @@
+name: RepCoach Backend CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "rep-counter-ai-main/backend/**"
+      - "rep-counter-ai-main/contracts/**"
+      - ".github/workflows/backend-ci.yml"
+  pull_request:
+    paths:
+      - "rep-counter-ai-main/backend/**"
+      - "rep-counter-ai-main/contracts/**"
+      - ".github/workflows/backend-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repcoach-backend-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  backend-tests:
+    name: Backend contract and privacy tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/backend
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Show Python version
+        run: python --version
+
+      - name: Compile backend
+        run: python -m compileall -q server.py ai_provider.py tests tools
+
+      - name: Run backend tests
+        run: python -m unittest discover -s tests -v

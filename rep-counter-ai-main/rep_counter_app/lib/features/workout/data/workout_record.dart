@@ -99,8 +99,9 @@ class WorkoutRecord {
         if (repDetails != null) 'rep_details_version': 2,
       };
 
+  /// Aggregate workout fields only. API contract metadata such as
+  /// schema_version/consent_version is owned by AiFeedbackService.
   Map<String, dynamic> toAiPayload() => {
-        'schema_version': 1,
         'exercise': exerciseId,
         'duration_seconds': durationSeconds,
         'reps': reps,

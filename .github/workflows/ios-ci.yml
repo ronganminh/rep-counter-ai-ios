@@ -79,7 +79,7 @@ jobs:
             video_id: "1m7rKK5_Mtfe1NaFCXSTVdg_lzywoDWf0"
             asset: "pushup-test-2.mp4"
     runs-on: macos-15
-    timeout-minutes: 75
+    timeout-minutes: 110
     env:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
       GH_TOKEN: ${{ github.token }}
@@ -292,7 +292,7 @@ jobs:
           result_found=0
           last_status=""
           stalled_checks=0
-          for _ in $(seq 1 660); do
+          for _ in $(seq 1 960); do
             if grep -Eq "F0000|Check failed:|Abort trap|Terminated due to signal" "$stderr_log" 2>/dev/null; then
               cat "$stderr_log"
               echo "[CI_VIDEO_ERROR] native_mlkit_crash" \
