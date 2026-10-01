@@ -89,6 +89,9 @@ class ProductionReleaseTests(unittest.TestCase):
         ):
             self.assertIn(value, NGINX)
         self.assertIn("rate=10r/m", RATE)
+        privacy_block = NGINX.split("location = /privacy-policy.html", 1)[1].split("}", 1)[0]
+        self.assertIn("proxy_pass http://127.0.0.1:8787;", privacy_block)
+        self.assertNotIn("alias ", privacy_block)
         self.assertIn("rotate 14", ROTATE)
         self.assertIn("WorkingDirectory=/home/nduythanh/apps/repcoach-backend", SERVICE)
         self.assertIn(
