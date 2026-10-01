@@ -20,6 +20,18 @@ class DeployConfigTests(unittest.TestCase):
         self.assertIn("default_type text/html;", NGINX)
         self.assertIn("charset utf-8;", NGINX)
 
+    def test_health_and_readiness_are_proxied_with_request_ids(self):
+        self.assertIn("location = /health", NGINX)
+        self.assertIn("location = /ready", NGINX)
+        self.assertGreaterEqual(
+            NGINX.count("proxy_set_header X-Request-ID $request_id;"), 3
+        )
+
+    def test_nginx_generated_api_errors_return_request_id(self):
+        self.assertGreaterEqual(
+            NGINX.count("add_header X-Request-ID $request_id always;"), 3
+        )
+
     def test_rate_limit_has_json_429_and_retry_after(self):
         self.assertIn("limit_req_status 429;", NGINX)
         self.assertIn("return 429 '{\"error\":\"RATE_LIMITED\"}';", NGINX)
@@ -36,6 +48,7 @@ class DeployConfigTests(unittest.TestCase):
 
     def test_access_log_format_is_metadata_only(self):
         self.assertIn("log_format repcoach_meta", RATE)
+        self.assertIn("request_id=$request_id", RATE)
         forbidden = (
             "$request_body",
             "$http_authorization",

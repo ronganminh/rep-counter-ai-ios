@@ -4,8 +4,37 @@ This service accepts a small JSON workout summary and forwards a constrained pro
 
 ## Production endpoint
 
-- Health: `https://repcoach-ai.duckdns.org/health`
+- Health: `GET https://repcoach-ai.duckdns.org/health`
+- Readiness: `GET https://repcoach-ai.duckdns.org/ready`
 - Feedback: `POST https://repcoach-ai.duckdns.org/v1/workout-feedback`
+
+## Health, readiness and request IDs
+
+`GET /health` is a process-liveness check only:
+
+```json
+{"status":"ok"}
+```
+
+It does not resolve provider configuration and never calls Gemini.
+
+`GET /ready` validates that the required provider configuration can be constructed locally:
+
+```json
+{"status":"ready"}
+```
+
+or, without exposing which secret/config value is missing:
+
+```json
+{"status":"not_ready"}
+```
+
+Readiness does not call Gemini or consume provider quota.
+
+Every backend JSON response includes `X-Request-ID`. Nginx generates a random request ID and forwards it to the backend; direct backend requests receive a server-generated random ID. Only bounded 32-character hexadecimal IDs are accepted from an upstream proxy, so arbitrary client tracking strings are not propagated. The same ID is present in structured backend logs for one-request debugging.
+
+The mobile API does not enable browser CORS. `OPTIONS /v1/workout-feedback` is rejected like other unsupported methods; mobile Flutter requests do not require CORS.
 
 ## AI provider boundary
 
@@ -149,18 +178,21 @@ Application logs contain operational metadata only:
 
 ```text
 timestamp
+request_id
 route
 method
 status
-latency_ms
+duration_ms
 coarse request_size bucket
 error_code when present
 provider_status_class when present
 ```
 
+The random request ID exists only to correlate one request through proxy/backend diagnostics and is not a user identifier.
+
 Application logs never contain the workout body, AI prompt, AI response text, API key, secret headers, or stack traces.
 
-Nginx uses the `repcoach_meta` format and records only IP address plus request metadata required for operations/rate limiting: timestamp, method, URI path, status, response bytes, and request duration. It does not log request bodies, authorization headers, referrer, or user-agent in the RepCoach access log.
+Nginx uses the `repcoach_meta` format and records only IP address plus request metadata required for operations/rate limiting: timestamp, random request ID, method, URI path, status, response bytes, and request duration. It does not log request bodies, authorization headers, referrer, or user-agent in the RepCoach access log.
 
 The provided `deploy/repcoach-ai.logrotate` rotates RepCoach Nginx access/error logs daily and keeps 14 rotations with compression. Backend structured metadata is emitted to the host system journal; its retention remains controlled by VPS journal settings.
 
@@ -207,7 +239,17 @@ cd rep-counter-ai-main/backend
 python3 -m unittest discover -s tests -v
 ```
 
-Coverage includes contract validation, request-size rejection, method rejection, timeout/error mapping, provider adapter swapping, required service-mode guards, prompt minimization, empty/invalid/overlong provider responses, no-content logging checks, and deploy configuration checks.
+Coverage includes contract validation, legacy-schema compatibility, malformed/unknown-field rejection, request-size and method rejection, health/readiness behavior, request-ID propagation, no-CORS behavior, timeout/error mapping, provider adapter swapping, required service-mode guards, prompt minimization, empty/invalid/overlong provider responses, no-content logging checks, privacy contract checks, and deploy configuration checks.
+
+## Backend CI
+
+Backend tests run in a dedicated GitHub Actions workflow, separate from expensive iOS video replay:
+
+```text
+.github/workflows/backend-ci.yml
+```
+
+The workflow runs Python compile checks and the complete standard-library unittest suite for backend changes. It does not inject a Gemini API key and does not make live Gemini requests.
 
 For an Nginx deployment, validate syntax before reload:
 

@@ -112,8 +112,8 @@
 
     <h3>5. RepCoach AI backend</h3>
     <p>The backend validates a strict allowlist, creates a minimized text prompt and sends that prompt to the configured AI provider. The application backend does not intentionally store workout request bodies, prompts or AI response text as server-side workout history.</p>
-    <p>Application logs contain operational metadata only, such as timestamp, route, HTTP method, status, latency, a coarse request-size bucket, error code and provider status class. They do not contain the workout body, prompt, AI response text or API key.</p>
-    <p>The reverse proxy processes network/operational metadata needed for HTTPS delivery, reliability, security and rate limiting. The dedicated RepCoach access log is configured to contain source IP address, timestamp, request method and URI path, HTTP status, response bytes and request duration. It is not configured to log request bodies, authorization headers, referrer or user-agent.</p>
+    <p>Application logs contain operational metadata only, such as timestamp, a random per-request request ID, route, HTTP method, status, duration, a coarse request-size bucket, error code and provider status class. The request ID is for debugging one request and is not used as a user identifier. They do not contain the workout body, prompt, AI response text or API key.</p>
+    <p>The reverse proxy processes network/operational metadata needed for HTTPS delivery, reliability, security and rate limiting. The dedicated RepCoach access log is configured to contain source IP address, timestamp, a random request ID, request method and URI path, HTTP status, response bytes and request duration. It is not configured to log request bodies, authorization headers, referrer or user-agent.</p>
 
     <h3>6. Server-log retention</h3>
     <p>RepCoach Nginx access/error logs are configured to rotate daily, keeping the current log plus 14 rotated files; older rotations are removed by log rotation. The Python backend writes its metadata-only operational events to the host system journal. Journal retention is controlled by VPS administration settings and is not assigned a separate fixed duration by the app repository.</p>
@@ -184,8 +184,8 @@
 
     <h3>5. Backend RepCoach AI</h3>
     <p>Backend kiểm tra allowlist nghiêm ngặt, tạo prompt văn bản tối giản rồi gửi prompt đó đến nhà cung cấp AI đã cấu hình. Backend ứng dụng không chủ ý lưu request body buổi tập, prompt hoặc nội dung phản hồi AI thành lịch sử tập phía máy chủ.</p>
-    <p>Log ứng dụng chỉ chứa metadata vận hành như thời điểm, route, HTTP method, status, độ trễ, nhóm kích thước request, mã lỗi và nhóm trạng thái provider. Log không chứa workout body, prompt, nội dung phản hồi AI hoặc API key.</p>
-    <p>Reverse proxy xử lý metadata mạng/vận hành cần cho HTTPS, ổn định, bảo mật và rate limit. Access log riêng của RepCoach được cấu hình chứa địa chỉ IP nguồn, thời điểm, method và đường dẫn URI, HTTP status, số byte phản hồi và thời gian xử lý request. Log này không được cấu hình để ghi request body, header Authorization, referrer hoặc user-agent.</p>
+    <p>Log ứng dụng chỉ chứa metadata vận hành như thời điểm, request ID ngẫu nhiên cho từng request, route, HTTP method, status, thời lượng, nhóm kích thước request, mã lỗi và nhóm trạng thái provider. Request ID chỉ dùng để debug một request, không dùng làm định danh người dùng. Log không chứa workout body, prompt, nội dung phản hồi AI hoặc API key.</p>
+    <p>Reverse proxy xử lý metadata mạng/vận hành cần cho HTTPS, ổn định, bảo mật và rate limit. Access log riêng của RepCoach được cấu hình chứa địa chỉ IP nguồn, thời điểm, request ID ngẫu nhiên, method và đường dẫn URI, HTTP status, số byte phản hồi và thời gian xử lý request. Log này không được cấu hình để ghi request body, header Authorization, referrer hoặc user-agent.</p>
 
     <h3>6. Thời gian lưu log máy chủ</h3>
     <p>Access/error log Nginx của RepCoach được cấu hình xoay vòng mỗi ngày, giữ log hiện tại cộng 14 file đã xoay vòng; bản cũ hơn bị xóa theo cấu hình logrotate. Backend Python ghi sự kiện vận hành chỉ-metadata vào system journal của máy chủ. Thời gian giữ journal do cấu hình quản trị VPS quyết định và repo ứng dụng hiện không đặt một thời hạn riêng cố định cho journal.</p>
