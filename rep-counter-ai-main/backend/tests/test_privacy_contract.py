@@ -73,6 +73,9 @@ class PrivacyContractTests(unittest.TestCase):
 
     def test_policy_discloses_server_metadata_and_retention(self):
         self.assertIn("source IP address", POLICY)
+        self.assertIn("random per-request request ID", POLICY)
+        self.assertIn("not used as a user identifier", POLICY)
+        self.assertIn("request ID ngẫu nhiên", POLICY)
         self.assertIn("14 rotated files", POLICY)
         self.assertIn("system journal", POLICY)
         self.assertIn("địa chỉ IP nguồn", POLICY)
