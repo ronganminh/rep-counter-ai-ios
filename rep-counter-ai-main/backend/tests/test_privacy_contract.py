@@ -62,8 +62,11 @@ class PrivacyContractTests(unittest.TestCase):
             "https://repcoach-ai.duckdns.org/privacy-policy.html", LEGAL
         )
         self.assertIn("location = /privacy-policy.html", NGINX)
-        self.assertIn("default_type text/html;", NGINX)
-        self.assertIn("charset utf-8;", NGINX)
+        privacy_block = NGINX.split(
+            "location = /privacy-policy.html", 1
+        )[1].split("}", 1)[0]
+        self.assertIn("proxy_pass http://127.0.0.1:8787;", privacy_block)
+        self.assertNotIn("alias ", privacy_block)
 
     def test_groq_is_current_provider_policy(self):
         self.assertIn('provider_name = os.getenv("AI_PROVIDER", "groq")', PROVIDER)
