@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Synthetic production smoke checks for the RepCoach public backend.
 
-This script never reads a provider API key. It sends only the shared synthetic
-workout fixture and validates public behavior expected after a B7 deployment.
+This script never reads a provider API key. It sends only synthetic workout
+fixtures and validates the public production contract, including the current
+consent gate.
 """
 from __future__ import annotations
 
@@ -197,6 +198,58 @@ def check_body_limit(host: str, port: int) -> None:
     print("PASS body_limit")
 
 
+def check_consent_gate(host: str, port: int, fixture_path: Path) -> None:
+    fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+    _assert(fixture.get("schema_version") == 2, "fixture must use schema v2")
+    _assert(
+        fixture.get("consent_version") == "2026-10-01-groq",
+        "fixture consent version drift",
+    )
+
+    variants = []
+
+    legacy_v1 = dict(fixture)
+    legacy_v1["schema_version"] = 1
+    legacy_v1.pop("consent_version", None)
+    variants.append(("legacy_v1", legacy_v1))
+
+    unversioned = dict(fixture)
+    unversioned.pop("schema_version", None)
+    variants.append(("unversioned", unversioned))
+
+    stale_consent = dict(fixture)
+    stale_consent["consent_version"] = "2026-09-30-gemini"
+    variants.append(("stale_consent", stale_consent))
+
+    missing_consent = dict(fixture)
+    missing_consent.pop("consent_version", None)
+    variants.append(("missing_consent", missing_consent))
+
+    for name, payload in variants:
+        body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+        status, headers, raw, _ = _request(
+            host,
+            port,
+            "POST",
+            "/v1/workout-feedback",
+            body=body,
+            headers={"content-type": "application/json"},
+            timeout=10,
+        )
+        _scan_for_secret_leak(raw, headers)
+        _assert(
+            status == 400,
+            f"{name} consent gate returned {status}: {raw[:300]!r}",
+        )
+        _assert(
+            _decode_json(raw) == {"error": "INVALID_REQUEST"},
+            f"{name} consent gate returned unexpected body",
+        )
+        _check_https_headers(headers)
+        _check_request_id(headers)
+        print(f"PASS consent_gate variant={name}")
+
+
 def check_feedback(host: str, port: int, fixture_path: Path) -> str:
     fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
     _assert(fixture.get("schema_version") == 2, "fixture must use schema v2")
@@ -265,6 +318,10 @@ def main() -> int:
         ("privacy", lambda: check_privacy(host, port)),
         ("method_guard", lambda: check_method_guard(host, port)),
         ("body_limit", lambda: check_body_limit(host, port)),
+        (
+            "consent_gate",
+            lambda: check_consent_gate(host, port, fixture_path),
+        ),
     )
 
     for name, check in checks:
