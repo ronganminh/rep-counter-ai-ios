@@ -132,8 +132,8 @@ class WorkoutRecord {
         'reps': reps,
         'sets': sets,
         'target_reps': targetReps,
-        'mode': mode.name,
-        if (challengeSeconds != null) 'challenge_seconds': challengeSeconds,
+        // Workout mode/challenge metadata is local product state. Keep the
+        // shared AI contract v2 unchanged until backend support is versioned.
         'goal_reached': goalReached,
         'placement_score': placementScore,
         'pose_frames': poseFrames,
