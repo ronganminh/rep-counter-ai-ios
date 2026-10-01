@@ -954,7 +954,7 @@ class _ProgressEmptyState extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 170),
+          const SizedBox(height: 32),
           SizedBox(
             width: double.infinity,
             child: FilledButton(
