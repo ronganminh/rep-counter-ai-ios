@@ -314,7 +314,7 @@ class WorkoutController extends ChangeNotifier {
     _routineRestUntil =
         frameTime + Duration(seconds: config.restSeconds);
     _routineRestTimer = Timer.periodic(
-      const Duration(milliseconds: 250),
+      const Duration(seconds: 1),
       (_) {
         if (_disposed || _terminalPhase != null) {
           _cancelRoutineRest();
