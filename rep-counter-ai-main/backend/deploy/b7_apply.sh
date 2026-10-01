@@ -44,16 +44,42 @@ rollback_local() {
   if [[ "$completed" -eq 0 && "$backup_ready" -eq 1 ]]; then
     echo "Deploy failed; restoring pre-deploy backup" >&2
     sudo systemctl stop repcoach-backend || true
-    [[ -f "$backup/app/server.py" ]] && install -m 0644 "$backup/app/server.py" "$app_dir/server.py"
-    [[ -f "$backup/app/ai_provider.py" ]] && install -m 0644 "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"
-    if sudo test -d "$backup/app/static"; then
+    if sudo test -f "$backup/app/server.py.present"; then
+      install -m 0644 "$backup/app/server.py" "$app_dir/server.py"
+    elif sudo test -f "$backup/app/server.py.absent"; then
+      rm -f "$app_dir/server.py"
+    fi
+    if sudo test -f "$backup/app/ai_provider.py.present"; then
+      install -m 0644 "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"
+    elif sudo test -f "$backup/app/ai_provider.py.absent"; then
+      rm -f "$app_dir/ai_provider.py"
+    fi
+    if sudo test -f "$backup/app/static.present"; then
       rm -rf "$app_dir/static"
       cp -a "$backup/app/static" "$app_dir/static"
+    elif sudo test -f "$backup/app/static.absent"; then
+      rm -rf "$app_dir/static"
     fi
-    sudo test -f "$backup/system/repcoach-backend.service" && sudo cp -a "$backup/system/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service || true
-    sudo test -f "$backup/system/nginx-site" && sudo cp -a "$backup/system/nginx-site" /etc/nginx/sites-available/repcoach-ai || true
-    sudo test -f "$backup/system/rate-limit.conf" && sudo cp -a "$backup/system/rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf || true
-    sudo test -f "$backup/system/logrotate" && sudo cp -a "$backup/system/logrotate" /etc/logrotate.d/repcoach-ai || true
+    if sudo test -f "$backup/system/repcoach-backend.service.present"; then
+      sudo cp -a "$backup/system/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service
+    elif sudo test -f "$backup/system/repcoach-backend.service.absent"; then
+      sudo rm -f /etc/systemd/system/repcoach-backend.service
+    fi
+    if sudo test -f "$backup/system/nginx-site.present"; then
+      sudo cp -a "$backup/system/nginx-site" /etc/nginx/sites-available/repcoach-ai
+    elif sudo test -f "$backup/system/nginx-site.absent"; then
+      sudo rm -f /etc/nginx/sites-available/repcoach-ai
+    fi
+    if sudo test -f "$backup/system/rate-limit.conf.present"; then
+      sudo cp -a "$backup/system/rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf
+    elif sudo test -f "$backup/system/rate-limit.conf.absent"; then
+      sudo rm -f /etc/nginx/conf.d/repcoach-rate-limit.conf
+    fi
+    if sudo test -f "$backup/system/logrotate.present"; then
+      sudo cp -a "$backup/system/logrotate" /etc/logrotate.d/repcoach-ai
+    elif sudo test -f "$backup/system/logrotate.absent"; then
+      sudo rm -f /etc/logrotate.d/repcoach-ai
+    fi
     sudo systemctl daemon-reload || true
     sudo nginx -t || true
     sudo systemctl start repcoach-backend || true
@@ -64,13 +90,50 @@ rollback_local() {
 trap rollback_local EXIT
 
 sudo install -d -m 0700 "$backup/app" "$backup/system"
-[[ -f "$app_dir/server.py" ]] && sudo cp -a "$app_dir/server.py" "$backup/app/server.py"
-[[ -f "$app_dir/ai_provider.py" ]] && sudo cp -a "$app_dir/ai_provider.py" "$backup/app/ai_provider.py"
-[[ -d "$app_dir/static" ]] && sudo cp -a "$app_dir/static" "$backup/app/static"
-sudo test -f /etc/systemd/system/repcoach-backend.service && sudo cp -a /etc/systemd/system/repcoach-backend.service "$backup/system/repcoach-backend.service" || true
-sudo test -f /etc/nginx/sites-available/repcoach-ai && sudo cp -a /etc/nginx/sites-available/repcoach-ai "$backup/system/nginx-site" || true
-sudo test -f /etc/nginx/conf.d/repcoach-rate-limit.conf && sudo cp -a /etc/nginx/conf.d/repcoach-rate-limit.conf "$backup/system/rate-limit.conf" || true
-sudo test -f /etc/logrotate.d/repcoach-ai && sudo cp -a /etc/logrotate.d/repcoach-ai "$backup/system/logrotate" || true
+
+if [[ -f "$app_dir/server.py" ]]; then
+  sudo cp -a "$app_dir/server.py" "$backup/app/server.py"
+  sudo touch "$backup/app/server.py.present"
+else
+  sudo touch "$backup/app/server.py.absent"
+fi
+if [[ -f "$app_dir/ai_provider.py" ]]; then
+  sudo cp -a "$app_dir/ai_provider.py" "$backup/app/ai_provider.py"
+  sudo touch "$backup/app/ai_provider.py.present"
+else
+  sudo touch "$backup/app/ai_provider.py.absent"
+fi
+if [[ -d "$app_dir/static" ]]; then
+  sudo cp -a "$app_dir/static" "$backup/app/static"
+  sudo touch "$backup/app/static.present"
+else
+  sudo touch "$backup/app/static.absent"
+fi
+
+if sudo test -f /etc/systemd/system/repcoach-backend.service; then
+  sudo cp -a /etc/systemd/system/repcoach-backend.service "$backup/system/repcoach-backend.service"
+  sudo touch "$backup/system/repcoach-backend.service.present"
+else
+  sudo touch "$backup/system/repcoach-backend.service.absent"
+fi
+if sudo test -f /etc/nginx/sites-available/repcoach-ai; then
+  sudo cp -a /etc/nginx/sites-available/repcoach-ai "$backup/system/nginx-site"
+  sudo touch "$backup/system/nginx-site.present"
+else
+  sudo touch "$backup/system/nginx-site.absent"
+fi
+if sudo test -f /etc/nginx/conf.d/repcoach-rate-limit.conf; then
+  sudo cp -a /etc/nginx/conf.d/repcoach-rate-limit.conf "$backup/system/rate-limit.conf"
+  sudo touch "$backup/system/rate-limit.conf.present"
+else
+  sudo touch "$backup/system/rate-limit.conf.absent"
+fi
+if sudo test -f /etc/logrotate.d/repcoach-ai; then
+  sudo cp -a /etc/logrotate.d/repcoach-ai "$backup/system/logrotate"
+  sudo touch "$backup/system/logrotate.present"
+else
+  sudo touch "$backup/system/logrotate.absent"
+fi
 backup_ready=1
 
 install -d -m 0755 "$app_dir/static"
