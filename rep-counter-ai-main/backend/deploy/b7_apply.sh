@@ -45,20 +45,20 @@ rollback_local() {
     echo "Deploy failed; restoring pre-deploy backup" >&2
     sudo systemctl stop repcoach-backend || true
     if sudo test -f "$backup/app/server.py.present"; then
-      install -m 0644 "$backup/app/server.py" "$app_dir/server.py"
+      sudo cp -a "$backup/app/server.py" "$app_dir/server.py"
     elif sudo test -f "$backup/app/server.py.absent"; then
-      rm -f "$app_dir/server.py"
+      sudo rm -f "$app_dir/server.py"
     fi
     if sudo test -f "$backup/app/ai_provider.py.present"; then
-      install -m 0644 "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"
+      sudo cp -a "$backup/app/ai_provider.py" "$app_dir/ai_provider.py"
     elif sudo test -f "$backup/app/ai_provider.py.absent"; then
-      rm -f "$app_dir/ai_provider.py"
+      sudo rm -f "$app_dir/ai_provider.py"
     fi
     if sudo test -f "$backup/app/static.present"; then
-      rm -rf "$app_dir/static"
-      cp -a "$backup/app/static" "$app_dir/static"
+      sudo rm -rf "$app_dir/static"
+      sudo cp -a "$backup/app/static" "$app_dir/static"
     elif sudo test -f "$backup/app/static.absent"; then
-      rm -rf "$app_dir/static"
+      sudo rm -rf "$app_dir/static"
     fi
     if sudo test -f "$backup/system/repcoach-backend.service.present"; then
       sudo cp -a "$backup/system/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service
