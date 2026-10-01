@@ -12,6 +12,11 @@ NGINX = (BACKEND / "deploy" / "repcoach-ai.nginx").read_text(encoding="utf-8")
 RATE = (BACKEND / "deploy" / "repcoach-rate-limit.conf").read_text(encoding="utf-8")
 ROTATE = (BACKEND / "deploy" / "repcoach-ai.logrotate").read_text(encoding="utf-8")
 SERVICE = (BACKEND / "deploy" / "repcoach-backend.service").read_text(encoding="utf-8")
+APPLY = (BACKEND / "deploy" / "b7_apply.sh").read_text(encoding="utf-8")
+ROLLBACK = (BACKEND / "deploy" / "b7_rollback.sh").read_text(encoding="utf-8")
+DEPLOY_WORKFLOW = (
+    PROJECT.parent / ".github" / "workflows" / "production-deploy.yml"
+).read_text(encoding="utf-8")
 
 
 class ProductionReleaseTests(unittest.TestCase):
@@ -84,6 +89,28 @@ class ProductionReleaseTests(unittest.TestCase):
             "EnvironmentFile=/home/nduythanh/apps/repcoach-backend/.env",
             SERVICE,
         )
+
+    def test_deploy_workflow_is_locked_and_pins_host_key(self):
+        self.assertIn("B7_DEPLOY_APPROVED", DEPLOY_WORKFLOW)
+        self.assertIn("DEPLOY_B7_2026_10_01", DEPLOY_WORKFLOW)
+        self.assertIn("secrets.VPS_SSH_KEY", DEPLOY_WORKFLOW)
+        self.assertIn("StrictHostKeyChecking=yes", DEPLOY_WORKFLOW)
+        self.assertIn(
+            "14.225.207.90 ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIG3oPFCAMe0W1WRqT5OjOHZo8SKDe5tFPeW9VQOYVmzF",
+            DEPLOY_WORKFLOW,
+        )
+        self.assertNotIn("StrictHostKeyChecking=no", DEPLOY_WORKFLOW)
+
+    def test_apply_requires_paid_mode_and_noninteractive_sudo(self):
+        self.assertIn("GEMINI_SERVICE_MODE=billing_enabled", APPLY)
+        self.assertIn("sudo -n true", APPLY)
+        self.assertIn("python3 -m py_compile", APPLY)
+        self.assertIn("BACKUP_PATH=", APPLY)
+        self.assertIn("Deploy failed; restoring pre-deploy backup", APPLY)
+
+    def test_rollback_accepts_only_b7_backup_path(self):
+        self.assertIn("/var/backups/repcoach-b7/*", ROLLBACK)
+        self.assertIn("ROLLBACK_PASS", ROLLBACK)
 
     def test_rollback_backup_names_do_not_collide(self):
         for value in (
