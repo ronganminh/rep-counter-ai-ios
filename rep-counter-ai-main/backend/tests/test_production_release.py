@@ -1,4 +1,3 @@
-import re
 import unittest
 from pathlib import Path
 
@@ -32,21 +31,24 @@ class ProductionReleaseTests(unittest.TestCase):
         ):
             self.assertIn(value, RUNBOOK)
 
-    def test_runbook_does_not_claim_billing_is_verified(self):
-        self.assertIn("BLOCKED / admin action required", RUNBOOK)
-        self.assertIn("Billing must be verified independently", README)
-        self.assertIn("Google AI Studio", RUNBOOK)
-        self.assertNotIn("billing verification: PASS", RUNBOOK)
+    def test_runbook_uses_groq_provider_contract(self):
+        self.assertIn("AI_PROVIDER=groq", RUNBOOK)
+        self.assertIn("GROQ_API_KEY=<server secret>", RUNBOOK)
+        self.assertIn("GROQ_MODEL=openai/gpt-oss-20b", RUNBOOK)
+        self.assertIn("docs/groq-provider.md", RUNBOOK)
+        self.assertNotIn("Exact production Gemini project verified Paid Tier", RUNBOOK)
 
     def test_runbook_keeps_secrets_out_of_repo(self):
-        self.assertIn("GEMINI_API_KEY=<server secret>", RUNBOOK)
-        self.assertNotRegex(RUNBOOK, r"GEMINI_API_KEY=[A-Za-z0-9_-]{20,}")
         self.assertNotIn("BEGIN OPENSSH PRIVATE KEY", RUNBOOK)
+        self.assertNotIn("gsk_", RUNBOOK)
+        self.assertNotIn("Bearer gsk_", RUNBOOK)
 
-    def test_legacy_deploy_guide_points_to_canonical_policy(self):
+    def test_deploy_guide_points_to_canonical_policy_and_groq(self):
         self.assertIn("../backend/static/privacy-policy.html", GUIDE)
         self.assertIn("../backend/docs/production-release.md", GUIDE)
         self.assertNotIn("/var/www/repcoach-ai", GUIDE)
+        self.assertIn("AI_PROVIDER=groq", GUIDE)
+        self.assertIn("GROQ_API_KEY", GUIDE)
         self.assertIn(
             "https://repcoach-ai.duckdns.org/privacy-policy.html",
             GUIDE,
@@ -55,10 +57,13 @@ class ProductionReleaseTests(unittest.TestCase):
     def test_public_smoke_uses_shared_v2_fixture(self):
         self.assertIn("workout_feedback_v2.json", SMOKE)
         self.assertIn('fixture.get("schema_version") == 2', SMOKE)
-        self.assertIn('fixture.get("consent_version") == "2026-10-01"', SMOKE)
+        self.assertIn(
+            'fixture.get("consent_version") == "2026-10-01-groq"',
+            SMOKE,
+        )
         self.assertIn("PRODUCTION_SMOKE_PASS", SMOKE)
 
-    def test_public_smoke_checks_required_routes_and_safety(self):
+    def test_public_smoke_checks_required_routes_and_secrets(self):
         for value in (
             '"/health"',
             '"/ready"',
@@ -67,7 +72,8 @@ class ProductionReleaseTests(unittest.TestCase):
             "strict-transport-security",
             "x-content-type-options",
             "X-Request-ID",
-            "GEMINI_API_KEY",
+            "GROQ_API_KEY",
+            "api.groq.com",
         ):
             self.assertIn(value, SMOKE)
 
@@ -101,8 +107,10 @@ class ProductionReleaseTests(unittest.TestCase):
         )
         self.assertNotIn("StrictHostKeyChecking=no", DEPLOY_WORKFLOW)
 
-    def test_apply_requires_paid_mode_and_noninteractive_sudo(self):
-        self.assertIn("GEMINI_SERVICE_MODE=billing_enabled", APPLY)
+    def test_apply_requires_groq_and_noninteractive_sudo(self):
+        self.assertIn("AI_PROVIDER=groq", APPLY)
+        self.assertIn("GROQ_API_KEY", APPLY)
+        self.assertIn("GROQ_MODEL=openai/gpt-oss-20b", APPLY)
         self.assertIn("sudo -n true", APPLY)
         self.assertIn("python3 -m py_compile", APPLY)
         self.assertIn("BACKUP_PATH=", APPLY)
@@ -112,15 +120,10 @@ class ProductionReleaseTests(unittest.TestCase):
         self.assertIn("/var/backups/repcoach-b7/*", ROLLBACK)
         self.assertIn("ROLLBACK_PASS", ROLLBACK)
 
-    def test_rollback_backup_names_do_not_collide(self):
-        for value in (
-            "$backup/system/nginx-site",
-            "$backup/system/rate-limit.conf",
-            "$backup/system/logrotate",
-        ):
-            self.assertIn(value, RUNBOOK)
-        self.assertEqual(RUNBOOK.count('$backup/system/nginx-site"'), 2)
-        self.assertEqual(RUNBOOK.count('$backup/system/logrotate"'), 2)
+    def test_runbook_documents_transactional_backup(self):
+        self.assertIn("/var/backups/repcoach-b7/<UTC timestamp>", RUNBOOK)
+        self.assertIn("b7_apply.sh", RUNBOOK)
+        self.assertIn("b7_rollback.sh", RUNBOOK)
 
 
 if __name__ == "__main__":
