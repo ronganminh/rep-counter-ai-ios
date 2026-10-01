@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../core/services/app_links.dart';
 import '../ai/ai_preferences.dart';
 import '../ai/presentation/ai_consent.dart';
+import '../history/export/export_data_sheet.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/i18n/app_strings.dart';
 import '../../core/i18n/locale_controller.dart';
@@ -285,6 +286,18 @@ class _SettingsPageState extends State<SettingsPage> {
                         '${snapshot.data ?? 0} sessions · includes saved calibration'),
                     onTap: _deleteData,
                   )),
+          SettingsRow(
+              icon: LucideIcons.download,
+              title: context.tr(
+                  'Xuất lịch sử tập luyện', 'Export workout history'),
+              subtitle: context.tr(
+                  'Tạo CSV hoặc JSON trên thiết bị',
+                  'Create CSV or JSON on this device'),
+              onTap: () => showModalBottomSheet<void>(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const ExportDataSheet())),
         ]),
         SettingsGroup(title: context.tr('Về app', 'About'), children: [
           SettingsRow(
