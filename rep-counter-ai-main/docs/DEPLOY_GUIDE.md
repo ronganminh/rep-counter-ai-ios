@@ -63,7 +63,7 @@ Never commit or copy the production .env into the repository.
 
 ## Do not use the old static-site deployment procedure
 
-Earlier versions of this guide described /var/www/repcoach-ai as the source of the public privacy page and listed a separate static-site rsync workflow. That procedure is obsolete for the B4+ Privacy Policy.
+Earlier versions of this guide described a separate legacy web-root directory as the source of the public privacy page and listed a static-site rsync workflow. That procedure is obsolete for the B4+ Privacy Policy.
 
 Do not overwrite the Nginx site with an older configuration from a previous release. Doing so can remove:
 
