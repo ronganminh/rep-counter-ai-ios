@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../core/i18n/locale_controller.dart';
 import '../../../theme/app_colors.dart';
-import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../application/result_controller.dart';
 import '../data/workout_record.dart';
@@ -10,6 +9,7 @@ import '../data/workout_history_store.dart';
 import 'widgets/rep_pace_chart.dart';
 import '../../share/story_page.dart';
 import '../../ai/ai_preferences.dart';
+import 'widgets/form_score_details.dart';
 import 'widgets/result_feedback_card.dart';
 import 'widgets/result_hero.dart';
 
@@ -132,7 +132,6 @@ class _ResultPageState extends State<ResultPage> {
   @override
   Widget build(BuildContext context) {
     final s = context.s, r = _controller.record;
-    final quality = r.quality;
     return PopScope(
         canPop: widget.readOnly && !_deleting,
         onPopInvokedWithResult: (didPop, _) {
@@ -203,44 +202,7 @@ class _ResultPageState extends State<ResultPage> {
                     controller: _controller, allowRefresh: !widget.readOnly),
                 const SizedBox(height: 24),
                 SectionLabel(context.tr('Điểm form', 'Form score')),
-                Card(
-                    child: Padding(
-                        padding: const EdgeInsets.all(20),
-                        child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              if (quality == null || !quality.hasEnoughData)
-                                Text(s.fbNotEnoughData,
-                                    style:
-                                        const TextStyle(color: AppColors.text2))
-                              else ...[
-                                Text.rich(TextSpan(
-                                    text: '${quality.qualityScore}',
-                                    style: AppTypography.metric64
-                                        .copyWith(color: AppColors.accent),
-                                    children: [
-                                      TextSpan(
-                                          text: ' / 100',
-                                          style: AppTypography.title20
-                                              .copyWith(color: AppColors.text3))
-                                    ])),
-                                const SizedBox(height: 20),
-                                _Score(context.tr('Biên độ', 'Range of motion'),
-                                    quality.rangeOfMotion),
-                                _Score(
-                                    context.tr(
-                                        'Nhịp đều', 'Cadence consistency'),
-                                    quality.cadenceConsistency),
-                                _Score(
-                                    context.tr('Cân bằng trái/phải',
-                                        'Left/right balance'),
-                                    quality.leftRightBalance),
-                                _Score(
-                                    context.tr(
-                                        'Tư thế ổn định', 'Pose alignment'),
-                                    quality.poseAlignment),
-                              ],
-                            ]))),
+                FormScoreSection(record: r),
                 const SizedBox(height: 24),
                 SectionLabel(context.tr('Nhịp từng rep', 'Rep pace')),
                 RepPaceChart(record: r),
@@ -253,24 +215,3 @@ class _ResultPageState extends State<ResultPage> {
   }
 }
 
-class _Score extends StatelessWidget {
-  const _Score(this.label, this.value);
-  final String label;
-  final int value;
-  @override
-  Widget build(BuildContext context) => Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Column(children: [
-        Row(children: [
-          Expanded(child: Text(label)),
-          Text('$value', style: const TextStyle(color: AppColors.text2))
-        ]),
-        const SizedBox(height: 8),
-        LinearProgressIndicator(
-            semanticsLabel: label,
-            semanticsValue: '$value%',
-            value: (value / 100).clamp(0, 1),
-            minHeight: 6,
-            borderRadius: BorderRadius.circular(4)),
-      ]));
-}

@@ -292,8 +292,11 @@ void main() {
   testWidgets('form breakdown uses stored scores instead of design examples',
       (tester) async {
     await pump(tester, ResultPage(record: record()));
-    await tester.scrollUntilVisible(find.text('67'), 250,
+    final explain = find.byKey(const Key('form-score-explain'));
+    await tester.scrollUntilVisible(explain, 250,
         scrollable: find.byType(Scrollable).first);
+    await tester.pumpAndSettle();
+    tester.widget<TextButton>(explain).onPressed!();
     await tester.pumpAndSettle();
     for (final value in ['67', '73', '79', '61']) {
       expect(find.text(value), findsOneWidget);

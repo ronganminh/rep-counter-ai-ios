@@ -255,21 +255,33 @@ class WorkoutQuality {
         'has_enough_data': hasEnoughData,
       };
 
-  factory WorkoutQuality.fromJson(Map<String, dynamic> j) => WorkoutQuality(
-        flaggedReps: (j['flagged_reps'] as num?)?.toInt() ?? 0,
-        avgRepSeconds: (j['avg_rep_sec'] as num?)?.toDouble() ?? 0,
-        avgAmplitude: (j['avg_amplitude'] as num?)?.toDouble() ?? 0,
-        amplitudeDropPercent:
-            (j['amplitude_drop_percent'] as num?)?.toDouble() ?? 0,
-        leftRightDiffPercent:
-            (j['left_right_diff_percent'] as num?)?.toDouble() ?? 0,
-        qualityScore: (j['quality_score'] as num?)?.toInt() ?? 0,
-        rangeOfMotion: (j['range_of_motion'] as num?)?.toInt() ?? 0,
-        cadenceConsistency: (j['cadence_consistency'] as num?)?.toInt() ?? 0,
-        leftRightBalance: (j['left_right_balance'] as num?)?.toInt() ?? 0,
-        poseAlignment: (j['pose_alignment'] as num?)?.toInt() ?? 0,
-        hasEnoughData: j['has_enough_data'] as bool? ?? false,
-      );
+  factory WorkoutQuality.fromJson(Map<String, dynamic> j) {
+    final completeScore = const [
+      'quality_score',
+      'range_of_motion',
+      'cadence_consistency',
+      'left_right_balance',
+      'pose_alignment',
+    ].every((key) => j[key] is num);
+    return WorkoutQuality(
+      flaggedReps: (j['flagged_reps'] as num?)?.toInt() ?? 0,
+      avgRepSeconds: (j['avg_rep_sec'] as num?)?.toDouble() ?? 0,
+      avgAmplitude: (j['avg_amplitude'] as num?)?.toDouble() ?? 0,
+      amplitudeDropPercent:
+          (j['amplitude_drop_percent'] as num?)?.toDouble() ?? 0,
+      leftRightDiffPercent:
+          (j['left_right_diff_percent'] as num?)?.toDouble() ?? 0,
+      qualityScore: (j['quality_score'] as num?)?.toInt() ?? 0,
+      rangeOfMotion: (j['range_of_motion'] as num?)?.toInt() ?? 0,
+      cadenceConsistency: (j['cadence_consistency'] as num?)?.toInt() ?? 0,
+      leftRightBalance: (j['left_right_balance'] as num?)?.toInt() ?? 0,
+      poseAlignment: (j['pose_alignment'] as num?)?.toInt() ?? 0,
+      // A legacy/partial payload may contain a few score fields but not the
+      // complete deterministic breakdown. Missing is unknown, never zero.
+      hasEnoughData:
+          (j['has_enough_data'] as bool? ?? false) && completeScore,
+    );
+  }
 }
 
 /// No image or landmark data; only measured duration and set membership.

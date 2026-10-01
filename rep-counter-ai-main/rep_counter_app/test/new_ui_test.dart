@@ -229,9 +229,17 @@ void main() {
       expect(tester.takeException(), isNull);
       await tester.drag(find.byType(ListView), const Offset(0, -650));
       await tester.pumpAndSettle();
+      final explain = find.byKey(const Key('form-score-explain'));
+      expect(explain, findsOneWidget);
+      tester.widget<TextButton>(explain).onPressed!();
+      await tester.pumpAndSettle();
       expect(find.text('88'), findsOneWidget);
       expect(tester.takeException(), isNull);
       if (scale == 1) await screenshot(tester, 'result-detail');
+      Navigator.of(
+        tester.element(find.byKey(const Key('form-score-details'))),
+      ).pop();
+      await tester.pumpAndSettle();
       await pump(
           tester, ResultPage(record: fixture(legacy: true), readOnly: true),
           width: 320, scale: scale);
