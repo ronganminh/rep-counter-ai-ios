@@ -19,9 +19,20 @@ grep -q '^GROQ_API_KEY=.' "$app_dir/.env"
 grep -qx 'GROQ_MODEL=openai/gpt-oss-20b' "$app_dir/.env"
 grep -qx 'BIND_HOST=127.0.0.1' "$app_dir/.env"
 
-# CI checks non-interactive sudo before invoking this script. When an operator
-# runs the script manually, normal sudo may prompt on the operator's TTY.
+# Compile before requesting sudo so syntax failures cannot touch production.
 python3 -m py_compile "$stage_dir/server.py" "$stage_dir/ai_provider.py"
+
+# Validate host dependencies before creating a backup or replacing any file.
+# This intentionally runs before all deployment writes.
+sudo sh -c '
+  set -eu
+  for cmd in nginx logrotate systemctl ss; do
+    if ! command -v "$cmd" >/dev/null 2>&1; then
+      echo "missing deployment dependency: $cmd" >&2
+      exit 3
+    fi
+  done
+'
 
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
 backup="/var/backups/repcoach-b7/$stamp"
