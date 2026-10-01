@@ -536,7 +536,7 @@ class _TrendCard extends StatelessWidget {
     final meaningful = values
             .where((value) =>
                 value != null &&
-                (selected == ProgressTrendMetric.form || value! > 0))
+                (selected == ProgressTrendMetric.form || value > 0))
             .length >=
         2;
     final latest = values.reversed
