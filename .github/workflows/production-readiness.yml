@@ -1,19 +1,13 @@
-name: RepCoach Production Readiness
+name: RepCoach Production Smoke
 
 on:
-  pull_request:
-    paths:
-      - "rep-counter-ai-main/backend/tools/production_smoke.py"
-      - "rep-counter-ai-main/backend/docs/production-release.md"
-      - "rep-counter-ai-main/contracts/workout_feedback_v2.json"
-      - ".github/workflows/production-readiness.yml"
   workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: repcoach-production-readiness-${{ github.workflow }}-${{ github.ref }}
+  group: repcoach-production-smoke
   cancel-in-progress: true
 
 jobs:
