@@ -342,7 +342,7 @@ void main() {
         completedSets: 0,
         sessionState: SessionState.working,
         goal: null,
-        elapsed: const Duration(seconds: 50),
+        elapsed: Duration(seconds: 50),
         placementReady: true,
         placementStatus: PlacementStatus.ready,
         placementMessage: '',
@@ -353,7 +353,7 @@ void main() {
         sessionStarted: true,
         mode: WorkoutMode.timed,
         challengeSeconds: 60,
-        challengeRemaining: const Duration(seconds: 10),
+        challengeRemaining: Duration(seconds: 10),
       );
 
       await _pump(
