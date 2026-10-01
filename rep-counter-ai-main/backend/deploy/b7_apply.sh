@@ -26,7 +26,7 @@ python3 -m py_compile "$stage_dir/server.py" "$stage_dir/ai_provider.py"
 # This intentionally runs before all deployment writes.
 sudo sh -c '
   set -eu
-  for cmd in nginx logrotate systemctl ss; do
+  for cmd in nginx logrotate systemctl ss curl; do
     if ! command -v "$cmd" >/dev/null 2>&1; then
       echo "missing deployment dependency: $cmd" >&2
       exit 3
@@ -152,14 +152,36 @@ sudo logrotate -d /etc/logrotate.d/repcoach-ai >/dev/null
 sudo systemctl restart repcoach-backend
 sudo systemctl reload nginx
 
-sudo systemctl is-active --quiet repcoach-backend
+# systemd can report active before Python has bound port 8787. Wait for the
+# actual local health route instead of treating that short startup window as a
+# failed deployment.
+backend_ready=0
+for _ in $(seq 1 20); do
+  if sudo systemctl is-active --quiet repcoach-backend \
+    && curl -fsS --max-time 1 http://127.0.0.1:8787/health \
+      | grep -Fq '"status": "ok"'; then
+    backend_ready=1
+    break
+  fi
+  sleep 0.5
+done
+if [[ "$backend_ready" -ne 1 ]]; then
+  echo "backend did not become healthy within 10 seconds" >&2
+  exit 4
+fi
+
 sudo ss -ltn | grep -F '127.0.0.1:8787' >/dev/null
-sudo nginx -T 2>/dev/null | grep -F 'client_max_body_size 16k;' >/dev/null
-sudo nginx -T 2>/dev/null | grep -F 'limit_req zone=repcoach_api' >/dev/null
-sudo nginx -T 2>/dev/null | grep -F 'proxy_read_timeout 22s;' >/dev/null
-sudo nginx -T 2>/dev/null | grep -F 'location = /privacy-policy.html' >/dev/null
-sudo nginx -T 2>/dev/null | grep -F 'location = /health' >/dev/null
-sudo nginx -T 2>/dev/null | grep -F 'location = /ready' >/dev/null
+
+# Capture nginx -T once. With pipefail enabled, piping nginx -T directly into
+# grep can produce a false failure when grep exits early and nginx receives
+# SIGPIPE.
+nginx_dump="$(sudo nginx -T 2>/dev/null)"
+grep -Fq 'client_max_body_size 16k;' <<<"$nginx_dump"
+grep -Fq 'limit_req zone=repcoach_api' <<<"$nginx_dump"
+grep -Fq 'proxy_read_timeout 22s;' <<<"$nginx_dump"
+grep -Fq 'location = /privacy-policy.html' <<<"$nginx_dump"
+grep -Fq 'location = /health' <<<"$nginx_dump"
+grep -Fq 'location = /ready' <<<"$nginx_dump"
 
 completed=1
 trap - EXIT
