@@ -116,7 +116,7 @@ Safe manual check that does not print the API key:
 
     grep -q '^GROQ_API_KEY=.' .env       && echo 'GROQ_API_KEY=PRESENT'       || echo 'GROQ_API_KEY=MISSING'
 
-The guarded CI deploy additionally requires non-interactive sudo. It never passes a sudo password through Actions.
+The guarded CI deploy additionally requires non-interactive sudo. It never passes a sudo password through Actions. If the VPS intentionally requires an interactive sudo password, keep the CI deploy locked and run the reviewed apply script manually from an SSH terminal; the script will use normal sudo prompts.
 
 ## Guarded GitHub Actions deployment
 
@@ -138,7 +138,7 @@ The workflow uses the repository secret:
 
 The private key must never be committed or pasted into issues/chat. SSH host-key checking is pinned to the ed25519 host key already trusted by the operator workstation.
 
-When approved, the workflow:
+When approved and passwordless narrow sudo is available, the workflow:
 
 1. validates the production Groq configuration without printing secrets;
 2. requires passwordless/non-interactive sudo;
@@ -149,6 +149,15 @@ When approved, the workflow:
 7. runs synthetic public production smoke;
 8. verifies privacy-safe logs using the returned request ID;
 9. rolls back automatically when a post-deploy check fails.
+
+## Manual interactive-sudo deployment
+
+If `sudo -n` is unavailable, do not weaken the VPS to `NOPASSWD: ALL`. From an SSH terminal, check out the reviewed B7 commit, then run:
+
+    cd <repository-root>
+    bash rep-counter-ai-main/backend/deploy/b7_apply.sh rep-counter-ai-main/backend
+
+Enter the sudo password only into the VPS terminal when prompted. The script performs the same preflight, backup, Nginx/logrotate validation and restart steps. It prints the backup path on success. Then run the public production smoke from a trusted checkout and complete the request-ID log verification manually.
 
 ## Files deployed
 
