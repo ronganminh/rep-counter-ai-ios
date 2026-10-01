@@ -11,6 +11,15 @@ class DeployConfigTests(unittest.TestCase):
     def test_body_limit_matches_app_limit(self):
         self.assertIn("client_max_body_size 16k;", NGINX)
 
+    def test_privacy_policy_route_is_static_html_utf8(self):
+        self.assertIn("location = /privacy-policy.html", NGINX)
+        self.assertIn(
+            "alias /home/nduythanh/apps/repcoach-backend/static/privacy-policy.html;",
+            NGINX,
+        )
+        self.assertIn("default_type text/html;", NGINX)
+        self.assertIn("charset utf-8;", NGINX)
+
     def test_rate_limit_has_json_429_and_retry_after(self):
         self.assertIn("limit_req_status 429;", NGINX)
         self.assertIn("return 429 '{\"error\":\"RATE_LIMITED\"}';", NGINX)

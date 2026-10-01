@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../widgets/product_ui.dart';
 import '../../../core/i18n/locale_controller.dart';
+import '../../../core/legal/legal_config.dart';
 import '../../legal/legal_page.dart';
 import '../ai_preferences.dart';
 
@@ -16,8 +17,16 @@ Future<bool> requestAutomaticAiConsent(BuildContext context) async {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                     Text(context.tr(
-                        'Sau khi lưu buổi tập mới, app sẽ gửi tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng tới máy chủ RepCoach AI để tạo nhận xét bằng Gemini. Không gửi video, ảnh hoặc tọa độ khớp.\n\nLịch sử cũ không tự tải lên. Bạn có thể tắt trong Cài đặt; việc tắt không thu hồi yêu cầu đã gửi. Kết quả vẫn lưu trên máy khi mạng lỗi.',
-                        'After a new workout is saved, the app sends the exercise, goal, reps/sets, duration, pose statistics and quality scores to the RepCoach AI server for Gemini feedback. No video, photos or landmark coordinates are sent.\n\nOlder history is not uploaded automatically. You can turn this off in Settings; disabling it cannot recall requests already sent. Workouts remain saved on device if the network fails.')),
+                        'AI dùng Gemini chỉ dành cho người từ 18 tuổi trở lên. Sau khi lưu buổi tập mới, app sẽ gửi tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng tới máy chủ RepCoach AI. Máy chủ chỉ cho phép gửi tiếp tới Gemini khi project production đã được xác minh có billing. Không gửi video, ảnh, âm thanh hoặc tọa độ landmark thô.\n\nTheo điều khoản Paid Services hiện hành của Google, prompt/response không được dùng để cải thiện sản phẩm của Google, nhưng Google có thể log chúng trong một khoảng thời gian giới hạn để chống lạm dụng và đáp ứng yêu cầu pháp lý. Lịch sử cũ không tự tải lên. Bạn có thể tắt trong Cài đặt; việc tắt không thu hồi yêu cầu đã gửi. Workout vẫn lưu trên máy nếu AI lỗi.',
+                        'Gemini-backed AI is for users aged 18 or older. After a new workout is saved, the app sends the exercise, goal, reps/sets, duration, pose statistics and quality scores to the RepCoach AI server. The server only forwards the request to Gemini when the production project has been verified as billing-enabled. No video, photos, audio or raw landmark coordinates are sent.\n\nUnder Google\'s current Paid Services terms, prompts/responses are not used to improve Google products, but Google may log them for a limited period for abuse prevention and required legal disclosures. Older history is not uploaded automatically. You can turn this off in Settings; disabling it cannot recall requests already sent. The workout remains saved on device if AI fails.')),
+                    const SizedBox(height: 12),
+                    Text(
+                      context.tr(
+                        'Phiên bản đồng ý: ${LegalConfig.aiConsentVersion}',
+                        'Consent version: ${LegalConfig.aiConsentVersion}',
+                      ),
+                      style: Theme.of(context).textTheme.bodySmall,
+                    ),
                     TextButton(
                         onPressed: () => Navigator.push(
                             context,
@@ -56,9 +65,17 @@ Future<bool> requestManualAiConsent(BuildContext context) async {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(context.tr(
-              'RepCoach AI sẽ gửi bản tóm tắt buổi tập này gồm tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng qua máy chủ RepCoach AI đến Google Gemini để tạo nhận xét. Không gửi video, ảnh, âm thanh hoặc tọa độ khớp thô.\n\nSự đồng ý này chỉ áp dụng cho yêu cầu bạn đang thực hiện.',
-              'RepCoach AI will send a summary of this workout, including the exercise, goal, reps/sets, duration, pose statistics and quality scores, through the RepCoach AI server to Google Gemini to generate feedback. No video, photos, audio or raw landmark coordinates are sent.\n\nThis consent applies only to the request you are making now.',
+              'AI dùng Gemini chỉ dành cho người từ 18 tuổi trở lên. RepCoach AI sẽ gửi bản tóm tắt buổi tập này gồm tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng qua máy chủ RepCoach AI. Máy chủ chỉ gửi tiếp tới Gemini khi project production đã được xác minh có billing. Không gửi video, ảnh, âm thanh hoặc tọa độ landmark thô.\n\nTheo điều khoản Paid Services hiện hành của Google, prompt/response không được dùng để cải thiện sản phẩm của Google, nhưng Google có thể log chúng trong một khoảng thời gian giới hạn để chống lạm dụng và đáp ứng yêu cầu pháp lý. Sự đồng ý này chỉ áp dụng cho yêu cầu bạn đang thực hiện.',
+              'Gemini-backed AI is for users aged 18 or older. RepCoach AI will send a summary of this workout, including the exercise, goal, reps/sets, duration, pose statistics and quality scores, to the RepCoach AI server. The server only forwards it to Gemini when the production project has been verified as billing-enabled. No video, photos, audio or raw landmark coordinates are sent.\n\nUnder Google\'s current Paid Services terms, prompts/responses are not used to improve Google products, but Google may log them for a limited period for abuse prevention and required legal disclosures. This consent applies only to the request you are making now.',
             )),
+            const SizedBox(height: 12),
+            Text(
+              context.tr(
+                'Phiên bản đồng ý: ${LegalConfig.aiConsentVersion}',
+                'Consent version: ${LegalConfig.aiConsentVersion}',
+              ),
+              style: Theme.of(context).textTheme.bodySmall,
+            ),
             TextButton(
               onPressed: () => Navigator.push(
                 context,

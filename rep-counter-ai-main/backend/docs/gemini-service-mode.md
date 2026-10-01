@@ -61,18 +61,17 @@ Google's billing documentation says the project's actual billing tier/status mus
 
 Therefore source code cannot prove the production mode.
 
-Allowed runtime metadata values are:
+RepCoach's production privacy contract now permits only:
 
 ```text
-GEMINI_SERVICE_MODE=unpaid
 GEMINI_SERVICE_MODE=billing_enabled
 ```
 
-The backend rejects missing or any other value with the generic public `AI_UNAVAILABLE` response.
+The adapter rejects `unpaid`, a missing value, or any other value with the generic public `AI_UNAVAILABLE` response. This prevents RepCoach workout summaries from being sent through Gemini Unpaid Services. The value remains a guard/assertion only: the exact Google project's Billing Tier/Plan must still be verified in Google AI Studio before deployment.
 
 ## Actual RepCoach production deployment mode
 
-**Status: NOT VERIFIED FROM SOURCE — production release blocker.**
+**Status: BILLING-ENABLED REQUIRED BY REPCOACH; EXACT PRODUCTION PROJECT STILL NOT VERIFIED FROM SOURCE — production release blocker.**
 
 The repository does not contain the Google AI Studio project billing state, and this phase has no authenticated access to that billing console. Do not infer the mode from the presence of `GEMINI_API_KEY`, from `.env.example`, or from successful requests.
 
@@ -81,7 +80,7 @@ Before production deployment, an operator with access to the exact Google projec
 1. open Google AI Studio Projects/Billing;
 2. verify the exact project's current Billing Tier/Plan;
 3. record the result and date in the deployment checklist;
-4. set `GEMINI_SERVICE_MODE` to the matching value;
+4. proceed only if the project is on a Paid Tier, then set `GEMINI_SERVICE_MODE=billing_enabled`;
 5. re-check the current official terms if the verification date is stale.
 
 ## Product/terms blocker requiring resolution before production

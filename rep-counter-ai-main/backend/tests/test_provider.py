@@ -111,18 +111,28 @@ class ProviderBoundaryTests(unittest.TestCase):
             with self.assertRaises(ai_provider.ProviderConfigurationError):
                 ai_provider.build_provider_from_env()
 
-    def test_provider_factory_accepts_verified_mode_labels(self):
-        for mode in ("unpaid", "billing_enabled"):
-            env = {
-                "AI_PROVIDER": "gemini",
-                "GEMINI_API_KEY": "test-key",
-                "GEMINI_MODEL": "test-model",
-                "GEMINI_SERVICE_MODE": mode,
-            }
-            with patch.dict(os.environ, env, clear=True):
-                provider = ai_provider.build_provider_from_env()
-            self.assertIsInstance(provider, ai_provider.GeminiProvider)
-            self.assertEqual(provider.service_mode, mode)
+    def test_provider_factory_accepts_billing_enabled_mode(self):
+        env = {
+            "AI_PROVIDER": "gemini",
+            "GEMINI_API_KEY": "test-key",
+            "GEMINI_MODEL": "test-model",
+            "GEMINI_SERVICE_MODE": "billing_enabled",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            provider = ai_provider.build_provider_from_env()
+        self.assertIsInstance(provider, ai_provider.GeminiProvider)
+        self.assertEqual(provider.service_mode, "billing_enabled")
+
+    def test_provider_factory_rejects_unpaid_mode(self):
+        env = {
+            "AI_PROVIDER": "gemini",
+            "GEMINI_API_KEY": "test-key",
+            "GEMINI_MODEL": "test-model",
+            "GEMINI_SERVICE_MODE": "unpaid",
+        }
+        with patch.dict(os.environ, env, clear=True):
+            with self.assertRaises(ai_provider.ProviderConfigurationError):
+                ai_provider.build_provider_from_env()
 
     def test_provider_factory_rejects_unknown_mode(self):
         env = {
@@ -173,7 +183,7 @@ class ProviderBoundaryTests(unittest.TestCase):
         self.assertNotIn("consent_version", prompt)
         self.assertNotIn("workout_id", prompt)
         self.assertNotIn("routine_library", prompt)
-        self.assertNotIn("camera", prompt)
+        self.assertNotIn("SHOULD_NOT_ENTER_PROMPT", prompt)
         self.assertNotIn("billing_enabled", prompt)
         self.assertEqual(headers["x-goog-api-key"], "SECRET_KEY_SENTINEL")
         self.assertEqual(
