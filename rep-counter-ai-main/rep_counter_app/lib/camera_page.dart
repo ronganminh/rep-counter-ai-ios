@@ -623,9 +623,15 @@ class _CameraPageState extends State<CameraPage>
     return n == 0 ? 0 : sum / n;
   }
 
-  /// Gom event của tracker: mỗi `RepCompleted` sinh một `RepMetric` có cờ chất lượng.
-  void _handle(List<RepEvent> events, Duration now, {required bool merge, required String arm}) {
+  /// Gom event của tracker. RepCompleted chỉ bổ sung presentation feedback
+  /// sau khi production counter đã chấp nhận rep; RepAborted không đổi tổng rep.
+  void _handle(List<RepEvent> events, Duration now,
+      {required bool merge, required String arm}) {
     for (final e in events) {
+      if (e is RepAborted) {
+        if (!_repThisFrame) _workout.reportRepAborted(e.reason);
+        continue;
+      }
       if (e is! RepCompleted) continue;
       if (merge && !_merger.accept(arm, now)) continue;
       if (!_workout.acceptsReps) continue;
@@ -779,6 +785,7 @@ class _CameraPageState extends State<CameraPage>
 
 
     double sig = double.nan;
+    var signalRestored = false;
     bool? gateOk;
     if (lm != null) {
       final raw = p.signal(lm, p.minLikelihood);
@@ -803,26 +810,43 @@ class _CameraPageState extends State<CameraPage>
           final v = vals.isEmpty
               ? null
               : _smoothL.add(vals.reduce((a, b) => a + b) / vals.length);
-          if (v != null) sig = v;
+          if (v != null) {
+            sig = v;
+            signalRestored = true;
+          }
           if (_workout.acceptsReps) _handle(_trackL.update(sample(v)), now, merge: false, arm: 'M');
         } else {
           final vl = raw.left == null ? null : _smoothL.add(raw.left!);
-          if (vl != null) sig = vl;
+          if (vl != null) {
+            sig = vl;
+            signalRestored = true;
+          }
           if (_workout.acceptsReps) _handle(_trackL.update(sample(vl)), now, merge: true, arm: 'L');
 
           final vr = raw.right == null ? null : _smoothR.add(raw.right!);
           if (sig.isNaN && vr != null) sig = vr;
+          if (vr != null) signalRestored = true;
           if (_workout.acceptsReps) _handle(_trackR.update(sample(vr)), now, merge: true, arm: 'R');
         }
         if (_calibrating && !sig.isNaN) _calibrator.add(sig);
       } else {
         // Rời tư thế hợp lệ -> huỷ chu kỳ đang dở, đừng ghép đáy cũ với đỉnh mới.
-        _trackL.onInterrupted(now, RepAbortReason.placementLost);
-        _trackR.onInterrupted(now, RepAbortReason.placementLost);
+        final leftAbort =
+            _trackL.onInterrupted(now, RepAbortReason.placementLost);
+        final rightAbort =
+            _trackR.onInterrupted(now, RepAbortReason.placementLost);
+        if (leftAbort != null) {
+          _handle([leftAbort], now, merge: false, arm: 'L');
+        }
+        if (rightAbort != null) {
+          _handle([rightAbort], now, merge: false, arm: 'R');
+        }
         _smoothL.reset();
         _smoothR.reset();
       }
     }
+
+    if (signalRestored) _workout.repSignalRestored();
 
     _workout.frameProcessed(
       at: now,
