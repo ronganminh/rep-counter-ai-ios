@@ -333,7 +333,7 @@ void main() {
 
     testWidgets('final ten HUD shows controller timer reps and truthful live form',
         (tester) async {
-      final state = WorkoutUiState(
+      const state = WorkoutUiState(
         phase: WorkoutUiPhase.active,
         exerciseId: 'push_up',
         exerciseName: 'Push-up',
