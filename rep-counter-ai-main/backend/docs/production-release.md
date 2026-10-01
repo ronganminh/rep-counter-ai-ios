@@ -170,7 +170,24 @@ Example:
 
 Record only the backup path in the private release record.
 
-## Deploy
+## Guarded GitHub Actions deployment
+
+The repository also contains a locked deployment workflow:
+
+    .github/workflows/production-deploy.yml
+
+It cannot deploy from ordinary B7 branch pushes unless the reviewed marker file exists with the exact approval token:
+
+    rep-counter-ai-main/backend/deploy/B7_DEPLOY_APPROVED
+    DEPLOY_B7_2026_10_01
+
+The workflow uses one repository secret named VPS_SSH_KEY. Never paste that private key into issues, commits or chat. The production host key is pinned to the ed25519 key already trusted by the operator workstation.
+
+Before the approval marker is created, the operator must independently verify the exact Google project is Paid Tier and ensure the production .env contains GEMINI_SERVICE_MODE=billing_enabled. The deploy also requires non-interactive sudo on the VPS; it refuses to pass a sudo password through CI.
+
+The workflow stages reviewed files, runs b7_apply.sh transactionally, executes public production smoke, checks privacy-safe logs by request ID, and runs b7_rollback.sh automatically when a post-deploy check fails.
+
+## Manual deploy
 
 From a checked-out copy of the release commit on the VPS, with the repository root as the current directory:
 
