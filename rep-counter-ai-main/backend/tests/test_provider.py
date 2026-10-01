@@ -148,6 +148,11 @@ class ProviderBoundaryTests(unittest.TestCase):
         self.assertEqual(connection.host, "api.groq.com")
         self.assertEqual(path, "/openai/v1/chat/completions")
         self.assertEqual(sent["model"], "openai/gpt-oss-20b")
+        self.assertEqual(sent["temperature"], 0.6)
+        self.assertEqual(sent["max_completion_tokens"], 512)
+        self.assertEqual(sent["reasoning_effort"], "low")
+        self.assertIs(sent["include_reasoning"], False)
+        self.assertNotIn("max_tokens", sent)
         self.assertTrue(connection.closed)
 
     def test_groq_empty_and_overlong_responses_are_rejected(self):
