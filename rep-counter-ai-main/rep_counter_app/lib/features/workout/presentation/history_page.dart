@@ -885,15 +885,19 @@ class _ProgressEmptyState extends StatelessWidget {
             decoration: BoxDecoration(
               color: p.surface,
               borderRadius: BorderRadius.circular(22),
-              border: Border(
-                top: BorderSide(color: p.accent, width: 4),
-                left: BorderSide(color: p.borderStrong),
-                right: BorderSide(color: p.borderStrong),
-                bottom: BorderSide(color: p.borderStrong),
-              ),
+              border: Border.all(color: p.borderStrong),
             ),
             child: Column(
               children: [
+                Container(
+                  width: double.infinity,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: p.accent,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+                const SizedBox(height: 28),
                 Container(
                   width: 140,
                   height: 140,
