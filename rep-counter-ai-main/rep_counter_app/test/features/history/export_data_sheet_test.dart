@@ -100,6 +100,12 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Không thể tạo file xuất'), findsOneWidget);
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('retry-export')),
+      180,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.byKey(const Key('retry-export')), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
