@@ -1,5 +1,5 @@
 [Unit]
-Description=RepCoach AI Gemini feedback backend
+Description=RepCoach AI workout feedback backend
 After=network-online.target
 Wants=network-online.target
 

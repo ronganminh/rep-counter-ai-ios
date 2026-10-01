@@ -1,6 +1,6 @@
 {
   "schema_version": 2,
-  "consent_version": "2026-10-01",
+  "consent_version": "2026-10-01-groq",
   "exercise": "push_up",
   "duration_seconds": 120,
   "reps": 20,

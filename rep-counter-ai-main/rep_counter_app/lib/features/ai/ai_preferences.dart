@@ -1,9 +1,9 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AiPreferences {
-  // Consent wording/data-flow changed in B4. A new key deliberately makes an
-  // older automatic-AI opt-in read as disabled until the user consents again.
-  static const key = 'automatic_ai_consent_2026_10_01';
+  // Provider/data-processing wording changed for Groq production. A new key
+  // deliberately makes older automatic-AI opt-in read as disabled.
+  static const key = 'automatic_ai_consent_2026_10_01_groq';
 
   static Future<bool> enabled() async =>
       (await SharedPreferences.getInstance()).getBool(key) == true;

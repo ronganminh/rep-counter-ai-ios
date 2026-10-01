@@ -51,10 +51,10 @@ class PrivacyContractTests(unittest.TestCase):
 
     def test_policy_and_app_share_effective_date_and_consent_version(self):
         self.assertIn("October 1, 2026", POLICY)
-        self.assertIn("2026-10-01", POLICY)
+        self.assertIn("2026-10-01-groq", POLICY)
         self.assertIn("effectiveDate = '01/10/2026'", LEGAL)
         self.assertIn("effectiveDateEn = 'October 1, 2026'", LEGAL)
-        self.assertIn("aiConsentVersion = '2026-10-01'", LEGAL)
+        self.assertIn("aiConsentVersion = '2026-10-01-groq'", LEGAL)
         self.assertIn("LegalConfig.aiConsentVersion", CONSENT)
 
     def test_public_url_matches_nginx_route(self):
@@ -62,14 +62,18 @@ class PrivacyContractTests(unittest.TestCase):
             "https://repcoach-ai.duckdns.org/privacy-policy.html", LEGAL
         )
         self.assertIn("location = /privacy-policy.html", NGINX)
-        self.assertIn("default_type text/html;", NGINX)
-        self.assertIn("charset utf-8;", NGINX)
+        privacy_block = NGINX.split(
+            "location = /privacy-policy.html", 1
+        )[1].split("}", 1)[0]
+        self.assertIn("proxy_pass http://127.0.0.1:8787;", privacy_block)
+        self.assertNotIn("alias ", privacy_block)
 
-    def test_paid_mode_is_single_provider_policy(self):
-        self.assertIn('SUPPORTED_GEMINI_SERVICE_MODES = {"billing_enabled"}', PROVIDER)
-        self.assertIn("billing-enabled Gemini API project", POLICY)
-        self.assertIn("Gemini API project đã xác minh có billing", POLICY)
-        self.assertNotIn('SUPPORTED_GEMINI_SERVICE_MODES = {"unpaid"', PROVIDER)
+    def test_groq_is_current_provider_policy(self):
+        self.assertIn('provider_name = os.getenv("AI_PROVIDER", "groq")', PROVIDER)
+        self.assertIn("class GroqProvider", PROVIDER)
+        self.assertIn("GroqCloud AI service", POLICY)
+        self.assertIn("Dịch vụ AI GroqCloud", POLICY)
+        self.assertNotIn("Google Gemini paid service", POLICY)
 
     def test_policy_discloses_server_metadata_and_retention(self):
         self.assertIn("source IP address", POLICY)
@@ -81,11 +85,12 @@ class PrivacyContractTests(unittest.TestCase):
         self.assertIn("địa chỉ IP nguồn", POLICY)
         self.assertIn("14 file đã xoay vòng", POLICY)
 
-    def test_policy_discloses_paid_provider_data_treatment(self):
-        self.assertIn("does not use paid-service prompts or responses", POLICY)
-        self.assertIn("limited period", POLICY)
-        self.assertIn("does not claim a specific Google retention period", POLICY)
-        self.assertIn("không tuyên bố có trạng thái zero-data-retention", POLICY)
+    def test_policy_discloses_groq_data_treatment(self):
+        self.assertIn("not retained by default", POLICY)
+        self.assertIn("up to 30 days", POLICY)
+        self.assertIn("does <strong>not</strong> currently claim that ZDR is enabled", POLICY)
+        self.assertIn("hiện <strong>không</strong> tuyên bố ZDR đã được bật", POLICY)
+        self.assertIn("not used to train or fine-tune models", POLICY)
 
     def test_policy_and_consent_cover_ai_optionality(self):
         for value in (
@@ -98,14 +103,15 @@ class PrivacyContractTests(unittest.TestCase):
         self.assertIn("Older history is not uploaded automatically", CONSENT)
         self.assertIn("This consent applies only to the request", CONSENT)
 
-    def test_age_requirement_is_consistent(self):
-        self.assertIn("aged 18 or older", POLICY)
-        self.assertIn("18 tuổi trở lên", POLICY)
-        self.assertIn("aged 18 or older", CONSENT)
-        self.assertIn("18 tuổi trở lên", CONSENT)
+    def test_provider_end_user_terms_are_disclosed(self):
+        self.assertIn("Customer Application", POLICY)
+        self.assertIn("End Users", POLICY)
+        self.assertIn("age of majority", POLICY)
+        self.assertNotIn("Gemini-backed AI", CONSENT)
 
     def test_automatic_consent_key_is_versioned(self):
-        self.assertIn("automatic_ai_consent_2026_10_01", PREFS)
+        self.assertIn("automatic_ai_consent_2026_10_01_groq", PREFS)
+        self.assertNotIn("automatic_ai_consent_2026_10_01';", PREFS)
         self.assertNotIn("automatic_ai_consent_v1", PREFS)
 
     def test_no_stale_android_only_instructions(self):

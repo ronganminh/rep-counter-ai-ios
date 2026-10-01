@@ -697,13 +697,13 @@ class S {
         'Lịch sử tập được lưu cục bộ trên thiết bị và có thể gồm rep, set, thời lượng, mục tiêu, thống kê pose/chất lượng, chi tiết từng rep, hiệu chỉnh và nhận xét AI đã trả về. Kho lịch sử giữ tối đa 100 bản ghi đọc được gần nhất.',
     privAiTitle: 'Nhận xét AI',
     privAiBody:
-        'Khi bạn chủ động yêu cầu hoặc đã đồng ý bật AI tự động, app gửi bản tóm tắt giới hạn gồm bài tập, mục tiêu, rep/set, thời lượng, thống kê pose và chỉ số chất lượng tới backend RepCoach AI. Production chỉ cho phép gửi tiếp tới project Gemini đã xác minh có billing. Không gửi ảnh, video, âm thanh hoặc tọa độ landmark thô.',
+        'Khi bạn chủ động yêu cầu hoặc đã đồng ý bật AI tự động, app gửi bản tóm tắt giới hạn gồm bài tập, mục tiêu, rep/set, thời lượng, thống kê pose và chỉ số chất lượng tới backend RepCoach AI. Production gửi prompt tối giản tới GroqCloud bằng API key chỉ lưu trên server. Không gửi ảnh, video, âm thanh hoặc tọa độ landmark thô.',
     privRetentionTitle: 'Lưu giữ và xóa dữ liệu',
     privRetentionBody:
         'Lịch sử tập và nhận xét AI đã lưu nằm trên thiết bị cho đến khi bạn xóa trong app, xóa dữ liệu ứng dụng hoặc gỡ app. Backend không chủ ý lưu workout body/prompt/response thành lịch sử server. Nginx log xoay mỗi ngày, giữ log hiện tại cộng 14 bản xoay; metadata backend còn đi vào system journal theo cấu hình VPS.',
     privSecurityTitle: 'Bảo mật và bên xử lý',
     privSecurityBody:
-        'Dữ liệu AI được truyền qua HTTPS. RepCoach production chỉ cho phép Gemini Paid Services. Theo điều khoản hiện hành của Google, prompt/response Paid Services không được dùng để cải thiện sản phẩm của Google nhưng có thể được log trong thời gian giới hạn để chống lạm dụng và đáp ứng yêu cầu pháp lý. RepCoach không tuyên bố zero-data-retention.',
+        'Dữ liệu AI được truyền qua HTTPS. RepCoach production dùng GroqCloud. Theo tài liệu GroqCloud hiện hành, dữ liệu inference không được lưu mặc định, ngoại trừ trường hợp cần cho độ tin cậy hệ thống hoặc điều tra lạm dụng; khi đó có thể được giữ tối đa 30 ngày. RepCoach hiện không tuyên bố Zero Data Retention.',
     privContactTitle: 'Liên hệ',
     termsIntroPrefix: 'Khi sử dụng',
     termsIntroSuffix: ', bạn đồng ý với các điều khoản dưới đây.',
@@ -727,7 +727,7 @@ class S {
         'Các tính năng có thể thay đổi, bị gián đoạn hoặc ngừng cung cấp. Điều khoản có thể được cập nhật và ngày hiệu lực mới sẽ được công bố tại đây.',
     privChildrenTitle: 'Quyền riêng tư của trẻ em',
     privChildrenBody:
-        'Nhận xét AI dùng Gemini chỉ dành cho người từ 18 tuổi trở lên theo yêu cầu hiện hành của nhà cung cấp. RepCoach không được bật tính năng Gemini ở production nếu cách phân phối và kiểm soát đối tượng chưa đáp ứng các yêu cầu đó.',
+        'Groq cho phép tích hợp API vào ứng dụng của khách hàng và cung cấp AI cho người dùng cuối. Nếu ứng dụng hướng tới hoặc có khả năng được người chưa đủ tuổi trưởng thành sử dụng, nhà phát triển chịu trách nhiệm tuân thủ các luật áp dụng về trẻ em và dữ liệu cá nhân.',
     privChoicesTitle: 'Lựa chọn của bạn',
     privChoicesBody:
         'Bạn có thể dùng bộ đếm rep trên thiết bị mà không bật AI. Bạn có thể thu hồi quyền camera trong cài đặt thiết bị, tắt AI tự động cho các yêu cầu tương lai và xóa lịch sử tập/hiệu chỉnh lưu trên máy trong ứng dụng. Việc tắt hoặc xóa cục bộ không thể thu hồi yêu cầu AI đã gửi.',
@@ -941,13 +941,13 @@ class S {
         'Workout history is stored locally and can include reps, sets, duration, goals, pose/quality statistics, per-rep detail, calibration and returned AI feedback. The history store keeps up to the latest 100 readable workout records.',
     privAiTitle: 'AI feedback',
     privAiBody:
-        'When you request AI feedback or opt in to automatic feedback, the app sends a limited summary including exercise, goal, reps/sets, duration, pose statistics and quality metrics to the RepCoach AI backend. Production only forwards requests to a verified billing-enabled Gemini project. No images, video, audio or raw landmark coordinates are sent.',
+        'When you request AI feedback or opt in to automatic feedback, the app sends a limited summary including exercise, goal, reps/sets, duration, pose statistics and quality metrics to the RepCoach AI backend. Production sends the minimized prompt to GroqCloud using an API key stored only on the server. No images, video, audio or raw landmark coordinates are sent.',
     privRetentionTitle: 'Data retention and deletion',
     privRetentionBody:
         'Workout history and saved AI feedback remain on your device until deleted in the app, app storage is cleared, or the app is uninstalled. The backend does not intentionally keep workout bodies/prompts/responses as server history. Nginx logs rotate daily with the current log plus 14 rotations; backend metadata also enters the host system journal under VPS retention settings.',
     privSecurityTitle: 'Security and processors',
     privSecurityBody:
-        'AI data is sent over HTTPS. RepCoach production permits Gemini Paid Services only. Under Google\'s current terms, Paid Services prompts/responses are not used to improve Google products but may be logged for a limited period for abuse prevention and required legal disclosures. RepCoach does not claim zero data retention.',
+        'AI data is sent over HTTPS. RepCoach production uses GroqCloud. Under GroqCloud\'s current documentation, inference customer data is not retained by default except when needed for system reliability or abuse investigation; in those cases it may be retained for up to 30 days. RepCoach does not currently claim Zero Data Retention.',
     privContactTitle: 'Contact',
     termsIntroPrefix: 'By using',
     termsIntroSuffix: ', you agree to the terms below.',
@@ -971,7 +971,7 @@ class S {
         'Features may change, be interrupted, or be discontinued. We may update these terms, and a new effective date will be published here.',
     privChildrenTitle: 'Children and privacy',
     privChildrenBody:
-        'Gemini-backed AI feedback is for users aged 18 or older under the provider\'s current requirements. RepCoach must not enable Gemini in production unless product distribution and audience controls satisfy those requirements.',
+        'Groq permits API integration into a Customer Application and making AI services available to End Users. If the app is directed toward or likely to be accessed by people under the age of majority, the developer is responsible for complying with applicable child and personal-data laws.',
     privChoicesTitle: 'Your choices',
     privChoicesBody:
         'You can use the on-device rep counter without AI. You may revoke camera permission in your device settings, disable automatic AI for future requests, and delete locally stored workout history/calibration in the app. Disabling AI or deleting local data cannot recall an AI request already sent.',

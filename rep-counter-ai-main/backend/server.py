@@ -29,6 +29,7 @@ SUPPORTED_REQUEST_SCHEMA_VERSIONS = {1, 2}
 SUPPORTED_EXERCISES = {"push_up", "pull_up", "curl", "overhead_extension"}
 SUPPORTED_LOCALES = {"vi", "en"}
 REQUEST_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{32}$")
+PRIVACY_POLICY_PATH = Path(__file__).with_name("static") / "privacy-policy.html"
 
 CORE_FIELDS = {
     "exercise",
@@ -279,6 +280,23 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(body)
         self._log_response(status, data.get("error"))
 
+    def reply_content(
+        self,
+        status: int,
+        body: bytes,
+        *,
+        content_type: str,
+    ) -> None:
+        request_id = self._ensure_request_id()
+        self.send_response(status)
+        self.send_header("content-type", content_type)
+        self.send_header("content-length", str(len(body)))
+        self.send_header("cache-control", "no-store")
+        self.send_header("x-request-id", request_id)
+        self.end_headers()
+        self.wfile.write(body)
+        self._log_response(status)
+
     def _log_response(self, status: int, error_code: object = None) -> None:
         event = {
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -306,6 +324,18 @@ class Handler(BaseHTTPRequestHandler):
         route = self.path.split("?", 1)[0]
         if route == "/health":
             self.reply(200, {"status": "ok"})
+            return
+        if route == "/privacy-policy.html":
+            try:
+                body = PRIVACY_POLICY_PATH.read_bytes()
+            except OSError:
+                self.reply(500, error_response("SERVER_ERROR"))
+                return
+            self.reply_content(
+                200,
+                body,
+                content_type="text/html; charset=utf-8",
+            )
             return
         if route == "/ready":
             if provider_configuration_ready():

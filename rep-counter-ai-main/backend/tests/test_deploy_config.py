@@ -11,14 +11,14 @@ class DeployConfigTests(unittest.TestCase):
     def test_body_limit_matches_app_limit(self):
         self.assertIn("client_max_body_size 16k;", NGINX)
 
-    def test_privacy_policy_route_is_static_html_utf8(self):
+    def test_privacy_policy_route_is_proxied_to_backend(self):
         self.assertIn("location = /privacy-policy.html", NGINX)
-        self.assertIn(
-            "alias /home/nduythanh/apps/repcoach-backend/static/privacy-policy.html;",
-            NGINX,
-        )
-        self.assertIn("default_type text/html;", NGINX)
-        self.assertIn("charset utf-8;", NGINX)
+        privacy_block = NGINX.split(
+            "location = /privacy-policy.html", 1
+        )[1].split("}", 1)[0]
+        self.assertIn("proxy_pass http://127.0.0.1:8787;", privacy_block)
+        self.assertIn("proxy_set_header X-Request-ID $request_id;", privacy_block)
+        self.assertNotIn("alias ", privacy_block)
 
     def test_health_and_readiness_are_proxied_with_request_ids(self):
         self.assertIn("location = /health", NGINX)
