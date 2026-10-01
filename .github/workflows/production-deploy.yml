@@ -101,7 +101,7 @@ jobs:
           output="$(
             ssh -i "$HOME/.ssh/repcoach_b7"               -o IdentitiesOnly=yes               -o BatchMode=yes               -o StrictHostKeyChecking=yes               nduythanh@14.225.207.90 '
                 set -eu
-                stage="/tmp/repcoach-b7-$(date -u +%Y%m%dT%H%M%SZ)"
+                stage="/tmp/repcoach-b7-stage"
                 rm -rf "$stage"
                 mkdir -p "$stage"
                 tar -xzf /tmp/repcoach-b7.tgz -C "$stage"
@@ -160,8 +160,8 @@ jobs:
           echo "Post-deploy validation failed; rolling back."
           ssh -i "$HOME/.ssh/repcoach_b7"             -o IdentitiesOnly=yes             -o BatchMode=yes             -o StrictHostKeyChecking=yes             nduythanh@14.225.207.90 "
               set -eu
-              stage=$(ls -dt /tmp/repcoach-b7-* 2>/dev/null | head -n1)
-              test -n \"$stage\"
+              stage=/tmp/repcoach-b7-stage
+              test -d \"$stage\"
               chmod 0755 \"$stage/deploy/b7_rollback.sh\"
               \"$stage/deploy/b7_rollback.sh\" '$BACKUP'
             "
