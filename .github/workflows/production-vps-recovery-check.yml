@@ -60,6 +60,45 @@ jobs:
               ls -l "$app/server.py" "$app/ai_provider.py" 2>/dev/null || true
             '
 
+      - name: Inspect privacy permissions and Nginx site
+        shell: bash
+        run: |
+          ssh -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            nduythanh@14.225.207.90 '
+              set +e
+              app=/home/nduythanh/apps/repcoach-backend
+              echo "PRIVACY_NAMEI"
+              namei -l "$app/static/privacy-policy.html" 2>&1 || true
+              echo "PRIVACY_LS"
+              ls -ld "$app" "$app/static" 2>&1 || true
+              ls -l "$app/static/privacy-policy.html" 2>&1 || true
+              echo "NGINX_SITE"
+              sed -n "1,260p" /etc/nginx/sites-available/repcoach-ai 2>&1 || true
+            '
+
+      - name: Upload Groq diagnostic
+        shell: bash
+        run: |
+          scp -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            rep-counter-ai-main/backend/tools/groq_shape_diagnose.py \
+            nduythanh@14.225.207.90:/tmp/groq_shape_diagnose.py
+
+      - name: Run Groq synthetic response-shape diagnostic
+        shell: bash
+        run: |
+          ssh -i "$HOME/.ssh/repcoach_b7" \
+            -o IdentitiesOnly=yes \
+            -o BatchMode=yes \
+            -o StrictHostKeyChecking=yes \
+            nduythanh@14.225.207.90 \
+            'python3 /tmp/groq_shape_diagnose.py; rm -f /tmp/groq_shape_diagnose.py'
+
       - name: Show reviewed app hashes
         shell: bash
         run: |
