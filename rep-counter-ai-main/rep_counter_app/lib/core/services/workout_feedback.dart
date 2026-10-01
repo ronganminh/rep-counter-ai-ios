@@ -113,6 +113,23 @@ class WorkoutFeedback {
     _say('$seconds');
   }
 
+  void routineRest({
+    required int completedSet,
+    required int restSeconds,
+  }) {
+    if (_disposed) return;
+    _say(language == AppLanguage.vi
+        ? 'Hoàn thành set $completedSet. Nghỉ $restSeconds giây.'
+        : 'Set $completedSet complete. Rest for $restSeconds seconds.');
+  }
+
+  void routineResume(int nextSet) {
+    if (_disposed) return;
+    _say(language == AppLanguage.vi
+        ? 'Bắt đầu set $nextSet.'
+        : 'Start set $nextSet.');
+  }
+
   bool _canCue(Duration at) {
     if (!preferences.voice || !preferences.cues || _disposed) return false;
     if (_lastCue != null && at - _lastCue! < const Duration(seconds: 8)) {
