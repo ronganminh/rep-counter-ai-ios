@@ -143,7 +143,7 @@ _FeedbackCopy _copy(BuildContext context, RepFeedback feedback) {
       );
     case RepFeedbackKind.countedWarning:
       return _FeedbackCopy(
-        context.tr('ĐÃ TÍNH', 'COUNTED'),
+        context.tr('✓ ĐÃ TÍNH', '✓ COUNTED'),
         _warningMessage(context, feedback.primaryFlag),
       );
     case RepFeedbackKind.placementInterrupted:
