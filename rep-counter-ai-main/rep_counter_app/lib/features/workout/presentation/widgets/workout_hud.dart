@@ -572,9 +572,9 @@ class _TimedChallengeHud extends StatelessWidget {
                 const SizedBox(height: 14),
                 Row(
                   children: [
-                    Expanded(
+                    const Expanded(
                       child: _TimedStatPill(
-                        key: const Key('timed-form-stat'),
+                        key: Key('timed-form-stat'),
                         label: 'FORM —',
                       ),
                     ),
