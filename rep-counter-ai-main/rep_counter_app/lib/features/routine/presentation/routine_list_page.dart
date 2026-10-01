@@ -5,6 +5,7 @@ import '../../../camera_page.dart';
 import '../../../core/config/feature_flags.dart';
 import '../../../core/i18n/locale_controller.dart';
 import '../../../exercise.dart';
+import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../data/routine_store.dart';
