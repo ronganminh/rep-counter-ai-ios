@@ -59,7 +59,9 @@ void main() {
       routine: routine,
       trackingClock: tracking,
       clock: session,
-      saveRecord: (record) async => saved = record,
+      saveRecord: (record) async {
+        saved = record;
+      },
     );
     addTearDown(controller.dispose);
 
