@@ -292,7 +292,7 @@ jobs:
           result_found=0
           last_status=""
           stalled_checks=0
-          for _ in $(seq 1 660); do
+          for _ in $(seq 1 960); do
             if grep -Eq "F0000|Check failed:|Abort trap|Terminated due to signal" "$stderr_log" 2>/dev/null; then
               cat "$stderr_log"
               echo "[CI_VIDEO_ERROR] native_mlkit_crash" \
