@@ -136,6 +136,23 @@ class ProductionReleaseTests(unittest.TestCase):
         self.assertNotIn("push:", SMOKE_WORKFLOW)
         self.assertIn("python tools/production_smoke.py", SMOKE_WORKFLOW)
 
+    def test_temporary_b7_diagnostics_are_removed(self):
+        obsolete = (
+            REPO / ".github" / "workflows" / "production-deploy.yml",
+            REPO / ".github" / "workflows" / "production-vps-preflight.yml",
+            REPO / ".github" / "workflows" / "production-vps-recovery-check.yml",
+            REPO / ".github" / "workflows" / "production-runtime-diagnose.yml",
+            BACKEND / "tools" / "groq_shape_diagnose.py",
+        )
+        for path in obsolete:
+            self.assertFalse(path.exists(), str(path))
+
+    def test_ops_workflow_health_check_has_literal_json_marker(self):
+        self.assertIn(
+            'grep -Fq "\\"status\\": \\"ok\\""',
+            OPS_WORKFLOW,
+        )
+
     def test_apply_requires_groq_and_supports_manual_sudo(self):
         self.assertIn("AI_PROVIDER=groq", APPLY)
         self.assertIn("GROQ_API_KEY", APPLY)
