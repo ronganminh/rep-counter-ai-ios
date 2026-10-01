@@ -5,10 +5,12 @@ on:
     branches: [main, master]
     paths:
       - "rep-counter-ai-main/backend/**"
+      - "rep-counter-ai-main/contracts/**"
       - ".github/workflows/backend-ci.yml"
   pull_request:
     paths:
       - "rep-counter-ai-main/backend/**"
+      - "rep-counter-ai-main/contracts/**"
       - ".github/workflows/backend-ci.yml"
   workflow_dispatch:
 
@@ -41,7 +43,7 @@ jobs:
         run: python --version
 
       - name: Compile backend
-        run: python -m compileall -q server.py ai_provider.py tests
+        run: python -m compileall -q server.py ai_provider.py tests tools
 
       - name: Run backend tests
         run: python -m unittest discover -s tests -v

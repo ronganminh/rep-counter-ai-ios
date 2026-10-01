@@ -1,0 +1,97 @@
+name: RepCoach Staging Integration CI
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "rep-counter-ai-main/contracts/**"
+      - "rep-counter-ai-main/backend/**"
+      - "rep-counter-ai-main/rep_counter_app/lib/features/ai/**"
+      - "rep-counter-ai-main/rep_counter_app/lib/features/workout/data/workout_record.dart"
+      - "rep-counter-ai-main/rep_counter_app/lib/core/legal/legal_config.dart"
+      - "rep-counter-ai-main/rep_counter_app/test/features/ai/**"
+      - "rep-counter-ai-main/rep_counter_app/tool/staging_contract_smoke.dart"
+      - ".github/workflows/staging-integration-ci.yml"
+  pull_request:
+    paths:
+      - "rep-counter-ai-main/contracts/**"
+      - "rep-counter-ai-main/backend/**"
+      - "rep-counter-ai-main/rep_counter_app/lib/features/ai/**"
+      - "rep-counter-ai-main/rep_counter_app/lib/features/workout/data/workout_record.dart"
+      - "rep-counter-ai-main/rep_counter_app/lib/core/legal/legal_config.dart"
+      - "rep-counter-ai-main/rep_counter_app/test/features/ai/**"
+      - "rep-counter-ai-main/rep_counter_app/tool/staging_contract_smoke.dart"
+      - ".github/workflows/staging-integration-ci.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repcoach-staging-ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+
+jobs:
+  synthetic-staging:
+    name: Flutter to backend synthetic contract
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Start synthetic staging backend
+        working-directory: rep-counter-ai-main/backend
+        run: |
+          python tools/fake_staging_server.py > /tmp/repcoach-staging.log 2>&1 &
+          echo $! > /tmp/repcoach-staging.pid
+          for _ in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8787/health >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/repcoach-staging.log
+          exit 1
+
+      - name: Resolve Flutter dependencies
+        working-directory: rep-counter-ai-main/rep_counter_app
+        run: flutter pub get
+
+      - name: Run real HTTP contract smoke
+        working-directory: rep-counter-ai-main/rep_counter_app
+        env:
+          STAGING_BASE_URL: http://127.0.0.1:8787
+        run: dart run tool/staging_contract_smoke.dart
+
+      - name: Run focused Flutter integration tests
+        working-directory: rep-counter-ai-main/rep_counter_app
+        run: |
+          flutter test --reporter expanded             test/features/ai/ai_feedback_service_test.dart             test/features/ai/ai_result_integration_test.dart
+
+      - name: Show backend staging log
+        if: always()
+        run: cat /tmp/repcoach-staging.log || true
+
+      - name: Stop synthetic staging backend
+        if: always()
+        run: |
+          if [[ -f /tmp/repcoach-staging.pid ]]; then
+            kill "$(cat /tmp/repcoach-staging.pid)" 2>/dev/null || true
+          fi

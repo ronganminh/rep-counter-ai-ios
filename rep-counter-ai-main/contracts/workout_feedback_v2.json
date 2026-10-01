@@ -1,0 +1,21 @@
+{
+  "schema_version": 2,
+  "consent_version": "2026-10-01",
+  "exercise": "push_up",
+  "duration_seconds": 120,
+  "reps": 20,
+  "sets": 2,
+  "target_reps": 20,
+  "goal_reached": true,
+  "placement_score": 95,
+  "pose_frames": 1000,
+  "pose_lost_frames": 20,
+  "flagged_reps": 1,
+  "avg_rep_sec": 1.5,
+  "avg_amplitude": 52.0,
+  "amplitude_drop_percent": 5.0,
+  "left_right_diff_percent": 4.0,
+  "quality_score": 88,
+  "has_enough_data": true,
+  "locale": "en"
+}
