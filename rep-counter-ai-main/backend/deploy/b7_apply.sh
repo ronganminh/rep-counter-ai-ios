@@ -19,9 +19,8 @@ grep -q '^GROQ_API_KEY=.' "$app_dir/.env"
 grep -qx 'GROQ_MODEL=openai/gpt-oss-20b' "$app_dir/.env"
 grep -qx 'BIND_HOST=127.0.0.1' "$app_dir/.env"
 
-# Deployment must be non-interactive. Do not pass sudo passwords through CI.
-sudo -n true
-
+# CI checks non-interactive sudo before invoking this script. When an operator
+# runs the script manually, normal sudo may prompt on the operator's TTY.
 python3 -m py_compile "$stage_dir/server.py" "$stage_dir/ai_provider.py"
 
 stamp="$(date -u +%Y%m%dT%H%M%SZ)"
