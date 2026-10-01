@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
 import '../../workout/data/workout_record.dart';
 
@@ -15,7 +16,7 @@ class WorkoutExportFile {
     required this.mimeType,
   });
 
-  final List<int> bytes;
+  final Uint8List bytes;
   final String fileName;
   final String mimeType;
 }
@@ -56,12 +57,12 @@ class WorkoutExportService {
     final stamp = _dateStamp(now ?? DateTime.now());
     return switch (format) {
       WorkoutExportFormat.csv => WorkoutExportFile(
-          bytes: utf8.encode(_csv(records, includeSavedAiFeedback)),
+          bytes: Uint8List.fromList(utf8.encode(_csv(records, includeSavedAiFeedback))),
           fileName: 'repcoach-workouts-$stamp.csv',
           mimeType: 'text/csv',
         ),
       WorkoutExportFormat.json => WorkoutExportFile(
-          bytes: utf8.encode(_json(records, includeSavedAiFeedback)),
+          bytes: Uint8List.fromList(utf8.encode(_json(records, includeSavedAiFeedback))),
           fileName: 'repcoach-workouts-$stamp.json',
           mimeType: 'application/json',
         ),
