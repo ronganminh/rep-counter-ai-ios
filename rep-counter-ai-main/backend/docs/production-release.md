@@ -143,14 +143,14 @@ Example:
 
     sudo install -d -m 0700 "$backup/app" "$backup/system"
 
-    sudo cp -a /home/nduythanh/apps/repcoach-backend/server.py "$backup/app/" 2>/dev/null || true
-    sudo cp -a /home/nduythanh/apps/repcoach-backend/ai_provider.py "$backup/app/" 2>/dev/null || true
-    sudo cp -a /home/nduythanh/apps/repcoach-backend/static "$backup/app/" 2>/dev/null || true
+    sudo cp -a /home/nduythanh/apps/repcoach-backend/server.py "$backup/app/server.py" 2>/dev/null || true
+    sudo cp -a /home/nduythanh/apps/repcoach-backend/ai_provider.py "$backup/app/ai_provider.py" 2>/dev/null || true
+    sudo cp -a /home/nduythanh/apps/repcoach-backend/static "$backup/app/static" 2>/dev/null || true
 
-    sudo cp -a /etc/systemd/system/repcoach-backend.service "$backup/system/" 2>/dev/null || true
-    sudo cp -a /etc/nginx/sites-available/repcoach-ai "$backup/system/" 2>/dev/null || true
-    sudo cp -a /etc/nginx/conf.d/repcoach-rate-limit.conf "$backup/system/" 2>/dev/null || true
-    sudo cp -a /etc/logrotate.d/repcoach-ai "$backup/system/" 2>/dev/null || true
+    sudo cp -a /etc/systemd/system/repcoach-backend.service "$backup/system/repcoach-backend.service" 2>/dev/null || true
+    sudo cp -a /etc/nginx/sites-available/repcoach-ai "$backup/system/nginx-site" 2>/dev/null || true
+    sudo cp -a /etc/nginx/conf.d/repcoach-rate-limit.conf "$backup/system/rate-limit.conf" 2>/dev/null || true
+    sudo cp -a /etc/logrotate.d/repcoach-ai "$backup/system/logrotate" 2>/dev/null || true
 
 Record only the backup path in the private release record.
 
@@ -277,9 +277,9 @@ Assuming backup points to the pre-deploy directory created above:
     fi
 
     sudo cp -a "$backup/system/repcoach-backend.service" /etc/systemd/system/repcoach-backend.service 2>/dev/null || true
-    sudo cp -a "$backup/system/repcoach-ai" /etc/nginx/sites-available/repcoach-ai 2>/dev/null || true
-    sudo cp -a "$backup/system/repcoach-rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf 2>/dev/null || true
-    sudo cp -a "$backup/system/repcoach-ai" /etc/logrotate.d/repcoach-ai 2>/dev/null || true
+    sudo cp -a "$backup/system/nginx-site" /etc/nginx/sites-available/repcoach-ai 2>/dev/null || true
+    sudo cp -a "$backup/system/rate-limit.conf" /etc/nginx/conf.d/repcoach-rate-limit.conf 2>/dev/null || true
+    sudo cp -a "$backup/system/logrotate" /etc/logrotate.d/repcoach-ai 2>/dev/null || true
 
     sudo systemctl daemon-reload
     sudo nginx -t
