@@ -6,6 +6,7 @@ on:
       - feature/backend-b7-production
     paths:
       - ".github/workflows/production-vps-recovery-check.yml"
+      - "rep-counter-ai-main/backend/tools/groq_shape_diagnose.py"
   workflow_dispatch:
 
 permissions:
