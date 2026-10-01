@@ -19,6 +19,8 @@ from urllib.parse import urlparse
 
 
 REQUEST_ID_RE = re.compile(r"^[0-9a-f]{32}$")
+RATE_LIMIT_INTERVAL_SECONDS = 6.2
+RATE_LIMIT_SETTLE_SECONDS = 19.0
 FORBIDDEN_PUBLIC_MARKERS = (
     "GROQ_API_KEY",
     "api.groq.com",
@@ -225,7 +227,18 @@ def check_consent_gate(host: str, port: int, fixture_path: Path) -> None:
     missing_consent.pop("consent_version", None)
     variants.append(("missing_consent", missing_consent))
 
-    for name, payload in variants:
+    # Production uses a shared 10r/m source-IP bucket. Earlier smoke
+    # checks consume that same bucket, so let it drain before adding the B9
+    # negative-contract probes and pace subsequent feedback requests.
+    print(
+        "INFO consent_gate waiting for production rate-limit bucket "
+        f"settle_seconds={RATE_LIMIT_SETTLE_SECONDS}"
+    )
+    time.sleep(RATE_LIMIT_SETTLE_SECONDS)
+
+    for index, (name, payload) in enumerate(variants):
+        if index:
+            time.sleep(RATE_LIMIT_INTERVAL_SECONDS)
         body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
         status, headers, raw, _ = _request(
             host,
@@ -248,6 +261,9 @@ def check_consent_gate(host: str, port: int, fixture_path: Path) -> None:
         _check_https_headers(headers)
         _check_request_id(headers)
         print(f"PASS consent_gate variant={name}")
+
+    # Leave one interval before the valid provider-backed feedback request.
+    time.sleep(RATE_LIMIT_INTERVAL_SECONDS)
 
 
 def check_feedback(host: str, port: int, fixture_path: Path) -> str:
