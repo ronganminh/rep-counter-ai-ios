@@ -215,6 +215,25 @@ No camera, RepCounter, RepTracker, WorkoutController, WorkoutUiState or persiste
 engine file changed in that comparison. This supports keeping 28/67 as the regression
 baseline, but it does **not** convert the timed-out current pushup-2 run into a pass.
 
+### Final A0 validation — GitHub Actions run #29
+
+Commit: `434f402597b2fab71377584a23863fcdaec7676a`
+
+- Analyze and Flutter tests: **PASS**
+- pushup-1 production replay: **PASS**
+  - frames: 3901
+  - HUD reps: 28
+  - saved reps: 28
+  - result reps: 28
+- pushup-2 production replay: **PASS**
+  - frames: 9007
+  - HUD reps: 67
+  - saved reps: 67
+  - result reps: 67
+
+Run #29 completed successfully after extending the job timeout and the internal polling
+window. The rep engine and frozen regression baselines were not changed.
+
 ## 6. Ground-truth metadata rule
 
 `test/fixtures/video_ground_truth.json` deliberately keeps
@@ -232,27 +251,30 @@ human annotation must remain separately measurable.
 | Shared Figma components confirmed | PASS |
 | Current analyze/tests | PASS |
 | Current production replay A = 28 and HUD=saved=result | PASS |
-| Current production replay B = 67 and HUD=saved=result | **NOT VERIFIED — run timed out** |
+| Current production replay B = 67 and HUD=saved=result | PASS |
 | Ground-truth metadata file created | PASS |
 | Guardrail ADR created | PASS |
 | Unnecessary product code changes | NONE |
 
-A0 must not be reported as fully green while the current-main pushup-2 replay remains
-inconclusive. Do not change 67 merely to make CI green.
+A0 is fully green on run #29. Baselines remain 28 / 67 and are still distinct from
+human ground truth.
 
 ## 8. CI timeout remediation
 
 The infrastructure timeout identified during A0 was fixed on `main` without touching
 the rep engine:
 
-- commit: `9bfc57057fb03c7ba671c72b2a3136c3ef3fcd7e`
-- change: iOS replay job `timeout-minutes` increased from `75` to `110`
-- new validation run: GitHub Actions run `36756011685` (run #25)
-- baseline remains `pushup-a = 28`, `pushup-b = 67`
+- commit `9bfc57057fb03c7ba671c72b2a3136c3ef3fcd7e`: iOS replay job
+  `timeout-minutes` increased from `75` to `110`;
+- commit `434f402597b2fab71377584a23863fcdaec7676a`: internal replay polling
+  window increased from `660` to `960` iterations;
+- five-minute stall detection remains unchanged;
+- final validation: GitHub Actions run #29 (`36806535665`) — **SUCCESS**;
+- baseline remains `pushup-a = 28`, `pushup-b = 67`.
 
-This is an infrastructure-only remediation. A0 is fully green only after run #25
-finishes with both production replay fixtures matching their frozen engine baselines.
+These were infrastructure-only changes. No rep-counting algorithm or production
+baseline was changed to make CI green.
 
-## 8. Stop boundary
+## 9. Stop boundary
 
 No A1 implementation is included in this branch.
