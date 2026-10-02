@@ -73,10 +73,10 @@ void main() {
     expect(regression['pushup_1']['human_ground_truth'], isNull);
     expect(regression['pushup_2']['human_ground_truth'], isNull);
 
-    expect(baseline['pushup-1']['current_engine_count'], 28);
-    expect(baseline['pushup-2']['current_engine_count'], 67);
-    expect(baseline['pushup-1']['human_ground_truth'], isNull);
-    expect(baseline['pushup-2']['human_ground_truth'], isNull);
+    expect(baseline['pushup-a']['current_engine_count'], 28);
+    expect(baseline['pushup-b']['current_engine_count'], 67);
+    expect(baseline['pushup-a']['human_ground_truth'], isNull);
+    expect(baseline['pushup-b']['human_ground_truth'], isNull);
   });
 
   test('A9 keeps pull-up gated after the blocked A8 decision', () {
