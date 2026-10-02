@@ -1,4 +1,5 @@
 name: RepCoach Staging Integration CI
+# A9 full stabilization trigger; restored before merge.
 
 on:
   push:
