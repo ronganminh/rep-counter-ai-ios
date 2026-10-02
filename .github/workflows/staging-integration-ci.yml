@@ -1,5 +1,4 @@
 name: RepCoach Staging Integration CI
-# A8 temporary branch trigger; restored before merge.
 
 on:
   push:
