@@ -1,4 +1,4 @@
-name: Publish SaveStream downloader v0.2
+name: Fix and validate SaveStream downloader v0.2
 
 on:
   push:
@@ -11,28 +11,11 @@ permissions:
   contents: read
 
 jobs:
-  publish:
+  fix-validate-publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 20
     steps:
-      - name: Checkout bridge branch
-        uses: actions/checkout@v4
-
-      - name: Reconstruct downloader source archive
-        shell: bash
-        run: |
-          set -euo pipefail
-          cat .bridge/savestream-downloader/chunk*.b64 > /tmp/savestream-downloader.b64
-          base64 -d /tmp/savestream-downloader.b64 > /tmp/savestream-downloader.zip
-          unzip -t /tmp/savestream-downloader.zip
-          mkdir -p /tmp/savestream-downloader-src
-          unzip -q /tmp/savestream-downloader.zip -d /tmp/savestream-downloader-src
-          test -f /tmp/savestream-downloader-src/pyproject.toml
-          test -f /tmp/savestream-downloader-src/src/savestream_downloader/main.py
-          echo "archive_bytes=$(wc -c < /tmp/savestream-downloader.zip)"
-          find /tmp/savestream-downloader-src -maxdepth 3 -type f | sort
-
-      - name: Publish to savestream-video-downloader
+      - name: Clone target repository
         env:
           BRIDGE_TOKEN: ${{ secrets.SAVESTREAM_DOWNLOADER_PUSH_TOKEN }}
         shell: bash
@@ -42,20 +25,60 @@ jobs:
             echo "::error::SAVESTREAM_DOWNLOADER_PUSH_TOKEN is missing or empty"
             exit 1
           fi
-
           auth="$(printf 'x-access-token:%s' "$BRIDGE_TOKEN" | base64 -w0)"
-          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth"             clone https://github.com/ronganminh/savestream-video-downloader.git /tmp/target
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth"             clone https://github.com/ronganminh/savestream-video-downloader.git target
 
-          cd /tmp/target
-          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
-          cp -a /tmp/savestream-downloader-src/. .
+      - name: Fix development dependency and package version
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          from pathlib import Path
+          p = Path("target/pyproject.toml")
+          s = p.read_text()
+          old = '"pytest==9.0.2"'
+          new = '"pytest==8.4.2"'
+          if old not in s:
+              raise SystemExit(f"expected dependency not found: {old}")
+          p.write_text(s.replace(old, new))
 
+          init = Path("target/src/savestream_downloader/__init__.py")
+          s = init.read_text()
+          if '__version__ = "0.1.0"' not in s:
+              raise SystemExit("expected old __version__ not found")
+          init.write_text(s.replace('__version__ = "0.1.0"', '__version__ = "0.2.0"'))
+          PY
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install and validate
+        shell: bash
+        working-directory: target
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          pip install -e '.[dev]'
+          ruff check src tests
+          mypy src
+          pytest -q
+
+      - name: Publish fixes
+        env:
+          BRIDGE_TOKEN: ${{ secrets.SAVESTREAM_DOWNLOADER_PUSH_TOKEN }}
+        shell: bash
+        working-directory: target
+        run: |
+          set -euo pipefail
           git config user.name "savestream-bridge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add -A
+          git add pyproject.toml src/savestream_downloader/__init__.py
           if git diff --cached --quiet; then
             echo "No changes to publish"
             exit 0
           fi
-          git commit -m "feat: support TikTok photo carousels"
+          git commit -m "fix: align test dependencies and package version"
+          auth="$(printf 'x-access-token:%s' "$BRIDGE_TOKEN" | base64 -w0)"
           git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth" push origin HEAD:main
