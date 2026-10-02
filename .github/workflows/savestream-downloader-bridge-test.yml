@@ -61,6 +61,7 @@ jobs:
           set -euo pipefail
           python -m pip install --upgrade pip
           pip install -e '.[dev]'
+          ruff check src tests --fix
           ruff check src tests
           mypy src
           pytest -q
@@ -74,11 +75,11 @@ jobs:
           set -euo pipefail
           git config user.name "savestream-bridge-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add pyproject.toml src/savestream_downloader/__init__.py
+          git add -A
           if git diff --cached --quiet; then
             echo "No changes to publish"
             exit 0
           fi
-          git commit -m "fix: align test dependencies and package version"
+          git commit -m "fix: clean CI for photo carousel backend"
           auth="$(printf 'x-access-token:%s' "$BRIDGE_TOKEN" | base64 -w0)"
           git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth" push origin HEAD:main
