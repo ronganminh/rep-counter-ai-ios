@@ -10,6 +10,9 @@ import '../domain/workout_mode.dart';
 import 'widgets/rep_pace_chart.dart';
 import '../../share/story_page.dart';
 import '../../ai/ai_preferences.dart';
+import '../../achievements/achievement.dart';
+import '../../achievements/achievement_service.dart';
+import '../../achievements/presentation/achievement_earned_card.dart';
 import 'widgets/form_score_details.dart';
 import 'widgets/result_feedback_card.dart';
 import 'widgets/result_hero.dart';
@@ -41,13 +44,35 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   late ResultController _controller;
   late final _history = widget.historyStore ?? WorkoutHistoryStore();
+  late final AchievementService _achievementService;
+  List<AchievementId> _newAchievements = const <AchievementId>[];
   bool _deleting = false;
   @override
   void initState() {
     super.initState();
+    _achievementService = AchievementService(history: _history);
     _createController();
+    if (!widget.readOnly) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _loadAchievements());
+    }
     if (widget.offerAutomaticAi && !widget.readOnly) {
       WidgetsBinding.instance.addPostFrameCallback((_) => _automaticAi());
+    }
+  }
+
+  Future<void> _loadAchievements() async {
+    final recordId = widget.record.id;
+    try {
+      final earned =
+          await _achievementService.claimAfterResult(widget.record);
+      if (!mounted ||
+          widget.readOnly ||
+          widget.record.id != recordId) {
+        return;
+      }
+      setState(() => _newAchievements = earned);
+    } catch (_) {
+      // Local achievement persistence must never block the saved result.
     }
   }
 
@@ -81,6 +106,11 @@ class _ResultPageState extends State<ResultPage> {
     if (oldWidget.record != widget.record) {
       _controller.dispose();
       _createController();
+      _newAchievements = const <AchievementId>[];
+      if (!widget.readOnly) {
+        WidgetsBinding.instance
+            .addPostFrameCallback((_) => _loadAchievements());
+      }
     }
   }
 
@@ -213,6 +243,16 @@ class _ResultPageState extends State<ResultPage> {
                       record: r,
                       loadPreviousBest: widget.timedBestLoader,
                     ),
+                    if (_newAchievements.isNotEmpty) ...[
+                      const SizedBox(height: 24),
+                      for (var i = 0; i < _newAchievements.length; i++) ...[
+                        AchievementEarnedCard(
+                          achievement: _newAchievements[i],
+                        ),
+                        if (i != _newAchievements.length - 1)
+                          const SizedBox(height: 16),
+                      ],
+                    ],
                     const SizedBox(height: 24),
                     Text(
                       s.resultDisclaimer,
@@ -229,6 +269,16 @@ class _ResultPageState extends State<ResultPage> {
                   padding: const EdgeInsets.fromLTRB(20, 20, 20, 24),
                   children: [
                     ResultHero(record: r),
+                    if (_newAchievements.isNotEmpty) ...[
+                      const SizedBox(height: 28),
+                      for (var i = 0; i < _newAchievements.length; i++) ...[
+                        AchievementEarnedCard(
+                          achievement: _newAchievements[i],
+                        ),
+                        if (i != _newAchievements.length - 1)
+                          const SizedBox(height: 16),
+                      ],
+                    ],
                     const SizedBox(height: 28),
                     ResultFeedbackCard(
                         controller: _controller, allowRefresh: !widget.readOnly),
