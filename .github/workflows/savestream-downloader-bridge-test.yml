@@ -1,4 +1,4 @@
-name: SaveStream TikTok fixture test
+name: Publish SaveStream downloader v0.2
 
 on:
   push:
@@ -11,124 +11,51 @@ permissions:
   contents: read
 
 jobs:
-  tiktok-fixture:
+  publish:
     runs-on: ubuntu-latest
-    timeout-minutes: 12
-    env:
-      TEST_URL: https://www.tiktok.com/@vnt.1.8/photo/7691561538561346837?is_from_webapp=1&sender_device=pc
+    timeout-minutes: 15
     steps:
-      - name: Install latest yt-dlp
-        run: |
-          python -m pip install --upgrade yt-dlp
-          yt-dlp --version
+      - name: Checkout bridge branch
+        uses: actions/checkout@v4
 
-      - name: yt-dlp metadata and real download test
+      - name: Reconstruct downloader source archive
         shell: bash
         run: |
-          set +e
-          mkdir -p ytdlp-out
-          echo "=== yt-dlp metadata ==="
-          yt-dlp --no-warnings --skip-download --dump-single-json "$TEST_URL" > ytdlp-info.json 2> ytdlp-info.err
-          META_RC=$?
-          echo "metadata_rc=$META_RC"
-          cat ytdlp-info.err || true
-          if [ "$META_RC" -eq 0 ]; then
-            python - <<'PY'
-          import json
-          d=json.load(open("ytdlp-info.json"))
-          keys=["_type","extractor","id","title","ext","protocol","duration","availability","webpage_url"]
-          print({k:d.get(k) for k in keys})
-          entries=d.get("entries")
-          print("entries_count=", len(entries) if isinstance(entries,list) else None)
-          print("formats_count=", len(d.get("formats") or []))
-          print("has_direct_url=", isinstance(d.get("url"), str))
-          PY
+          set -euo pipefail
+          cat .bridge/savestream-downloader/chunk*.b64 > /tmp/savestream-downloader.b64
+          base64 -d /tmp/savestream-downloader.b64 > /tmp/savestream-downloader.zip
+          unzip -t /tmp/savestream-downloader.zip
+          mkdir -p /tmp/savestream-downloader-src
+          unzip -q /tmp/savestream-downloader.zip -d /tmp/savestream-downloader-src
+          test -f /tmp/savestream-downloader-src/pyproject.toml
+          test -f /tmp/savestream-downloader-src/src/savestream_downloader/main.py
+          echo "archive_bytes=$(wc -c < /tmp/savestream-downloader.zip)"
+          find /tmp/savestream-downloader-src -maxdepth 3 -type f | sort
+
+      - name: Publish to savestream-video-downloader
+        env:
+          BRIDGE_TOKEN: ${{ secrets.SAVESTREAM_DOWNLOADER_PUSH_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${BRIDGE_TOKEN:-}" ]; then
+            echo "::error::SAVESTREAM_DOWNLOADER_PUSH_TOKEN is missing or empty"
+            exit 1
           fi
 
-          echo "=== yt-dlp download ==="
-          yt-dlp --no-warnings --no-playlist --max-filesize 120M \
-            -o 'ytdlp-out/%(id)s.%(ext)s' "$TEST_URL" > ytdlp-download.log 2>&1
-          DL_RC=$?
-          echo "download_rc=$DL_RC"
-          cat ytdlp-download.log
-          echo "=== yt-dlp produced files ==="
-          find ytdlp-out -type f -printf '%f %s bytes\n' | sort || true
+          auth="$(printf 'x-access-token:%s' "$BRIDGE_TOKEN" | base64 -w0)"
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth"             clone https://github.com/ronganminh/savestream-video-downloader.git /tmp/target
 
-      - name: Start self-hosted Cobalt
-        shell: bash
-        run: |
-          docker run -d --name cobalt -p 9000:9000 \
-            -e API_URL=http://127.0.0.1:9000/ \
-            -e API_PORT=9000 \
-            -e API_LISTEN_ADDRESS=0.0.0.0 \
-            ghcr.io/imputnet/cobalt:11
-          for i in {1..30}; do
-            if curl -fsS http://127.0.0.1:9000/ >/dev/null 2>&1; then
-              exit 0
-            fi
-            sleep 1
-          done
-          docker logs cobalt
-          exit 1
+          cd /tmp/target
+          find . -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a /tmp/savestream-downloader-src/. .
 
-      - name: Cobalt resolve and fetch test
-        shell: bash
-        run: |
-          set +e
-          cat > payload.json <<JSON
-          {
-            "url": "$TEST_URL",
-            "downloadMode": "auto",
-            "filenameStyle": "basic",
-            "videoQuality": "max",
-            "alwaysProxy": true,
-            "localProcessing": "disabled"
-          }
-          JSON
-          HTTP_CODE=$(curl -sS -o cobalt.json -w '%{http_code}' \
-            -H 'Accept: application/json' -H 'Content-Type: application/json' \
-            --data @payload.json http://127.0.0.1:9000/)
-          echo "cobalt_http=$HTTP_CODE"
-          python - <<'PY'
-          import json, pathlib
-          p=pathlib.Path("cobalt.json")
-          if not p.exists():
-              print("no cobalt response")
-              raise SystemExit()
-          try:
-              d=json.loads(p.read_text())
-          except Exception:
-              print(p.read_text()[:2000])
-              raise SystemExit()
-          print("status=", d.get("status"))
-          print("filename=", d.get("filename"))
-          print("has_url=", isinstance(d.get("url"), str))
-          picker=d.get("picker")
-          if isinstance(picker, list):
-              print("picker_count=", len(picker))
-              print("picker_types=", [x.get("type") for x in picker[:20] if isinstance(x,dict)])
-          err=d.get("error")
-          if err:
-              print("error=", err)
-          PY
-
-          python - <<'PY'
-          import json, urllib.request, pathlib
-          d=json.load(open("cobalt.json"))
-          urls=[]
-          if isinstance(d.get("url"), str):
-              urls.append(("direct", d["url"]))
-          for i,item in enumerate(d.get("picker") or []):
-              if isinstance(item,dict) and isinstance(item.get("url"),str):
-                  urls.append((f"picker-{i}-{item.get('type','unknown')}", item["url"]))
-          print("downloadable_items=", len(urls))
-          if urls:
-              name,url=urls[0]
-              req=urllib.request.Request(url, headers={"User-Agent":"Mozilla/5.0"})
-              with urllib.request.urlopen(req, timeout=30) as r:
-                  data=r.read(1024*1024+1)
-                  print("first_item=", name)
-                  print("first_item_http=", getattr(r, "status", None))
-                  print("first_item_content_type=", r.headers.get("Content-Type"))
-                  print("first_item_first_chunk_bytes=", len(data))
-          PY
+          git config user.name "savestream-bridge-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No changes to publish"
+            exit 0
+          fi
+          git commit -m "feat: support TikTok photo carousels"
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth" push origin HEAD:main
