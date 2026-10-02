@@ -73,7 +73,9 @@ class WorkoutFeedback {
   int _generation = 0, _lastRep = 0;
 
   void configure(TrainingPreferences value, AppLanguage locale) {
-    final changed = preferences.voice != value.voice || language != locale;
+    final changed = preferences.voice != value.voice ||
+        preferences.repSpeechCadence != value.repSpeechCadence ||
+        language != locale;
     if (preferences.sound && !value.sound) _sounds.stop();
     preferences = value;
     language = locale;
