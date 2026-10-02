@@ -81,6 +81,13 @@ void main() {
     expect(find.byKey(const Key('routine-exercise')), findsOneWidget);
     expect(find.byKey(const Key('routine-reps')), findsOneWidget);
     expect(find.byKey(const Key('routine-sets')), findsOneWidget);
+
+    await tester.scrollUntilVisible(
+      find.byKey(const Key('routine-rest')),
+      220,
+      scrollable: find.byType(Scrollable).first,
+    );
+    await tester.pumpAndSettle();
     expect(find.byKey(const Key('routine-rest')), findsOneWidget);
 
     await tester.scrollUntilVisible(
