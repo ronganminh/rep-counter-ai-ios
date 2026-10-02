@@ -170,7 +170,7 @@
       "node": "16:109",
       "name": "Form Score details sheet",
       "implementation": [
-        "lib/features/workout/presentation/widgets/form_score_details_sheet.dart"
+        "lib/features/workout/presentation/widgets/form_score_details.dart"
       ],
       "tests": [
         "test/features/workout/form_score_details_test.dart"
@@ -181,7 +181,7 @@
       "node": "16:142",
       "name": "Form Score insufficient data",
       "implementation": [
-        "lib/features/workout/presentation/widgets/form_score_details_sheet.dart"
+        "lib/features/workout/presentation/widgets/form_score_details.dart"
       ],
       "tests": [
         "test/features/workout/form_score_details_test.dart",
