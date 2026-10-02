@@ -23,7 +23,7 @@ void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
   test('cadence persists separately from existing training controls', () async {
-    final original = const TrainingPreferences(
+    const original = TrainingPreferences(
       voice: false,
       haptics: true,
       sound: true,
