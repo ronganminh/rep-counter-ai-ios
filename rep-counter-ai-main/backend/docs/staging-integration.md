@@ -1,4 +1,4 @@
-# B6 staging integration contract
+# B6/B9 staging integration contract
 
 Date: 2026-10-01
 
@@ -21,15 +21,23 @@ The shared synthetic contract fixture is:
 
 It contains only non-personal aggregate test data.
 
-## Backend request compatibility
+## Backend request contract after B9
 
-The backend continues to accept:
+B9 completes the separately reviewed v1 sunset that B6 deferred.
 
-    legacy request without schema_version -> normalized to v1
+The backend now accepts only:
+
+    schema_version = 2
+    consent_version = 2026-10-01-groq
+
+The backend rejects before provider invocation:
+
+    missing schema_version
     schema_version = 1
-    schema_version = 2 + consent_version
+    missing consent_version
+    stale or arbitrary consent_version
 
-B6 does not remove v1. Removing v1 requires a later separately reviewed change after the v2 app has shipped and been observed.
+The shipped Flutter client already sends schema v2 plus LegalConfig.aiConsentVersion, so no Flutter payload change is required in B9. Older app builds can receive INVALID_REQUEST for optional AI feedback; core workouts remain local-first and continue to save/count without backend AI.
 
 ## Success response
 
@@ -91,4 +99,4 @@ GitHub Actions workflow .github/workflows/staging-integration-ci.yml runs this c
 
 No dedicated remote staging hostname is defined in the repository. The smoke client accepts STAGING_BASE_URL so an operator can run the same synthetic request against an external staging deployment later.
 
-Do not use the production hostname merely to satisfy B6. Production provider selection is now GroqCloud; B7 still requires VPS deployment, provider-config preflight and public smoke checks.
+Do not use the production hostname merely to satisfy staging CI. Production provider selection is GroqCloud. Any B9 runtime deployment must use the reviewed manual production deploy/rollback procedure and synthetic public smoke from the production runbook.

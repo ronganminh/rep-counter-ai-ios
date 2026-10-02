@@ -66,15 +66,17 @@ The provider is instructed to return concise, non-medical workout feedback. Prov
 
 ## Workout-feedback API contract
 
-The endpoint temporarily accepts both the current v1 client contract and v2.
+The endpoint accepts only the current consent-bound request contract.
 
-### Compatibility
+### Current request gate
 
-- Missing `schema_version` is treated as legacy v1.
-- `schema_version: 1` remains accepted while the Flutter client is still on v1.
-- `schema_version: 2` requires `consent_version`.
+- `schema_version` must be exactly `2`.
+- `consent_version` must be exactly `2026-10-01-groq`.
+- Missing/unversioned legacy requests and explicit v1 requests are rejected.
+- A stale or arbitrary non-empty consent version is rejected before the AI provider is called.
 - Unknown fields are rejected instead of silently entering the contract.
 - `schema_version` and `consent_version` are contract/audit metadata and are not sent to the AI provider.
+- Older app builds may lose optional AI feedback after this sunset, but local workout counting/history remain unaffected.
 
 ### v2 request example
 
@@ -232,7 +234,7 @@ cd rep-counter-ai-main/backend
 python3 -m unittest discover -s tests -v
 ```
 
-Coverage includes contract validation, legacy-schema compatibility, malformed/unknown-field rejection, request-size and method rejection, health/readiness behavior, request-ID propagation, no-CORS behavior, timeout/error mapping, provider adapter swapping, required service-mode guards, prompt minimization, empty/invalid/overlong provider responses, no-content logging checks, privacy contract checks, and deploy configuration checks.
+Coverage includes v2/current-consent enforcement, rejection of legacy or stale-consent requests before provider invocation, malformed/unknown-field rejection, request-size and method rejection, health/readiness behavior, request-ID propagation, no-CORS behavior, timeout/error mapping, provider adapter swapping, required service-mode guards, prompt minimization, empty/invalid/overlong provider responses, no-content logging checks, privacy contract checks, and deploy configuration checks.
 
 ## Backend CI
 
