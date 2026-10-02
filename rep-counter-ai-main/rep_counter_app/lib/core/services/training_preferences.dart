@@ -1,10 +1,10 @@
+import 'package:shared_preferences/shared_preferences.dart';
+
 enum RepSpeechCadence {
   everyRep,
   every5Reps,
   milestonesOnly,
 }
-
-import 'package:shared_preferences/shared_preferences.dart';
 
 /// Device-local preferences. No camera data or AI configuration is stored here.
 class TrainingPreferences {
