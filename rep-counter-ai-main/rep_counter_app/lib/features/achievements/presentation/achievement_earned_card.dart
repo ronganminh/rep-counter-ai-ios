@@ -46,21 +46,31 @@ class AchievementEarnedCard extends StatelessWidget {
                 width: 128,
                 height: 128,
                 child: Stack(
-                  fit: StackFit.expand,
+                  alignment: Alignment.center,
                   children: [
-                    Image.asset(
-                      'assets/vnext/achievement_badge_ring.png',
-                      fit: BoxFit.contain,
+                    Container(
+                      width: 128,
+                      height: 128,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: p.accent, width: 2),
+                      ),
                     ),
-                    Center(
-                      child: Text(
-                        '★',
-                        textScaler: TextScaler.noScaling,
-                        style: AppTypography.metric64.copyWith(
-                          color: p.accent,
-                          fontSize: 64,
-                          height: .95,
-                        ),
+                    Container(
+                      width: 104,
+                      height: 104,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: p.accent),
+                      ),
+                    ),
+                    Text(
+                      '★',
+                      textScaler: TextScaler.noScaling,
+                      style: AppTypography.metric64.copyWith(
+                        color: p.accent,
+                        fontSize: 64,
+                        height: .95,
                       ),
                     ),
                   ],
