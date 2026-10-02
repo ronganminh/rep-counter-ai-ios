@@ -73,7 +73,7 @@ void main() {
     for (var i = 0; i < 9; i++) {
       await history.save(record(
         id: 'r$i',
-        at: now.subtract(Duration(days: i.clamp(0, 6))),
+        at: now.subtract(Duration(days: i > 6 ? 6 : i)),
         reps: 10,
       ));
     }
