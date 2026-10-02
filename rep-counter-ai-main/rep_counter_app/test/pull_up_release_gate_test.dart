@@ -8,7 +8,7 @@ Map<String, dynamic> loadJson(String path) =>
     jsonDecode(File(path).readAsStringSync()) as Map<String, dynamic>;
 
 void main() {
-  final manifestPath = 'test/fixtures/pull_up_validation_manifest.json';
+  const manifestPath = 'test/fixtures/pull_up_validation_manifest.json';
 
   test('A8 fixture metrics stay tied to explicit human aggregate counts', () {
     final manifest = loadJson(manifestPath);
