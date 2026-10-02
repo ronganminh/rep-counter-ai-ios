@@ -24,11 +24,14 @@ class FeatureFlags {
   /// Bài duy nhất được hỗ trợ ở MVP.
   static const String mvpExerciseId = 'push_up';
 
-  /// Kéo xà: mới chỉ kiểm trên 2 video, chưa có người thật dùng qua app.
+  /// Kéo xà: A8 production release gate hiện vẫn BLOCKED.
   ///
-  /// Hiện ở bản `diag` để tester quay video + CSV về; bản `store` giữ nguyên
-  /// cho tới khi số liệu từ tester xác nhận. Ép bật bằng
-  /// `--dart-define=ENABLE_PULL_UP=true`.
+  /// Hai fixture hiện có chỉ có aggregate manual count; còn thiếu coverage,
+  /// event-level annotation, production CameraPage replay và real-device
+  /// validation. Vì vậy bản `store` không được mở chỉ vì fixture offline pass.
+  ///
+  /// Bản `diag` vẫn dùng để thu evidence. Ép bật thủ công bằng
+  /// `--dart-define=ENABLE_PULL_UP=true` chỉ dành cho validation.
   static bool get enablePullUp =>
       const bool.fromEnvironment('ENABLE_PULL_UP') || appFlavor == 'diag';
 
