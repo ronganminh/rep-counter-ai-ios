@@ -47,6 +47,19 @@ jobs:
           if '__version__ = "0.1.0"' not in s:
               raise SystemExit("expected old __version__ not found")
           init.write_text(s.replace('__version__ = "0.1.0"', '__version__ = "0.2.0"'))
+
+          main = Path("target/src/savestream_downloader/main.py")
+          s = main.read_text()
+          s = s.replace("from typing import AsyncIterator, BinaryIO", "from typing import AsyncIterator")
+          s = s.replace(
+              "tuple[BinaryIO, int]",
+              "tuple[tempfile.SpooledTemporaryFile[bytes], int]",
+          )
+          s = s.replace(
+              "tuple[ResolvedMedia, BinaryIO, int]",
+              "tuple[ResolvedMedia, tempfile.SpooledTemporaryFile[bytes], int]",
+          )
+          main.write_text(s)
           PY
 
       - name: Set up Python
