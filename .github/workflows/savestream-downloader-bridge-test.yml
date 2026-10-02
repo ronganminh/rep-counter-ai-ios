@@ -1,4 +1,4 @@
-name: Fix and validate SaveStream downloader v0.2
+name: E2E SaveStream TikTok photo API
 
 on:
   push:
@@ -11,88 +11,127 @@ permissions:
   contents: read
 
 jobs:
-  fix-validate-publish:
+  photo-api-e2e:
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 15
+    env:
+      TEST_URL: https://www.tiktok.com/@vnt.1.8/photo/7691561538561346837?is_from_webapp=1&sender_device=pc
+      INTERNAL_API_KEY: e2e-key
+      TOKEN_SECRET: e2e-token-secret-not-for-production
+      REDIS_URL: ""
+      PROVIDER_ORDER: cobalt
+      ENABLE_YTDLP: "false"
+      COBALT_URL: http://127.0.0.1:9000/
+      MAX_CAROUSEL_ITEMS: "50"
     steps:
-      - name: Clone target repository
-        env:
-          BRIDGE_TOKEN: ${{ secrets.SAVESTREAM_DOWNLOADER_PUSH_TOKEN }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "${BRIDGE_TOKEN:-}" ]; then
-            echo "::error::SAVESTREAM_DOWNLOADER_PUSH_TOKEN is missing or empty"
-            exit 1
-          fi
-          auth="$(printf 'x-access-token:%s' "$BRIDGE_TOKEN" | base64 -w0)"
-          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth"             clone https://github.com/ronganminh/savestream-video-downloader.git target
-
-      - name: Fix development dependency and package version
-        shell: bash
-        run: |
-          set -euo pipefail
-          python - <<'PY'
-          from pathlib import Path
-          p = Path("target/pyproject.toml")
-          s = p.read_text()
-          old = '"pytest==9.0.2"'
-          new = '"pytest==8.4.2"'
-          if old not in s:
-              raise SystemExit(f"expected dependency not found: {old}")
-          p.write_text(s.replace(old, new))
-
-          init = Path("target/src/savestream_downloader/__init__.py")
-          s = init.read_text()
-          if '__version__ = "0.1.0"' not in s:
-              raise SystemExit("expected old __version__ not found")
-          init.write_text(s.replace('__version__ = "0.1.0"', '__version__ = "0.2.0"'))
-
-          main = Path("target/src/savestream_downloader/main.py")
-          s = main.read_text()
-          s = s.replace("from typing import AsyncIterator, BinaryIO", "from typing import AsyncIterator")
-          s = s.replace(
-              "tuple[BinaryIO, int]",
-              "tuple[tempfile.SpooledTemporaryFile[bytes], int]",
-          )
-          s = s.replace(
-              "tuple[ResolvedMedia, BinaryIO, int]",
-              "tuple[ResolvedMedia, tempfile.SpooledTemporaryFile[bytes], int]",
-          )
-          main.write_text(s)
-          PY
+      - name: Clone downloader
+        run: git clone --depth=1 https://github.com/ronganminh/savestream-video-downloader.git target
 
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
 
-      - name: Install and validate
-        shell: bash
+      - name: Install downloader
         working-directory: target
         run: |
-          set -euo pipefail
           python -m pip install --upgrade pip
-          pip install -e '.[dev]'
-          ruff check src tests --fix
-          ruff check src tests
-          mypy src
-          pytest -q
+          pip install -e .
 
-      - name: Publish fixes
-        env:
-          BRIDGE_TOKEN: ${{ secrets.SAVESTREAM_DOWNLOADER_PUSH_TOKEN }}
-        shell: bash
+      - name: Start self-hosted Cobalt
+        run: |
+          docker run -d --name cobalt -p 9000:9000 \
+            -e API_URL=http://127.0.0.1:9000/ \
+            -e API_PORT=9000 \
+            -e API_LISTEN_ADDRESS=0.0.0.0 \
+            ghcr.io/imputnet/cobalt:11
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:9000/ >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cobalt
+          exit 1
+
+      - name: Start downloader API
         working-directory: target
         run: |
+          nohup uvicorn savestream_downloader.main:app --host 127.0.0.1 --port 8787 \
+            > /tmp/downloader-api.log 2>&1 &
+          echo $! > /tmp/downloader-api.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:8787/healthz >/dev/null 2>&1; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/downloader-api.log
+          exit 1
+
+      - name: Resolve exact TikTok photo post
+        shell: bash
+        run: |
           set -euo pipefail
-          git config user.name "savestream-bridge-bot"
-          git config user.email "actions@users.noreply.github.com"
-          git add -A
-          if git diff --cached --quiet; then
-            echo "No changes to publish"
-            exit 0
-          fi
-          git commit -m "fix: clean CI for photo carousel backend"
-          auth="$(printf 'x-access-token:%s' "$BRIDGE_TOKEN" | base64 -w0)"
-          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth" push origin HEAD:main
+          python - <<'PY'
+          import json, os, urllib.request
+          url = "http://127.0.0.1:8787/v1/resolve"
+          body = json.dumps({"source":"tiktok","url":os.environ["TEST_URL"]}).encode()
+          req = urllib.request.Request(
+              url,
+              data=body,
+              headers={
+                  "Content-Type":"application/json",
+                  "X-SaveStream-Service-Key":os.environ["INTERNAL_API_KEY"],
+              },
+              method="POST",
+          )
+          with urllib.request.urlopen(req, timeout=40) as r:
+              data = json.load(r)
+          print(json.dumps(data, indent=2))
+          assert data["media_type"] == "photo_carousel", data
+          assert len(data["items"]) == 3, data
+          assert data["download_all_url"], data
+          assert all(item["kind"] == "photo" for item in data["items"]), data
+          open("/tmp/resolve.json","w").write(json.dumps(data))
+          PY
+
+      - name: Download first photo and ZIP through API
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          d=json.load(open("/tmp/resolve.json"))
+          print("item_url="+d["items"][0]["download_url"])
+          print("zip_url="+d["download_all_url"])
+          open("/tmp/item_url","w").write(d["items"][0]["download_url"])
+          open("/tmp/zip_url","w").write(d["download_all_url"])
+          PY
+          ITEM_URL="$(cat /tmp/item_url)"
+          ZIP_URL="$(cat /tmp/zip_url)"
+          curl -fsS -D /tmp/item.headers \
+            -H "X-SaveStream-Service-Key: $INTERNAL_API_KEY" \
+            "http://127.0.0.1:8787$ITEM_URL" -o /tmp/photo.bin
+          curl -fsS -D /tmp/zip.headers \
+            -H "X-SaveStream-Service-Key: $INTERNAL_API_KEY" \
+            "http://127.0.0.1:8787$ZIP_URL" -o /tmp/photos.zip
+          echo "=== item headers ==="
+          cat /tmp/item.headers
+          echo "photo_bytes=$(wc -c < /tmp/photo.bin)"
+          file /tmp/photo.bin
+          echo "=== zip headers ==="
+          cat /tmp/zip.headers
+          echo "zip_bytes=$(wc -c < /tmp/photos.zip)"
+          unzip -t /tmp/photos.zip
+          COUNT="$(unzip -Z1 /tmp/photos.zip | wc -l | tr -d ' ')"
+          echo "zip_items=$COUNT"
+          test "$COUNT" = "3"
+
+      - name: Show service logs
+        if: always()
+        run: |
+          echo "=== downloader ==="
+          cat /tmp/downloader-api.log 2>/dev/null || true
+          echo "=== cobalt ==="
+          docker logs cobalt 2>&1 || true
