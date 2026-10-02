@@ -78,7 +78,7 @@ class AchievementService {
 
   static Future<void> clearAll() => _serial(() async {
         final prefs = await SharedPreferences.getInstance();
-        if (!await prefs.remove(_key)) {
+        if (prefs.containsKey(_key) && !await prefs.remove(_key)) {
           throw StateError('Cannot clear achievements');
         }
       });
