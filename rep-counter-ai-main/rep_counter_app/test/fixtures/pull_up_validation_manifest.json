@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "exercise_id": "pull_up",
+  "required_dataset_coverage": [
+    "front_view",
+    "rear_view",
+    "slight_left_right_angle",
+    "different_body_sizes",
+    "different_clothing",
+    "different_lighting",
+    "different_device_distances",
+    "different_bars_backgrounds",
+    "mount_dismount_rest",
+    "temporary_pose_loss"
+  ],
+  "release_threshold": {
+    "complete_human_annotation_for_release_fixtures": true,
+    "no_systematic_mount_dismount_false_reps": true,
+    "accepted_rep_total_monotonic": true,
+    "hud_saved_result_equal": true,
+    "no_severe_angle_specific_failure": true,
+    "recent_supported_iphone_required": true,
+    "older_supported_iphone_required": true
+  },
+  "fixtures": [
+    {
+      "id": "pull_up_front",
+      "fixture_file": "test/fixtures/pull_up_front.json",
+      "source": "IMG_8708.MOV",
+      "coverage_tags": [
+        "front_view",
+        "different_lighting",
+        "different_device_distances",
+        "different_bars_backgrounds"
+      ],
+      "camera_angle_notes": "Front view, outdoors. Legacy manual aggregate count exists, but event-level A8 annotation has not been completed.",
+      "actual_rep_count": 47,
+      "valid_rep_intervals_ms": null,
+      "invalid_partial_attempt_intervals_ms": null,
+      "mount_intervals_ms": null,
+      "dismount_intervals_ms": null,
+      "pose_loss_windows_ms": null,
+      "annotation_status": "aggregate_count_only",
+      "licensing_storage_status": "not_reviewed_for_automated_video_distribution"
+    },
+    {
+      "id": "pull_up_back_closeup",
+      "fixture_file": "test/fixtures/pull_up_back_closeup.json",
+      "source": "Messenger_creation_394F54C2-CC7C-4726-AC52-3958F10278B5.mp4",
+      "coverage_tags": [
+        "rear_view",
+        "different_device_distances",
+        "different_bars_backgrounds"
+      ],
+      "camera_angle_notes": "Rear close-up view. Hands/bar leave the frame frequently; legacy manual aggregate count exists, but event-level A8 annotation has not been completed.",
+      "actual_rep_count": 30,
+      "valid_rep_intervals_ms": null,
+      "invalid_partial_attempt_intervals_ms": null,
+      "mount_intervals_ms": null,
+      "dismount_intervals_ms": null,
+      "pose_loss_windows_ms": null,
+      "annotation_status": "aggregate_count_only",
+      "licensing_storage_status": "not_reviewed_for_automated_video_distribution"
+    }
+  ],
+  "production_replay_evidence": [],
+  "real_device_validation": {
+    "recent_supported_iphone": null,
+    "older_supported_iphone": null,
+    "expected_camera_orientation": null,
+    "representative_mounting_distance": null,
+    "tts_haptics_interference": null,
+    "normal_session_thermal_behavior": null
+  },
+  "release_decision": {
+    "status": "blocked",
+    "store_visible": false,
+    "reason": "Dataset coverage, event-level human annotations, pull-up production CameraPage replay evidence, and real-device validation are incomplete."
+  }
+}
