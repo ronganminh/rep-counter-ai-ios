@@ -210,6 +210,7 @@ class _CameraPageState extends State<CameraPage>
         haptics: _preferences.haptics,
         sound: _preferences.sound,
         cues: _preferences.cues,
+        repSpeechCadence: _preferences.repSpeechCadence,
       );
 
   @override
@@ -626,7 +627,7 @@ class _CameraPageState extends State<CameraPage>
     // guideFor cần chuỗi theo ngôn ngữ, mà InheritedWidget chưa dùng được trong
     // initState. Ở đây còn tự dựng lại khi người dùng đổi ngôn ngữ giữa chừng.
     _strings = context.s;
-    if (_preferencesLoaded) _feedback.configure(_preferences, context.language);
+    if (_preferencesLoaded) _feedback.configure(_feedbackPreferences, context.language);
     _guide = guideFor(p, _strings);
     // Nạp ở đây chứ không ở initState: hàm nạp báo thông báo theo `_strings`, mà
     // `_strings` là `late` và chỉ có giá trị từ didChangeDependencies trở đi.
