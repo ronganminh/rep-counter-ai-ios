@@ -87,9 +87,27 @@ class WorkoutFeedback {
     if (_disposed || number <= _lastRep) return;
     _lastRep = number;
     _vibrate(goalReached);
-    _say(goalReached
-        ? '$number. ${language == AppLanguage.vi ? 'Đạt mục tiêu!' : 'Goal reached!'}'
-        : '$number${cue != null && at != null && _canCue(at) ? '. $cue' : ''}');
+
+    final cueText =
+        cue != null && at != null && _canCue(at) ? cue : null;
+    final speakCount = switch (preferences.repSpeechCadence) {
+      RepSpeechCadence.everyRep => true,
+      RepSpeechCadence.every5Reps => number % 5 == 0,
+      RepSpeechCadence.milestonesOnly => goalReached,
+    };
+
+    if (goalReached) {
+      _say(
+        '$number. ${language == AppLanguage.vi ? 'Đạt mục tiêu!' : 'Goal reached!'}',
+      );
+    } else if (speakCount && cueText != null) {
+      _say('$number. $cueText');
+    } else if (speakCount) {
+      _say('$number');
+    } else if (cueText != null) {
+      // Posture reminders are independent from the rep-count cadence.
+      _say(cueText);
+    }
   }
 
   void countdown(int value) {
