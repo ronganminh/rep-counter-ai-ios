@@ -181,6 +181,13 @@ class _SettingsPageState extends State<SettingsPage> {
               subtitle: context.tr(
                   'Giọng hệ thống theo ngôn ngữ app. Cần có giọng đọc đã cài trên máy.',
                   'System voice follows the app language. Requires a voice installed on your device.'),
+              onTap: _training == null
+                  ? null
+                  : () async {
+                      await Navigator.of(context).push(MaterialPageRoute<void>(
+                          builder: (_) => const VoiceCadencePage()));
+                      if (mounted) await _loadTraining();
+                    },
               trailing: Switch(
                   key: const Key('voice-setting'),
                   value: _training?.voice ?? true,
@@ -249,26 +256,6 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Text(l.label, overflow: TextOverflow.ellipsis))
                     ],
                   )))),
-          SettingsRow(
-              icon: LucideIcons.volume2,
-              title: context.tr(
-                  'Tần suất đọc số rep', 'Rep speech cadence'),
-              subtitle: switch (_training?.repSpeechCadence ??
-                  RepSpeechCadence.everyRep) {
-                RepSpeechCadence.everyRep =>
-                  context.tr('Mỗi rep', 'Every rep'),
-                RepSpeechCadence.every5Reps =>
-                  context.tr('Mỗi 5 rep', 'Every 5 reps'),
-                RepSpeechCadence.milestonesOnly => context.tr(
-                    'Chỉ các mốc quan trọng', 'Milestones only'),
-              },
-              onTap: _training == null
-                  ? null
-                  : () async {
-                      await Navigator.of(context).push(MaterialPageRoute<void>(
-                          builder: (_) => const VoiceCadencePage()));
-                      if (mounted) await _loadTraining();
-                    }),
         ]),
         SettingsGroup(
             title: context.tr('AI & Quyền riêng tư', 'AI & privacy'),
