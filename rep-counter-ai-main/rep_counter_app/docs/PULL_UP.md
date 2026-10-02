@@ -1,7 +1,8 @@
 # Kéo xà (pull_up)
 
 Trạng thái: **chỉ hiện ở bản `diag`** (hoặc `--dart-define=ENABLE_PULL_UP=true`).
-Bản `store` chưa có, chờ số liệu từ tester.
+Bản `store` vẫn bị chặn bởi A8. Xem `docs/PULL_UP_RELEASE_GATE.md` và
+`test/fixtures/pull_up_validation_manifest.json` để biết evidence còn thiếu.
 
 ## Cách đếm
 
@@ -28,6 +29,11 @@ theo các chấm vai–khuỷu–cổ tay chứ không theo số độ.
 
 ## Kiểm trên video thật (`pull_up/`, 7.5 fps)
 
+Các số dưới đây chỉ là **đếm tay tổng hợp (aggregate count)**. Chúng chưa có
+annotation từng rep/mount/dismount/pose-loss nên không đủ để suy ra
+precision/recall hoặc quyết định mở store.
+
+
 | Video | Đếm tay | App | Rep ma |
 |---|---|---|---|
 | `IMG_8708.MOV` — trực diện, ngoài trời, 10 set | 47 | 46 | 0 |
@@ -45,6 +51,13 @@ cho bề rộng vai, mà lúc treo vai co giãn, sai hơn 20 rep.
 
 Sinh `test/fixtures/pull_up_*.json`; `test/pull_up_test.dart` phát lại và so
 từng rep với bản Python.
+
+## A8 release gate
+
+A8 hiện kết luận **BLOCKED**: chưa đủ coverage dataset, chưa có annotation
+human event-level, chưa có production CameraPage replay cho pull-up và chưa có
+real-device validation trên recent + older supported iPhone. Không được bật
+store visibility bằng cách nới gate.
 
 ## Chưa làm
 
