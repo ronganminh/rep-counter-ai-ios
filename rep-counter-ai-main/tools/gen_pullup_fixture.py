@@ -11,8 +11,10 @@ Bản tham chiếu phải chạy ĐÚNG như `camera_page.dart` với profile `p
 trung bình hai tay -> RollingMean(2) -> cổng từng khung -> RepCounter với
 `startFromTop`. Test Dart so từng thời điểm rep với số ở đây.
 
-Đếm tay (ground truth) trên video: IMG_8708 = 47 rep (10 set), video quay
-lưng = 30 rep (15 set x 2). Xem docs/PULL_UP.md.
+Đếm tay tổng hợp (aggregate count) trên video: IMG_8708 = 47 rep (10 set),
+video quay lưng = 30 rep (15 set x 2). Đây KHÔNG phải event-level A8 ground
+truth: fixture chưa chứa valid/invalid intervals, mount/dismount hay pose-loss
+windows. Xem docs/PULL_UP_RELEASE_GATE.md.
 
     python tools/gen_pullup_fixture.py
 """
@@ -134,7 +136,8 @@ def main():
         d["expected_rep_ms"] = reference(d)
         meta = dict(source=file, fps=30 / STEP, hi=HI, lo=LO, min_amplitude=AMP,
                     min_period_ms=int(MIN_PERIOD * 1000), smooth_window=WIN,
-                    ground_truth_reps=truth)
+                    ground_truth_reps=truth,
+                    human_annotation_level="aggregate_count_only")
         (OUT / f"{name}.json").write_text(
             json.dumps({**meta, **d}, ensure_ascii=False, separators=(",", ":")),
             encoding="utf-8")
