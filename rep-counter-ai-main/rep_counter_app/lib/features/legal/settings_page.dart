@@ -5,6 +5,7 @@ import '../../core/services/app_links.dart';
 import '../ai/ai_preferences.dart';
 import '../ai/presentation/ai_consent.dart';
 import '../history/export/export_data_sheet.dart';
+import '../achievements/achievement_service.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/i18n/app_strings.dart';
 import '../../core/i18n/locale_controller.dart';
@@ -18,6 +19,7 @@ import '../workout/data/calibration_store.dart';
 import '../workout/data/workout_history_store.dart';
 import '../workout/domain/quality_thresholds.dart';
 import 'legal_page.dart';
+import 'voice_cadence_page.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -145,6 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
     try {
       await WorkoutHistoryStore().clear();
       await const CalibrationStore().clearAll();
+      await AchievementService.clearAll();
       if (!mounted) return;
       setState(() {
         _count = _loadCount();
@@ -246,6 +249,26 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Text(l.label, overflow: TextOverflow.ellipsis))
                     ],
                   )))),
+          SettingsRow(
+              icon: LucideIcons.volume2,
+              title: context.tr(
+                  'Tần suất đọc số rep', 'Rep speech cadence'),
+              subtitle: switch (_training?.repSpeechCadence ??
+                  RepSpeechCadence.everyRep) {
+                RepSpeechCadence.everyRep =>
+                  context.tr('Mỗi rep', 'Every rep'),
+                RepSpeechCadence.every5Reps =>
+                  context.tr('Mỗi 5 rep', 'Every 5 reps'),
+                RepSpeechCadence.milestonesOnly => context.tr(
+                    'Chỉ các mốc quan trọng', 'Milestones only'),
+              },
+              onTap: _training == null
+                  ? null
+                  : () async {
+                      await Navigator.of(context).push(MaterialPageRoute<void>(
+                          builder: (_) => const VoiceCadencePage()));
+                      if (mounted) await _loadTraining();
+                    }),
         ]),
         SettingsGroup(
             title: context.tr('AI & Quyền riêng tư', 'AI & privacy'),
