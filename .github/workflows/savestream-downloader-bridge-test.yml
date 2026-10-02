@@ -1,0 +1,40 @@
+name: SaveStream downloader bridge test
+
+on:
+  push:
+    branches:
+      - chore/savestream-downloader-bridge-test
+    paths:
+      - .github/workflows/savestream-downloader-bridge-test.yml
+
+permissions:
+  contents: read
+
+jobs:
+  verify-push-token:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify target repository write access
+        env:
+          BRIDGE_TOKEN: ${{ secrets.SAVESTREAM_DOWNLOADER_PUSH_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [ -z "${BRIDGE_TOKEN:-}" ]; then
+            echo "::error::SAVESTREAM_DOWNLOADER_PUSH_TOKEN is missing or empty"
+            exit 1
+          fi
+
+          workdir="$(mktemp -d)"
+          cd "$workdir"
+          git init -b main
+          git config user.name "savestream-bridge-bot"
+          git config user.email "actions@users.noreply.github.com"
+
+          printf 'bridge-ok\nsource=ronganminh/rep-counter-ai-ios\n' > .savestream-bridge-test
+          git add .savestream-bridge-test
+          git commit -m "chore: verify SaveStream downloader push token"
+
+          git remote add origin https://github.com/ronganminh/savestream-video-downloader.git
+          auth="$(printf 'x-access-token:%s' "$BRIDGE_TOKEN" | base64 -w0)"
+          git -c http.https://github.com/.extraheader="AUTHORIZATION: basic $auth" push origin HEAD:main
