@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../core/i18n/locale_controller.dart';
 import '../../core/services/training_preferences.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
+import '../../widgets/product_ui.dart';
 
 class VoiceCadencePage extends StatefulWidget {
   const VoiceCadencePage({super.key});
