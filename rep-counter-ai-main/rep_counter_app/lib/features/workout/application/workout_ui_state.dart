@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import '../../../placement.dart';
 import '../../../rep_counter.dart';
 import '../domain/workout_mode.dart';
+import '../../routine/domain/routine_preset.dart';
 import 'rep_feedback.dart';
 
 /// Presentation phases, not a replacement for the legacy rep/set state machine.
@@ -13,6 +14,7 @@ enum WorkoutUiPhase {
   calibrating,
   countdown,
   active,
+  resting,
   paused,
   ending,
   saving,
@@ -49,6 +51,10 @@ class WorkoutUiState {
     this.challengeSeconds,
     this.challengeRemaining,
     this.challengeExpired = false,
+    this.routine,
+    this.routineRestRemaining,
+    this.routineCompletedSetReps = 0,
+    this.routineComplete = false,
   });
 
   final WorkoutUiPhase phase;
@@ -72,8 +78,20 @@ class WorkoutUiState {
   final int? challengeSeconds;
   final Duration? challengeRemaining;
   final bool challengeExpired;
+  final RoutineSnapshot? routine;
+  final Duration? routineRestRemaining;
+  final int routineCompletedSetReps;
+  final bool routineComplete;
 
   bool get isTimedChallenge => mode == WorkoutMode.timed;
+  bool get isRoutine => routine != null;
+  bool get isRoutineResting => phase == WorkoutUiPhase.resting;
+  int? get routineRestRemainingSeconds {
+    final remaining = routineRestRemaining;
+    if (remaining == null) return null;
+    if (remaining <= Duration.zero) return 0;
+    return (remaining.inMilliseconds + 999) ~/ 1000;
+  }
   bool get isFinalTenSeconds =>
       isTimedChallenge &&
       sessionStarted &&

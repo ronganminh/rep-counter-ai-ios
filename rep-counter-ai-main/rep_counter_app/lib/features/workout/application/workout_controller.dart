@@ -13,6 +13,7 @@ import '../domain/rep_tracker.dart';
 import '../domain/workout_aggregator.dart';
 import '../domain/workout_summary.dart';
 import '../domain/workout_mode.dart';
+import '../../routine/domain/routine_preset.dart';
 import 'rep_feedback.dart';
 import 'workout_ui_state.dart';
 
@@ -45,6 +46,7 @@ class WorkoutController extends ChangeNotifier {
     this.targetReps,
     WorkoutMode? mode,
     this.timedChallenge,
+    this.routine,
     this.requireCountdown = true,
     this.feedbackDuration = const Duration(milliseconds: 1600),
     WorkoutClock? trackingClock,
@@ -66,7 +68,10 @@ class WorkoutController extends ChangeNotifier {
         _now = now ?? DateTime.now,
         _saveRecord = saveRecord ?? WorkoutHistoryStore().save,
         _session = SessionTracker(
-            restTimeout: const Duration(seconds: 6), minReps: 1),
+            restTimeout: routine == null
+                ? const Duration(seconds: 6)
+                : const Duration(days: 365),
+            minReps: 1),
         _aggregator = const WorkoutAggregator(
             setGap: Duration(seconds: 6), minRepsPerSet: 1) {
     _startedAt = _now();
@@ -76,6 +81,7 @@ class WorkoutController extends ChangeNotifier {
   final int? targetReps;
   final WorkoutMode mode;
   final TimedChallengeConfig? timedChallenge;
+  final RoutineSnapshot? routine;
   final bool requireCountdown;
   final Duration feedbackDuration;
   final WorkoutClock _trackingClock;
@@ -83,6 +89,7 @@ class WorkoutController extends ChangeNotifier {
   Duration? _readySince, _lastReadyFrame;
   Timer? _countdownTimer;
   Timer? _feedbackTimer;
+  Timer? _routineRestTimer;
   int? _countdown;
   final WorkoutClock _clock;
   final DateTime Function() _now;
@@ -94,6 +101,9 @@ class WorkoutController extends ChangeNotifier {
   late DateTime _startedAt;
   bool _started = false, _paused = false, _disposed = false;
   bool _challengeExpired = false;
+  Duration? _routineRestUntil;
+  int _routineCompletedSetReps = 0;
+  bool _routineComplete = false;
   bool _calibrating = false, _calibrated = false, _goalReachedOnce = false;
   int _calibrationSamples = 0;
   int _poseFrames = 0, _readyFrames = 0, _lostFrames = 0;
@@ -108,6 +118,13 @@ class WorkoutController extends ChangeNotifier {
   bool get hasStarted => _started;
   bool get isTimedChallenge => mode == WorkoutMode.timed;
   bool get challengeExpired => _challengeExpired;
+  bool get isRoutineResting => _routineRestUntil != null;
+  Duration? get routineRestRemaining {
+    final until = _routineRestUntil;
+    if (until == null) return null;
+    final left = until - frameTime;
+    return left.isNegative ? Duration.zero : left;
+  }
 
   /// Pose/placement time must advance while the workout timer is still stopped.
   Duration get frameTime => _trackingClock.elapsed;
@@ -128,7 +145,12 @@ class WorkoutController extends ChangeNotifier {
   }
 
   bool get acceptsReps =>
-      acceptsFrames && _armed && !_calibrating && !_pastChallengeDeadline;
+      acceptsFrames &&
+      _armed &&
+      !_calibrating &&
+      !_pastChallengeDeadline &&
+      !isRoutineResting &&
+      !_routineComplete;
   bool get acceptsFrames =>
       !_disposed &&
       _started &&
@@ -144,13 +166,15 @@ class WorkoutController extends ChangeNotifier {
                     ? WorkoutUiPhase.countdown
                     : _calibrating
                         ? WorkoutUiPhase.calibrating
-                        : !_placementReady
-                            ? WorkoutUiPhase.positioning
-                            : _armed && requireCountdown
-                                ? WorkoutUiPhase.active
-                                : _session.totalReps == 0
-                                    ? WorkoutUiPhase.ready
-                                    : WorkoutUiPhase.active),
+                        : isRoutineResting
+                            ? WorkoutUiPhase.resting
+                            : !_placementReady
+                                ? WorkoutUiPhase.positioning
+                                : _armed && requireCountdown
+                                    ? WorkoutUiPhase.active
+                                    : _session.totalReps == 0
+                                        ? WorkoutUiPhase.ready
+                                        : WorkoutUiPhase.active),
         exerciseId: profile.id,
         exerciseName: profile.name,
         reps: _session.totalReps,
@@ -174,6 +198,10 @@ class WorkoutController extends ChangeNotifier {
         challengeSeconds: timedChallenge?.durationSeconds,
         challengeRemaining: challengeRemaining,
         challengeExpired: _challengeExpired,
+        routine: routine,
+        routineRestRemaining: routineRestRemaining,
+        routineCompletedSetReps: _routineCompletedSetReps,
+        routineComplete: _routineComplete,
       );
 
   void _emit() {
@@ -242,9 +270,11 @@ class WorkoutController extends ChangeNotifier {
       return false;
     }
     final flags = _analyzer.analyze(observation);
+    final assignedSetIndex =
+        routine == null ? 1 : _session.sets.length + 1;
     _reps.add(RepMetric(
       index: _reps.length + 1,
-      setIndex: 1,
+      setIndex: assignedSetIndex,
       observation: observation,
       flags: flags,
     ));
@@ -255,8 +285,62 @@ class WorkoutController extends ChangeNotifier {
         _session.totalReps >= targetReps! &&
         !_goalReachedOnce;
     if (reached) _goalReachedOnce = true;
+
+    final routineConfig = routine;
+    if (routineConfig != null &&
+        _session.repsInCurrentSet >= routineConfig.targetReps) {
+      _routineCompletedSetReps = _session.repsInCurrentSet;
+      _session.finish();
+      if (_session.sets.length >= routineConfig.targetSets) {
+        _routineComplete = true;
+        _cancelRoutineRest();
+      } else {
+        _beginRoutineRest();
+      }
+    }
+
     _emit();
     return reached;
+  }
+
+  void _beginRoutineRest() {
+    final config = routine;
+    if (config == null || _routineComplete) return;
+    _cancelRoutineRest();
+    if (config.restSeconds <= 0) {
+      _emit();
+      return;
+    }
+    _routineRestUntil =
+        frameTime + Duration(seconds: config.restSeconds);
+    _routineRestTimer = Timer.periodic(
+      const Duration(seconds: 1),
+      (_) {
+        if (_disposed || _terminalPhase != null) {
+          _cancelRoutineRest();
+          return;
+        }
+        if ((routineRestRemaining ?? Duration.zero) <= Duration.zero) {
+          skipRoutineRest();
+        } else {
+          _emit();
+        }
+      },
+    );
+  }
+
+  void skipRoutineRest() {
+    if (!isRoutineResting) return;
+    _cancelRoutineRest();
+    _placementReady = false;
+    _clearRepFeedback();
+    _emit();
+  }
+
+  void _cancelRoutineRest() {
+    _routineRestTimer?.cancel();
+    _routineRestTimer = null;
+    _routineRestUntil = null;
   }
 
   /// Presentation-only event from the existing tracker. It never changes the
@@ -402,6 +486,7 @@ class WorkoutController extends ChangeNotifier {
     _finishFuture = completer.future;
     final resumeOnFailure = _clock.isRunning;
     _cancelCountdown();
+    _cancelRoutineRest();
     _clearRepFeedback();
     _clock.stop();
     _terminalPhase = WorkoutUiPhase.ending;
@@ -425,6 +510,7 @@ class WorkoutController extends ChangeNotifier {
             countableFrames: _readyFrames,
             poseLostFrames: _lostFrames),
         calibration: calibration,
+        preserveAssignedSetIndex: routine != null,
       );
       final durationSeconds = isTimedChallenge
           ? (_challengeExpired
@@ -438,6 +524,7 @@ class WorkoutController extends ChangeNotifier {
         targetReps: targetReps,
         mode: mode,
         challengeSeconds: timedChallenge?.durationSeconds,
+        routine: routine,
         poseFrames: _poseFrames,
         readyFrames: _readyFrames,
         lostFrames: _lostFrames,
@@ -461,6 +548,7 @@ class WorkoutController extends ChangeNotifier {
   void abort() {
     if (_disposed || _terminalPhase != null) return;
     _cancelCountdown();
+    _cancelRoutineRest();
     _clearRepFeedback();
     _trackingClock.stop();
     _clock.stop();
@@ -472,6 +560,7 @@ class WorkoutController extends ChangeNotifier {
   void dispose() {
     _disposed = true;
     _cancelCountdown();
+    _cancelRoutineRest();
     _clearRepFeedback();
     _trackingClock.stop();
     _clock.stop();

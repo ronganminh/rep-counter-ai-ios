@@ -10,6 +10,7 @@ import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../../exercises/presentation/exercise_picker_screen.dart';
 import '../../plan/presentation/plan_today_sheet.dart';
+import '../../routine/presentation/routine_list_page.dart';
 import '../../workout/data/workout_history_store.dart';
 import '../../workout/data/workout_record.dart';
 import '../../workout/presentation/exercise_icon.dart';
@@ -107,6 +108,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         label: Text(context.tr('TẬP NGAY', 'TRAIN NOW'),
                             style: AppTypography.display40
                                 .copyWith(fontSize: 36))),
+                    const SizedBox(height: 28),
+                    const RoutineListSection(),
                     const SizedBox(height: 28),
                     FutureBuilder<List<WorkoutRecord>>(
                         future: _records,

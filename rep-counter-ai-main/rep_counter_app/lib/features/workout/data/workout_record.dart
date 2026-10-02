@@ -1,5 +1,6 @@
 import '../domain/workout_summary.dart';
 import '../domain/workout_mode.dart';
+import '../../routine/domain/routine_preset.dart';
 
 class WorkoutRecord {
   const WorkoutRecord({
@@ -19,6 +20,7 @@ class WorkoutRecord {
     this.aiFeedback,
     this.quality,
     this.repDetails,
+    this.routine,
   }) : _mode = mode;
 
   /// Số liệu chất lượng lấy từ `WorkoutSummary`.
@@ -36,6 +38,7 @@ class WorkoutRecord {
     WorkoutMode? mode,
     int? challengeSeconds,
     String? aiFeedback,
+    RoutineSnapshot? routine,
   }) =>
       WorkoutRecord(
         id: summary.id,
@@ -52,6 +55,7 @@ class WorkoutRecord {
         mode: mode,
         challengeSeconds: challengeSeconds,
         aiFeedback: aiFeedback,
+        routine: routine,
         quality: WorkoutQuality.fromSummary(summary),
         repDetails: [
           for (final set in summary.sets)
@@ -80,6 +84,7 @@ class WorkoutRecord {
   final int? challengeSeconds;
   final String? aiFeedback;
   final WorkoutQuality? quality;
+  final RoutineSnapshot? routine;
 
   /// Optional local-only timing detail; legacy records remain readable.
   final List<StoredRep>? repDetails;
@@ -119,6 +124,7 @@ class WorkoutRecord {
         'lost_frames': lostFrames,
         if (aiFeedback != null) 'ai_feedback': aiFeedback,
         if (quality != null) 'quality': quality!.toJson(),
+        if (routine != null) 'routine': routine!.toJson(),
         if (repDetails != null)
           'rep_details': repDetails!.map((r) => r.toJson()).toList(),
         if (repDetails != null) 'rep_details_version': 2,
@@ -161,6 +167,7 @@ class WorkoutRecord {
         aiFeedback: aiFeedback ?? this.aiFeedback,
         quality: quality,
         repDetails: repDetails,
+        routine: routine,
       );
 
   factory WorkoutRecord.fromJson(Map<String, dynamic> j) {
@@ -183,6 +190,7 @@ class WorkoutRecord {
       aiFeedback: j['ai_feedback'] as String?,
       repDetails: _readRepDetails(j),
       quality: _readQuality(j['quality']),
+      routine: _readRoutine(j['routine']),
     );
   }
 
@@ -199,6 +207,16 @@ class WorkoutRecord {
     if (challengeSeconds != null) return WorkoutMode.timed;
     if (targetReps != null) return WorkoutMode.targetReps;
     return null;
+  }
+
+  static RoutineSnapshot? _readRoutine(Object? value) {
+    try {
+      return value == null
+          ? null
+          : RoutineSnapshot.fromJson(value as Map<String, dynamic>);
+    } catch (_) {
+      return null;
+    }
   }
 
   static WorkoutQuality? _readQuality(Object? value) {

@@ -68,6 +68,42 @@ class WorkoutAggregator {
     return out;
   }
 
+  /// For structured routines, the live SessionTracker owns set boundaries.
+  /// Preserve those assigned set indexes so Skip rest cannot collapse two
+  /// intentional sets merely because their rep timestamps are close together.
+  List<SetMetric> groupByAssignedSetIndex(List<RepMetric> reps) {
+    if (reps.isEmpty) return const [];
+    final groups = <List<RepMetric>>[];
+    var assigned = reps.first.setIndex;
+    var current = <RepMetric>[];
+    for (final rep in reps) {
+      if (rep.setIndex != assigned && current.isNotEmpty) {
+        groups.add(current);
+        current = <RepMetric>[];
+        assigned = rep.setIndex;
+      }
+      current.add(rep);
+    }
+    if (current.isNotEmpty) groups.add(current);
+
+    return [
+      for (var i = 0; i < groups.length; i++)
+        SetMetric(
+          index: i + 1,
+          reps: [
+            for (final rep in groups[i])
+              RepMetric(
+                index: rep.index,
+                setIndex: i + 1,
+                observation: rep.observation,
+                flags: rep.flags,
+                valid: rep.valid,
+              ),
+          ],
+        ),
+    ];
+  }
+
   /// Biên độ nửa sau giảm bao nhiêu % so với nửa đầu. Không giảm -> 0.
   double amplitudeDropPercent(List<RepMetric> reps) {
     if (reps.length < 4) return 0;
@@ -156,8 +192,11 @@ class WorkoutAggregator {
     required List<RepMetric> reps,
     required PoseQualityStats poseStats,
     required CalibrationSnapshot calibration,
+    bool preserveAssignedSetIndex = false,
   }) {
-    final sets = groupIntoSets(reps);
+    final sets = preserveAssignedSetIndex
+        ? groupByAssignedSetIndex(reps)
+        : groupIntoSets(reps);
     final kept = [for (final s in sets) ...s.reps];
     return WorkoutSummary(
       id: id,
