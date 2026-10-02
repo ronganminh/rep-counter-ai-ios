@@ -216,12 +216,39 @@ class _ChoiceRow extends StatelessWidget {
               ),
               child: Row(
                 children: [
-                  Image.asset(
-                    selected
-                        ? 'assets/vnext/voice_cadence_radio_on.png'
-                        : 'assets/vnext/voice_cadence_radio_off.png',
+                  SizedBox(
                     width: 28,
                     height: 28,
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        Container(
+                          width: 28,
+                          height: 28,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: selected ? p.accent : p.text3,
+                              width: selected ? 2 : 1,
+                            ),
+                          ),
+                        ),
+                        if (selected)
+                          Container(
+                            width: 20,
+                            height: 20,
+                            decoration: BoxDecoration(
+                              color: p.accent,
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.check,
+                              size: 14,
+                              color: p.accentInk,
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                   const SizedBox(width: 14),
                   Expanded(
