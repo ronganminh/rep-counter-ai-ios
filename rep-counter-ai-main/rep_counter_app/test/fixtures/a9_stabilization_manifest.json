@@ -110,7 +110,8 @@
       "routine_rest",
       "pushup_real_camera"
     ],
-    "pull_up": "not_applicable_while_a8_gate_blocked"
+    "pull_up": "not_applicable_while_a8_gate_blocked",
+    "release_owner_exception": "accepted_simulator_first_physical_device_deferred"
   },
   "deliverables": [
     {
@@ -405,5 +406,31 @@
         "test/core/services/voice_cadence_test.dart"
       ]
     }
-  ]
+  ],
+  "simulator_release_evidence": {
+    "accepted_by_release_owner": true,
+    "accepted_at": "2026-10-02",
+    "scope": "Track A completion is allowed simulator-first; physical iPhone smoke remains deferred and is not represented as passed.",
+    "staging": {
+      "run_id": 36966478752,
+      "conclusion": "success"
+    },
+    "production_replay": {
+      "run_id": 36966478844,
+      "pushup_1": {
+        "frames": 3901,
+        "hud_reps": 28,
+        "saved_reps": 28,
+        "result_reps": 28,
+        "monotonic": true
+      },
+      "pushup_2": {
+        "frames": 9007,
+        "hud_reps": 67,
+        "saved_reps": 67,
+        "result_reps": 67,
+        "monotonic": true
+      }
+    }
+  }
 }

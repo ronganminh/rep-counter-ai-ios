@@ -73,3 +73,21 @@ Automated CI may be green while the real-device gate remains pending. A9 is
 ready for merge only after the required automated gates are green **and** the
 real-device smoke evidence is reviewed, unless the release owner explicitly
 accepts the manual-gate exception.
+
+
+## Simulator-first Track A completion exception
+
+On 2026-10-02 the release owner explicitly accepted completing Track A with
+simulator/CI evidence first because no physical iPhone was available through
+the connected tooling. This exception does **not** claim that the real-device
+smoke test passed; that hardware check remains deferred.
+
+Accepted simulator/CI evidence:
+
+- Staging Integration #110: success.
+- RepCoach CI #172: success.
+- pushup-1: 3901 frames, HUD 28, saved 28, ResultPage 28, monotonic.
+- pushup-2: 9007 frames, HUD 67, saved 67, ResultPage 67, monotonic.
+
+Under this explicit exception, A9 may be merged and Track A may be considered
+code/CI complete. Physical-iPhone smoke remains a post-Track-A follow-up.
