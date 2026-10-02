@@ -1,0 +1,409 @@
+{
+  "schema_version": 1,
+  "phase": "A9",
+  "production_regression": {
+    "pushup_1": {
+      "fixture_key": "pushup-1",
+      "expected_engine_count": 28,
+      "human_ground_truth": null
+    },
+    "pushup_2": {
+      "fixture_key": "pushup-2",
+      "expected_engine_count": 67,
+      "human_ground_truth": null
+    }
+  },
+  "full_sweep": [
+    {
+      "id": "free_workout",
+      "test_paths": [
+        "test/features/workout/workout_controller_test.dart",
+        "test/phase7_test.dart"
+      ]
+    },
+    {
+      "id": "target_reps",
+      "test_paths": [
+        "test/features/workout/workout_controller_test.dart",
+        "test/phase6_test.dart"
+      ]
+    },
+    {
+      "id": "timed_challenge",
+      "test_paths": [
+        "test/features/workout/time_challenge_test.dart"
+      ]
+    },
+    {
+      "id": "routine_workout",
+      "test_paths": [
+        "test/features/routine/routine_workout_test.dart",
+        "test/features/routine/routine_ui_test.dart"
+      ]
+    },
+    {
+      "id": "history_reopen",
+      "test_paths": [
+        "test/phase8_test.dart",
+        "test/features/workout/workout_record_test.dart"
+      ]
+    },
+    {
+      "id": "progress_filters",
+      "test_paths": [
+        "test/features/history/progress_statistics_test.dart"
+      ]
+    },
+    {
+      "id": "export",
+      "test_paths": [
+        "test/features/history/workout_export_service_test.dart",
+        "test/features/history/export_data_sheet_test.dart"
+      ]
+    },
+    {
+      "id": "settings",
+      "test_paths": [
+        "test/phase3_test.dart",
+        "test/core/services/voice_cadence_test.dart"
+      ]
+    },
+    {
+      "id": "ai_result_ui",
+      "test_paths": [
+        "test/features/ai/ai_result_integration_test.dart",
+        "test/phase7_test.dart"
+      ]
+    }
+  ],
+  "accessibility": {
+    "required": [
+      "vi",
+      "en",
+      "2x_text",
+      "voiceover_semantics",
+      "reduced_motion",
+      "muted_voice",
+      "camera_readability"
+    ],
+    "automated_evidence": [
+      "test/features/workout/rep_feedback_pill_test.dart",
+      "test/features/workout/form_score_details_test.dart",
+      "test/features/routine/routine_ui_test.dart",
+      "test/features/achievements/a7_ui_test.dart",
+      "test/features/workout/camera_page_controller_test.dart",
+      "test/core/services/voice_cadence_test.dart"
+    ],
+    "manual_visual_qa_status": "pending_real_device"
+  },
+  "real_device_smoke": {
+    "status": "pending",
+    "evidence": null,
+    "required": [
+      "camera_orientation_skeleton",
+      "placement",
+      "tts",
+      "haptics",
+      "pause_background",
+      "export_share",
+      "time_challenge",
+      "routine_rest",
+      "pushup_real_camera"
+    ],
+    "pull_up": "not_applicable_while_a8_gate_blocked"
+  },
+  "deliverables": [
+    {
+      "id": 1,
+      "node": "16:5",
+      "name": "Camera counted clean",
+      "implementation": [
+        "lib/features/workout/presentation/widgets/rep_feedback_pill.dart",
+        "lib/camera_page.dart"
+      ],
+      "tests": [
+        "test/features/workout/rep_feedback_pill_test.dart",
+        "test/features/workout/workout_rep_feedback_controller_test.dart"
+      ]
+    },
+    {
+      "id": 2,
+      "node": "16:31",
+      "name": "Camera counted with warning",
+      "implementation": [
+        "lib/features/workout/presentation/widgets/rep_feedback_pill.dart",
+        "lib/camera_page.dart"
+      ],
+      "tests": [
+        "test/features/workout/rep_feedback_pill_test.dart",
+        "test/features/workout/rep_feedback_test.dart"
+      ]
+    },
+    {
+      "id": 3,
+      "node": "16:57",
+      "name": "Camera interrupted placement",
+      "implementation": [
+        "lib/features/workout/presentation/widgets/rep_feedback_pill.dart",
+        "lib/camera_page.dart"
+      ],
+      "tests": [
+        "test/features/workout/rep_feedback_pill_test.dart",
+        "test/features/workout/workout_rep_feedback_controller_test.dart"
+      ]
+    },
+    {
+      "id": 4,
+      "node": "16:83",
+      "name": "Camera pose lost",
+      "implementation": [
+        "lib/features/workout/presentation/widgets/rep_feedback_pill.dart",
+        "lib/camera_page.dart"
+      ],
+      "tests": [
+        "test/features/workout/rep_feedback_pill_test.dart",
+        "test/features/workout/workout_rep_feedback_controller_test.dart"
+      ]
+    },
+    {
+      "id": 5,
+      "node": "16:109",
+      "name": "Form Score details sheet",
+      "implementation": [
+        "lib/features/workout/presentation/widgets/form_score_details_sheet.dart"
+      ],
+      "tests": [
+        "test/features/workout/form_score_details_test.dart"
+      ]
+    },
+    {
+      "id": 6,
+      "node": "16:142",
+      "name": "Form Score insufficient data",
+      "implementation": [
+        "lib/features/workout/presentation/widgets/form_score_details_sheet.dart"
+      ],
+      "tests": [
+        "test/features/workout/form_score_details_test.dart",
+        "test/phase7_test.dart"
+      ]
+    },
+    {
+      "id": 7,
+      "node": "17:5",
+      "name": "Time Challenge setup",
+      "implementation": [
+        "lib/features/workout/presentation/goal_setup_page.dart"
+      ],
+      "tests": [
+        "test/features/workout/time_challenge_test.dart"
+      ]
+    },
+    {
+      "id": 8,
+      "node": "17:35",
+      "name": "Time Challenge active HUD",
+      "implementation": [
+        "lib/camera_page.dart"
+      ],
+      "tests": [
+        "test/features/workout/time_challenge_test.dart"
+      ]
+    },
+    {
+      "id": 9,
+      "node": "17:65",
+      "name": "Time Challenge final 10 seconds",
+      "implementation": [
+        "lib/camera_page.dart",
+        "lib/features/workout/application/workout_controller.dart"
+      ],
+      "tests": [
+        "test/features/workout/time_challenge_test.dart"
+      ]
+    },
+    {
+      "id": 10,
+      "node": "17:97",
+      "name": "Time Challenge result new PR",
+      "implementation": [
+        "lib/features/workout/presentation/result_page.dart",
+        "lib/features/workout/presentation/widgets/timed_challenge_result.dart"
+      ],
+      "tests": [
+        "test/features/workout/time_challenge_test.dart"
+      ]
+    },
+    {
+      "id": 11,
+      "node": "17:117",
+      "name": "Time Challenge result no PR",
+      "implementation": [
+        "lib/features/workout/presentation/result_page.dart",
+        "lib/features/workout/presentation/widgets/timed_challenge_result.dart"
+      ],
+      "tests": [
+        "test/features/workout/time_challenge_test.dart"
+      ]
+    },
+    {
+      "id": 12,
+      "node": "18:5",
+      "name": "Progress 7 day",
+      "implementation": [
+        "lib/features/workout/presentation/history_page.dart",
+        "lib/features/history/progress_statistics.dart"
+      ],
+      "tests": [
+        "test/features/history/progress_statistics_test.dart"
+      ]
+    },
+    {
+      "id": 13,
+      "node": "18:101",
+      "name": "Progress 30 day",
+      "implementation": [
+        "lib/features/workout/presentation/history_page.dart",
+        "lib/features/history/progress_statistics.dart"
+      ],
+      "tests": [
+        "test/features/history/progress_statistics_test.dart"
+      ]
+    },
+    {
+      "id": 14,
+      "node": "18:202",
+      "name": "Progress 90 day",
+      "implementation": [
+        "lib/features/workout/presentation/history_page.dart",
+        "lib/features/history/progress_statistics.dart"
+      ],
+      "tests": [
+        "test/features/history/progress_statistics_test.dart"
+      ]
+    },
+    {
+      "id": 15,
+      "node": "18:303",
+      "name": "Progress empty",
+      "implementation": [
+        "lib/features/workout/presentation/history_page.dart"
+      ],
+      "tests": [
+        "test/features/history/progress_statistics_test.dart"
+      ]
+    },
+    {
+      "id": 16,
+      "node": "18:327",
+      "name": "Personal Records card",
+      "implementation": [
+        "lib/features/workout/presentation/history_page.dart",
+        "lib/features/workout/domain/workout_personal_records.dart"
+      ],
+      "tests": [
+        "test/features/history/progress_statistics_test.dart",
+        "test/features/workout/time_challenge_test.dart"
+      ]
+    },
+    {
+      "id": 17,
+      "node": "19:5",
+      "name": "Export Data sheet",
+      "implementation": [
+        "lib/features/history/export/export_data_sheet.dart",
+        "lib/features/history/export/workout_export_service.dart"
+      ],
+      "tests": [
+        "test/features/history/export_data_sheet_test.dart",
+        "test/features/history/workout_export_service_test.dart"
+      ]
+    },
+    {
+      "id": 18,
+      "node": "19:30",
+      "name": "Export preparing",
+      "implementation": [
+        "lib/features/history/export/export_data_sheet.dart"
+      ],
+      "tests": [
+        "test/features/history/export_data_sheet_test.dart"
+      ]
+    },
+    {
+      "id": 19,
+      "node": "19:48",
+      "name": "Export error empty",
+      "implementation": [
+        "lib/features/history/export/export_data_sheet.dart"
+      ],
+      "tests": [
+        "test/features/history/export_data_sheet_test.dart"
+      ]
+    },
+    {
+      "id": 20,
+      "node": "19:72",
+      "name": "Routine list",
+      "implementation": [
+        "lib/features/routine/presentation/routine_list_page.dart"
+      ],
+      "tests": [
+        "test/features/routine/routine_ui_test.dart",
+        "test/features/routine/routine_preset_test.dart"
+      ]
+    },
+    {
+      "id": 21,
+      "node": "19:99",
+      "name": "Routine editor",
+      "implementation": [
+        "lib/features/routine/presentation/routine_editor_page.dart"
+      ],
+      "tests": [
+        "test/features/routine/routine_ui_test.dart",
+        "test/features/routine/routine_preset_test.dart"
+      ]
+    },
+    {
+      "id": 22,
+      "node": "19:129",
+      "name": "Routine rest state",
+      "implementation": [
+        "lib/features/routine/presentation/rest_overlay.dart",
+        "lib/features/workout/application/workout_controller.dart"
+      ],
+      "tests": [
+        "test/features/routine/routine_ui_test.dart",
+        "test/features/routine/routine_workout_test.dart"
+      ]
+    },
+    {
+      "id": 23,
+      "node": "20:5",
+      "name": "Achievement earned card",
+      "implementation": [
+        "lib/features/achievements/presentation/achievement_earned_card.dart",
+        "lib/features/achievements/achievement_service.dart"
+      ],
+      "tests": [
+        "test/features/achievements/a7_ui_test.dart",
+        "test/features/achievements/achievement_service_test.dart"
+      ]
+    },
+    {
+      "id": 24,
+      "node": "20:24",
+      "name": "Voice cadence settings",
+      "implementation": [
+        "lib/features/legal/voice_cadence_page.dart",
+        "lib/core/services/workout_feedback.dart",
+        "lib/core/services/training_preferences.dart"
+      ],
+      "tests": [
+        "test/features/achievements/a7_ui_test.dart",
+        "test/core/services/voice_cadence_test.dart"
+      ]
+    }
+  ]
+}
