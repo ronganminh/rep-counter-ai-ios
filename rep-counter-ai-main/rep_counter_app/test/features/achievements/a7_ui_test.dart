@@ -98,6 +98,11 @@ void main() {
       find.byKey(const Key('achievement-firstWorkout')),
       findsOneWidget,
     );
+    await tester.drag(
+      find.byType(ListView).last,
+      const Offset(0, -620),
+    );
+    await tester.pumpAndSettle();
     expect(
       find.byKey(const Key('achievement-newPersonalRecord')),
       findsOneWidget,
@@ -118,12 +123,20 @@ void main() {
     await pumpApp(tester, const VoiceCadencePage(), scale: 2);
 
     expect(find.byKey(const Key('cadence-every-rep')), findsOneWidget);
+    final every5 = find.byKey(const Key('cadence-every-5'));
     await tester.scrollUntilVisible(
-      find.byKey(const Key('cadence-every-5')),
-      160,
+      every5,
+      220,
       scrollable: find.byType(Scrollable).first,
     );
-    await tester.tap(find.byKey(const Key('cadence-every-5')));
+    await tester.ensureVisible(every5);
+    await tester.pumpAndSettle();
+    await tester.tap(
+      find.descendant(
+        of: every5,
+        matching: find.text('Mỗi 5 rep'),
+      ),
+    );
     await tester.pumpAndSettle();
 
     final loaded = await TrainingPreferences.load();
