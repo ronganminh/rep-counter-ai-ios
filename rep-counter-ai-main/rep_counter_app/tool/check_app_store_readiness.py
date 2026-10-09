@@ -34,7 +34,7 @@ def main():
     ensure(set(info["CFBundleLocalizations"]) == {"en", "vi"}, "Native localization missing")
     manifest = plistlib.loads((ROOT / "ios/Runner/PrivacyInfo.xcprivacy").read_bytes())
     ensure(manifest["NSPrivacyTracking"] is False, "Tracking declaration changed")
-    ensure(any(x["NSPrivacyAccessedAPIType"] == "NSPrivacyAccessedAPITypeUserDefaults"
+    ensure(any(x["NSPrivacyAccessedAPIType"] == "NSPrivacyAccessedAPICategoryUserDefaults"
                and "CA92.1" in x["NSPrivacyAccessedAPITypeReasons"]
                for x in manifest["NSPrivacyAccessedAPITypes"]), "UserDefaults reason missing")
     for lang in ("en", "vi"):
