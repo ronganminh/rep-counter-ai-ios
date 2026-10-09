@@ -6,12 +6,17 @@
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>vi</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>RepCoach AI</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>Lưu ảnh kết quả buổi tập khi bạn chọn Lưu ảnh.</string>
+	<string>Save the workout story image to Photos only when you choose Save Image.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>Camera giúp nhận diện tư thế và đếm rep ngay trên máy. Hình ảnh không được tải lên máy chủ.</string>
+	<string>RepCoach AI uses your camera to detect exercise posture and count repetitions on your device. Camera frames are not uploaded.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -19,7 +24,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>rep_counter_app</string>
+	<string>RepCoach AI</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>

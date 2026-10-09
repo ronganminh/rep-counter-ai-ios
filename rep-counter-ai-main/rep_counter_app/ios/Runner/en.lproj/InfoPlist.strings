@@ -1,0 +1,4 @@
+/* English iOS permission dialogs. */
+CFBundleDisplayName = "RepCoach AI";
+NSCameraUsageDescription = "RepCoach AI uses your camera to detect exercise posture and count repetitions on your device. Camera frames are not uploaded.";
+NSPhotoLibraryAddUsageDescription = "Save the workout story image to Photos only when you choose Save Image.";

@@ -4,12 +4,13 @@ import '../legal/legal_config.dart';
 
 class AppLinks {
   static const appStoreId = String.fromEnvironment('APP_STORE_ID');
+  static bool get hasAppStoreListing => RegExp(r'^\d+$').hasMatch(appStoreId);
   static Uri get email => Uri(
       scheme: 'mailto',
       path: LegalConfig.contactEmail,
       query: 'subject=${Uri.encodeComponent('RepCoach AI feedback')}');
   static Uri? reviewUrl({required bool ios}) => ios
-      ? (RegExp(r'^\d+$').hasMatch(appStoreId)
+      ? (hasAppStoreListing
           ? Uri.parse(
               'https://apps.apple.com/app/id$appStoreId?action=write-review')
           : null)

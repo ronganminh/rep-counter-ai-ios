@@ -1,0 +1,59 @@
+name: App Store v1 readiness
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "rep-counter-ai-main/rep_counter_app/**"
+      - ".github/workflows/app-store-readiness.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  contract:
+    name: App Store source and privacy contracts
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Validate app metadata and privacy
+        working-directory: rep-counter-ai-main/rep_counter_app
+        run: python3 tool/check_app_store_readiness.py
+
+  unsigned-iphone:
+    name: Xcode 26+ unsigned iPhone release
+    runs-on: macos-26
+    needs: contract
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: Xcode and SDK gate
+        shell: bash
+        run: |
+          xcodebuild -version
+          xcrun --sdk iphoneos --show-sdk-version
+          XCODE_MAJOR="$(xcodebuild -version | awk '/^Xcode / {split($2,v,"."); print v[1]}')"
+          SDK_MAJOR="$(xcrun --sdk iphoneos --show-sdk-version | cut -d. -f1)"
+          test "$XCODE_MAJOR" -ge 26
+          test "$SDK_MAJOR" -ge 26
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.47.5'
+          channel: stable
+          cache: true
+      - name: Flutter dependencies and quality
+        working-directory: rep-counter-ai-main/rep_counter_app
+        run: |
+          flutter config --no-enable-swift-package-manager
+          flutter pub get
+          flutter analyze --fatal-infos
+          flutter test
+      - name: Install CocoaPods
+        working-directory: rep-counter-ai-main/rep_counter_app/ios
+        run: pod install --repo-update
+      - name: Build unsigned device release
+        working-directory: rep-counter-ai-main/rep_counter_app
+        run: bash tool/build_ios.sh --release --no-codesign --no-pub

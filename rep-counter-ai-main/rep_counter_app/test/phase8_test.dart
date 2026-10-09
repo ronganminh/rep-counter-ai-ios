@@ -427,7 +427,12 @@ void main() {
     testWidgets(
         'history detail cancel, delete and undo preserve exact record through AppShell ${scale}x',
         (tester) async {
-      final r = detail().copyWith(aiFeedback: 'Saved feedback');
+      // Keep this history-navigation fixture within the default 7-day filter.
+      // A fixed 2026-09-27 record would disappear as the calendar advances.
+      final recent = detail().toJson()
+        ..['started_at'] = DateTime.now().toIso8601String();
+      final r =
+          WorkoutRecord.fromJson(recent).copyWith(aiFeedback: 'Saved feedback');
       final store = WorkoutHistoryStore();
       await store.save(r);
       await pump(tester, const AppShell(), scale: scale);
@@ -440,7 +445,8 @@ void main() {
       await tester.tap(find.byType(ListTile));
       await tester.pumpAndSettle();
       expect(find.byType(ResultPage), findsOneWidget);
-      expect(tester.takeException(), isNull, reason: 'History and detail at $scale text');
+      expect(tester.takeException(), isNull,
+          reason: 'History and detail at $scale text');
       await tester.tap(find.byKey(const Key('delete-workout-detail')));
       await tester.pumpAndSettle();
       await tester.tap(find.text(S.vi.cancel));

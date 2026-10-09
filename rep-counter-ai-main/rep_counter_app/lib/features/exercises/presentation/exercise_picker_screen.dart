@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/config/feature_flags.dart';
 import '../../../core/i18n/locale_controller.dart';
 import '../../../exercise.dart';
 import '../../../theme/app_colors.dart';
@@ -11,6 +12,11 @@ class ExercisePickerScreen extends StatelessWidget {
   const ExercisePickerScreen({super.key});
   @override
   Widget build(BuildContext context) {
+    final available = allExercises
+        .where((profile) => FeatureFlags.enableAllExercises ||
+            FeatureFlags.visibleExerciseIds.contains(profile.id))
+        .map((profile) => profile.id)
+        .toSet();
     final items = [
       for (final profile in allExercises)
         (profile.id, profile.localizedName(context.s)),
@@ -41,7 +47,7 @@ class ExercisePickerScreen extends StatelessWidget {
                           final profile = allExercises
                               .where((p) => p.id == item.$1)
                               .firstOrNull;
-                          if (profile != null) {
+                          if (profile != null && available.contains(profile.id)) {
                             showPlanTodaySheet(context, profile);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -56,23 +62,21 @@ class ExercisePickerScreen extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                      allExercises.any((p) => p.id == item.$1)
+                                      available.contains(item.$1)
                                           ? context.tr('CÓ SẴN', 'AVAILABLE')
                                           : context.tr(
                                               'SẮP RA MẮT', 'COMING SOON'),
                                       style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w700,
-                                          color: allExercises
-                                                  .any((p) => p.id == item.$1)
+                                          color: available.contains(item.$1)
                                               ? AppColors.success
                                               : AppColors.text3)),
                                   const SizedBox(height: 20),
                                   Center(
                                       child: ExerciseIcon(
                                           exerciseId: item.$1,
-                                          color: allExercises
-                                                  .any((p) => p.id == item.$1)
+                                          color: available.contains(item.$1)
                                               ? AppColors.accent
                                               : AppColors.text3,
                                           size: 56)),
@@ -83,7 +87,7 @@ class ExercisePickerScreen extends StatelessWidget {
                                           fontWeight: FontWeight.w700)),
                                   const SizedBox(height: 6),
                                   Text(
-                                      allExercises.any((p) => p.id == item.$1)
+                                      available.contains(item.$1)
                                           ? allExercises
                                               .firstWhere(
                                                   (p) => p.id == item.$1)

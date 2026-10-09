@@ -18,4 +18,9 @@ trap 'rm -rf "$repcoach_tools"' EXIT
 chmod +x "$repcoach_tools/xcrun"
 export DEVELOPER_DIR="$repcoach_developer_dir"
 export PATH="$repcoach_tools:$PATH"
-"$repcoach_flutter" build ios "$@"
+repcoach_build_target="ios"
+if [[ "${1:-}" == "--ipa" ]]; then
+  repcoach_build_target="ipa"
+  shift
+fi
+"$repcoach_flutter" build "$repcoach_build_target" "$@"
