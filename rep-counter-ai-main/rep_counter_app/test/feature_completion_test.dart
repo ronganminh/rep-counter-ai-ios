@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:rep_counter_app/core/config/feature_flags.dart';
 import 'package:rep_counter_app/core/i18n/app_strings.dart';
 import 'package:rep_counter_app/core/i18n/locale_controller.dart';
 import 'package:rep_counter_app/core/services/app_links.dart';
@@ -245,8 +246,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(await AiPreferences.enabled(), false);
   });
-  for (final profile in allExercises) {
-    testWidgets('exercise picker opens existing ${profile.id} profile',
+  for (final profile in allExercises.where((e) =>
+      FeatureFlags.enableAllExercises || FeatureFlags.visibleExerciseIds.contains(e.id))) {
+    testWidgets('exercise picker opens available ${profile.id} profile',
         (tester) async {
       await pump(tester, const ExercisePickerScreen());
       final tile = find.byKey(Key('exercise-${profile.id}'));
@@ -260,6 +262,19 @@ void main() {
               .profile
               .id,
           profile.id);
+      expect(tester.takeException(), isNull);
+    });
+  }
+  for (final profile in allExercises.where((e) =>
+      !FeatureFlags.enableAllExercises && !FeatureFlags.visibleExerciseIds.contains(e.id))) {
+    testWidgets('exercise picker gates unfinished ${profile.id}', (tester) async {
+      await pump(tester, const ExercisePickerScreen());
+      final tile = find.byKey(Key('exercise-${profile.id}'));
+      await tester.scrollUntilVisible(tile, 300);
+      await tester.tap(tile);
+      await tester.pumpAndSettle();
+      expect(find.byType(GoalSetupContent), findsNothing);
+      expect(find.text('Bài tập này sắp ra mắt.'), findsOneWidget);
       expect(tester.takeException(), isNull);
     });
   }

@@ -103,10 +103,10 @@ class _SettingsPageState extends State<SettingsPage> {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(context.tr(
-            Platform.isIOS && AppLinks.appStoreId.isEmpty
+            Platform.isIOS && !AppLinks.hasAppStoreListing
                 ? 'Bản iOS chưa có trang App Store để đánh giá.'
                 : 'Chưa mở được cửa hàng. Bản test cần tài khoản được mời.',
-            Platform.isIOS && AppLinks.appStoreId.isEmpty
+            Platform.isIOS && !AppLinks.hasAppStoreListing
                 ? 'This iOS build has no App Store listing yet.'
                 : 'Could not open the store. Test builds require an invited account.'))));
   }
@@ -314,18 +314,15 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: LucideIcons.messageCircle,
               title: context.tr('Gửi góp ý', 'Send feedback'),
               onTap: _contact),
-          SettingsRow(
-              icon: LucideIcons.star,
-              title: context.tr('Đánh giá app', 'Rate the app'),
-              subtitle: Platform.isIOS && AppLinks.appStoreId.isEmpty
-                  ? context.tr('Chờ phát hành trên App Store',
-                      'Awaiting App Store release')
-                  : null,
-              onTap: _review),
+          if (!Platform.isIOS || AppLinks.hasAppStoreListing)
+            SettingsRow(
+                icon: LucideIcons.star,
+                title: context.tr('Đánh giá app', 'Rate the app'),
+                onTap: _review),
           SettingsRow(
               icon: LucideIcons.info,
               title: s.versionLabel,
-              trailing: Text('1.0.0 (2)', style: TextStyle(color: p.text2))),
+              trailing: Text('1.0.0 (3)', style: TextStyle(color: p.text2))),
           SettingsRow(
               icon: LucideIcons.fileText,
               title: s.termsOfUse,

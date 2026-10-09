@@ -1,0 +1,4 @@
+/* Vietnamese iOS permission dialogs. */
+CFBundleDisplayName = "RepCoach AI";
+NSCameraUsageDescription = "RepCoach AI sử dụng camera để nhận diện tư thế và đếm số lần tập ngay trên thiết bị. Khung hình camera không được tải lên máy chủ.";
+NSPhotoLibraryAddUsageDescription = "Chỉ lưu ảnh tóm tắt buổi tập vào thư viện khi bạn chọn Lưu ảnh.";

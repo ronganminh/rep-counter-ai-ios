@@ -566,13 +566,13 @@ class S {
     secondsShort: 'giây',
     aiNotConfigured: 'Tính năng AI chưa được cấu hình ở bản này.',
     aiTimeout:
-        'Gemini phản hồi quá lâu. Kết quả đã được lưu, bạn có thể thử lại.',
+        'Dịch vụ AI phản hồi quá lâu. Kết quả đã được lưu, bạn có thể thử lại.',
     aiOffline: 'Không có kết nối mạng. Kết quả đã được lưu trên máy.',
     aiServerBusy: 'Máy chủ AI đang bận. Kết quả vẫn an toàn, hãy thử lại sau.',
     aiUnknownError: 'Không thể nhận xét lúc này. Kết quả vẫn được lưu trên máy.',
     aiPrivacyNote:
-        'Gemini chỉ nhận bản tóm tắt nhẹ của buổi tập, không gửi video hay ảnh của bạn.',
-    aiAsk: 'Nhận nhận xét từ Gemini',
+        'Dịch vụ AI chỉ nhận số liệu tổng hợp của buổi tập, không nhận video hay ảnh của bạn.',
+    aiAsk: 'Nhận nhận xét AI',
     aiAskAgain: 'Nhận xét lại',
     resultDetail: 'Chi tiết buổi tập',
     resultDone: 'Hoàn thành',
@@ -809,14 +809,14 @@ class S {
     secondsShort: 'sec',
     aiNotConfigured: 'AI feedback is not configured in this build.',
     aiTimeout:
-        'Gemini took too long to answer. Your workout is saved — you can try again.',
+        'The AI service took too long to answer. Your workout is saved — you can try again.',
     aiOffline: 'No network connection. Your workout is saved on this device.',
     aiServerBusy: 'The AI server is busy. Your workout is safe — try again later.',
     aiUnknownError:
         'Could not get feedback right now. Your workout is still saved on this device.',
     aiPrivacyNote:
-        'Gemini only receives a small summary of the session — no video or images are sent.',
-    aiAsk: 'Get feedback from Gemini',
+        'The AI service only receives limited workout statistics — no videos or photos are sent.',
+    aiAsk: 'Get AI feedback',
     aiAskAgain: 'Get feedback again',
     resultDetail: 'Workout detail',
     resultDone: 'Completed',
