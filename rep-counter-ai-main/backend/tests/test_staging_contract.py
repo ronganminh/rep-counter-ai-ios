@@ -18,6 +18,13 @@ FIXTURE = json.loads(
 
 
 class CrossStackContractTests(unittest.TestCase):
+    def test_shared_fixture_uses_backend_current_consent(self):
+        self.assertEqual(FIXTURE["schema_version"], 2)
+        self.assertEqual(
+            FIXTURE["consent_version"],
+            server.CURRENT_AI_CONSENT_VERSION,
+        )
+
     @classmethod
     def setUpClass(cls):
         cls.httpd = server.ThreadingHTTPServer(("127.0.0.1", 0), server.Handler)

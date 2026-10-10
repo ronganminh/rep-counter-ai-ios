@@ -8,9 +8,13 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import server
 
 
-def valid_v1():
+CURRENT_CONSENT_VERSION = "2026-10-01-groq"
+
+
+def valid_v2():
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "consent_version": CURRENT_CONSENT_VERSION,
         "exercise": "push_up",
         "duration_seconds": 780,
         "reps": 28,
@@ -31,28 +35,27 @@ def valid_v1():
     }
 
 
-def valid_v2():
-    payload = valid_v1()
-    payload["schema_version"] = 2
-    payload["consent_version"] = "2026-10-01"
-    return payload
-
-
 class ValidationTests(unittest.TestCase):
-    def test_valid_v1(self):
-        normalized = server.normalize_workout_request(valid_v1())
-        self.assertEqual(normalized["schema_version"], 1)
-
-    def test_valid_unversioned_legacy_is_normalized_to_v1(self):
-        payload = valid_v1()
-        payload.pop("schema_version")
-        normalized = server.normalize_workout_request(payload)
-        self.assertEqual(normalized["schema_version"], 1)
-
-    def test_valid_v2(self):
+    def test_valid_v2_with_current_consent(self):
         normalized = server.normalize_workout_request(valid_v2())
         self.assertEqual(normalized["schema_version"], 2)
-        self.assertEqual(normalized["consent_version"], "2026-10-01")
+        self.assertEqual(
+            normalized["consent_version"],
+            CURRENT_CONSENT_VERSION,
+        )
+
+    def test_unversioned_legacy_is_rejected(self):
+        payload = valid_v2()
+        payload.pop("schema_version")
+        with self.assertRaises(server.RequestValidationError):
+            server.normalize_workout_request(payload)
+
+    def test_explicit_v1_is_rejected(self):
+        payload = valid_v2()
+        payload["schema_version"] = 1
+        payload.pop("consent_version")
+        with self.assertRaises(server.RequestValidationError):
+            server.normalize_workout_request(payload)
 
     def test_v2_requires_consent_version(self):
         payload = valid_v2()
@@ -60,70 +63,83 @@ class ValidationTests(unittest.TestCase):
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
+    def test_v2_rejects_stale_consent_version(self):
+        payload = valid_v2()
+        payload["consent_version"] = "2026-09-30-gemini"
+        with self.assertRaises(server.RequestValidationError):
+            server.normalize_workout_request(payload)
+
+    def test_v2_rejects_arbitrary_nonempty_consent_version(self):
+        payload = valid_v2()
+        payload["consent_version"] = "some-nonempty-value"
+        with self.assertRaises(server.RequestValidationError):
+            server.normalize_workout_request(payload)
+
     def test_missing_required_field(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload.pop("reps")
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_unknown_field(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["camera_frame"] = "not-allowed"
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_wrong_type(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["reps"] = "28"
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_bool_is_not_accepted_as_integer(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["reps"] = True
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_negative_reps(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["reps"] = -1
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_negative_duration(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["duration_seconds"] = -1
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_invalid_locale(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["locale"] = "fr"
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_invalid_exercise(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["exercise"] = "bench_press"
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_all_current_app_exercises_are_allowed(self):
         for exercise in ("push_up", "pull_up", "curl", "overhead_extension"):
-            payload = valid_v1()
+            payload = valid_v2()
             payload["exercise"] = exercise
             self.assertEqual(
-                server.normalize_workout_request(payload)["exercise"], exercise
+                server.normalize_workout_request(payload)["exercise"],
+                exercise,
             )
 
     def test_pose_lost_frames_cannot_exceed_pose_frames(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["pose_lost_frames"] = payload["pose_frames"] + 1
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_flagged_reps_cannot_exceed_reps(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["flagged_reps"] = payload["reps"] + 1
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
@@ -137,13 +153,13 @@ class ValidationTests(unittest.TestCase):
             server.parse_workout_request(b"[]")
 
     def test_oversized_numeric_value(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["reps"] = 100_001
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
 
     def test_non_finite_numeric_value(self):
-        payload = valid_v1()
+        payload = valid_v2()
         payload["avg_amplitude"] = float("inf")
         with self.assertRaises(server.RequestValidationError):
             server.normalize_workout_request(payload)
@@ -163,7 +179,9 @@ class ValidationTests(unittest.TestCase):
 
     def test_serialized_valid_v2_round_trip(self):
         payload = valid_v2()
-        normalized = server.parse_workout_request(json.dumps(payload).encode("utf-8"))
+        normalized = server.parse_workout_request(
+            json.dumps(payload).encode("utf-8")
+        )
         self.assertEqual(normalized, payload)
 
 
