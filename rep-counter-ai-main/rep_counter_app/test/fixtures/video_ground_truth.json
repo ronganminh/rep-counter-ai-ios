@@ -8,5 +8,24 @@
     "current_engine_count": 67,
     "human_ground_truth": null,
     "notes": "Regression baseline only; not yet human-verified"
+  },
+  "pushup-rest-regression": {
+    "source_asset": "pushup-rest-regression.mp4",
+    "sha256": "1e1919ecbb0ed93d99491043d61c9fdc1ccf92986e825f2f92718a19449dc853",
+    "duration_ms": 1829591,
+    "rest_intervals_ms": [
+      [60000, 150000],
+      [205000, 350000],
+      [400000, 615000],
+      [665000, 830000],
+      [885000, 995000],
+      [1060000, 1220000],
+      [1275000, 1435000],
+      [1480000, 1595000],
+      [1650000, 1790000]
+    ],
+    "current_engine_count": null,
+    "human_ground_truth": null,
+    "notes": "Raw iPhone video with short push-up sets separated by long seated rest periods. Use to reject rep increases while resting; establish a count baseline only after human annotation."
   }
 }

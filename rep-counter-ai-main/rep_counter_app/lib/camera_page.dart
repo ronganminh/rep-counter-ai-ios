@@ -115,8 +115,7 @@ enum _CameraState {
   suspended,
 }
 
-class _CameraPageState extends State<CameraPage>
-    with WidgetsBindingObserver {
+class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   static const _videoFrames = MethodChannel('rep_counter/video_frames');
 
   CameraController? _cam;
@@ -143,6 +142,7 @@ class _CameraPageState extends State<CameraPage>
   // độ thì đứng yên rung tay cũng vượt, và ngưỡng rơi vào vùng nhiễu -> rep ma
   // được lưu luôn cho các buổi sau.
   late final _calibrator = Calibrator(minSpan: p.minAmplitude);
+
   /// `RepTracker` bọc quanh `RepCounter` — cùng phép đếm, nhưng gom thêm số liệu
   /// từng rep (biên độ, nhịp, lệch hai tay, độ tin cậy pose) để dựng
   /// `WorkoutSummary`. Không có nó, AI chỉ biết được số rep chứ không biết tập
@@ -158,6 +158,7 @@ class _CameraPageState extends State<CameraPage>
   bool _busy = false;
   bool _calibrating = false;
   bool _calibrationSaving = false;
+
   /// Đã hiệu chỉnh ngưỡng theo người dùng chưa — ghi vào CalibrationSnapshot
   /// để sau này biết số liệu chất lượng dựa trên mốc của ai.
   bool _calibrated = false;
@@ -171,6 +172,12 @@ class _CameraPageState extends State<CameraPage>
   /// đúng tình huống đó.
   bool _calibratedThisSession = false;
   bool _calibrationLoadStarted = false;
+
+  /// Last frame diagnostics exposed only by the prerecorded-video CI harness.
+  /// This keeps production counting untouched while making a failed fixture
+  /// explain whether placement, pose confidence, or the angle signal blocked it.
+  String _ciLastFrameDebug = '';
+
   /// Thời điểm gần nhất tư thế còn ĐẠT. Bộ đếm vẫn chạy trong [_placementGrace]
   /// sau mốc này.
   ///
@@ -205,8 +212,8 @@ class _CameraPageState extends State<CameraPage>
   WorkoutUiState get _ui => _workout.state;
   bool get _finishing => _ui.isFinishing;
   TrainingPreferences get _feedbackPreferences => TrainingPreferences(
-        voice: _preferences.voice &&
-            (widget.routine?.voiceCoachEnabled ?? true),
+        voice:
+            _preferences.voice && (widget.routine?.voiceCoachEnabled ?? true),
         haptics: _preferences.haptics,
         sound: _preferences.sound,
         cues: _preferences.cues,
@@ -218,8 +225,11 @@ class _CameraPageState extends State<CameraPage>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _feedback = WorkoutFeedback(onVoiceUnavailable: () {
-      if (mounted) { _notify(context.tr('Không có giọng đọc phù hợp trên máy. Bạn vẫn có thể tập với số trên màn hình.',
-        'A matching voice is unavailable on this device. On-screen counting still works.')); }
+      if (mounted) {
+        _notify(context.tr(
+            'Không có giọng đọc phù hợp trên máy. Bạn vẫn có thể tập với số trên màn hình.',
+            'A matching voice is unavailable on this device. On-screen counting still works.'));
+      }
     });
     _loadTrainingPreferences();
     _workout = WorkoutController(
@@ -254,7 +264,9 @@ class _CameraPageState extends State<CameraPage>
   }
 
   Future<void> _loadTrainingPreferences() async {
-    try { _preferences = await TrainingPreferences.load(); } catch (_) { /* Defaults still work for this session. */ }
+    try {
+      _preferences = await TrainingPreferences.load();
+    } catch (_) {/* Defaults still work for this session. */}
     if (!mounted) return;
     _preferencesLoaded = true;
     _feedback.configure(_feedbackPreferences, context.language);
@@ -269,8 +281,13 @@ class _CameraPageState extends State<CameraPage>
       if (!mounted) return;
       _feedback.configure(_feedbackPreferences, context.language);
     } catch (_) {
-      if (mounted) _notify(context.tr('Chưa lưu được tùy chọn giọng đọc.', 'Could not save the voice preference.'));
-    } finally { if (mounted) setState(() => _settingsBusy = false); }
+      if (mounted) {
+        _notify(context.tr('Chưa lưu được tùy chọn giọng đọc.',
+            'Could not save the voice preference.'));
+      }
+    } finally {
+      if (mounted) setState(() => _settingsBusy = false);
+    }
   }
 
   void _resetTransient() {
@@ -293,9 +310,7 @@ class _CameraPageState extends State<CameraPage>
     if (_ui.sessionState != _lastSetState) {
       _lastSetState = _ui.sessionState;
       if (_lastSetState != SessionState.idle &&
-          (accepting ||
-              _workout.isRoutineResting ||
-              _ui.routineComplete)) {
+          (accepting || _workout.isRoutineResting || _ui.routineComplete)) {
         _feedback.setBoundary(_lastSetState == SessionState.working);
       }
     }
@@ -319,8 +334,11 @@ class _CameraPageState extends State<CameraPage>
     final countdown = _ui.countdown;
     if (countdown != _lastCountdown) {
       _lastCountdown = countdown;
-      if (countdown != null) { _feedback.countdown(countdown); }
-      else { _feedback.stop(); }
+      if (countdown != null) {
+        _feedback.countdown(countdown);
+      } else {
+        _feedback.stop();
+      }
     }
     if (_ui.sessionStarted && !_sessionArmed) {
       _sessionArmed = true;
@@ -348,10 +366,10 @@ class _CameraPageState extends State<CameraPage>
   }
 
   void _syncCalibration() => _workout.calibrationChanged(
-    collecting: _calibrating,
-    calibrated: _calibrated,
-    samples: _calibrator.sampleCount,
-  );
+        collecting: _calibrating,
+        calibrated: _calibrated,
+        samples: _calibrator.sampleCount,
+      );
 
   /// Thông báo một lần cho các sự kiện hiệu chỉnh.
   ///
@@ -384,8 +402,8 @@ class _CameraPageState extends State<CameraPage>
     if (!_calibrated) return;
     // Đợi hết khung hình hiện tại rồi mới báo: didChangeDependencies chạy
     // trước khi Scaffold có mặt, ScaffoldMessenger lúc đó chưa tìm thấy.
-    WidgetsBinding.instance.addPostFrameCallback(
-        (_) => _notify(_strings.calibrateRestored));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _notify(_strings.calibrateRestored));
   }
 
   /// Thu camera khi app xuống nền, mở lại khi quay về.
@@ -395,9 +413,10 @@ class _CameraPageState extends State<CameraPage>
   /// và tụt pin. Tệ hơn, Android có quyền thu hồi camera của app đang ở nền,
   /// lúc quay lại sẽ là màn hình đen chứ không phải preview.
   ///
-  /// Chỉ xử lý `paused`/`hidden`/`detached`, KHÔNG xử lý `inactive`: `inactive`
-  /// bắn ra cả khi chỉ kéo thanh thông báo xuống, dựng lại camera cho một cú
-  /// kéo nhầm thì giật hơn là để yên.
+  /// Phải thu camera ngay từ `inactive`, không chờ tới `paused`. Trên iOS,
+  /// app khác có thể giành camera trong khoảng chuyển trạng thái này; giữ
+  /// AVCaptureSession thêm dù chỉ một nhịp có thể làm dịch vụ camera bị kẹt,
+  /// khiến cả Camera hệ thống và các app khác chỉ nhận khung hình đen.
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
     super.didChangeAppLifecycleState(state);
@@ -405,13 +424,12 @@ class _CameraPageState extends State<CameraPage>
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
       case AppLifecycleState.detached:
+      case AppLifecycleState.inactive:
         _inBackground = true;
         _suspendCamera();
       case AppLifecycleState.resumed:
         _inBackground = false;
         _resumeCamera();
-      case AppLifecycleState.inactive:
-        break;
     }
   }
 
@@ -455,7 +473,7 @@ class _CameraPageState extends State<CameraPage>
   Future<void> _releaseCamera(CameraController cam) async {
     try {
       if (cam.value.isStreamingImages) await cam.stopImageStream();
-    } catch (_) { /* Stream may have already stopped during teardown. */ }
+    } catch (_) {/* Stream may have already stopped during teardown. */}
     try {
       await cam.dispose();
     } catch (error) {
@@ -465,7 +483,13 @@ class _CameraPageState extends State<CameraPage>
 
   Future<void> _resumeCamera() async {
     await _cameraShutdown;
-    if (!mounted || _inBackground || _manualPaused || _cam != null || _finishing) return;
+    if (!mounted ||
+        _inBackground ||
+        _manualPaused ||
+        _cam != null ||
+        _finishing) {
+      return;
+    }
     // Chưa từng mở camera (còn ở màn giải thích) thì đừng tự mở.
     if (!_workout.hasStarted && _cameraState != _CameraState.suspended) return;
     await _start();
@@ -589,7 +613,7 @@ class _CameraPageState extends State<CameraPage>
 
       if (atMs % 5000 == 0) {
         await _writeCiStatus(
-          '[CI_VIDEO_STATUS] production_workout at_ms=$atMs total_ms=$durationMs frames=$processed reps=${_ui.reps} phase=${_ui.phase.name}',
+          '[CI_VIDEO_STATUS] production_workout at_ms=$atMs total_ms=$durationMs frames=$processed reps=${_ui.reps} phase=${_ui.phase.name} $_ciLastFrameDebug',
         );
       }
     }
@@ -627,7 +651,9 @@ class _CameraPageState extends State<CameraPage>
     // guideFor cần chuỗi theo ngôn ngữ, mà InheritedWidget chưa dùng được trong
     // initState. Ở đây còn tự dựng lại khi người dùng đổi ngôn ngữ giữa chừng.
     _strings = context.s;
-    if (_preferencesLoaded) _feedback.configure(_feedbackPreferences, context.language);
+    if (_preferencesLoaded) {
+      _feedback.configure(_feedbackPreferences, context.language);
+    }
     _guide = guideFor(p, _strings);
     // Nạp ở đây chứ không ở initState: hàm nạp báo thông báo theo `_strings`, mà
     // `_strings` là `late` và chỉ có giá trị từ didChangeDependencies trở đi.
@@ -658,7 +684,8 @@ class _CameraPageState extends State<CameraPage>
 
   /// Độ lệch trục thân so với hướng bài tập yêu cầu (độ).
   double? _torsoDeviation(Landmarks lm) {
-    final sh = lm.mid(PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
+    final sh = lm.mid(
+        PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
         minLikelihood: p.minLikelihood);
     final hp = lm.mid(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip,
         minLikelihood: p.minLikelihood);
@@ -716,7 +743,10 @@ class _CameraPageState extends State<CameraPage>
 
   Future<void> _start() async {
     await _cameraShutdown;
-    if (!mounted || _inBackground || _finishing || _ui.phase == WorkoutUiPhase.aborted ||
+    if (!mounted ||
+        _inBackground ||
+        _finishing ||
+        _ui.phase == WorkoutUiPhase.aborted ||
         _cameraState == _CameraState.initializing) {
       return;
     }
@@ -782,8 +812,12 @@ class _CameraPageState extends State<CameraPage>
     }
   }
 
-  bool _cameraRequestCurrent(int epoch) => mounted && !_inBackground &&
-      epoch == _cameraEpoch && !_finishing && _ui.phase != WorkoutUiPhase.aborted;
+  bool _cameraRequestCurrent(int epoch) =>
+      mounted &&
+      !_inBackground &&
+      epoch == _cameraEpoch &&
+      !_finishing &&
+      _ui.phase != WorkoutUiPhase.aborted;
 
   Future<void> _onFrame(CameraImage image) async {
     if (_busy || !mounted || !_workout.acceptsFrames) return;
@@ -795,7 +829,12 @@ class _CameraPageState extends State<CameraPage>
       final input = _toInputImage(image);
       if (input == null) return;
       final poses = await _detector.processImage(input);
-      if (!mounted || epoch != _cameraEpoch || !identical(camera, _cam) || !_workout.acceptsFrames) return;
+      if (!mounted ||
+          epoch != _cameraEpoch ||
+          !identical(camera, _cam) ||
+          !_workout.acceptsFrames) {
+        return;
+      }
       _consume(poses.isEmpty ? null : poses.first, image);
     } catch (e) {
       debugPrint('pose error: $e');
@@ -807,11 +846,17 @@ class _CameraPageState extends State<CameraPage>
   void _consume(Pose? pose, CameraImage image) {
     final camera = _cam;
     if (camera == null) return;
+    final transform = cameraPoseTransform(
+      isIOS: Platform.isIOS,
+      sensorOrientation: camera.description.sensorOrientation,
+      isFrontCamera:
+          camera.description.lensDirection == CameraLensDirection.front,
+    );
     _consumePose(
       pose,
       rawImageSize: Size(image.width.toDouble(), image.height.toDouble()),
-      rotationDegrees: camera.description.sensorOrientation,
-      mirror: camera.description.lensDirection == CameraLensDirection.front,
+      rotationDegrees: transform.rotationDegrees,
+      mirror: transform.mirror,
     );
   }
 
@@ -841,15 +886,18 @@ class _CameraPageState extends State<CameraPage>
     final status = _statusDebouncer.update(placement.status);
     final now = _workout.frameTime;
     if (status.canCount) _lastPlacementOk = now;
-    final canCount = _lastPlacementOk != null &&
-        now - _lastPlacementOk! <= _placementGrace;
-
+    final canCount =
+        _lastPlacementOk != null && now - _lastPlacementOk! <= _placementGrace;
 
     double sig = double.nan;
+    double? rawLeft;
+    double? rawRight;
     var signalRestored = false;
     bool? gateOk;
     if (lm != null) {
       final raw = p.signal(lm, p.minLikelihood);
+      rawLeft = raw.left;
+      rawRight = raw.right;
       gateOk = p.countGate?.call(lm, p.minLikelihood);
 
       if (canCount && gateOk != false) {
@@ -875,19 +923,25 @@ class _CameraPageState extends State<CameraPage>
             sig = v;
             signalRestored = true;
           }
-          if (_workout.acceptsReps) _handle(_trackL.update(sample(v)), now, merge: false, arm: 'M');
+          if (_workout.acceptsReps) {
+            _handle(_trackL.update(sample(v)), now, merge: false, arm: 'M');
+          }
         } else {
           final vl = raw.left == null ? null : _smoothL.add(raw.left!);
           if (vl != null) {
             sig = vl;
             signalRestored = true;
           }
-          if (_workout.acceptsReps) _handle(_trackL.update(sample(vl)), now, merge: true, arm: 'L');
+          if (_workout.acceptsReps) {
+            _handle(_trackL.update(sample(vl)), now, merge: true, arm: 'L');
+          }
 
           final vr = raw.right == null ? null : _smoothR.add(raw.right!);
           if (sig.isNaN && vr != null) sig = vr;
           if (vr != null) signalRestored = true;
-          if (_workout.acceptsReps) _handle(_trackR.update(sample(vr)), now, merge: true, arm: 'R');
+          if (_workout.acceptsReps) {
+            _handle(_trackR.update(sample(vr)), now, merge: true, arm: 'R');
+          }
         }
         if (_calibrating && !sig.isNaN) _calibrator.add(sig);
       } else {
@@ -905,6 +959,21 @@ class _CameraPageState extends State<CameraPage>
         _smoothL.reset();
         _smoothR.reset();
       }
+    } else {
+      // A completely missing pose must break the current rep immediately.
+      // Leaving the trackers armed here can join a "down" angle from before
+      // a long rest with an "up" angle after the person returns, producing a
+      // rep that never actually happened.
+      final leftAbort = _trackL.onInterrupted(now, RepAbortReason.signalLost);
+      final rightAbort = _trackR.onInterrupted(now, RepAbortReason.signalLost);
+      if (leftAbort != null) {
+        _handle([leftAbort], now, merge: false, arm: 'L');
+      }
+      if (rightAbort != null) {
+        _handle([rightAbort], now, merge: false, arm: 'R');
+      }
+      _smoothL.reset();
+      _smoothR.reset();
     }
 
     if (signalRestored) _workout.repSignalRestored();
@@ -917,6 +986,15 @@ class _CameraPageState extends State<CameraPage>
       message: placement.detail,
       calibrationSamples: _calibrator.sampleCount,
     );
+    if (widget.ciVideoPath != null) {
+      String number(double? value) =>
+          value == null || value.isNaN ? 'na' : value.toStringAsFixed(1);
+      _ciLastFrameDebug =
+          'pose=${pose != null} placement=${status.name} countable=$canCount '
+          'raw_status=${placement.status.name} raw_l=${number(rawLeft)} '
+          'raw_r=${number(rawRight)} signal=${number(sig)} '
+          'gate=${gateOk ?? 'na'} detail=${placement.detail.replaceAll(' ', '_')}';
+    }
     // Keep the legacy placement grace: a normal rep can briefly leave the guide.
     if (_workout.acceptsReps && !canCount && !_repThisFrame) {
       _feedback.cue(status.message(_strings), now);
@@ -1066,9 +1144,14 @@ class _CameraPageState extends State<CameraPage>
     _smoothL.reset();
     _smoothR.reset();
     try {
-      final saving = _workout.finish(calibration: CalibrationSnapshot(
-          repHi: _repHi, repLo: _repLo, minAmplitude: _repAmp,
-          source: _calibrated ? CalibrationSource.userCalibration : CalibrationSource.defaults));
+      final saving = _workout.finish(
+          calibration: CalibrationSnapshot(
+              repHi: _repHi,
+              repLo: _repLo,
+              minAmplitude: _repAmp,
+              source: _calibrated
+                  ? CalibrationSource.userCalibration
+                  : CalibrationSource.defaults));
       // Release the camera as soon as saving begins. A storage failure still
       // leaves the controller snapshot available for retry/resume.
       final camera = _cam;
@@ -1079,7 +1162,8 @@ class _CameraPageState extends State<CameraPage>
       await _cameraShutdown;
       if (!mounted) return;
       _allowPop = true;
-      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => ResultPage(record: record, offerAutomaticAi: true)));
+      Navigator.of(context).pushReplacement(MaterialPageRoute(
+          builder: (_) => ResultPage(record: record, offerAutomaticAi: true)));
     } catch (_) {
       if (!mounted) return;
       _notify(context.tr('Chưa lưu được buổi tập. Bạn có thể thử lại.',
@@ -1128,7 +1212,11 @@ class _CameraPageState extends State<CameraPage>
   }
 
   Future<void> _toggleCalibration() async {
-    if (!_workout.acceptsFrames || _ui.countdown != null || _calibrationSaving) return;
+    if (!_workout.acceptsFrames ||
+        _ui.countdown != null ||
+        _calibrationSaving) {
+      return;
+    }
     _feedback.stop();
     _resetTransient();
     var shouldSave = false;
@@ -1157,20 +1245,31 @@ class _CameraPageState extends State<CameraPage>
     if (shouldSave) {
       _calibrationSaving = true;
       try {
-        final saved = await _calibrationStore.save(p.id, CalibrationSnapshot(repHi: _repHi, repLo: _repLo,
-          minAmplitude: _repAmp, source: CalibrationSource.userCalibration));
+        final saved = await _calibrationStore.save(
+            p.id,
+            CalibrationSnapshot(
+                repHi: _repHi,
+                repLo: _repLo,
+                minAmplitude: _repAmp,
+                source: CalibrationSource.userCalibration));
         if (!saved) throw StateError('Calibration write failed');
         if (mounted) _notify(context.s.calibrateDone);
       } catch (_) {
-        if (mounted) { _notify(context.tr('Đã áp dụng hiệu chỉnh cho buổi này nhưng chưa lưu được. Hãy hiệu chỉnh lại ở buổi sau.',
-          'Calibration is active for this workout but could not be saved. Calibrate again next time.')); }
-      } finally { _calibrationSaving = false; }
+        if (mounted) {
+          _notify(context.tr(
+              'Đã áp dụng hiệu chỉnh cho buổi này nhưng chưa lưu được. Hãy hiệu chỉnh lại ở buổi sau.',
+              'Calibration is active for this workout but could not be saved. Calibrate again next time.'));
+        }
+      } finally {
+        _calibrationSaving = false;
+      }
     }
   }
 
   InputImage? _toInputImage(CameraImage image) {
+    // iOS đã xoay buffer tại AVCaptureConnection; Android vẫn cần góc cảm biến.
     final rotation = InputImageRotationValue.fromRawValue(
-        _cam!.description.sensorOrientation);
+        Platform.isIOS ? 0 : _cam!.description.sensorOrientation);
     if (rotation == null) return null;
 
     final format = InputImageFormatValue.fromRawValue(image.format.raw);
@@ -1216,8 +1315,11 @@ class _CameraPageState extends State<CameraPage>
   @override
   Widget build(BuildContext context) {
     if (_finishing) {
-      return Scaffold(body: Center(child: Column(mainAxisSize: MainAxisSize.min, children: [
-        const CircularProgressIndicator(), const SizedBox(height: 24),
+      return Scaffold(
+          body: Center(
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+        const CircularProgressIndicator(),
+        const SizedBox(height: 24),
         Text(context.tr('Đang lưu buổi tập…', 'Saving your workout…')),
       ])));
     }
@@ -1257,40 +1359,55 @@ class _CameraPageState extends State<CameraPage>
         body: Stack(
           fit: StackFit.expand,
           children: [
-          if (ciVideoReady)
-            FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox.fromSize(
-                size: ciVideo!.value.size,
-                child: VideoPlayer(ciVideo),
+            if (ciVideoReady)
+              FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox.fromSize(
+                  size: ciVideo!.value.size,
+                  child: VideoPlayer(ciVideo),
+                ),
+              )
+            else
+              FittedBox(
+                fit: BoxFit.cover,
+                child: SizedBox(
+                  width: cam!.value.previewSize!.height,
+                  height: cam.value.previewSize!.width,
+                  child: CameraPreview(cam),
+                ),
               ),
-            )
-          else
-            FittedBox(
-              fit: BoxFit.cover,
-              child: SizedBox(
-                width: cam!.value.previewSize!.height,
-                height: cam.value.previewSize!.width,
-                child: CameraPreview(cam),
+            CustomPaint(
+              painter: PoseOverlayPainter(
+                profile: p,
+                guide: _guide,
+                status: _ui.placementStatus,
+                landmarks: _landmarks,
+                repFlash:
+                    MediaQuery.disableAnimationsOf(context) ? 0 : _repFlash,
+                repHi: _repHi,
+                repLo: _repLo,
+                strings: context.s,
+                showGuide: !_ui.placementReady,
               ),
             ),
-          CustomPaint(
-            painter: PoseOverlayPainter(
-              profile: p,
-              guide: _guide,
-              status: _ui.placementStatus,
-              landmarks: _landmarks,
-              repFlash: MediaQuery.disableAnimationsOf(context) ? 0 : _repFlash,
-              repHi: _repHi,
-              repLo: _repLo,
-              strings: context.s,
-              showGuide: !_ui.placementReady,
-            ),
-          ),
-            const IgnorePointer(child: DecoratedBox(decoration: BoxDecoration(gradient: LinearGradient(
-              begin: Alignment.topCenter, end: Alignment.bottomCenter,
-              colors: [Color(0xF20B0B0C), Color(0x990B0B0C), Color(0x000B0B0C), Color(0xD90B0B0C)],
-              stops: [0, .4, .7, 1])))),
+            const IgnorePointer(
+                child: DecoratedBox(
+                    decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                  Color(0xF20B0B0C),
+                  Color(0x990B0B0C),
+                  Color(0x000B0B0C),
+                  Color(0xD90B0B0C)
+                ],
+                            stops: [
+                  0,
+                  .4,
+                  .7,
+                  1
+                ])))),
             SafeArea(child: _hud()),
           ],
         ),
@@ -1299,19 +1416,26 @@ class _CameraPageState extends State<CameraPage>
   }
 
   Widget _cameraGate() => PopScope(
-    canPop: _allowPop,
-    onPopInvokedWithResult: (didPop, _) { if (!didPop) _confirmExit(); },
-    child: CameraPermissionView(
-      title: _cameraTitle, body: _cameraBody,
-      denied: _cameraState == _CameraState.denied,
-      loading: _cameraState == _CameraState.initializing,
-      actionLabel: _cameraState == _CameraState.denied ? context.s.openSettings
-        : _cameraState == _CameraState.awaitingConsent ? context.s.cameraAllowAndOpen : context.s.retry,
-      onAction: _cameraState == _CameraState.denied ? openAppSettings : _start,
-      onRetry: _cameraState == _CameraState.denied ? _start : null,
-      onExit: _confirmExit,
-    ),
-  );
+        canPop: _allowPop,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) _confirmExit();
+        },
+        child: CameraPermissionView(
+          title: _cameraTitle,
+          body: _cameraBody,
+          denied: _cameraState == _CameraState.denied,
+          loading: _cameraState == _CameraState.initializing,
+          actionLabel: _cameraState == _CameraState.denied
+              ? context.s.openSettings
+              : _cameraState == _CameraState.awaitingConsent
+                  ? context.s.cameraAllowAndOpen
+                  : context.s.retry,
+          onAction:
+              _cameraState == _CameraState.denied ? openAppSettings : _start,
+          onRetry: _cameraState == _CameraState.denied ? _start : null,
+          onExit: _confirmExit,
+        ),
+      );
 
   String get _cameraTitle => switch (_cameraState) {
         _CameraState.awaitingConsent => context.s.cameraPermissionTitle,
@@ -1332,23 +1456,36 @@ class _CameraPageState extends State<CameraPage>
       };
 
   Widget _hud() => WorkoutHud(
-    state: _ui, onStart: _workout.requestStart,
-    challengeBestReps: widget.challengeBestReps,
-    voiceEnabled: _feedbackPreferences.voice,
-    onToggleVoice: _preferencesLoaded &&
-            !_settingsBusy &&
-            (widget.routine?.voiceCoachEnabled ?? true)
-        ? _toggleVoice
-        : null,
-    exerciseName: p.localizedName(context.s), hint: p.localizedHint(context.s),
-    onExit: _confirmExit, onPause: _pauseWorkout, onResume: _resumeWorkout,
-    onFinish: _finishWorkout, onCalibrate: _toggleCalibration,
-    onHelp: () => showExerciseHelp(context, p),
-    goalBanner: _goalBanner, onDismissGoal: () => setState(() => _goalBanner = false),
-    diagnosticAction: !_diagAvailable ? null : IconButton(
-      onPressed: _toggleDiagRecording,
-      tooltip: _diagRecording ? context.s.hudStopRecord : context.s.hudRecord,
-      icon: Icon(_diagRecording ? Icons.stop_circle : Icons.videocam_outlined,
-        color: _diagRecording ? AppColors.danger : AppColors.text)),
-  );
+        state: _ui,
+        onStart: _workout.requestStart,
+        challengeBestReps: widget.challengeBestReps,
+        voiceEnabled: _feedbackPreferences.voice,
+        onToggleVoice: _preferencesLoaded &&
+                !_settingsBusy &&
+                (widget.routine?.voiceCoachEnabled ?? true)
+            ? _toggleVoice
+            : null,
+        exerciseName: p.localizedName(context.s),
+        hint: p.localizedHint(context.s),
+        onExit: _confirmExit,
+        onPause: _pauseWorkout,
+        onResume: _resumeWorkout,
+        onFinish: _finishWorkout,
+        onCalibrate: _toggleCalibration,
+        onHelp: () => showExerciseHelp(context, p),
+        goalBanner: _goalBanner,
+        onDismissGoal: () => setState(() => _goalBanner = false),
+        diagnosticAction: !_diagAvailable
+            ? null
+            : IconButton(
+                onPressed: _toggleDiagRecording,
+                tooltip: _diagRecording
+                    ? context.s.hudStopRecord
+                    : context.s.hudRecord,
+                icon: Icon(
+                    _diagRecording
+                        ? Icons.stop_circle
+                        : Icons.videocam_outlined,
+                    color: _diagRecording ? AppColors.danger : AppColors.text)),
+      );
 }

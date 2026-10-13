@@ -11,6 +11,24 @@ library;
 
 import 'dart:ui' show Offset, Size;
 
+/// Cách diễn giải landmark mà ML Kit trả về cho từng pipeline camera.
+///
+/// `camera_avfoundation` đã xoay buffer theo hướng thiết bị và mirror camera
+/// trước ngay tại `AVCaptureConnection`. Vì vậy trên iOS, landmark và preview
+/// đã cùng một hệ tọa độ; xoay hoặc mirror lần nữa sẽ làm skeleton lệch khỏi
+/// người. Android vẫn giao buffer theo hướng cảm biến nên cần hai bước đó.
+({int rotationDegrees, bool mirror}) cameraPoseTransform({
+  required bool isIOS,
+  required int sensorOrientation,
+  required bool isFrontCamera,
+}) =>
+    isIOS
+        ? (rotationDegrees: 0, mirror: false)
+        : (
+            rotationDegrees: sensorOrientation,
+            mirror: isFrontCamera,
+          );
+
 class PoseMapper {
   const PoseMapper({
     required this.rawImageSize,
@@ -67,7 +85,11 @@ class PoseMapper {
     return Offset(mirror ? viewSize.width - vx : vx, vy);
   }
 
-  PoseMapper copyWith({Size? rawImageSize, Size? viewSize, int? rotationDegrees, bool? mirror}) =>
+  PoseMapper copyWith(
+          {Size? rawImageSize,
+          Size? viewSize,
+          int? rotationDegrees,
+          bool? mirror}) =>
       PoseMapper(
         rawImageSize: rawImageSize ?? this.rawImageSize,
         viewSize: viewSize ?? this.viewSize,
@@ -76,6 +98,7 @@ class PoseMapper {
       );
 
   @override
-  String toString() => 'PoseMapper(raw=$rawImageSize, upright=$uprightImageSize, '
+  String toString() =>
+      'PoseMapper(raw=$rawImageSize, upright=$uprightImageSize, '
       'view=$viewSize, rot=$rotationDegrees, mirror=$mirror)';
 }

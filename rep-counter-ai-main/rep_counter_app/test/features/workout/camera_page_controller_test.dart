@@ -204,6 +204,10 @@ void main() {
     granted = true;
     await open(tester);
     expect(find.byKey(const Key('native-preview')), findsOneWidget);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    await settleNative(tester);
+    expect(camera.disposed, [1]);
+    // Các trạng thái nền kế tiếp không được đóng cùng camera lần thứ hai.
     binding.handleAppLifecycleStateChanged(AppLifecycleState.paused);
     await settleNative(tester);
     expect(camera.disposed, [1]);

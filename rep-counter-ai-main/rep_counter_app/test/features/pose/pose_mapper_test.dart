@@ -21,6 +21,30 @@ void expectOffset(Offset got, Offset want, {double tol = 0.01}) {
 }
 
 void main() {
+  group('biến đổi frame camera theo nền tảng', () {
+    test('iOS không xoay và không mirror lần hai', () {
+      final transform = cameraPoseTransform(
+        isIOS: true,
+        sensorOrientation: 90,
+        isFrontCamera: true,
+      );
+
+      expect(transform.rotationDegrees, 0);
+      expect(transform.mirror, isFalse);
+    });
+
+    test('Android giữ góc cảm biến và mirror camera trước', () {
+      final transform = cameraPoseTransform(
+        isIOS: false,
+        sensorOrientation: 90,
+        isFrontCamera: true,
+      );
+
+      expect(transform.rotationDegrees, 90);
+      expect(transform.mirror, isTrue);
+    });
+  });
+
   group('cùng tỉ lệ khung hình — không cắt', () {
     const m = PoseMapper(
       rawImageSize: Size(480, 640),
@@ -94,24 +118,28 @@ void main() {
     });
 
     test('180 độ giữ nguyên kích thước', () {
-      const m = PoseMapper(rawImageSize: raw, viewSize: Size(400, 800), rotationDegrees: 180);
+      const m = PoseMapper(
+          rawImageSize: raw, viewSize: Size(400, 800), rotationDegrees: 180);
       expect(m.uprightImageSize, const Size(1280, 720));
     });
 
     test('90 độ hoán đổi rộng/cao', () {
-      const m = PoseMapper(rawImageSize: raw, viewSize: Size(400, 800), rotationDegrees: 90);
+      const m = PoseMapper(
+          rawImageSize: raw, viewSize: Size(400, 800), rotationDegrees: 90);
       expect(m.uprightImageSize, const Size(720, 1280));
     });
 
     test('270 độ cũng hoán đổi', () {
-      const m = PoseMapper(rawImageSize: raw, viewSize: Size(400, 800), rotationDegrees: 270);
+      const m = PoseMapper(
+          rawImageSize: raw, viewSize: Size(400, 800), rotationDegrees: 270);
       expect(m.uprightImageSize, const Size(720, 1280));
     });
 
     test('quên hoán đổi ở 90 độ làm lệch hẳn — đây là lỗi test này canh', () {
       const rotated = PoseMapper(
           rawImageSize: raw, viewSize: Size(400, 800), rotationDegrees: 90);
-      const notRotated = PoseMapper(rawImageSize: raw, viewSize: Size(400, 800));
+      const notRotated =
+          PoseMapper(rawImageSize: raw, viewSize: Size(400, 800));
       // cùng một landmark, hai cách hiểu -> lệch rất xa, không phải sai số làm tròn
       final a = rotated.map(360, 640);
       final b = notRotated.map(360, 640);
@@ -120,7 +148,8 @@ void main() {
   });
 
   group('camera trước lật ngang', () {
-    const back = PoseMapper(rawImageSize: Size(480, 640), viewSize: Size(240, 320));
+    const back =
+        PoseMapper(rawImageSize: Size(480, 640), viewSize: Size(240, 320));
     const front = PoseMapper(
         rawImageSize: Size(480, 640), viewSize: Size(240, 320), mirror: true);
 
@@ -147,7 +176,8 @@ void main() {
     });
 
     test('preview khác kích thước ảnh vào vẫn ánh xạ tâm về tâm', () {
-      const m = PoseMapper(rawImageSize: Size(640, 480), viewSize: Size(1080, 2400));
+      const m =
+          PoseMapper(rawImageSize: Size(640, 480), viewSize: Size(1080, 2400));
       expectOffset(m.map(320, 240), const Offset(540, 1200));
     });
   });
