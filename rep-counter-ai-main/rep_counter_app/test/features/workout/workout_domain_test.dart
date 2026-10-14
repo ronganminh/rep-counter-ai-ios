@@ -91,6 +91,30 @@ void main() {
       expect(a.analyze(obs(startMs: 0, endMs: 500)), contains(RepQualityFlag.tooFast));
     });
 
+    test('tracker bắt lại giữa rep không được báo nhanh khi cadence vẫn chậm', () {
+      final flags = a.analyze(
+        obs(startMs: 1600, bottomMs: 1800, endMs: 2000),
+        cadenceDuration: ms(2000),
+      );
+      expect(flags, isNot(contains(RepQualityFlag.tooFast)));
+    });
+
+    test('cadence thật sự nhanh vẫn bị cảnh báo', () {
+      final flags = a.analyze(
+        obs(startMs: 100, bottomMs: 250, endMs: 500),
+        cadenceDuration: ms(500),
+      );
+      expect(flags, contains(RepQualityFlag.tooFast));
+    });
+
+    test('khoảng nghỉ dài không được dùng để che một rep quá nhanh', () {
+      final flags = a.analyze(
+        obs(startMs: 7600, bottomMs: 7800, endMs: 8000),
+        cadenceDuration: ms(8000),
+      );
+      expect(flags, contains(RepQualityFlag.tooFast));
+    });
+
     test('quá chậm', () {
       expect(a.analyze(obs(startMs: 0, endMs: 6000)), contains(RepQualityFlag.tooSlow));
     });

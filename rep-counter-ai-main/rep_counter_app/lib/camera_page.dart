@@ -27,7 +27,6 @@ import 'features/workout/application/workout_controller.dart';
 import 'features/workout/application/workout_ui_state.dart';
 import 'features/workout/domain/quality_thresholds.dart';
 import 'features/workout/domain/rep_tracker.dart';
-import 'features/workout/domain/rep_quality_analyzer.dart';
 import 'features/workout/domain/rep_metric.dart';
 import 'features/workout/domain/workout_mode.dart';
 import 'widgets/product_ui.dart';
@@ -724,7 +723,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       if (merge && !_merger.accept(arm, now)) continue;
       if (!_workout.acceptsReps) continue;
       final reachedGoal = _workout.acceptRep(e.observation, now);
-      final flags = const RepQualityAnalyzer().analyze(e.observation);
+      // Reuse the controller's cadence-aware classification. Re-analyzing the
+      // winning arm in isolation can falsely call a slow rep "too fast" when
+      // that arm's landmarks were reacquired halfway through the movement.
+      final flags = _workout.lastAcceptedRepFlags ?? const <RepQualityFlag>{};
       final cue = flags.contains(RepQualityFlag.poseUnreliable)
           ? context.tr('Giữ người trong khung hình', 'Keep your body in view')
           : flags.contains(RepQualityFlag.bodyAlignmentLost)

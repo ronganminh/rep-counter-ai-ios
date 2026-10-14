@@ -57,6 +57,37 @@ void main() {
     expect(controller.state.repFeedback?.primaryFlag, RepQualityFlag.tooFast);
   });
 
+  test('slow accepted cadence suppresses a partial-arm too-fast warning', () {
+    final controller = WorkoutController(
+      profile: pushUp,
+      requireCountdown: false,
+      clock: _Clock(),
+    );
+    addTearDown(controller.dispose);
+    controller.cameraStarted();
+
+    controller.acceptRep(_observation(endMs: 2000), const Duration(seconds: 2));
+    controller.acceptRep(
+      const RepObservation(
+        startedAt: Duration(milliseconds: 3700),
+        bottomAt: Duration(milliseconds: 3850),
+        completedAt: Duration(milliseconds: 4000),
+        bottomAngle: 90,
+        topAngle: 160,
+        leftBottomAngle: 90,
+        rightBottomAngle: 92,
+        averagePoseConfidence: .9,
+        sampleCount: 6,
+      ),
+      const Duration(seconds: 4),
+    );
+
+    expect(controller.state.reps, 2);
+    expect(controller.state.repFeedback?.kind, RepFeedbackKind.countedClean);
+    expect(controller.lastAcceptedRepFlags,
+        isNot(contains(RepQualityFlag.tooFast)));
+  });
+
   test('aborted event never subtracts an accepted rep', () {
     final controller = WorkoutController(
       profile: pushUp,

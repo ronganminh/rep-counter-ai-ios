@@ -129,6 +129,8 @@ class WorkoutController extends ChangeNotifier {
   /// Pose/placement time must advance while the workout timer is still stopped.
   Duration get frameTime => _trackingClock.elapsed;
   Duration get elapsed => _clock.elapsed;
+  Set<RepQualityFlag>? get lastAcceptedRepFlags =>
+      _reps.isEmpty ? null : Set<RepQualityFlag>.unmodifiable(_reps.last.flags);
   Duration? get challengeRemaining {
     final config = timedChallenge;
     if (!isTimedChallenge || config == null) return null;
@@ -269,7 +271,15 @@ class WorkoutController extends ChangeNotifier {
         elapsed > Duration(seconds: challenge.durationSeconds)) {
       return false;
     }
-    final flags = _analyzer.analyze(observation);
+    final previousCompletedAt =
+        _reps.isEmpty ? null : _reps.last.observation.completedAt;
+    final cadenceDuration = previousCompletedAt == null
+        ? null
+        : observation.completedAt - previousCompletedAt;
+    final flags = _analyzer.analyze(
+      observation,
+      cadenceDuration: cadenceDuration,
+    );
     final assignedSetIndex =
         routine == null ? 1 : _session.sets.length + 1;
     _reps.add(RepMetric(

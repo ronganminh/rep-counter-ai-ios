@@ -12,12 +12,29 @@ class RepQualityAnalyzer {
   Set<RepQualityFlag> analyze(
     RepObservation o, {
     CalibrationSnapshot? calibration,
+    Duration? cadenceDuration,
   }) {
     final t = thresholds;
     final flags = <RepQualityFlag>{};
     final seconds = o.duration.inMicroseconds / 1e6;
+    final cadenceSeconds = cadenceDuration == null
+        ? null
+        : cadenceDuration.inMicroseconds / 1e6;
 
-    if (seconds < t.minRepSeconds) flags.add(RepQualityFlag.tooFast);
+    // A single-arm tracker can reacquire halfway through a rep after landmark
+    // jitter. In that case `o.duration` only covers the tail of the movement
+    // and can be < 0.7 s even though accepted reps are several seconds apart.
+    // For every rep after the first, completion-to-completion cadence is the
+    // more stable signal for the pace users perceive.
+    var paceSeconds = seconds;
+    if (cadenceSeconds != null &&
+        cadenceSeconds > 0 &&
+        cadenceSeconds <= t.maxRepSeconds &&
+        cadenceSeconds > paceSeconds) {
+      paceSeconds = cadenceSeconds;
+    }
+
+    if (paceSeconds < t.minRepSeconds) flags.add(RepQualityFlag.tooFast);
     if (seconds > t.maxRepSeconds) flags.add(RepQualityFlag.tooSlow);
 
     // Chỉ kết luận hai bên lệch khi ĐO ĐƯỢC CẢ HAI. Thiếu một tay thì im lặng —
