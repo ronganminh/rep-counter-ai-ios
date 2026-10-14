@@ -922,15 +922,38 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     );
     final lm = pose == null ? null : remapPose(pose, mapper);
 
-    final placement = evaluatePlacement(
+    final now = _workout.frameTime;
+    bool? rawGateOk;
+    var gateState = CountGateState.open;
+    final countGate = p.countGate;
+    if (lm != null && countGate != null) {
+      rawGateOk = countGate(lm, p.minLikelihood);
+      gateState = _countGateLatch.update(rawGateOk, now);
+    }
+
+    var placement = evaluatePlacement(
       profile: p,
       lm: lm,
       viewSize: view,
       guide: _guide,
       strings: _strings,
+      // CameraPage áp dụng gate đã chống rung ngay dưới đây. Nếu kiểm lại raw
+      // gate ở đây, một frame landmark xấu vẫn đổi placement sang wrongPose và
+      // vô hiệu toàn bộ thời gian ân hạn.
+      checkCountGate: false,
     );
+    if (lm != null &&
+        countGate != null &&
+        gateState == CountGateState.closed &&
+        placement.status == PlacementStatus.ready) {
+      placement = PlacementResult(
+        PlacementStatus.wrongPose,
+        detail: p.id == 'pull_up'
+            ? _strings.detailNotHanging
+            : p.localizedHint(_strings),
+      );
+    }
     final status = _statusDebouncer.update(placement.status);
-    final now = _workout.frameTime;
     if (status.canCount) _lastPlacementOk = now;
     final canCount =
         _lastPlacementOk != null && now - _lastPlacementOk! <= _placementGrace;
@@ -939,17 +962,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     double? rawLeft;
     double? rawRight;
     var signalRestored = false;
-    bool? rawGateOk;
-    var gateState = CountGateState.open;
     if (lm != null) {
       final raw = p.signal(lm, p.minLikelihood);
       rawLeft = raw.left;
       rawRight = raw.right;
-      final gate = p.countGate;
-      if (gate != null) {
-        rawGateOk = gate(lm, p.minLikelihood);
-        gateState = _countGateLatch.update(rawGateOk, now);
-      }
 
       if (canCount && gateState != CountGateState.closed) {
         final torso = _torsoDeviation(lm);

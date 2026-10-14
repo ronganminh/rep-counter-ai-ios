@@ -158,12 +158,11 @@ bool _handsAtBarLevel(Landmarks lm, double ml) {
 /// quay trực diện nên trục vai-hông của tư thế ngồi và hít đất đều gần thẳng
 /// đứng trong ảnh; chỉ kiểm hướng thân không phân biệt được hai trường hợp.
 ///
-/// Ở góc quay trực diện, tư thế chống đẩy có hai cổ tay mở rộng và nằm thấp
-/// hơn hông trong ảnh. Đây là hai dấu hiệu trực tiếp của việc chống tay xuống
-/// sàn và ổn định hơn điểm gối: MediaPipe thường làm mất/nhảy gối đúng lúc
-/// người tập hạ xuống, nên không được bắt buộc phải thấy gối ở từng frame.
+/// Ở góc quay trực diện, tư thế chống đẩy có hai cổ tay mở rộng và hai gối thu
+/// vào phía sau. Không dùng vị trí dọc cổ tay-hông làm điều kiện bắt buộc: phép
+/// chiếu ở nhiều góc camera thật đảo thứ tự đó trong phần lớn một rep.
 ///
-/// Khi thấy đủ hai gối, dùng chúng như một bằng chứng âm bổ sung: người ngồi
+/// Khi thấy đủ hai gối, dùng chúng làm bằng chứng chính: người ngồi
 /// xếp bằng có hai gối mở rộng bằng hoặc hơn hai cổ tay. So sánh mọi khoảng
 /// cách theo bề rộng vai để không phụ thuộc độ phân giải hay khoảng cách máy.
 bool _handsInPushUpSupport(Landmarks lm, double ml) {
@@ -180,22 +179,25 @@ bool _handsInPushUpSupport(Landmarks lm, double ml) {
   }
 
   final wristWidth = (leftWrist.dx - rightWrist.dx).abs();
-  final wristsBelowHips = math.min(leftWrist.dy, rightWrist.dy) - hips.dy;
-  if (wristWidth < shoulderWidth * 0.75 ||
-      wristsBelowHips < shoulderWidth * 0.15) {
-    return false;
-  }
+  if (wristWidth < shoulderWidth * 0.75) return false;
 
   final leftKnee = lm.pt(PoseLandmarkType.leftKnee, minLikelihood: ml);
   final rightKnee = lm.pt(PoseLandmarkType.rightKnee, minLikelihood: ml);
   if (leftKnee != null && rightKnee != null) {
     final kneeWidth = (leftKnee.dx - rightKnee.dx).abs();
+    // Ở 269 mốc lấy mẫu nằm trong 9 khoảng nghỉ của fixture thật, quy tắc này
+    // chặn 269/269; các mốc chống đẩy có knee/shoulder chủ yếu 0.3-0.7.
     final clearlySeated =
-        kneeWidth >= shoulderWidth * 1.15 && kneeWidth >= wristWidth * 1.05;
+        kneeWidth >= shoulderWidth * 0.90 && kneeWidth >= wristWidth * 0.70;
     if (clearlySeated) return false;
+    return true;
   }
 
-  return true;
+  // Khi gối tạm mất, chỉ dùng dấu hiệu cổ tay thấp hơn hông làm fallback.
+  // Không bắt buộc điều này khi thấy gối: ở nhiều góc camera thật, phép chiếu
+  // khiến cổ tay có thể nằm ngang hoặc cao hơn hông dù người vẫn đang chống.
+  final wristsBelowHips = math.min(leftWrist.dy, rightWrist.dy) - hips.dy;
+  return wristsBelowHips >= shoulderWidth * 0.15;
 }
 
 /// Điều kiện thô của một frame trước khi áp dụng chống rung theo thời gian.
