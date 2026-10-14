@@ -403,6 +403,18 @@ jobs:
             --manifest test/fixtures/video_ground_truth.json \
             --fixture pushup-rest-regression
 
+      - name: Preserve established rep baseline
+        if: matrix.fixture_key == 'pushup-1' || matrix.fixture_key == 'pushup-2'
+        run: |
+          fixture_name="pushup-a"
+          if [[ "$TEST_VIDEO_KEY" == "pushup-2" ]]; then
+            fixture_name="pushup-b"
+          fi
+          python3 tool/check_video_rep_baseline.py \
+            --result "$GITHUB_WORKSPACE/ci-artifacts/ci-video-result.txt" \
+            --manifest test/fixtures/video_ground_truth.json \
+            --fixture "$fixture_name"
+
       - name: Build unsigned iPhone release
         run: ./tool/build_ios.sh --release --no-codesign --no-pub
 

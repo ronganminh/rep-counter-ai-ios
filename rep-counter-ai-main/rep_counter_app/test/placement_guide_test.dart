@@ -35,7 +35,7 @@ const _pushUpMedians = <PoseLandmarkType, Offset>{
   PoseLandmarkType.rightKnee: Offset(0.45865, 0.64853),
 };
 
-Landmarks _landmarksFromMedians() {
+Map<PoseLandmarkType, PoseLandmark> _landmarkMapFromMedians() {
   final out = <PoseLandmarkType, PoseLandmark>{};
   _pushUpMedians.forEach((type, norm) {
     out[type] = PoseLandmark(
@@ -46,12 +46,14 @@ Landmarks _landmarksFromMedians() {
       likelihood: 0.95,
     );
   });
-  return Landmarks(out);
+  return out;
 }
+
+Landmarks _landmarksFromMedians() => Landmarks(_landmarkMapFromMedians());
 
 /// Tư thế nghỉ từng gây rep ma trong video hồi quy: thân vẫn thẳng theo ảnh,
 /// nhưng hai tay đang giữ điện thoại sát người thay vì chống xuống sàn.
-Landmarks _seatedHoldingPhone() {
+Landmarks _seatedHoldingPhone({double wristY = 1250}) {
   PoseLandmark point(PoseLandmarkType type, double x, double y) =>
       PoseLandmark(type: type, x: x, y: y, z: 0, likelihood: 0.95);
 
@@ -64,8 +66,9 @@ Landmarks _seatedHoldingPhone() {
     PoseLandmarkType.rightElbow: point(PoseLandmarkType.rightElbow, 430, 1080),
     // Một tay chống sàn và một tay cầm điện thoại có thể làm hai cổ tay mở
     // đủ rộng; hai gối xếp bằng vẫn rộng hơn và phải đóng cổng.
-    PoseLandmarkType.leftWrist: point(PoseLandmarkType.leftWrist, 668, 1250),
-    PoseLandmarkType.rightWrist: point(PoseLandmarkType.rightWrist, 412, 1250),
+    PoseLandmarkType.leftWrist: point(PoseLandmarkType.leftWrist, 668, wristY),
+    PoseLandmarkType.rightWrist:
+        point(PoseLandmarkType.rightWrist, 412, wristY),
     PoseLandmarkType.leftHip: point(PoseLandmarkType.leftHip, 620, 1250),
     PoseLandmarkType.rightHip: point(PoseLandmarkType.rightHip, 460, 1250),
     PoseLandmarkType.leftKnee: point(PoseLandmarkType.leftKnee, 780, 1650),
@@ -117,6 +120,28 @@ void main() {
     );
     expect(result.status, PlacementStatus.wrongPose);
     expect(result.detail, S.vi.pushUpSetupHint);
+  });
+
+  test('không bắt buộc thấy gối khi đang chống đẩy', () {
+    final withoutKnees = Landmarks(_landmarkMapFromMedians()
+      ..remove(PoseLandmarkType.leftKnee)
+      ..remove(PoseLandmarkType.rightKnee));
+
+    expect(
+      pushUp.countGate!(withoutKnees, pushUp.minLikelihood),
+      isTrue,
+      reason: 'Mất điểm gối thoáng qua không được hủy chu kỳ rep.',
+    );
+  });
+
+  test('gối mở rộng xác nhận tư thế ngồi dù hai tay đặt thấp', () {
+    final handsLowerThanHips = _seatedHoldingPhone(wristY: 1320);
+
+    expect(
+      pushUp.countGate!(handsLowerThanHips, pushUp.minLikelihood),
+      isFalse,
+      reason: 'Hai gối xếp bằng vẫn phải chặn chuyển động tay khi ngồi.',
+    );
   });
 
   test('chu kỳ khuỷu tay khi ngồi vẫn phải là 0 rep', () {
