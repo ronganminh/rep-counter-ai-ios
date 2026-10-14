@@ -22,6 +22,21 @@ class FakeSpeechDriver implements SpeechDriver {
 void main() {
   setUp(() => SharedPreferences.setMockInitialValues({}));
 
+  test('live coaching is opt-in and persists independently', () async {
+    final defaults = await TrainingPreferences.load();
+    expect(defaults.coachingEnabled, isFalse);
+    expect(defaults.voice, isTrue);
+    expect(defaults.cues, isTrue);
+
+    final updated = await defaults.update(coachingEnabled: true);
+    final loaded = await TrainingPreferences.load();
+
+    expect(updated.coachingEnabled, isTrue);
+    expect(loaded.coachingEnabled, isTrue);
+    expect(loaded.voice, isTrue);
+    expect(loaded.cues, isTrue);
+  });
+
   test('cadence persists separately from existing training controls', () async {
     const original = TrainingPreferences(
       voice: false,

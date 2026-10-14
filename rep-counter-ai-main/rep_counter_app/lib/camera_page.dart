@@ -211,11 +211,13 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   WorkoutUiState get _ui => _workout.state;
   bool get _finishing => _ui.isFinishing;
   TrainingPreferences get _feedbackPreferences => TrainingPreferences(
-        voice:
-            _preferences.voice && (widget.routine?.voiceCoachEnabled ?? true),
+        coachingEnabled: _preferences.coachingEnabled,
+        voice: _preferences.coachingEnabled &&
+            _preferences.voice &&
+            (widget.routine?.voiceCoachEnabled ?? true),
         haptics: _preferences.haptics,
         sound: _preferences.sound,
-        cues: _preferences.cues,
+        cues: _preferences.coachingEnabled && _preferences.cues,
         repSpeechCadence: _preferences.repSpeechCadence,
       );
 
@@ -276,7 +278,11 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     if (!_preferencesLoaded || _settingsBusy) return;
     setState(() => _settingsBusy = true);
     try {
-      _preferences = await _preferences.update(voice: !_preferences.voice);
+      final enableCoaching = !_preferences.coachingEnabled;
+      _preferences = await _preferences.update(
+        coachingEnabled: enableCoaching ? true : null,
+        voice: enableCoaching ? true : !_preferences.voice,
+      );
       if (!mounted) return;
       _feedback.configure(_feedbackPreferences, context.language);
     } catch (_) {
@@ -1462,6 +1468,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         onStart: _workout.requestStart,
         challengeBestReps: widget.challengeBestReps,
         voiceEnabled: _feedbackPreferences.voice,
+        showRepFeedback: _preferences.coachingEnabled,
         onToggleVoice: _preferencesLoaded &&
                 !_settingsBusy &&
                 (widget.routine?.voiceCoachEnabled ?? true)

@@ -100,6 +100,7 @@ void main() {
       'sound and posture preferences persist independently of voice and haptics',
       () async {
     final defaults = await TrainingPreferences.load();
+    expect(defaults.coachingEnabled, false);
     expect(defaults.sound, false);
     expect(defaults.cues, true);
     await defaults.update(sound: true, cues: false);

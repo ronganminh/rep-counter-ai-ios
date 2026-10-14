@@ -28,6 +28,7 @@ class WorkoutHud extends StatelessWidget {
       this.diagnosticAction,
       this.onStart,
       this.voiceEnabled = true,
+      this.showRepFeedback = true,
       this.onToggleVoice,
       this.challengeBestReps});
   final WorkoutUiState state;
@@ -43,6 +44,7 @@ class WorkoutHud extends StatelessWidget {
   final Widget? diagnosticAction;
   final VoidCallback? onStart, onToggleVoice;
   final bool voiceEnabled;
+  final bool showRepFeedback;
   final int? challengeBestReps;
   @override
   Widget build(BuildContext context) {
@@ -55,6 +57,7 @@ class WorkoutHud extends StatelessWidget {
         state: state,
         exerciseName: exerciseName,
         voiceEnabled: voiceEnabled,
+        showRepFeedback: showRepFeedback,
         challengeBestReps: challengeBestReps,
         diagnosticAction: diagnosticAction,
         onToggleVoice: onToggleVoice,
@@ -255,7 +258,8 @@ class WorkoutHud extends StatelessWidget {
                               style: const TextStyle(
                                   fontSize: 18, color: AppColors.text2)),
                         ],
-                        if (!paused &&
+                        if (showRepFeedback &&
+                            !paused &&
                             !positioning &&
                             !state.isCalibrating &&
                             state.countdown == null) ...[
@@ -382,6 +386,7 @@ class _TimedChallengeHud extends StatelessWidget {
     required this.state,
     required this.exerciseName,
     required this.voiceEnabled,
+    required this.showRepFeedback,
     required this.onExit,
     required this.onPause,
     required this.onResume,
@@ -394,6 +399,7 @@ class _TimedChallengeHud extends StatelessWidget {
   final WorkoutUiState state;
   final String exerciseName;
   final bool voiceEnabled;
+  final bool showRepFeedback;
   final int? challengeBestReps;
   final Widget? diagnosticAction;
   final VoidCallback? onToggleVoice;
@@ -671,8 +677,10 @@ class _TimedChallengeHud extends StatelessWidget {
                     ),
                   ),
                 ],
-                const SizedBox(height: 16),
-                RepFeedbackTransition(feedback: state.repFeedback),
+                if (showRepFeedback) ...[
+                  const SizedBox(height: 16),
+                  RepFeedbackTransition(feedback: state.repFeedback),
+                ],
               ],
             ),
           ),

@@ -9,6 +9,7 @@ enum RepSpeechCadence {
 /// Device-local preferences. No camera data or AI configuration is stored here.
 class TrainingPreferences {
   const TrainingPreferences({
+    this.coachingEnabled = false,
     this.voice = true,
     this.haptics = true,
     this.sound = false,
@@ -16,9 +17,13 @@ class TrainingPreferences {
     this.repSpeechCadence = RepSpeechCadence.everyRep,
   });
 
+  /// Master opt-in for spoken counts and per-rep coaching. Off keeps the
+  /// camera guidance and counter working, but makes the workout count-only.
+  final bool coachingEnabled;
   final bool voice, haptics, sound, cues;
   final RepSpeechCadence repSpeechCadence;
 
+  static const coachingEnabledKey = 'training_live_coaching_v1';
   static const voiceKey = 'training_voice_v1';
   static const soundKey = 'training_sound_v1';
   static const cuesKey = 'training_cues_v1';
@@ -28,6 +33,7 @@ class TrainingPreferences {
   static Future<TrainingPreferences> load() async {
     final prefs = await SharedPreferences.getInstance();
     return TrainingPreferences(
+      coachingEnabled: prefs.getBool(coachingEnabledKey) ?? false,
       voice: prefs.getBool(voiceKey) ?? true,
       haptics: prefs.getBool(hapticsKey) ?? true,
       sound: prefs.getBool(soundKey) ?? false,
@@ -39,6 +45,7 @@ class TrainingPreferences {
   }
 
   Future<TrainingPreferences> update({
+    bool? coachingEnabled,
     bool? voice,
     bool? haptics,
     bool? sound,
@@ -46,6 +53,10 @@ class TrainingPreferences {
     RepSpeechCadence? repSpeechCadence,
   }) async {
     final prefs = await SharedPreferences.getInstance();
+    if (coachingEnabled != null &&
+        !await prefs.setBool(coachingEnabledKey, coachingEnabled)) {
+      throw StateError('Cannot save live coaching setting');
+    }
     if (voice != null && !await prefs.setBool(voiceKey, voice)) {
       throw StateError('Cannot save voice setting');
     }
@@ -66,6 +77,7 @@ class TrainingPreferences {
       throw StateError('Cannot save rep speech cadence');
     }
     return TrainingPreferences(
+      coachingEnabled: coachingEnabled ?? this.coachingEnabled,
       voice: voice ?? this.voice,
       haptics: haptics ?? this.haptics,
       sound: sound ?? this.sound,

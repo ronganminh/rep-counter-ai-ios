@@ -393,12 +393,16 @@ void main() {
         child: MaterialApp(
             theme: RepCoachTheme.dark(), home: const SettingsPage())));
     await tester.pumpAndSettle();
+    expect(find.byKey(const Key('voice-setting')), findsNothing);
+    await tester.tap(find.byKey(const Key('live-coaching-setting')));
+    await tester.pumpAndSettle();
     await tester.tap(find.byKey(const Key('voice-setting')));
     await tester.pumpAndSettle();
     await tester.ensureVisible(find.byKey(const Key('haptics-setting')));
     await tester.tap(find.byKey(const Key('haptics-setting')));
     await tester.pumpAndSettle();
     final saved = await TrainingPreferences.load();
+    expect(saved.coachingEnabled, isTrue);
     expect(saved.voice, isFalse);
     expect(saved.haptics, isFalse);
     expect(tester.takeException(), isNull);

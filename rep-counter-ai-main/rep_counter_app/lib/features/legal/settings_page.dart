@@ -121,12 +121,21 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Future<void> _setTraining(
-      {bool? voice, bool? haptics, bool? sound, bool? cues}) async {
+      {bool? coachingEnabled,
+      bool? voice,
+      bool? haptics,
+      bool? sound,
+      bool? cues}) async {
     if (_preferenceBusy || _training == null) return;
     setState(() => _preferenceBusy = true);
     try {
       final value = await _training!
-          .update(voice: voice, haptics: haptics, sound: sound, cues: cues);
+          .update(
+              coachingEnabled: coachingEnabled,
+              voice: voice,
+              haptics: haptics,
+              sound: sound,
+              cues: cues);
       if (mounted) setState(() => _training = value);
     } catch (_) {
       if (mounted) {
@@ -176,6 +185,20 @@ class _SettingsPageState extends State<SettingsPage> {
         const SizedBox(height: 28),
         SettingsGroup(title: context.tr('Tập luyện', 'Training'), children: [
           SettingsRow(
+              icon: LucideIcons.sparkles,
+              title: context.tr(
+                  'Huấn luyện trực tiếp', 'Live coaching'),
+              subtitle: context.tr(
+                  'Mặc định tắt: app chỉ đếm rep. Bật để đọc số và hiện nhận xét nhanh/chậm, độ sâu từng rep.',
+                  'Off by default: the app only counts reps. Enable spoken counts and per-rep pace/depth feedback.'),
+              trailing: Switch(
+                  key: const Key('live-coaching-setting'),
+                  value: _training?.coachingEnabled ?? false,
+                  onChanged: _training == null || _preferenceBusy
+                      ? null
+                      : (value) =>
+                          _setTraining(coachingEnabled: value))),
+          if (_training?.coachingEnabled ?? false) SettingsRow(
               icon: LucideIcons.volume2,
               title: context.tr('Đọc số rep', 'Speak rep count'),
               subtitle: context.tr(
@@ -216,7 +239,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   onChanged: _training == null || _preferenceBusy
                       ? null
                       : (v) => _setTraining(sound: v))),
-          SettingsRow(
+          if (_training?.coachingEnabled ?? false) SettingsRow(
               icon: LucideIcons.messageCircle,
               title: context.tr('Nhắc tư thế', 'Posture reminders'),
               subtitle: context.tr(
