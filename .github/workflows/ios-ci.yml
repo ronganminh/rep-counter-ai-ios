@@ -63,6 +63,45 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  app-store-release-build:
+    name: App Store release build (Xcode 26+)
+    needs: quality
+    runs-on: macos-26
+    timeout-minutes: 40
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Verify App Store toolchain
+        shell: bash
+        run: |
+          set -euo pipefail
+          xcodebuild -version
+          sdk_major="$(xcrun --sdk iphoneos --show-sdk-version | cut -d. -f1)"
+          xcode_major="$(xcodebuild -version | awk '/^Xcode / { split($2, version, "."); print version[1] }')"
+          test "$xcode_major" -ge 26
+          test "$sdk_major" -ge 26
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Verify App Store source metadata
+        run: python3 tool/check_app_store_readiness.py
+
+      - name: Build unsigned iPhone release
+        run: ./tool/build_ios.sh --release --no-codesign --no-pub
+
   ios-build-video-test:
     name: Apple Silicon iOS replay (${{ matrix.fixture_key }})
     needs: quality

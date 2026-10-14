@@ -6,7 +6,7 @@ This gate applies to the **iPhone-only** Flutter release. Do not submit for App 
 - Product: push-ups and local workout history. Pull-ups and other exercises remain disabled in production until independently validated; never advertise unvalidated counters.
 - Camera inference stays on device. AI feedback is optional, consent-gated and sends limited workout statistics to RepCoach's backend and GroqCloud. No camera frames, videos, audio or raw pose landmarks are sent.
 - No account or in-app purchases in this Flutter v1. Do not advertise subscriptions, AI credits or account sync until actually implemented.
-- Release version 1.0.0 (5), bundle ID `com.ronganminh.repCounterApp`; target iPhone. iOS minimum 15.5.
+- Release version 1.0.0 (6), bundle ID `com.ronganminh.repCounterApp`; target iPhone. iOS minimum 15.5.
 - App Privacy on App Store Connect must reflect actual app and every bundled SDK. Review the built app's merged privacy report, including third-party plugin manifests, rather than treating the first-party PrivacyInfo.xcprivacy as exhaustive.
 
 ## CI and code verification

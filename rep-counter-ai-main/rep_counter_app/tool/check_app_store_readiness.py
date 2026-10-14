@@ -15,7 +15,7 @@ def ensure(condition, message):
 
 def main():
     spec = read("pubspec.yaml")
-    ensure("version: 1.0.0+5" in spec, "Release version/build is not synchronized")
+    ensure("version: 1.0.0+6" in spec, "Release version/build is not synchronized")
     strings = read("lib/core/i18n/app_strings.dart")
     legal = read("lib/features/legal/legal_page.dart")
     ensure("Gemini" not in strings and "Gemini" not in legal, "Stale Gemini provider text")
@@ -25,11 +25,13 @@ def main():
     picker = read("lib/features/exercises/presentation/exercise_picker_screen.dart")
     ensure("FeatureFlags.visibleExerciseIds.contains" in picker, "Exercise picker must respect release gate")
     settings = read("lib/features/legal/settings_page.dart")
-    ensure("1.0.0 (5)" in settings, "Settings release version mismatched")
+    ensure("1.0.0 (6)" in settings, "Settings release version mismatched")
     ensure("AppLinks.hasAppStoreListing" in settings, "iOS review link needs listing gate")
     info = plistlib.loads((ROOT / "ios/Runner/Info.plist").read_bytes())
     for key in ("NSCameraUsageDescription", "NSPhotoLibraryAddUsageDescription"):
         ensure(bool(info.get(key)), f"Missing {key}")
+    ensure(info.get("ITSAppUsesNonExemptEncryption") is False,
+           "Export-compliance declaration must stay synchronized")
     ensure(info["CFBundleDisplayName"] == "RepCoach AI", "Incorrect iOS display name")
     ensure(set(info["CFBundleLocalizations"]) == {"en", "vi"}, "Native localization missing")
     manifest = plistlib.loads((ROOT / "ios/Runner/PrivacyInfo.xcprivacy").read_bytes())
