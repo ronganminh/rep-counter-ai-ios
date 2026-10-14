@@ -108,7 +108,9 @@ jobs:
     if: github.event_name != 'pull_request'
     strategy:
       fail-fast: false
-      max-parallel: 2
+      # Ba fixture độc lập; chạy đồng thời để kết quả hồi quy không phải chờ
+      # video dài trước đó giải phóng runner.
+      max-parallel: 3
       matrix:
         include:
           - fixture_key: pushup-1

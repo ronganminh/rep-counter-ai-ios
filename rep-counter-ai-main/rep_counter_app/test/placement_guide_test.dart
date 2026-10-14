@@ -144,6 +144,23 @@ void main() {
     );
   });
 
+  test('cổng hít đất chịu được pose chập chờn nhưng đóng khi nghỉ lâu', () {
+    final latch = CountGateLatch(pushUp.countGateGrace);
+
+    expect(latch.update(false, Duration.zero), CountGateState.closed);
+    expect(latch.update(true, const Duration(seconds: 1)), CountGateState.open);
+    expect(latch.update(false, const Duration(milliseconds: 2800)),
+        CountGateState.holding,
+        reason: 'Một đoạn mất landmark ngắn không được hủy rep đang dở.');
+    expect(latch.update(false, const Duration(milliseconds: 3001)),
+        CountGateState.closed,
+        reason: 'Quá thời gian ân hạn thì tư thế nghỉ phải đóng cổng.');
+
+    latch.reset();
+    expect(
+        latch.update(false, const Duration(seconds: 4)), CountGateState.closed);
+  });
+
   test('chu kỳ khuỷu tay khi ngồi vẫn phải là 0 rep', () {
     final landmarks = _seatedHoldingPhone();
     final angles = <double>[165, 130, 90, 75, 110, 150, 165];

@@ -53,6 +53,7 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
   }
 
   final _smooth = RollingMean(5);
+  final _countGateLatch = CountGateLatch(pushUp.countGateGrace);
   late RepCounter _counter;
   List<_VideoPoseFrame> _frames = const [];
   int _frameIndex = -1;
@@ -100,6 +101,7 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
       minPeriod: pushUp.minPeriod,
     );
     _smooth.reset();
+    _countGateLatch.reset();
     _positionLocked = false;
     _frameIndex = -1;
     _consumedIndex = -1;
@@ -279,14 +281,16 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
     if (placement.status.canCount) _positionLocked = true;
     final raw = pushUp.signal(landmarks, pushUp.minLikelihood);
     final arms = [raw.left, raw.right].whereType<double>().toList();
-    final signal = arms.isEmpty
+    final rawGateOk =
+        pushUp.countGate?.call(landmarks, pushUp.minLikelihood) ?? true;
+    final gateState =
+        _countGateLatch.update(rawGateOk, _frames[_frameIndex].at);
+    final signal = arms.isEmpty || gateState != CountGateState.open
         ? double.nan
         : _smooth.add(arms.reduce((a, b) => a + b) / arms.length);
-    final gateOk =
-        pushUp.countGate?.call(landmarks, pushUp.minLikelihood) ?? true;
-    if (_positionLocked && gateOk && !signal.isNaN) {
+    if (_positionLocked && gateState == CountGateState.open && !signal.isNaN) {
       if (_counter.update(signal, _frames[_frameIndex].at) != null) _flash = 1;
-    } else {
+    } else if (!_positionLocked || gateState == CountGateState.closed) {
       _counter.onSignalLost();
       _smooth.reset();
     }

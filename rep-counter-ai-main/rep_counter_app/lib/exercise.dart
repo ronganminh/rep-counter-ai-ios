@@ -198,8 +198,40 @@ bool _handsInPushUpSupport(Landmarks lm, double ml) {
   return true;
 }
 
-/// Điều kiện phải đúng ở TỪNG khung thì khung đó mới được đưa vào bộ đếm.
+/// Điều kiện thô của một frame trước khi áp dụng chống rung theo thời gian.
 typedef CountGate = bool Function(Landmarks lm, double minLikelihood);
+
+enum CountGateState { open, holding, closed }
+
+/// Giữ cổng đếm mở trong một khoảng ngắn khi landmark chập chờn.
+///
+/// MLKit có thể làm cổ tay/gối nhảy sai 1-2 frame ngay ở đáy rep. Nếu coi một
+/// frame đó là mất tư thế và hủy chu kỳ thì video thật gần như không còn rep.
+/// Cổng vẫn tự đóng sau [grace], nên một quãng nghỉ dài không thể tiếp tục dùng
+/// trạng thái chống tay cũ.
+class CountGateLatch {
+  CountGateLatch(this.grace);
+
+  final Duration grace;
+  Duration? _lastAllowedAt;
+
+  CountGateState update(bool rawAllowed, Duration at) {
+    if (rawAllowed) {
+      _lastAllowedAt = at;
+      return CountGateState.open;
+    }
+    final last = _lastAllowedAt;
+    if (last == null || at < last) {
+      _lastAllowedAt = null;
+      return CountGateState.closed;
+    }
+    if (at - last <= grace) return CountGateState.holding;
+    _lastAllowedAt = null;
+    return CountGateState.closed;
+  }
+
+  void reset() => _lastAllowedAt = null;
+}
 
 class ExerciseProfile {
   const ExerciseProfile({
@@ -221,6 +253,7 @@ class ExerciseProfile {
     this.smoothWindow = 5,
     this.startFromTop = false,
     this.countGate,
+    this.countGateGrace = Duration.zero,
     this.minRepsPerSet = 1,
   });
 
@@ -262,12 +295,13 @@ class ExerciseProfile {
   /// Xem [RepCounter.startFromTop].
   final bool startFromTop;
 
-  /// Chặn từng khung, KHÔNG qua thời gian ân hạn của trạng thái đặt người.
+  /// Cổng tư thế riêng của bài.
   ///
-  /// Trạng thái đặt người được giữ thêm 2 s sau khi mất (cần cho hít đất, vì ở
-  /// đáy pose hay vỡ). Với kéo xà, 2 s đó đúng lúc buông xà: tay gập rồi thả
-  /// xuống duỗi thẳng — đủ một vòng để bị tính rep.
+  /// [countGateGrace] chỉ dùng cho bài đã đo được landmark chập chờn giữa rep.
+  /// Kéo xà giữ mặc định bằng 0: lúc buông xà, tay gập rồi duỗi đủ tạo một rep
+  /// ma nếu còn bất kỳ thời gian ân hạn nào.
   final CountGate? countGate;
+  final Duration countGateGrace;
 
   /// Ngưỡng nhóm set cũ, giữ lại để tương thích cấu hình.
   ///
@@ -311,6 +345,7 @@ const pushUp = ExerciseProfile(
   ],
   shoulderWidthFraction: (min: 0.20, max: 0.65),
   countGate: _handsInPushUpSupport,
+  countGateGrace: Duration(seconds: 2),
   setupHint:
       'Đặt máy thấp trước mặt, chống tay sao cho khung xương trùng với mẫu.',
 );
