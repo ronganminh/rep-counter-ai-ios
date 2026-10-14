@@ -159,6 +159,7 @@ PlacementResult evaluatePlacement({
   required Size viewSize,
   required GuideZone guide,
   required S strings,
+  bool checkCountGate = true,
 }) {
   if (lm == null) return const PlacementResult(PlacementStatus.noPose);
 
@@ -223,7 +224,7 @@ PlacementResult evaluatePlacement({
   // 5) Điều kiện riêng của bài. Chỉ để báo cho người dùng — bộ đếm tự kiểm lại
   //    ở từng khung, xem `countGate`.
   final gate = profile.countGate;
-  if (gate != null && !gate(lm, ml)) {
+  if (checkCountGate && gate != null && !gate(lm, ml)) {
     return PlacementResult(PlacementStatus.wrongPose,
         detail: profile.id == 'pull_up'
             ? strings.detailNotHanging
