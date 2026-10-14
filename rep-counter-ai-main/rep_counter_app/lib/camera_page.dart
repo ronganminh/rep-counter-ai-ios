@@ -716,6 +716,41 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     return n == 0 ? 0 : sum / n;
   }
 
+  String _ciPushUpGateMetrics(Landmarks lm) {
+    if (p.id != 'push_up') return '';
+    final sw = lm.shoulderWidth(minLikelihood: p.minLikelihood);
+    final lw =
+        lm.pt(PoseLandmarkType.leftWrist, minLikelihood: p.minLikelihood);
+    final rw =
+        lm.pt(PoseLandmarkType.rightWrist, minLikelihood: p.minLikelihood);
+    final shoulders = lm.mid(
+        PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
+        minLikelihood: p.minLikelihood);
+    final hips = lm.mid(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip,
+        minLikelihood: p.minLikelihood);
+    if (sw == null ||
+        lw == null ||
+        rw == null ||
+        shoulders == null ||
+        hips == null) {
+      return ' support_metrics=missing';
+    }
+    final wristWidthRatio = (lw.dx - rw.dx).abs() / sw;
+    final wristsBelowHipRatio = (math.min(lw.dy, rw.dy) - hips.dy) / sw;
+    final torsoDropRatio = (hips.dy - shoulders.dy) / sw;
+    final leftKnee =
+        lm.pt(PoseLandmarkType.leftKnee, minLikelihood: p.minLikelihood);
+    final rightKnee =
+        lm.pt(PoseLandmarkType.rightKnee, minLikelihood: p.minLikelihood);
+    final kneeMetrics = leftKnee == null || rightKnee == null
+        ? ' support_k=missing'
+        : ' support_k=${((leftKnee.dx - rightKnee.dx).abs() / sw).toStringAsFixed(2)}'
+            ' support_ky=${(((leftKnee.dy + rightKnee.dy) / 2 - hips.dy) / sw).toStringAsFixed(2)}';
+    return ' support_w=${wristWidthRatio.toStringAsFixed(2)}'
+        ' support_y=${wristsBelowHipRatio.toStringAsFixed(2)}'
+        ' support_t=${torsoDropRatio.toStringAsFixed(2)}$kneeMetrics';
+  }
+
   /// Gom event của tracker. RepCompleted chỉ bổ sung presentation feedback
   /// sau khi production counter đã chấp nhận rep; RepAborted không đổi tổng rep.
   void _handle(List<RepEvent> events, Duration now,
@@ -1001,7 +1036,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           'pose=${pose != null} placement=${status.name} countable=$canCount '
           'raw_status=${placement.status.name} raw_l=${number(rawLeft)} '
           'raw_r=${number(rawRight)} signal=${number(sig)} '
-          'gate=${gateOk ?? 'na'} detail=${placement.detail.replaceAll(' ', '_')}';
+          'gate=${gateOk ?? 'na'}${lm == null ? '' : _ciPushUpGateMetrics(lm)} '
+          'detail=${placement.detail.replaceAll(' ', '_')}';
     }
     // Keep the legacy placement grace: a normal rep can briefly leave the guide.
     if (_workout.acceptsReps && !canCount && !_repThisFrame) {

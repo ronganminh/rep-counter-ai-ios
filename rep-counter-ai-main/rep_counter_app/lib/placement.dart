@@ -59,7 +59,6 @@ class GuideZone {
   const GuideZone(
       {required this.body, required this.hands, required this.label});
 
-
   /// Vùng thân người nên nằm gọn bên trong.
   ///
   /// `null` = **không kiểm tra "lọt trong khung"** cho bài này.
@@ -221,12 +220,14 @@ PlacementResult evaluatePlacement({
     }
   }
 
-  // 5) Điều kiện riêng của bài (kéo xà: phải đang bám xà). Chỉ để báo cho
-  //    người dùng — bộ đếm tự kiểm lại ở từng khung, xem `countGate`.
+  // 5) Điều kiện riêng của bài. Chỉ để báo cho người dùng — bộ đếm tự kiểm lại
+  //    ở từng khung, xem `countGate`.
   final gate = profile.countGate;
   if (gate != null && !gate(lm, ml)) {
     return PlacementResult(PlacementStatus.wrongPose,
-        detail: strings.detailNotHanging);
+        detail: profile.id == 'pull_up'
+            ? strings.detailNotHanging
+            : profile.localizedHint(strings));
   }
 
   return const PlacementResult(PlacementStatus.ready);
