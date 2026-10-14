@@ -145,9 +145,54 @@ bool _handsAtBarLevel(Landmarks lm, double ml) {
     lm.pt(PoseLandmarkType.rightWrist, minLikelihood: ml),
   ].whereType<Offset>().toList();
   if (wrists.isEmpty) return false;
-  final wristY = wrists.map((w) => w.dy).reduce((a, b) => a + b) / wrists.length;
+  final wristY =
+      wrists.map((w) => w.dy).reduce((a, b) => a + b) / wrists.length;
   final shoulderY = (ls.dy + rs.dy) / 2;
   return (shoulderY - wristY) / sw > _pullUpGateMargin;
+}
+
+/// Chỉ mở bộ đếm hít đất khi hai tay đang chống xuống sàn.
+///
+/// Góc khuỷu tay của người ngồi cầm điện thoại vẫn có thể đi qua đầy đủ hai
+/// ngưỡng 100°/140° và trông hệt một rep đối với bộ đếm một chiều. Camera lại
+/// quay trực diện nên trục vai-hông của tư thế ngồi và hít đất đều gần thẳng
+/// đứng trong ảnh; chỉ kiểm hướng thân không phân biệt được hai trường hợp.
+///
+/// Ở góc quay trực diện, tư thế chống đẩy có hai tay mở rộng còn hai gối/ống
+/// chân thu vào phía sau thân. Người ngồi xếp bằng thì ngược lại: hai gối mở
+/// rộng, hai tay thường ở sát nhau để cầm điện thoại. So sánh các khoảng cách
+/// này theo bề rộng vai nên không phụ thuộc độ phân giải hay khoảng cách máy.
+/// Dùng cả hai tay và hai gối còn giúp không tính chuyển động lúc người tập
+/// đang vào/ra vị trí chống đẩy.
+bool _handsInPushUpSupport(Landmarks lm, double ml) {
+  final leftWrist = lm.pt(PoseLandmarkType.leftWrist, minLikelihood: ml);
+  final rightWrist = lm.pt(PoseLandmarkType.rightWrist, minLikelihood: ml);
+  final leftKnee = lm.pt(PoseLandmarkType.leftKnee, minLikelihood: ml);
+  final rightKnee = lm.pt(PoseLandmarkType.rightKnee, minLikelihood: ml);
+  final hips = lm.mid(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip,
+      minLikelihood: ml);
+  final shoulders = lm.mid(
+      PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
+      minLikelihood: ml);
+  final shoulderWidth = lm.shoulderWidth(minLikelihood: ml);
+  if (leftWrist == null ||
+      rightWrist == null ||
+      leftKnee == null ||
+      rightKnee == null ||
+      hips == null ||
+      shoulders == null ||
+      shoulderWidth == null) {
+    return false;
+  }
+
+  final wristWidth = (leftWrist.dx - rightWrist.dx).abs();
+  final kneeWidth = (leftKnee.dx - rightKnee.dx).abs();
+  final torsoDrop = hips.dy - shoulders.dy;
+  return wristWidth >= shoulderWidth * 0.75 &&
+      kneeWidth <= shoulderWidth * 0.90 &&
+      wristWidth >= kneeWidth * 1.20 &&
+      torsoDrop >= shoulderWidth * 0.25 &&
+      torsoDrop <= shoulderWidth;
 }
 
 /// Điều kiện phải đúng ở TỪNG khung thì khung đó mới được đưa vào bộ đếm.
@@ -262,6 +307,7 @@ const pushUp = ExerciseProfile(
     PoseLandmarkType.rightHip
   ],
   shoulderWidthFraction: (min: 0.20, max: 0.65),
+  countGate: _handsInPushUpSupport,
   setupHint:
       'Đặt máy thấp trước mặt, chống tay sao cho khung xương trùng với mẫu.',
 );

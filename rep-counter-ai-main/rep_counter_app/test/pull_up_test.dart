@@ -72,7 +72,10 @@ void main() {
 
   group('startFromTop', () {
     RepCounter make(bool top) => RepCounter(
-        hi: 140, lo: 90, minAmplitude: 40, startFromTop: top,
+        hi: 140,
+        lo: 90,
+        minAmplitude: 40,
+        startFromTop: top,
         minPeriod: const Duration(milliseconds: 100));
 
     int run(RepCounter c, List<double> xs) {
@@ -191,10 +194,10 @@ void main() {
     });
   });
 
-  test('hít đất không đổi hành vi', () {
+  test('hít đất giữ cấu hình đếm và có cổng tư thế chống tay', () {
     expect(pushUp.smoothWindow, 5);
     expect(pushUp.startFromTop, isFalse);
-    expect(pushUp.countGate, isNull);
+    expect(pushUp.countGate, isNotNull);
   });
 
   group('CSV chẩn đoán', () {
