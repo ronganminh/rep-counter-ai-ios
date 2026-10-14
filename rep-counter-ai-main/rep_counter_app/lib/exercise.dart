@@ -158,41 +158,44 @@ bool _handsAtBarLevel(Landmarks lm, double ml) {
 /// quay trực diện nên trục vai-hông của tư thế ngồi và hít đất đều gần thẳng
 /// đứng trong ảnh; chỉ kiểm hướng thân không phân biệt được hai trường hợp.
 ///
-/// Ở góc quay trực diện, tư thế chống đẩy có hai tay mở rộng còn hai gối/ống
-/// chân thu vào phía sau thân. Người ngồi xếp bằng thì ngược lại: hai gối mở
-/// rộng, hai tay thường ở sát nhau để cầm điện thoại. So sánh các khoảng cách
-/// này theo bề rộng vai nên không phụ thuộc độ phân giải hay khoảng cách máy.
-/// Dùng cả hai tay và hai gối còn giúp không tính chuyển động lúc người tập
-/// đang vào/ra vị trí chống đẩy.
+/// Ở góc quay trực diện, tư thế chống đẩy có hai cổ tay mở rộng và nằm thấp
+/// hơn hông trong ảnh. Đây là hai dấu hiệu trực tiếp của việc chống tay xuống
+/// sàn và ổn định hơn điểm gối: MediaPipe thường làm mất/nhảy gối đúng lúc
+/// người tập hạ xuống, nên không được bắt buộc phải thấy gối ở từng frame.
+///
+/// Khi thấy đủ hai gối, dùng chúng như một bằng chứng âm bổ sung: người ngồi
+/// xếp bằng có hai gối mở rộng bằng hoặc hơn hai cổ tay. So sánh mọi khoảng
+/// cách theo bề rộng vai để không phụ thuộc độ phân giải hay khoảng cách máy.
 bool _handsInPushUpSupport(Landmarks lm, double ml) {
   final leftWrist = lm.pt(PoseLandmarkType.leftWrist, minLikelihood: ml);
   final rightWrist = lm.pt(PoseLandmarkType.rightWrist, minLikelihood: ml);
-  final leftKnee = lm.pt(PoseLandmarkType.leftKnee, minLikelihood: ml);
-  final rightKnee = lm.pt(PoseLandmarkType.rightKnee, minLikelihood: ml);
   final hips = lm.mid(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip,
-      minLikelihood: ml);
-  final shoulders = lm.mid(
-      PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
       minLikelihood: ml);
   final shoulderWidth = lm.shoulderWidth(minLikelihood: ml);
   if (leftWrist == null ||
       rightWrist == null ||
-      leftKnee == null ||
-      rightKnee == null ||
       hips == null ||
-      shoulders == null ||
       shoulderWidth == null) {
     return false;
   }
 
   final wristWidth = (leftWrist.dx - rightWrist.dx).abs();
-  final kneeWidth = (leftKnee.dx - rightKnee.dx).abs();
-  final torsoDrop = hips.dy - shoulders.dy;
-  return wristWidth >= shoulderWidth * 0.75 &&
-      kneeWidth <= shoulderWidth * 0.90 &&
-      wristWidth >= kneeWidth * 1.20 &&
-      torsoDrop >= shoulderWidth * 0.25 &&
-      torsoDrop <= shoulderWidth;
+  final wristsBelowHips = math.min(leftWrist.dy, rightWrist.dy) - hips.dy;
+  if (wristWidth < shoulderWidth * 0.75 ||
+      wristsBelowHips < shoulderWidth * 0.15) {
+    return false;
+  }
+
+  final leftKnee = lm.pt(PoseLandmarkType.leftKnee, minLikelihood: ml);
+  final rightKnee = lm.pt(PoseLandmarkType.rightKnee, minLikelihood: ml);
+  if (leftKnee != null && rightKnee != null) {
+    final kneeWidth = (leftKnee.dx - rightKnee.dx).abs();
+    final clearlySeated =
+        kneeWidth >= shoulderWidth * 1.15 && kneeWidth >= wristWidth * 1.05;
+    if (clearlySeated) return false;
+  }
+
+  return true;
 }
 
 /// Điều kiện phải đúng ở TỪNG khung thì khung đó mới được đưa vào bộ đếm.
