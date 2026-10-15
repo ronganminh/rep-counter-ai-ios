@@ -30,6 +30,8 @@ SUPPORTED_EXERCISES = {"push_up", "pull_up", "curl", "overhead_extension"}
 SUPPORTED_LOCALES = {"vi", "en"}
 REQUEST_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{32}$")
 PRIVACY_POLICY_PATH = Path(__file__).with_name("static") / "privacy-policy.html"
+SUPPORT_PAGE_PATH = Path(__file__).with_name("static") / "support.html"
+TERMS_PAGE_PATH = Path(__file__).with_name("static") / "terms.html"
 
 CORE_FIELDS = {
     "exercise",
@@ -328,6 +330,30 @@ class Handler(BaseHTTPRequestHandler):
         if route == "/privacy-policy.html":
             try:
                 body = PRIVACY_POLICY_PATH.read_bytes()
+            except OSError:
+                self.reply(500, error_response("SERVER_ERROR"))
+                return
+            self.reply_content(
+                200,
+                body,
+                content_type="text/html; charset=utf-8",
+            )
+            return
+        if route == "/support.html":
+            try:
+                body = SUPPORT_PAGE_PATH.read_bytes()
+            except OSError:
+                self.reply(500, error_response("SERVER_ERROR"))
+                return
+            self.reply_content(
+                200,
+                body,
+                content_type="text/html; charset=utf-8",
+            )
+            return
+        if route == "/terms.html":
+            try:
+                body = TERMS_PAGE_PATH.read_bytes()
             except OSError:
                 self.reply(500, error_response("SERVER_ERROR"))
                 return
