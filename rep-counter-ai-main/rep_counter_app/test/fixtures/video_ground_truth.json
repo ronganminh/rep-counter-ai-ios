@@ -1,13 +1,15 @@
 {
   "pushup-a": {
-    "current_engine_count": 28,
+    "current_engine_count": 15,
+    "previous_engine_count": 28,
     "human_ground_truth": null,
-    "notes": "Regression baseline only; not yet human-verified"
+    "notes": "Re-baselined after the seated-rest false-positive gate was applied once in the production pipeline; GitHub Actions run 38581459034. Regression baseline only; not yet human-verified."
   },
   "pushup-b": {
-    "current_engine_count": 67,
+    "current_engine_count": 21,
+    "previous_engine_count": 67,
     "human_ground_truth": null,
-    "notes": "Regression baseline only; not yet human-verified"
+    "notes": "Re-baselined after the seated-rest false-positive gate was applied once in the production pipeline; GitHub Actions run 38581459034. Regression baseline only; not yet human-verified."
   },
   "pushup-rest-regression": {
     "source_asset": "pushup-rest-regression.mp4",

@@ -68,13 +68,15 @@ void main() {
     final regression =
         manifest['production_regression'] as Map<String, dynamic>;
 
-    expect(regression['pushup_1']['expected_engine_count'], 28);
-    expect(regression['pushup_2']['expected_engine_count'], 67);
+    expect(regression['pushup_1']['expected_engine_count'], 15);
+    expect(regression['pushup_2']['expected_engine_count'], 21);
     expect(regression['pushup_1']['human_ground_truth'], isNull);
     expect(regression['pushup_2']['human_ground_truth'], isNull);
 
-    expect(baseline['pushup-a']['current_engine_count'], 28);
-    expect(baseline['pushup-b']['current_engine_count'], 67);
+    expect(baseline['pushup-a']['current_engine_count'], 15);
+    expect(baseline['pushup-b']['current_engine_count'], 21);
+    expect(baseline['pushup-a']['previous_engine_count'], 28);
+    expect(baseline['pushup-b']['previous_engine_count'], 67);
     expect(baseline['pushup-a']['human_ground_truth'], isNull);
     expect(baseline['pushup-b']['human_ground_truth'], isNull);
   });
