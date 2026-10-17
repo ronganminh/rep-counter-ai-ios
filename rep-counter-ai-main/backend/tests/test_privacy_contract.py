@@ -6,6 +6,7 @@ PROJECT = BACKEND.parent
 POLICY = (BACKEND / "static" / "privacy-policy.html").read_text(encoding="utf-8")
 NGINX = (BACKEND / "deploy" / "repcoach-ai.nginx").read_text(encoding="utf-8")
 PROVIDER = (BACKEND / "ai_provider.py").read_text(encoding="utf-8")
+SERVER = (BACKEND / "server.py").read_text(encoding="utf-8")
 LEGAL = (
     PROJECT
     / "rep_counter_app"
@@ -48,6 +49,14 @@ class PrivacyContractTests(unittest.TestCase):
         self.assertIn('id="vi"', POLICY)
         self.assertIn('lang="en"', POLICY)
         self.assertIn('lang="vi"', POLICY)
+
+    def test_backend_app_and_policy_share_current_consent_version(self):
+        self.assertIn(
+            'CURRENT_AI_CONSENT_VERSION = "2026-10-01-groq"',
+            SERVER,
+        )
+        self.assertIn("2026-10-01-groq", POLICY)
+        self.assertIn("aiConsentVersion = '2026-10-01-groq'", LEGAL)
 
     def test_policy_and_app_share_effective_date_and_consent_version(self):
         self.assertIn("October 1, 2026", POLICY)

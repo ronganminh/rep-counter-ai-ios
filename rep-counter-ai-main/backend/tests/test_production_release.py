@@ -69,6 +69,11 @@ class ProductionReleaseTests(unittest.TestCase):
             SMOKE,
         )
         self.assertIn("PRODUCTION_SMOKE_PASS", SMOKE)
+        self.assertIn('variants.append(("legacy_v1", legacy_v1))', SMOKE)
+        self.assertIn('variants.append(("unversioned", unversioned))', SMOKE)
+        self.assertIn('variants.append(("stale_consent", stale_consent))', SMOKE)
+        self.assertIn('variants.append(("missing_consent", missing_consent))', SMOKE)
+        self.assertIn('print(f"PASS consent_gate variant={name}")', SMOKE)
 
     def test_public_smoke_checks_required_routes_and_secrets(self):
         for value in (
