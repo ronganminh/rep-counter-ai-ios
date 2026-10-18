@@ -1,0 +1,219 @@
+name: RepCoach Android Replay
+
+# Replays a fixture push-up video through the PRODUCTION workout on a real
+# Android emulator and reports the engine rep count, mirroring the iOS replay.
+# Android uses ML Kit's Android pose backend, so its counts can differ from
+# iOS; this job is INFORMATIONAL for now (prints the count + uploads evidence)
+# and does not fail on a rep baseline until an Android baseline is agreed.
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main, master]
+    paths:
+      - "rep-counter-ai-main/rep_counter_app/**"
+      - ".github/workflows/android-replay.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repcoach-android-replay-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+
+jobs:
+  android-replay:
+    name: Android replay (${{ matrix.fixture_key }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fixture_key: pushup-1
+            asset: "pushup-test.mp4"
+            video_id: "13TwRvZQAXsm0-Gl7d_GmPV1T75B8QFf8"
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TEST_VIDEO_ASSET: ${{ matrix.asset }}
+      TEST_VIDEO_KEY: ${{ matrix.fixture_key }}
+      TEST_VIDEO_ID: ${{ matrix.video_id }}
+      PKG: com.ronganminh.repcoach
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v7
+
+      - name: Enable KVM (hardware acceleration)
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+        working-directory: .
+
+      - name: Install Flutter
+        uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Resolve dependencies
+        run: flutter pub get
+
+      - name: Reuse or download CI fixture video once
+        id: fixture
+        shell: bash
+        run: |
+          set -euo pipefail
+          fixture_dir="$RUNNER_TEMP/repcoach-ci-fixtures"
+          fixture="$fixture_dir/$TEST_VIDEO_ASSET"
+          parts_dir="$fixture_dir/parts"
+          mkdir -p "$fixture_dir" "$parts_dir"
+
+          if gh release download ci-fixtures --repo "$GITHUB_REPOSITORY" \
+              --pattern "$TEST_VIDEO_ASSET" --dir "$fixture_dir" >/dev/null 2>&1; then
+            echo "source=github-release"
+          elif gh release download ci-fixtures --repo "$GITHUB_REPOSITORY" \
+              --pattern "$TEST_VIDEO_ASSET.part.*" --dir "$parts_dir" >/dev/null 2>&1; then
+            cat "$parts_dir"/"$TEST_VIDEO_ASSET".part.* > "$fixture"
+            echo "source=github-release-chunks"
+          else
+            echo "Downloading fixture from Google Drive once."
+            venv="$RUNNER_TEMP/gdown"; python3 -m venv "$venv"
+            "$venv/bin/pip" install --quiet gdown
+            "$venv/bin/gdown" "https://drive.google.com/uc?id=$TEST_VIDEO_ID" -O "$fixture"
+          fi
+          test -s "$fixture"
+          ls -lh "$fixture"
+          echo "fixture_path=$fixture" >> "$GITHUB_OUTPUT"
+
+      - name: Build debug APK (CI video mode)
+        run: |
+          flutter build apk --debug --flavor store \
+            --dart-define=REPCOACH_CI_VIDEO_ASSET="$TEST_VIDEO_ASSET"
+          ls -lh build/app/outputs/flutter-apk/app-store-debug.apk
+
+      - name: Replay on emulator and capture rep count
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          FIXTURE_PATH: ${{ steps.fixture.outputs.fixture_path }}
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 2
+          ram-size: 4096M
+          disable-animations: true
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          working-directory: rep-counter-ai-main/rep_counter_app
+          script: |
+            set -uo pipefail
+            ART="$GITHUB_WORKSPACE/ci-artifacts"; mkdir -p "$ART"
+            APK="build/app/outputs/flutter-apk/app-store-debug.apk"
+            ACTIVITY="$PKG/.MainActivity"
+            RESULT="ci-video-result.txt"
+
+            adb wait-for-device
+            adb install -r -g "$APK" || adb install -r "$APK"
+            adb shell pm grant "$PKG" android.permission.CAMERA 2>/dev/null || true
+
+            # Clear logs, launch once with no video so the app logs the temp path
+            adb logcat -c || true
+            adb shell am start -n "$ACTIVITY" >/dev/null 2>&1 || \
+              adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+
+            tmp_path=""
+            for _ in $(seq 1 40); do
+              line="$(adb logcat -d | grep -F '[CI_VIDEO_ERROR] missing_file path=' | tail -n1 || true)"
+              if [[ -n "$line" ]]; then
+                tmp_path="${line##*path=}"; tmp_path="${tmp_path%%[$'\r\n']*}"
+                break
+              fi
+              sleep 3
+            done
+            if [[ -z "$tmp_path" ]]; then
+              echo "Could not discover the app temp path from logcat." >&2
+              adb logcat -d | tail -n 200 | tee "$ART/android-logcat.txt"
+              exit 1
+            fi
+            tmp_dir="$(dirname "$tmp_path")"
+            echo "App temp dir: $tmp_dir"
+
+            # Push the fixture into the app's private dir via run-as
+            adb push "$FIXTURE_PATH" "/data/local/tmp/$TEST_VIDEO_ASSET"
+            adb shell "run-as $PKG mkdir -p '$tmp_dir'" 2>/dev/null || true
+            adb shell "run-as $PKG sh -c 'cp /data/local/tmp/$TEST_VIDEO_ASSET \"$tmp_path\"'"
+            adb shell "run-as $PKG sh -c 'rm -f \"$tmp_dir/$RESULT\"'" 2>/dev/null || true
+
+            # Relaunch to run the replay
+            adb shell am force-stop "$PKG" || true
+            adb logcat -c || true
+            adb shell am start -n "$ACTIVITY" >/dev/null 2>&1 || \
+              adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
+
+            # Poll the result file inside the app sandbox
+            found=0
+            for _ in $(seq 1 1100); do
+              cur="$(adb shell "run-as $PKG sh -c 'cat \"$tmp_dir/$RESULT\" 2>/dev/null'" 2>/dev/null || true)"
+              if echo "$cur" | grep -q '\[CI_VIDEO_RESULT\]'; then
+                found=1; break
+              fi
+              if echo "$cur" | grep -q '\[CI_VIDEO_ERROR\]'; then
+                echo "$cur"; break
+              fi
+              sleep 6
+            done
+
+            adb exec-out screencap -p > "$ART/android-video-result.png" 2>/dev/null || true
+            adb logcat -d > "$ART/android-logcat.txt" 2>/dev/null || true
+            adb shell "run-as $PKG sh -c 'cat \"$tmp_dir/$RESULT\"'" > "$ART/ci-video-result.txt" 2>/dev/null || true
+            grep -F 'CI_VIDEO_STATUS' "$ART/android-logcat.txt" > "$ART/ci-video-timeline.txt" 2>/dev/null || true
+
+            echo "=================== ANDROID REPLAY RESULT ==================="
+            cat "$ART/ci-video-result.txt" || echo "(no result file)"
+            echo "============================================================"
+
+            if [[ "$found" != "1" ]]; then
+              echo "::warning::Android replay did not produce a CI_VIDEO_RESULT in time (informational job)."
+            fi
+
+      - name: Report rep count (informational)
+        if: always()
+        shell: bash
+        run: |
+          echo "## Android replay — ${TEST_VIDEO_KEY}" >> "$GITHUB_STEP_SUMMARY"
+          if [[ -f "$GITHUB_WORKSPACE/ci-artifacts/ci-video-result.txt" ]]; then
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+            cat "$GITHUB_WORKSPACE/ci-artifacts/ci-video-result.txt" >> "$GITHUB_STEP_SUMMARY"
+            echo '```' >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "_No result captured._" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+      - name: Upload Android replay evidence
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: android-replay-evidence-${{ matrix.fixture_key }}
+          path: |
+            ci-artifacts/ci-video-result.txt
+            ci-artifacts/ci-video-timeline.txt
+            ci-artifacts/android-logcat.txt
+            ci-artifacts/android-video-result.png
+          if-no-files-found: warn
+          retention-days: 30
