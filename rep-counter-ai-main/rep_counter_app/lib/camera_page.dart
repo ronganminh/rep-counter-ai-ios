@@ -526,6 +526,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   Future<void> _writeCiStatus(String line) async {
     if (widget.ciVideoPath == null) return;
+    // Also emit to the log so the Android replay (which cannot poll the
+    // overwritten result file) can reconstruct the full status timeline from
+    // logcat. No-op in release builds; harmless on iOS (which reads the file).
+    debugPrint(line);
     try {
       await File(_ciResultPath).writeAsString('$line\n', flush: true);
     } catch (error) {
