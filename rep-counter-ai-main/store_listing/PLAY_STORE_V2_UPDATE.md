@@ -5,8 +5,9 @@ All store content below is in **English**. Audience: the person (or Claude in Ch
 filling the Play Console.
 
 > App: **RepCoach AI: Đếm Hít Đất** · package `com.ronganminh.repcoach`
-> Current live release: **versionCode 3 (1.0.1)**. New upload is **versionCode 7**, which is
-> higher than 3 → Play will accept it. Push-ups only; do not advertise other exercises.
+> Current live release: **versionCode 3 (1.0.1)**. New upload is **versionCode 8**
+> (versionCode 7 was already uploaded with an incorrect icon; 8 supersedes it), which is
+> higher than any uploaded code → Play will accept it. Push-ups only; do not advertise other exercises.
 
 ---
 
@@ -17,7 +18,7 @@ filling the Play Console.
 | File | `rep-counter-ai-main/rep_counter_app/build/app/outputs/bundle/storeRelease/app-store-release.aab` |
 | Size | ~99 MB |
 | versionName | `2.0.0` |
-| versionCode | `7` |
+| versionCode | `8` |
 | Flavor | `store` (no screen-record permission) |
 | Signing | upload key `repcoach-upload` (same key as v1 — verified) |
 
@@ -28,8 +29,8 @@ filling the Play Console.
 Play Console → **RepCoach AI → Release → Production → Create new release**
 (or use **Testing → Closed testing** first if you want to test before going live).
 
-1. **App bundles**: upload the `.aab` above. Confirm it shows **Version code 7 / 2.0.0**.
-2. **Release name** (internal, not shown to users): `2.0.0 (7)`
+1. **App bundles**: upload the `.aab` above. Confirm it shows **Version code 8 / 2.0.0**.
+2. **Release name** (internal, not shown to users): `2.0.0 (8)`
 3. **Release notes** → paste per language (see §2).
 4. **Next → Review release → Start rollout to Production** (choose % rollout or 100%).
 
@@ -156,8 +157,8 @@ AI feedback; camera frames, video and pose landmarks stay on device.
 
 ## 6. Submit checklist
 
-- [ ] app-store-release.aab uploaded, shows versionCode 7 / 2.0.0
-- [ ] Release name `2.0.0 (7)`
+- [ ] app-store-release.aab uploaded, shows versionCode 8 / 2.0.0
+- [ ] Release name `2.0.0 (8)`
 - [ ] Release notes filled for every active language (EN + VI)
 - [ ] (Optional) English store listing: name, short + full description
 - [ ] Screenshots replaced with the 5 play-v2 images (1398×2796)

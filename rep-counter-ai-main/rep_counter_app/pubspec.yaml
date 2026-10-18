@@ -1,7 +1,7 @@
 name: rep_counter_app
 description: Đếm rep tập luyện thời gian thực bằng camera và MediaPipe Pose.
 publish_to: "none"
-version: 2.0.0+7
+version: 2.0.0+8
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
