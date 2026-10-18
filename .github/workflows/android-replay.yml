@@ -51,12 +51,12 @@ jobs:
         uses: actions/checkout@v7
 
       - name: Enable KVM (hardware acceleration)
+        working-directory: .
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
             | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
-        working-directory: .
 
       - name: Install Flutter
         uses: subosito/flutter-action@v2.23.0
@@ -121,76 +121,7 @@ jobs:
           disable-animations: true
           emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
           working-directory: rep-counter-ai-main/rep_counter_app
-          script: |
-            set -uo pipefail
-            ART="$GITHUB_WORKSPACE/ci-artifacts"; mkdir -p "$ART"
-            APK="build/app/outputs/flutter-apk/app-store-debug.apk"
-            ACTIVITY="$PKG/.MainActivity"
-            RESULT="ci-video-result.txt"
-
-            adb wait-for-device
-            adb install -r -g "$APK" || adb install -r "$APK"
-            adb shell pm grant "$PKG" android.permission.CAMERA 2>/dev/null || true
-
-            # Clear logs, launch once with no video so the app logs the temp path
-            adb logcat -c || true
-            adb shell am start -n "$ACTIVITY" >/dev/null 2>&1 || \
-              adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-
-            tmp_path=""
-            for _ in $(seq 1 40); do
-              line="$(adb logcat -d | grep -F '[CI_VIDEO_ERROR] missing_file path=' | tail -n1 || true)"
-              if [[ -n "$line" ]]; then
-                tmp_path="${line##*path=}"; tmp_path="${tmp_path%%[$'\r\n']*}"
-                break
-              fi
-              sleep 3
-            done
-            if [[ -z "$tmp_path" ]]; then
-              echo "Could not discover the app temp path from logcat." >&2
-              adb logcat -d | tail -n 200 | tee "$ART/android-logcat.txt"
-              exit 1
-            fi
-            tmp_dir="$(dirname "$tmp_path")"
-            echo "App temp dir: $tmp_dir"
-
-            # Push the fixture into the app's private dir via run-as
-            adb push "$FIXTURE_PATH" "/data/local/tmp/$TEST_VIDEO_ASSET"
-            adb shell "run-as $PKG mkdir -p '$tmp_dir'" 2>/dev/null || true
-            adb shell "run-as $PKG sh -c 'cp /data/local/tmp/$TEST_VIDEO_ASSET \"$tmp_path\"'"
-            adb shell "run-as $PKG sh -c 'rm -f \"$tmp_dir/$RESULT\"'" 2>/dev/null || true
-
-            # Relaunch to run the replay
-            adb shell am force-stop "$PKG" || true
-            adb logcat -c || true
-            adb shell am start -n "$ACTIVITY" >/dev/null 2>&1 || \
-              adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
-
-            # Poll the result file inside the app sandbox
-            found=0
-            for _ in $(seq 1 1100); do
-              cur="$(adb shell "run-as $PKG sh -c 'cat \"$tmp_dir/$RESULT\" 2>/dev/null'" 2>/dev/null || true)"
-              if echo "$cur" | grep -q '\[CI_VIDEO_RESULT\]'; then
-                found=1; break
-              fi
-              if echo "$cur" | grep -q '\[CI_VIDEO_ERROR\]'; then
-                echo "$cur"; break
-              fi
-              sleep 6
-            done
-
-            adb exec-out screencap -p > "$ART/android-video-result.png" 2>/dev/null || true
-            adb logcat -d > "$ART/android-logcat.txt" 2>/dev/null || true
-            adb shell "run-as $PKG sh -c 'cat \"$tmp_dir/$RESULT\"'" > "$ART/ci-video-result.txt" 2>/dev/null || true
-            grep -F 'CI_VIDEO_STATUS' "$ART/android-logcat.txt" > "$ART/ci-video-timeline.txt" 2>/dev/null || true
-
-            echo "=================== ANDROID REPLAY RESULT ==================="
-            cat "$ART/ci-video-result.txt" || echo "(no result file)"
-            echo "============================================================"
-
-            if [[ "$found" != "1" ]]; then
-              echo "::warning::Android replay did not produce a CI_VIDEO_RESULT in time (informational job)."
-            fi
+          script: bash tool/ci_android_replay.sh
 
       - name: Report rep count (informational)
         if: always()
