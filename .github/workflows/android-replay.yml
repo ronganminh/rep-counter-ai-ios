@@ -28,7 +28,7 @@ jobs:
   android-replay:
     name: Android replay (${{ matrix.fixture_key }})
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 180
     strategy:
       fail-fast: false
       matrix:

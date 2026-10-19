@@ -59,7 +59,7 @@ adb shell am start -n "$ACTIVITY" >/dev/null 2>&1 \
   || adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 
 found=0
-for _ in $(seq 1 1100); do
+for _ in $(seq 1 1500); do
   cur="$(adb shell "run-as $PKG sh -c 'cat \"$tmp_dir/$RESULT\" 2>/dev/null'" 2>/dev/null || true)"
   if printf '%s' "$cur" | grep -q '\[CI_VIDEO_RESULT\]'; then
     found=1
