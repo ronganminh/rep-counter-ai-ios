@@ -48,6 +48,13 @@ adb shell "run-as $PKG sh -c 'rm -f \"$tmp_dir/$RESULT\"'" 2>/dev/null || true
 # Relaunch to run the replay.
 adb shell am force-stop "$PKG" || true
 adb logcat -c || true
+adb logcat -G 16M 2>/dev/null || true
+# Stream logcat (flutter tag) to a file for the whole replay. A long video
+# overflows the ring buffer, so a single `logcat -d` at the end loses early
+# status lines; streaming captures every CI_VIDEO_STATUS as it is emitted.
+adb logcat -v time flutter:I "*:S" > "$ART/android-logcat.txt" 2>&1 &
+logcat_pid=$!
+
 adb shell am start -n "$ACTIVITY" >/dev/null 2>&1 \
   || adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 
@@ -65,10 +72,11 @@ for _ in $(seq 1 1100); do
   sleep 6
 done
 
+kill "$logcat_pid" 2>/dev/null || true
 adb exec-out screencap -p > "$ART/android-video-result.png" 2>/dev/null || true
-adb logcat -d > "$ART/android-logcat.txt" 2>/dev/null || true
 adb shell "run-as $PKG sh -c 'cat \"$tmp_dir/$RESULT\"'" > "$ART/ci-video-result.txt" 2>/dev/null || true
 grep -F 'CI_VIDEO_STATUS' "$ART/android-logcat.txt" > "$ART/ci-video-timeline.txt" 2>/dev/null || true
+echo "Captured $(wc -l < "$ART/ci-video-timeline.txt" 2>/dev/null || echo 0) CI_VIDEO_STATUS timeline samples."
 
 echo "=================== ANDROID REPLAY RESULT ==================="
 cat "$ART/ci-video-result.txt" 2>/dev/null || echo "(no result file)"
