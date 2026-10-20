@@ -17,7 +17,7 @@ import server
 def valid_v2():
     return {
         "schema_version": 2,
-        "consent_version": "CONSENT_SENTINEL_2026_10_01",
+        "consent_version": "2026-10-01-groq",
         "exercise": "push_up",
         "duration_seconds": 120,
         "reps": 20,
@@ -99,9 +99,42 @@ class ApiSecurityTests(unittest.TestCase):
         logged = stream.getvalue()
         self.assertIn('"status":200', logged)
         self.assertIn('"request_size":', logged)
-        self.assertNotIn("CONSENT_SENTINEL_2026_10_01", logged)
+        self.assertNotIn("2026-10-01-groq", logged)
         self.assertNotIn("FEEDBACK_SENTINEL", logged)
         self.assertNotIn("TEST_API_KEY_SENTINEL", logged)
+
+    def test_legacy_v1_is_rejected_before_provider(self):
+        payload = valid_v2()
+        payload["schema_version"] = 1
+        payload.pop("consent_version")
+        with patch.object(server, "generate_feedback") as generate:
+            status, _, body = self.request(body=payload)
+        self.assertEqual((status, body), (400, {"error": "INVALID_REQUEST"}))
+        generate.assert_not_called()
+
+    def test_unversioned_request_is_rejected_before_provider(self):
+        payload = valid_v2()
+        payload.pop("schema_version")
+        with patch.object(server, "generate_feedback") as generate:
+            status, _, body = self.request(body=payload)
+        self.assertEqual((status, body), (400, {"error": "INVALID_REQUEST"}))
+        generate.assert_not_called()
+
+    def test_missing_consent_is_rejected_before_provider(self):
+        payload = valid_v2()
+        payload.pop("consent_version")
+        with patch.object(server, "generate_feedback") as generate:
+            status, _, body = self.request(body=payload)
+        self.assertEqual((status, body), (400, {"error": "INVALID_REQUEST"}))
+        generate.assert_not_called()
+
+    def test_stale_consent_is_rejected_before_provider(self):
+        payload = valid_v2()
+        payload["consent_version"] = "2026-09-30-gemini"
+        with patch.object(server, "generate_feedback") as generate:
+            status, _, body = self.request(body=payload)
+        self.assertEqual((status, body), (400, {"error": "INVALID_REQUEST"}))
+        generate.assert_not_called()
 
     def test_oversized_body_is_rejected_before_provider(self):
         oversized = "x" * (server.MAX_BODY_BYTES + 1)
