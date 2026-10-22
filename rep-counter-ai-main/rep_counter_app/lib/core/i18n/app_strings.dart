@@ -517,11 +517,9 @@ class S {
     curlName: 'Cuốn tạ đơn',
     curlSetupHint: 'Đứng thẳng, thấy rõ vai và hai cẳng tay trong khung.',
     overheadName: 'Đẩy tạ qua đầu',
-    overheadSetupHint:
-        'Chừa khoảng trống phía trên đầu để thấy tạ khi duỗi thẳng tay.',
+    overheadSetupHint: 'Chừa khoảng trống phía trên đầu để thấy tạ khi duỗi thẳng tay.',
     pullUpName: 'Kéo xà',
-    pullUpSetupHint:
-        'Đặt máy cách xà 2–3 m, thấy cả xà và hai bàn tay khi treo.',
+    pullUpSetupHint: 'Đặt máy cách xà 2–3 m, thấy cả xà và hai bàn tay khi treo.',
     placeNoPose: 'Chưa thấy người — bước vào khung',
     placePartiallyOut: 'Đưa cả người vào trong khung',
     placeTooFar: 'Lại gần máy hơn',
@@ -559,8 +557,7 @@ class S {
     resultAiOffline: 'Không có mạng — chỉ hiển thị nhận xét cơ bản',
     resultAiFailed: 'Không lấy được nhận xét AI',
     resultAiRetry: 'Thử lại',
-    resultDisclaimer:
-        'Nhận xét chỉ mang tính tham khảo tập luyện, không phải tư vấn y tế.',
+    resultDisclaimer: 'Nhận xét chỉ mang tính tham khảo tập luyện, không phải tư vấn y tế.',
     historyTitle: 'Lịch sử',
     historyEmpty: 'Chưa có buổi tập nào',
     cameraPermissionTitle: 'Cần quyền camera',
@@ -581,8 +578,7 @@ class S {
         'Dịch vụ AI phản hồi quá lâu. Kết quả đã được lưu, bạn có thể thử lại.',
     aiOffline: 'Không có kết nối mạng. Kết quả đã được lưu trên máy.',
     aiServerBusy: 'Máy chủ AI đang bận. Kết quả vẫn an toàn, hãy thử lại sau.',
-    aiUnknownError:
-        'Không thể nhận xét lúc này. Kết quả vẫn được lưu trên máy.',
+    aiUnknownError: 'Không thể nhận xét lúc này. Kết quả vẫn được lưu trên máy.',
     aiPrivacyNote:
         'Dịch vụ AI chỉ nhận số liệu tổng hợp của buổi tập, không nhận video hay ảnh của bạn.',
     aiAsk: 'Nhận nhận xét AI',
@@ -748,7 +744,8 @@ class S {
     privChangesBody:
         'Chính sách này có thể được cập nhật. Ngày hiệu lực ở trên cho biết bản sửa đổi mới nhất. Mọi câu hỏi về quyền riêng tư xin gửi về địa chỉ dưới đây.',
     termsContactTitle: 'Liên hệ',
-    termsContactBody: 'Mọi câu hỏi về điều khoản xin gửi về địa chỉ dưới đây.',
+    termsContactBody:
+        'Mọi câu hỏi về điều khoản xin gửi về địa chỉ dưới đây.',
   );
 
   static const S en = S(
@@ -761,14 +758,11 @@ class S {
     pushUpSetupHint:
         'Place the phone low in front of you and set your hands so your skeleton matches the guide.',
     curlName: 'Dumbbell curl',
-    curlSetupHint:
-        'Stand upright with your shoulders and forearms clearly in frame.',
+    curlSetupHint: 'Stand upright with your shoulders and forearms clearly in frame.',
     overheadName: 'Overhead extension',
-    overheadSetupHint:
-        'Leave headroom above you so the weight stays in frame at full extension.',
+    overheadSetupHint: 'Leave headroom above you so the weight stays in frame at full extension.',
     pullUpName: 'Pull-up',
-    pullUpSetupHint:
-        'Place the phone 2–3 m from the bar so the bar and both hands stay in frame.',
+    pullUpSetupHint: 'Place the phone 2–3 m from the bar so the bar and both hands stay in frame.',
     placeNoPose: 'No one detected — step into the frame',
     placePartiallyOut: 'Move your whole body inside the guide',
     placeTooFar: 'Move closer to the camera',
@@ -806,8 +800,7 @@ class S {
     resultAiOffline: 'Offline — showing basic feedback only',
     resultAiFailed: 'Could not get AI feedback',
     resultAiRetry: 'Retry',
-    resultDisclaimer:
-        'Feedback is for training reference only and is not medical advice.',
+    resultDisclaimer: 'Feedback is for training reference only and is not medical advice.',
     historyTitle: 'History',
     historyEmpty: 'No workouts yet',
     cameraPermissionTitle: 'Camera permission needed',
@@ -827,8 +820,7 @@ class S {
     aiTimeout:
         'The AI service took too long to answer. Your workout is saved — you can try again.',
     aiOffline: 'No network connection. Your workout is saved on this device.',
-    aiServerBusy:
-        'The AI server is busy. Your workout is safe — try again later.',
+    aiServerBusy: 'The AI server is busy. Your workout is safe — try again later.',
     aiUnknownError:
         'Could not get feedback right now. Your workout is still saved on this device.',
     aiPrivacyNote:
@@ -934,8 +926,7 @@ class S {
     fbShortSession: 'Short session',
     aiCoach: 'AI Coach',
     guidePushUp: 'Hands down, body inside the frame — head at the top',
-    guidePullUp:
-        'Keep the bar and both hands in view — move the phone back if they are cut off',
+    guidePullUp: 'Keep the bar and both hands in view — move the phone back if they are cut off',
     exerciseHelp: exerciseHelpEn,
     helpTooltip: 'How it works',
     helpPlacement: 'Phone placement',

@@ -77,15 +77,16 @@ class _RepCounterAppState extends State<RepCounterApp> {
             home: _ciVideoAsset.isNotEmpty
                 ? CameraPage(
                     profile: pushUp,
-                    ciVideoPath: '${Directory.systemTemp.path}/$_ciVideoAsset',
+                    ciVideoPath:
+                        '${Directory.systemTemp.path}/$_ciVideoAsset',
                   )
                 : _onboarded == null
-                    ? const Scaffold(
-                        body: Center(child: CircularProgressIndicator()))
-                    : _onboarded!
-                        ? const AppShell()
-                        : OnboardingPage(
-                            onDone: () => setState(() => _onboarded = true)),
+                ? const Scaffold(
+                    body: Center(child: CircularProgressIndicator()))
+                : _onboarded!
+                    ? const AppShell()
+                    : OnboardingPage(
+                        onDone: () => setState(() => _onboarded = true)),
           ),
         ),
       );
