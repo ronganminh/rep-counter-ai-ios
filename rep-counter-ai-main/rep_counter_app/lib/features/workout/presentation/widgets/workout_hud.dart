@@ -1,8 +1,11 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/i18n/locale_controller.dart';
 import '../../../../placement.dart';
 import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_motion.dart';
 import '../../../../theme/app_typography.dart';
 import '../../../../widgets/product_ui.dart';
 import '../../application/workout_ui_state.dart';
@@ -775,6 +778,9 @@ class _Glass extends StatelessWidget {
 
 class HoldToFinish extends StatefulWidget {
   const HoldToFinish({super.key, required this.onFinish});
+
+  /// Token `components.hud.holdToFinish`: 76 px disc.
+  static const size = 76.0;
   final VoidCallback onFinish;
   @override
   State<HoldToFinish> createState() => _HoldToFinishState();
@@ -782,20 +788,41 @@ class HoldToFinish extends StatefulWidget {
 
 class _HoldToFinishState extends State<HoldToFinish>
     with SingleTickerProviderStateMixin {
-  late final _progress =
-      AnimationController(vsync: this, duration: const Duration(seconds: 1))
-        ..addStatusListener((status) {
-          if (status == AnimationStatus.completed) widget.onFinish();
-        });
+  // `preserve`: with the OS "reduce/remove animations" setting a `normal`
+  // controller runs at 5% duration, which would turn the 1 s hold into ~50 ms
+  // and finish workouts by accident. The hold keeps its full second (tokens:
+  // reducedMotion); only the visual becomes a static fill.
+  late final _progress = AnimationController(
+      vsync: this,
+      duration: AppMotion.holdToEnd,
+      animationBehavior: AnimationBehavior.preserve)
+    ..addStatusListener((status) {
+      if (status == AnimationStatus.completed) widget.onFinish();
+    });
   bool _holding = false;
+  bool _showHint = false;
+  Timer? _hintTimer;
+
   void _cancel() {
     if (!mounted) return;
+    // Released before the second elapsed: explain instead of failing silently.
+    final early = _holding && !_progress.isCompleted;
     _progress.reset();
-    if (mounted) setState(() => _holding = false);
+    setState(() {
+      _holding = false;
+      _showHint = early;
+    });
+    _hintTimer?.cancel();
+    if (early) {
+      _hintTimer = Timer(const Duration(seconds: 2), () {
+        if (mounted) setState(() => _showHint = false);
+      });
+    }
   }
 
   @override
   void dispose() {
+    _hintTimer?.cancel();
     _progress.dispose();
     super.dispose();
   }
@@ -825,13 +852,17 @@ class _HoldToFinishState extends State<HoldToFinish>
             child: ExcludeSemantics(
                 child: Listener(
                     onPointerDown: (_) {
-                      setState(() => _holding = true);
+                      _hintTimer?.cancel();
+                      setState(() {
+                        _holding = true;
+                        _showHint = false;
+                      });
                       _progress.forward(from: 0);
                     },
                     onPointerUp: (_) => _cancel(),
                     onPointerCancel: (_) => _cancel(),
                     child: SizedBox.square(
-                        dimension: 64,
+                        dimension: HoldToFinish.size,
                         child: Stack(fit: StackFit.expand, children: [
                           const DecoratedBox(
                               decoration: BoxDecoration(
@@ -843,7 +874,11 @@ class _HoldToFinishState extends State<HoldToFinish>
                               animation: _progress,
                               builder: (context, _) =>
                                   CircularProgressIndicator(
-                                      value: _progress.value,
+                                      key: const Key('hold-to-finish-ring'),
+                                      value: MediaQuery.disableAnimationsOf(
+                                              context)
+                                          ? (_holding ? 1 : 0)
+                                          : _progress.value,
                                       color: AppColors.danger,
                                       strokeWidth: 4)),
                         ]))))),
@@ -851,7 +886,11 @@ class _HoldToFinishState extends State<HoldToFinish>
         Text(
             _holding
                 ? context.tr('Đang giữ…', 'Keep holding…')
-                : context.tr('Giữ để kết thúc', 'Hold to finish'),
+                : _showHint
+                    // Same copy as ARB workoutHoldHint (moves to ARB in L-1).
+                    ? context.tr('Giữ 1 giây để kết thúc',
+                        'Keep holding for 1 second to finish')
+                    : context.tr('Giữ để kết thúc', 'Hold to finish'),
             textAlign: TextAlign.center,
             style: const TextStyle(fontSize: 12)),
       ]);

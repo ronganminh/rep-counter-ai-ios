@@ -33,6 +33,7 @@ import 'widgets/product_ui.dart';
 import 'theme/app_colors.dart';
 import 'features/workout/presentation/widgets/workout_hud.dart';
 import 'features/workout/presentation/widgets/camera_permission_view.dart';
+import 'features/workout/presentation/widgets/discard_confirm.dart';
 import 'features/workout/presentation/result_page.dart';
 import 'overlay_painter.dart';
 import 'placement.dart';
@@ -1283,6 +1284,14 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     );
     if (!mounted) return;
     if (choice == 'save') return _finishWorkout();
+    // Counted reps are lost on discard, so ask once more (W-2). With 0 reps
+    // there is nothing to lose and the user leaves directly.
+    if (choice == 'discard' &&
+        discardNeedsConfirmation(_ui.reps) &&
+        !await confirmDiscardWorkout(context)) {
+      return;
+    }
+    if (!mounted || _finishing) return;
     if (choice == 'discard') {
       _feedback.stop();
       _workout.abort();
