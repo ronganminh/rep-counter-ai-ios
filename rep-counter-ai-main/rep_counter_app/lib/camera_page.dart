@@ -1497,6 +1497,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
                   .7,
                   1
                 ])))),
+            // HUD C1: paused overlay dims the camera to 60 %.
+            if (_ui.phase == WorkoutUiPhase.paused)
+              const IgnorePointer(
+                  child: ColoredBox(color: AppColors.dialogScrim)),
             SafeArea(child: _hud()),
           ],
         ),
