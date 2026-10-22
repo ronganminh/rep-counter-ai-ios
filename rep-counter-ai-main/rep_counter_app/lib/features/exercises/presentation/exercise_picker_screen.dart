@@ -101,7 +101,7 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
                                           fontWeight: FontWeight.w700,
                                           color: available.contains(item.$1)
                                               ? AppColors.success
-                                              : AppColors.text3)),
+                                              : AppColors.text2)),
                                   const SizedBox(height: 20),
                                   Center(
                                       child: ExerciseIcon(
@@ -126,7 +126,7 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
                                               'In development'),
                                       style: const TextStyle(
                                           fontSize: 12,
-                                          color: AppColors.text3)),
+                                          color: AppColors.text2)),
                                 ])),
                       ))),
               ]),

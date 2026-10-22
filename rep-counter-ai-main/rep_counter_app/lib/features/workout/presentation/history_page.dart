@@ -533,10 +533,12 @@ class _PersonalRecordsCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SectionLabel(context.tr(
-                    'Kỷ lục cá nhân',
-                    'Personal records',
-                  )),
+                  SectionLabel(
+                      context.tr(
+                        'Kỷ lục cá nhân',
+                        'Personal records',
+                      ),
+                      onSurface: true),
                   if (!hasExercise)
                     Text(
                       context.tr(
@@ -617,7 +619,8 @@ class _TrendCard extends StatelessWidget {
   Widget build(BuildContext context) {
     const lightSurface = Color(0xFFF7F7F5);
     const lightText = Color(0xFF171719);
-    const lightText2 = Color(0xFF7C7C82);
+    // #7C7C82 is 3.87:1 on this light card; the light palette's text2 passes.
+    const lightText2 = AppColors.lightText2;
     final values = _values();
     final meaningful = values
             .where((value) =>
@@ -826,7 +829,8 @@ class _HeatmapCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionLabel(context.tr('Tần suất tập', 'Training frequency')),
+          SectionLabel(context.tr('Tần suất tập', 'Training frequency'),
+              onSurface: true),
           Semantics(
             label: context.tr(
               'Lịch tập tháng ${now.month}. Dấu chấm đánh dấu ngày có cường độ cao.',
@@ -896,7 +900,7 @@ class _HeatmapCard extends StatelessWidget {
             children: [
               Text(
                 context.tr('Ít', 'Less'),
-                style: AppTypography.caption12.copyWith(color: p.text3),
+                style: AppTypography.caption12.copyWith(color: p.text2),
               ),
               const SizedBox(width: 6),
               _LegendBox(color: p.surface2),
@@ -909,7 +913,7 @@ class _HeatmapCard extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 context.tr('Nhiều', 'More'),
-                style: AppTypography.caption12.copyWith(color: p.text3),
+                style: AppTypography.caption12.copyWith(color: p.text2),
               ),
             ],
           ),
@@ -1175,7 +1179,7 @@ class _SessionRow extends StatelessWidget {
                 r.aiFeedback!,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: p.text3, fontSize: 12),
+                style: TextStyle(color: p.text2, fontSize: 12),
               ),
           ],
         ),

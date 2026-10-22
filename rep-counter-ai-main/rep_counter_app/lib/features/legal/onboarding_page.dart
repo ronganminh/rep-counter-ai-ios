@@ -106,7 +106,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             child: Text(
                                 context.tr('NHÌN TỪ BÊN CẠNH', 'SIDE VIEW'),
                                 style: AppTypography.caption12
-                                    .copyWith(color: AppColors.text3))),
+                                    .copyWith(color: AppColors.text2))),
                         Positioned(
                             left: 12,
                             top: 100,
