@@ -51,7 +51,7 @@ class _AppShellState extends State<AppShell> with RouteAware {
             key: ValueKey('${_tab.name}:$_revision'),
             child: switch (_tab) {
               AppTab.exercises => const ExercisePickerScreen(),
-              AppTab.progress => HistoryPage(onTrain: _train),
+              AppTab.progress => ProgressPage(onTrain: _train),
               AppTab.profile => const ProfilePage(),
               AppTab.home || AppTab.train => const HomeScreen(),
             }),

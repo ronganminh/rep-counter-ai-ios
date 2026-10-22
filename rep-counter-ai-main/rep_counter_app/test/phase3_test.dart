@@ -191,6 +191,9 @@ void main() {
     expect(find.text('27 rep'), findsOneWidget);
     await tester.tap(find.text('Tiến bộ').last);
     await tester.pumpAndSettle();
+    // v2 (H-1): the session list is a child route of Progress.
+    await tester.tap(find.byKey(const Key('open-history-list')));
+    await tester.pumpAndSettle();
     expect(find.text('27 rep'), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
