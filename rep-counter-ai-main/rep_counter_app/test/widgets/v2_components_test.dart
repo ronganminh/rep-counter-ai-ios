@@ -222,6 +222,15 @@ void main() {
     expect(taps, 1);
     expect(tester.getSemantics(find.text('Off')),
         matchesSemantics(label: 'Off', isButton: true, hasEnabledState: true));
+    // Enabled buttons must stay operable by screen readers.
+    expect(
+        tester.getSemantics(find.text('On')),
+        matchesSemantics(
+            label: 'On',
+            isButton: true,
+            hasEnabledState: true,
+            isEnabled: true,
+            hasTapAction: true));
   });
 
   testWidgets('AppToast shows a message with a labelled close button',

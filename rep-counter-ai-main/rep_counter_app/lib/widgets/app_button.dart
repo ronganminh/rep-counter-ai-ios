@@ -111,6 +111,8 @@ class AppButton extends StatelessWidget {
       button: true,
       enabled: _enabled,
       label: semanticLabel ?? label,
+      // excludeSemantics drops the InkWell's action, so expose it here.
+      onTap: _enabled ? onPressed : null,
       excludeSemantics: true,
       child: ConstrainedBox(
         constraints: BoxConstraints(
