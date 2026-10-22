@@ -29,6 +29,16 @@ abstract final class AppColors {
   static const dangerTint = Color(0x1FFF5A5F);
   static const scrim = Color(0x9E000000);
 
+  // Final C tokens (DESIGN_SYSTEM_TOKENS.json). Dark-only, like the v2 designs
+  // (D-03), so they are not mirrored into the light AppPalette.
+  static const textMuted = Color(0xFFC9C9CE);
+  static const info = Color(0xFF8AB4FF);
+  // Token `scrim` (0.55) is for sheets; the existing `scrim` above equals the
+  // token `scrimStrong` (0.62) and keeps its current uses.
+  static const sheetScrim = Color(0x8C000000);
+  static const dialogScrim = Color(0x99000000);
+  static const hudGlass = Color(0x8C0B0B0C);
+
   static const lightBg = Color(0xFFF6F6F3);
   static const lightSurface = Color(0xFFFFFFFF);
   static const lightSurface2 = Color(0xFFEDEDEA);

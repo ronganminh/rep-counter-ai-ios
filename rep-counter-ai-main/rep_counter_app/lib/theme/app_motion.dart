@@ -11,4 +11,7 @@ abstract final class AppMotion {
   static const progressCurve = Cubic(0.34, 1.3, 0.64, 1);
   static const holdToEnd = Duration(seconds: 1);
   static const readyHold = Duration(milliseconds: 1500);
+  static const sheet = Duration(milliseconds: 280);
+  static const page = Duration(milliseconds: 300);
+  static const standardCurve = Curves.easeOutCubic;
 }

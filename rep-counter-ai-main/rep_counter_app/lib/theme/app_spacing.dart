@@ -17,4 +17,11 @@ abstract final class AppSpacing {
   static const screenPadding = EdgeInsets.symmetric(horizontal: 24);
   static const listPadding = EdgeInsets.symmetric(horizontal: 16);
   static const cardPadding = EdgeInsets.all(20);
+
+  // v2 (Final C) layout; existing screens keep the values above until restyled.
+  static const screenPaddingV2 = EdgeInsets.symmetric(horizontal: 20);
+  static const cardPaddingV2 = EdgeInsets.all(16);
+  static const listRowMinHeight = 56.0;
+  static const sectionGap = 12.0;
+  static const buttonHeightCompact = 44.0;
 }
