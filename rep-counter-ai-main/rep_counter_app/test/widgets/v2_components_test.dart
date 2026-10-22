@@ -1,3 +1,5 @@
+import 'dart:io' show Platform;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -146,13 +148,15 @@ void main() {
         });
       }
     }
+    // Goldens are rendered on Linux (the CI "Analyze and Flutter tests" job);
+    // macOS text rasterisation differs by a few pixels, so other hosts skip.
     testWidgets('golden · ${locale.languageCode} 393x852', (tester) async {
       await _pump(tester, const _Gallery(), locale: locale);
       await expectLater(
           find.byType(_Gallery),
           matchesGoldenFile(
               'goldens/v2_components_${locale.languageCode}.png'));
-    });
+    }, skip: !Platform.isLinux);
   }
 
   testWidgets('localized labels follow the glossary', (tester) async {
