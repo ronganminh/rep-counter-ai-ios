@@ -1,0 +1,7 @@
+# gen-l10n (roadmap F-1). ARB files are the Final C handoff copies
+# (docs/design/v2-final-c/handoff/l10n), kept byte-identical.
+arb-dir: lib/l10n
+template-arb-file: app_en.arb
+output-localization-file: app_localizations.dart
+output-class: AppLocalizations
+nullable-getter: false
