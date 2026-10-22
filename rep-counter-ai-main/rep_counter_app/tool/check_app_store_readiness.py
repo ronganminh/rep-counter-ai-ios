@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Fail closed for deterministic App Store source / metadata regressions."""
+import json
 import pathlib
 import plistlib
 import re
@@ -13,6 +14,18 @@ def ensure(condition, message):
     if not condition:
         raise AssertionError(message)
 
+def shown_copy(path):
+    """Source text of a screen plus the EN / VI ARB values of the
+    `context.l10n.<key>` getters it uses."""
+    source = read(path)
+    keys = set(re.findall(r"context\.l10n\.(\w+)", source))
+    texts = []
+    for locale in ("en", "vi"):
+        arb = json.loads(read(f"lib/l10n/app_{locale}.arb"))
+        texts.append(source + "\n" + "\n".join(str(arb.get(k, "")) for k in keys))
+    return tuple(texts)
+
+
 def main():
     spec = read("pubspec.yaml")
     version_match = re.search(
@@ -21,9 +34,14 @@ def main():
     ensure(version_match is not None, "Release version/build is not synchronized")
     release_version, release_build = version_match.groups()
     strings = read("lib/core/i18n/app_strings.dart")
-    legal = read("lib/features/legal/legal_page.dart")
-    ensure("Gemini" not in strings and "Gemini" not in legal, "Stale Gemini provider text")
-    ensure("GroqCloud" in legal and "GroqCloud" in read("lib/features/ai/presentation/ai_consent.dart"), "AI provider privacy copy inconsistent")
+    # Screens migrated to gen-l10n (roadmap L-1) show ARB text, so check the
+    # copy each screen actually renders in both languages, not only literals.
+    legal_en, legal_vi = shown_copy("lib/features/legal/legal_page.dart")
+    consent_en, consent_vi = shown_copy("lib/features/ai/presentation/ai_consent.dart")
+    ensure(all("Gemini" not in text for text in (strings, legal_en, legal_vi)),
+           "Stale Gemini provider text")
+    ensure(all("GroqCloud" in text for text in (legal_en, legal_vi, consent_en, consent_vi)),
+           "AI provider privacy copy inconsistent")
     flags = read("lib/core/config/feature_flags.dart")
     ensure("defaultValue: false" in flags, "Release feature defaults must remain gated")
     picker = read("lib/features/exercises/presentation/exercise_picker_screen.dart")
