@@ -12,6 +12,7 @@ import '../../../widgets/tap_target.dart';
 import '../domain/workout_mode.dart';
 import '../domain/workout_personal_records.dart';
 import 'exercise_icon.dart';
+import '../../../core/i18n/l10n.dart';
 
 typedef TimedBestLoader = Future<int?> Function(
   String exerciseId,
@@ -175,10 +176,7 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
           ),
           const SizedBox(height: 12),
           Text(
-            context.tr(
-              'Chọn mục tiêu. Bạn vẫn có thể tập tiếp sau khi đạt.',
-              'Choose a goal. You can keep going after reaching it.',
-            ),
+            context.l10n.legacyGoalSetupChooseGoalCanKeep,
             style: const TextStyle(color: AppColors.text2, height: 1.5),
           ),
           const SizedBox(height: 24),
@@ -244,10 +242,7 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
           ),
           const SizedBox(height: 12),
           Text(
-            context.tr(
-              'Tập theo nhịp của bạn, không có mục tiêu rep hay giới hạn thời gian.',
-              'Train at your own pace with no rep target or time limit.',
-            ),
+            context.l10n.legacyGoalSetupTrainOwnPaceNo,
             style: const TextStyle(color: AppColors.text2, height: 1.5),
           ),
           const SizedBox(height: 24),
@@ -263,10 +258,7 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    context.tr(
-                      'Mọi rep được engine xác nhận vẫn được lưu bình thường.',
-                      'Every rep accepted by the engine is saved normally.',
-                    ),
+                    context.l10n.legacyGoalSetupEveryRepAcceptedEngine,
                     style: const TextStyle(color: AppColors.text2, height: 1.5),
                   ),
                 ),
@@ -300,19 +292,19 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
               border: Border.all(color: AppColors.accent),
             ),
             child: Text(
-              context.tr('THỬ THÁCH THỜI GIAN', 'TIME CHALLENGE'),
+              context.l10n.legacyGoalSetupTimeChallenge,
               style: AppTypography.caption12.copyWith(color: AppColors.accent),
             ),
           ),
         ),
         const SizedBox(height: 18),
         Text(
-          context.tr('THỬ THÁCH THỜI GIAN', 'TIME CHALLENGE'),
+          context.l10n.legacyGoalSetupTimeChallenge,
           style: AppTypography.display40,
         ),
         const SizedBox(height: 18),
         Text(
-          context.tr('Chọn thời lượng', 'Choose duration'),
+          context.l10n.legacyGoalSetupChooseDuration,
           style: AppTypography.body14.copyWith(color: AppColors.text2),
         ),
         const SizedBox(height: 12),
@@ -327,7 +319,7 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
                 onTap: () => _selectChallenge(value),
               ),
             _TimeChip(
-              label: context.tr('Tùy chỉnh', 'Custom'),
+              label: context.l10n.legacyGoalSetupCustom,
               selected: _customTime,
               onTap: _selectCustomTime,
             ),
@@ -344,8 +336,8 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
               LengthLimitingTextInputFormatter(4),
             ],
             decoration: InputDecoration(
-              labelText: context.tr('Thời lượng', 'Duration'),
-              suffixText: context.tr('giây', 'sec'),
+              labelText: context.l10n.resultDuration,
+              suffixText: context.l10n.secondsShort,
               filled: true,
               fillColor: AppColors.surface2,
               border: OutlineInputBorder(
@@ -377,10 +369,7 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
             borderRadius: BorderRadius.circular(18),
           ),
           child: Text(
-            context.tr(
-              'Mục tiêu: làm nhiều rep tốt nhất có thể trong thời gian đã chọn.',
-              'Goal: complete as many good reps as possible in the selected time.',
-            ),
+            context.l10n.legacyGoalSetupGoalCompleteManyGood,
             style: AppTypography.body14.copyWith(color: AppColors.text2),
           ),
         ),
@@ -400,7 +389,7 @@ class _GoalSetupContentState extends State<GoalSetupContent> {
                   );
                 },
           child: Text(
-            context.tr('Bắt đầu thử thách', 'Start challenge'),
+            context.l10n.legacyGoalSetupStartChallenge,
           ),
         ),
         const SizedBox(height: 12),
@@ -440,13 +429,13 @@ class _ModeSelector extends StatelessWidget {
         children: [
           _ModeChip(
             key: const Key('mode-free'),
-            label: context.tr('Tự do', 'Free'),
+            label: context.l10n.legacyGoalSetupFree,
             selected: selected == WorkoutMode.free,
             onTap: () => onSelected(WorkoutMode.free),
           ),
           _ModeChip(
             key: const Key('mode-target'),
-            label: context.tr('Mục tiêu rep', 'Target reps'),
+            label: context.l10n.legacyGoalSetupTargetReps,
             selected: selected == WorkoutMode.targetReps,
             onTap: () => onSelected(WorkoutMode.targetReps),
           ),

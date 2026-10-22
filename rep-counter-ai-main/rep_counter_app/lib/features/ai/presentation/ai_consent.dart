@@ -4,6 +4,7 @@ import '../../../core/i18n/locale_controller.dart';
 import '../../../core/legal/legal_config.dart';
 import '../../legal/legal_page.dart';
 import '../ai_preferences.dart';
+import '../../../core/i18n/l10n.dart';
 
 const _groqVi =
     'RepCoach AI sẽ gửi bản tóm tắt giới hạn của buổi tập tới máy chủ RepCoach AI, sau đó máy chủ gửi prompt tối giản tới GroqCloud để tạo nhận xét. Dữ liệu có thể gồm tên bài, mục tiêu, số rep/set, thời gian, thống kê pose và điểm chất lượng. Không gửi video, ảnh, âm thanh hoặc tọa độ landmark thô.\n\nTheo tài liệu GroqCloud hiện hành, dữ liệu inference không được lưu mặc định, ngoại trừ khi cần cho độ tin cậy hệ thống hoặc điều tra lạm dụng; trường hợp đó có thể được giữ tối đa 30 ngày. RepCoach hiện không tuyên bố Zero Data Retention. Lịch sử cũ không tự tải lên; tắt AI không thu hồi yêu cầu đã gửi. Workout vẫn lưu trên máy nếu AI lỗi.';
@@ -15,8 +16,7 @@ Future<bool> requestAutomaticAiConsent(BuildContext context) async {
   final consent = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-              title: Text(context.tr('Tự động nhận xét sau buổi tập?',
-                  'Automatic workout feedback?')),
+              title: Text(context.l10n.legacyAiConsentAutomaticWorkoutFeedback),
               content: SingleChildScrollView(
                   child: Column(
                       mainAxisSize: MainAxisSize.min,
@@ -42,12 +42,12 @@ Future<bool> requestAutomaticAiConsent(BuildContext context) async {
               actions: [
                 TextButton(
                     onPressed: () => Navigator.pop(context, false),
-                    child: Text(context.tr('Để sau', 'Not now'))),
+                    child: Text(context.l10n.commonNotNow)),
                 FilledButton(
                     key: const Key('accept-automatic-ai'),
                     onPressed: () => Navigator.pop(context, true),
                     child:
-                        Text(context.tr('Đồng ý và bật', 'Agree and enable'))),
+                        Text(context.l10n.legacyAiConsentAgreeEnable)),
               ]));
   if (consent != true) return false;
   await AiPreferences.setEnabled(true);
@@ -58,10 +58,7 @@ Future<bool> requestManualAiConsent(BuildContext context) async {
   final consent = await showDialog<bool>(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text(context.tr(
-        'Gửi số liệu buổi tập cho AI?',
-        'Send workout statistics to AI?',
-      )),
+      title: Text(context.l10n.legacyAiConsentSendWorkoutStatisticsAi),
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -100,7 +97,7 @@ Future<bool> requestManualAiConsent(BuildContext context) async {
         FilledButton(
           key: const Key('accept-manual-ai'),
           onPressed: () => Navigator.pop(context, true),
-          child: Text(context.tr('Đồng ý & gửi', 'Agree & send')),
+          child: Text(context.l10n.legacyAiConsentAgreeSend),
         ),
       ],
     ),

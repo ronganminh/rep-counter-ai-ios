@@ -13,6 +13,7 @@ import '../data/workout_record.dart';
 import '../domain/workout_mode.dart';
 import 'exercise_icon.dart';
 import 'result_page.dart';
+import '../../../core/i18n/l10n.dart';
 
 /// Which parts of the history/progress screen to show.
 ///
@@ -87,10 +88,7 @@ class _HistoryPageState extends State<HistoryPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(
-              context.tr(
-                'Không thể xóa. Hãy thử lại.',
-                'Could not delete. Please retry.',
-              ),
+              context.l10n.legacyHistoryPageCouldNotDeletePlease,
             ),
           ),
         );
@@ -110,7 +108,7 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
         action: SnackBarAction(
           textColor: context.palette.accentInk,
-          label: context.tr('Hoàn tác', 'Undo'),
+          label: context.l10n.commonUndo,
           onPressed: () => _restore(deleted),
         ),
       ),
@@ -127,10 +125,7 @@ class _HistoryPageState extends State<HistoryPage> {
           SnackBar(
             backgroundColor: context.palette.surface2,
             content: Text(
-              context.tr(
-                'Chưa khôi phục được buổi tập.',
-                'Could not restore workout.',
-              ),
+              context.l10n.legacyHistoryPageCouldNotRestoreWorkout,
               style: TextStyle(color: context.palette.text),
             ),
             action: SnackBarAction(
@@ -163,7 +158,7 @@ class _HistoryPageState extends State<HistoryPage> {
             child: Semantics(
               header: true,
               child: Text(
-                context.tr('Tiến bộ', 'Progress').toUpperCase(),
+                context.l10n.navProgress.toUpperCase(),
                 style: AppTypography.display40,
               ),
             ),
@@ -190,7 +185,7 @@ class _HistoryPageState extends State<HistoryPage> {
           Padding(
             padding: const EdgeInsets.only(bottom: 5),
             child: Text(
-              context.tr('Tiến bộ', 'Progress'),
+              context.l10n.navProgress,
               style: AppTypography.body14.copyWith(
                 color: context.palette.accentInk,
               ),
@@ -304,7 +299,7 @@ class _HistoryPageState extends State<HistoryPage> {
         if (stats.records.isEmpty)
           _RangeEmptyMessage(onTrain: _startTraining)
         else if (_showSessions) ...[
-          SectionLabel(context.tr('Buổi tập', 'Sessions')),
+          SectionLabel(context.l10n.legacyHistoryPageSessions),
           for (final group in groups.entries) ...[
             Padding(
               padding: const EdgeInsets.only(top: 4, bottom: 8),
@@ -414,7 +409,7 @@ class _ExerciseFilter extends StatelessWidget {
       child: Row(
         children: [
           SegmentChip(
-            label: context.tr('Tất cả', 'All exercises'),
+            label: context.l10n.legacyHistoryPageAllExercises,
             selected: selected == null,
             onTap: () => onSelected(null),
           ),
@@ -442,19 +437,19 @@ class _SummaryMetrics extends StatelessWidget {
     final average = stats.averageForm;
     final cards = <Widget>[
       MetricCard(
-        label: context.tr('Tổng rep', 'Total reps'),
+        label: context.l10n.legacyHistoryPageTotalReps,
         value: '${stats.totalReps}',
       ),
       MetricCard(
-        label: context.tr('Buổi tập', 'Sessions'),
+        label: context.l10n.legacyHistoryPageSessions,
         value: '${stats.sessions}',
       ),
       MetricCard(
-        label: context.tr('Form TB', 'Avg form'),
+        label: context.l10n.legacyHistoryPageAvgForm,
         value: average == null ? '—' : '${average.round()}',
       ),
       MetricCard(
-        label: context.tr('Đạt mục tiêu', 'Goals reached'),
+        label: context.l10n.legacyHistoryPageGoalsReached,
         value: '${stats.goalsReached}',
       ),
     ];
@@ -534,32 +529,26 @@ class _PersonalRecordsCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   SectionLabel(
-                      context.tr(
-                        'Kỷ lục cá nhân',
-                        'Personal records',
-                      ),
+                      context.l10n.legacyHistoryPagePersonalRecords,
                       onSurface: true),
                   if (!hasExercise)
                     Text(
-                      context.tr(
-                        'Chọn một bài tập để xem kỷ lục theo đúng bài và chế độ.',
-                        'Choose one exercise to view mode-specific records.',
-                      ),
+                      context.l10n.legacyHistoryPageChooseOneExerciseView,
                       style: AppTypography.body14.copyWith(color: p.text2),
                     )
                   else ...[
                     _PersonalRecordRow(
-                      label: context.tr('Tập tự do', 'Free workout'),
+                      label: context.l10n.legacyStoryPageFreeWorkout,
                       value: stats.personalBestFree,
                     ),
                     const SizedBox(height: 10),
                     _PersonalRecordRow(
-                      label: context.tr('60 giây', '60 sec'),
+                      label: context.l10n.legacyHistoryPageSec,
                       value: stats.personalBestTimed(60),
                     ),
                     const SizedBox(height: 10),
                     _PersonalRecordRow(
-                      label: context.tr('90 giây', '90 sec'),
+                      label: context.l10n.legacyHistoryPageSec2,
                       value: stats.personalBestTimed(90),
                     ),
                   ],
@@ -645,7 +634,7 @@ class _TrendCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              context.tr('XU HƯỚNG', 'TREND'),
+              context.l10n.legacyHistoryPageTrend,
               style: AppTypography.caption12.copyWith(color: lightText2),
             ),
             const SizedBox(height: 10),
@@ -674,10 +663,7 @@ class _TrendCard extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 18),
                 child: Text(
-                  context.tr(
-                    'Cần thêm dữ liệu để hiển thị xu hướng.',
-                    'More data is needed to show a trend.',
-                  ),
+                  context.l10n.legacyHistoryPageMoreDataNeededShow,
                   style: AppTypography.body14.copyWith(color: lightText2),
                 ),
               )
@@ -690,7 +676,7 @@ class _TrendCard extends StatelessWidget {
                       '${stats.range.label} · chưa có dữ liệu',
                       '${stats.range.label} · no data yet',
                     )
-                  : '${stats.range.label} · ${context.tr('mới nhất', 'latest')} ${_formatLatest(context, latest)}',
+                  : '${stats.range.label} · ${context.l10n.legacyHistoryPageLatest} ${_formatLatest(context, latest)}',
               style: AppTypography.caption12.copyWith(color: lightText2),
             ),
           ],
@@ -736,7 +722,7 @@ class _TrendCard extends StatelessWidget {
       switch (metric) {
         ProgressTrendMetric.reps => context.tr('Rep', 'Reps'),
         ProgressTrendMetric.sessions => context.tr('Buổi', 'Sessions'),
-        ProgressTrendMetric.duration => context.tr('Thời lượng', 'Duration'),
+        ProgressTrendMetric.duration => context.l10n.resultDuration,
         ProgressTrendMetric.form => 'Form',
       };
 
@@ -829,7 +815,7 @@ class _HeatmapCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          SectionLabel(context.tr('Tần suất tập', 'Training frequency'),
+          SectionLabel(context.l10n.legacyHistoryPageTrainingFrequency,
               onSurface: true),
           Semantics(
             label: context.tr(
@@ -899,7 +885,7 @@ class _HeatmapCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Text(
-                context.tr('Ít', 'Less'),
+                context.l10n.legacyHistoryPageLess,
                 style: AppTypography.caption12.copyWith(color: p.text2),
               ),
               const SizedBox(width: 6),
@@ -912,7 +898,7 @@ class _HeatmapCard extends StatelessWidget {
               _LegendBox(color: p.accent, dot: true),
               const SizedBox(width: 6),
               Text(
-                context.tr('Nhiều', 'More'),
+                context.l10n.legacyHistoryPageMore,
                 style: AppTypography.caption12.copyWith(color: p.text2),
               ),
             ],
@@ -1002,28 +988,19 @@ class _ProgressEmptyState extends StatelessWidget {
                 ),
                 const SizedBox(height: 30),
                 Text(
-                  context.tr(
-                    'Chưa có buổi tập nào',
-                    'No workouts yet',
-                  ),
+                  context.l10n.emptyHistory,
                   textAlign: TextAlign.center,
                   style: AppTypography.title20,
                 ),
                 const SizedBox(height: 10),
                 Text(
-                  context.tr(
-                    'Tiến bộ của bạn bắt đầu từ buổi tập đầu tiên.',
-                    'Your progress starts with your first workout.',
-                  ),
+                  context.l10n.legacyHistoryPageProgressStartsFirstWorkout,
                   textAlign: TextAlign.center,
                   style: AppTypography.title20,
                 ),
                 const SizedBox(height: 14),
                 Text(
-                  context.tr(
-                    'Hoàn thành một buổi để mở khóa xu hướng, kỷ lục và streak.',
-                    'Complete a workout to unlock trends, records and streaks.',
-                  ),
+                  context.l10n.legacyHistoryPageCompleteWorkoutUnlockTrends,
                   textAlign: TextAlign.center,
                   style: AppTypography.body14.copyWith(color: p.text2),
                 ),
@@ -1060,19 +1037,13 @@ class _RangeEmptyMessage extends StatelessWidget {
         child: Column(
           children: [
             Text(
-              context.tr(
-                'Chưa có buổi tập trong bộ lọc này.',
-                'No workouts match this filter yet.',
-              ),
+              context.l10n.legacyHistoryPageNoWorkoutsMatchFilter,
               textAlign: TextAlign.center,
               style: AppTypography.title20,
             ),
             const SizedBox(height: 8),
             Text(
-              context.tr(
-                'Kỷ lục phía trên vẫn dùng toàn bộ lịch sử của bài tập đã chọn.',
-                'Records above still use the full history for the selected exercise.',
-              ),
+              context.l10n.legacyHistoryPageRecordsAboveStillUse,
               textAlign: TextAlign.center,
               style: TextStyle(color: context.palette.text2),
             ),
@@ -1099,10 +1070,10 @@ class _LoadError extends StatelessWidget {
       padding: const EdgeInsets.only(top: 48),
       child: Column(
         children: [
-          Text(context.tr('Không đọc được lịch sử.', 'Could not load history.')),
+          Text(context.l10n.legacyHistoryPageCouldNotLoadHistory),
           TextButton(
             onPressed: onRetry,
-            child: Text(context.tr('Thử lại', 'Retry')),
+            child: Text(context.l10n.resultAiRetry),
           ),
         ],
       ),
@@ -1131,9 +1102,9 @@ class _SessionRow extends StatelessWidget {
           '${r.challengeSeconds ?? r.durationSeconds}s challenge',
         ),
       WorkoutMode.targetReps => r.goalReached
-          ? context.tr('Đạt mục tiêu', 'Goal reached')
+          ? context.l10n.legacyStoryPageGoalReached
           : '${r.targetReps == null || r.targetReps == 0 ? 0 : (r.reps / r.targetReps! * 100).round()}%',
-      WorkoutMode.free => context.tr('Tập tự do', 'Free workout'),
+      WorkoutMode.free => context.l10n.legacyStoryPageFreeWorkout,
     };
 
     return Card(

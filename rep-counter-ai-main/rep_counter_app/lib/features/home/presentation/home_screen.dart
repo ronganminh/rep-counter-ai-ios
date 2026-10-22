@@ -16,6 +16,7 @@ import '../../workout/data/workout_record.dart';
 import '../../workout/presentation/exercise_icon.dart';
 import '../../workout/presentation/goal_setup_page.dart';
 import '../../workout/presentation/result_page.dart';
+import '../../../core/i18n/l10n.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -69,8 +70,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ]),
                     const SizedBox(height: 32),
                     Text(
-                        context.tr('Hôm nay, mình tập nhé.',
-                            'Ready for today’s workout?'),
+                        context.l10n.legacyHomeScreenReadyTodaySWorkout,
                         style: AppTypography.headline28),
                     const SizedBox(height: 12),
                     Row(children: [
@@ -78,8 +78,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(width: 8),
                       Expanded(
                           child: Text(
-                              context.tr('Xử lý trên máy · không cần tài khoản',
-                                  'On device · no account needed'),
+                              context.l10n.legacyHomeScreenDeviceNoAccountNeeded,
                               style: TextStyle(color: p.text3, fontSize: 12)))
                     ]),
                     const SizedBox(height: 24),
@@ -105,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             minimumSize: const Size.fromHeight(80)),
                         onPressed: () => showPlanTodaySheet(context, pushUp),
                         icon: const Icon(LucideIcons.play, size: 28),
-                        label: Text(context.tr('TẬP NGAY', 'TRAIN NOW'),
+                        label: Text(context.l10n.legacyHomeScreenTrainNow,
                             style: AppTypography.display40
                                 .copyWith(fontSize: 36))),
                     const SizedBox(height: 28),
@@ -122,8 +121,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           if (snapshot.hasError) {
                             return TextButton(
                                 onPressed: _reload,
-                                child: Text(context.tr(
-                                    'Tải lại lịch sử', 'Reload history')));
+                                child: Text(context.l10n.legacyHomeScreenReloadHistory));
                           }
                           final records = snapshot.data ?? [];
                           if (records.isEmpty) {
@@ -137,15 +135,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                           size: 72),
                                       const SizedBox(height: 16),
                                       Text(
-                                          context.tr('Bắt đầu từ rep đầu tiên.',
-                                              'Start with your first rep.'),
+                                          context.l10n.legacyHomeScreenStartFirstRep,
                                           style: AppTypography.title20,
                                           textAlign: TextAlign.center),
                                       const SizedBox(height: 8),
                                       Text(
-                                          context.tr(
-                                              'Chọn mục tiêu, đặt điện thoại chắc chắn và để app đếm cùng bạn.',
-                                              'Choose a goal, position your phone securely and let the app count with you.'),
+                                          context.l10n.legacyHomeScreenChooseGoalPositionPhone,
                                           textAlign: TextAlign.center,
                                           style: TextStyle(color: p.text2)),
                                     ])));
@@ -166,7 +161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.stretch,
                               children: [
                                 SectionLabel(
-                                    context.tr('Tuần này', 'This week')),
+                                    context.l10n.legacyHomeScreenWeek),
                                 Card(
                                     child: Padding(
                                         padding: const EdgeInsets.all(20),
@@ -190,8 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       color: p.text2)),
                                             ]))),
                                 const SizedBox(height: 24),
-                                SectionLabel(context.tr(
-                                    'Buổi gần nhất', 'Last session')),
+                                SectionLabel(context.l10n.legacyHomeScreenLastSession),
                                 Card(
                                     child: ListTile(
                                   contentPadding: const EdgeInsets.all(20),
@@ -216,8 +210,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     if (FeatureFlags.enableAllExercises ||
                         FeatureFlags.enablePullUp) ...[
                       const SizedBox(height: 24),
-                      SectionLabel(context.tr(
-                          'Bài thử nghiệm', 'Experimental exercises')),
+                      SectionLabel(context.l10n.legacyHomeScreenExperimentalExercises),
                       for (final profile in allExercises.where((e) =>
                           e.id != 'push_up' &&
                           (FeatureFlags.enableAllExercises ||

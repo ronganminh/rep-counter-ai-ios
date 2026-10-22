@@ -11,6 +11,7 @@ import '../../../widgets/product_ui.dart';
 import '../data/routine_store.dart';
 import '../domain/routine_preset.dart';
 import 'routine_editor_page.dart';
+import '../../../core/i18n/l10n.dart';
 
 class RoutineListSection extends StatefulWidget {
   const RoutineListSection({super.key, this.store});
@@ -61,17 +62,17 @@ class _RoutineListSectionState extends State<RoutineListSection> {
     final yes = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text(context.tr('Xóa routine?', 'Delete routine?')),
+        title: Text(context.l10n.legacyRoutineListDeleteRoutine),
         content: Text(preset.name),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text(context.tr('Hủy', 'Cancel')),
+            child: Text(context.l10n.commonCancel),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
             child: Text(
-              context.tr('Xóa', 'Delete'),
+              context.l10n.commonDelete,
               style: TextStyle(color: context.palette.dangerText),
             ),
           ),
@@ -87,10 +88,7 @@ class _RoutineListSectionState extends State<RoutineListSection> {
     final profile = _profileFor(preset.exerciseId);
     if (profile == null) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text(context.tr(
-          'Bài tập này chưa khả dụng trong bản hiện tại.',
-          'This exercise is not available in this build.',
-        )),
+        content: Text(context.l10n.legacyRoutineListExerciseNotAvailableBuild),
       ));
       return;
     }
@@ -115,14 +113,14 @@ class _RoutineListSectionState extends State<RoutineListSection> {
           if (snapshot.hasError) {
             return TextButton(
               onPressed: _reload,
-              child: Text(context.tr('Tải lại routine', 'Reload routines')),
+              child: Text(context.l10n.legacyRoutineListReloadRoutines),
             );
           }
           final routines = snapshot.data ?? const <RoutinePreset>[];
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              SectionLabel(context.tr('Bài tập đã lưu', 'Saved routines')),
+              SectionLabel(context.l10n.legacyRoutineListSavedRoutines),
               for (final routine in routines) ...[
                 _RoutineCard(
                   routine: routine,
@@ -148,7 +146,7 @@ class _RoutineListSectionState extends State<RoutineListSection> {
                   ),
                   alignment: Alignment.centerLeft,
                   child: Text(
-                    context.tr('+ Tạo routine', '+ Create routine'),
+                    context.l10n.legacyRoutineListCreateRoutine,
                     style: AppTypography.title20.copyWith(
                       color: p.accentInk,
                       fontWeight: FontWeight.w700,
@@ -199,8 +197,8 @@ class _RoutineCard extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(
                       '${routine.targetSets} × ${routine.targetReps} · '
-                      '${context.tr('Nghỉ', 'Rest')} ${routine.restSeconds} '
-                      '${context.tr('giây', 'sec')} · $exerciseName',
+                      '${context.l10n.legacyRoutineListRest} ${routine.restSeconds} '
+                      '${context.l10n.secondsShort} · $exerciseName',
                       style: AppTypography.body14.copyWith(color: p.text2),
                     ),
                     const SizedBox(height: 12),
@@ -216,18 +214,18 @@ class _RoutineCard extends StatelessWidget {
                             padding: const EdgeInsets.symmetric(horizontal: 18),
                           ),
                           onPressed: onStart,
-                          child: Text(context.tr('Bắt đầu', 'Start')),
+                          child: Text(context.l10n.goalStart),
                         ),
                         TextButton.icon(
                           onPressed: onEdit,
                           icon: const Icon(LucideIcons.pencil, size: 16),
-                          label: Text(context.tr('Sửa', 'Edit')),
+                          label: Text(context.l10n.legacyRoutineListEdit),
                         ),
                         TextButton.icon(
                           onPressed: onDelete,
                           icon: const Icon(LucideIcons.trash2, size: 16),
                           label: Text(
-                            context.tr('Xóa', 'Delete'),
+                            context.l10n.commonDelete,
                             style: TextStyle(color: p.dangerText),
                           ),
                         ),

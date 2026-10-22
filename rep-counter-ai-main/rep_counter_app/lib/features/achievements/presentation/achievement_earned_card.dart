@@ -4,6 +4,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../achievement.dart';
+import '../../../core/i18n/l10n.dart';
 
 class AchievementEarnedCard extends StatelessWidget {
   const AchievementEarnedCard({
@@ -78,7 +79,7 @@ class AchievementEarnedCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               Text(
-                context.tr('HUY HIỆU MỚI', 'NEW ACHIEVEMENT'),
+                context.l10n.legacyAchievementEarnedNewAchievement,
                 textAlign: TextAlign.center,
                 style: AppTypography.caption12.copyWith(color: p.accent),
               ),
@@ -103,43 +104,25 @@ class AchievementEarnedCard extends StatelessWidget {
 
   String _title(BuildContext context) => switch (achievement) {
         AchievementId.firstWorkout =>
-          context.tr('Buổi tập đầu tiên', 'First Workout'),
+          context.l10n.legacyAchievementEarnedFirstWorkout,
         AchievementId.totalReps100 =>
-          context.tr('100 rep tổng', '100 Total Reps'),
+          context.l10n.legacyAchievementEarnedTotalReps,
         AchievementId.streak7 =>
-          context.tr('Streak 7 ngày', '7-Day Streak'),
+          context.l10n.legacyAchievementEarnedDayStreak,
         AchievementId.firstTimeChallenge =>
-          context.tr('Thử thách đầu tiên', 'First Time Challenge'),
+          context.l10n.legacyAchievementEarnedFirstTimeChallenge,
         AchievementId.newPersonalRecord =>
-          context.tr('Kỷ lục cá nhân mới', 'New Personal Record'),
+          context.l10n.legacyAchievementEarnedNewPersonalRecord,
         AchievementId.workouts10 =>
-          context.tr('10 buổi tập', '10 Workouts'),
+          context.l10n.legacyAchievementEarnedWorkouts,
       };
 
   String _description(BuildContext context) => switch (achievement) {
-        AchievementId.firstWorkout => context.tr(
-            'Bạn đã hoàn thành buổi tập đầu tiên.',
-            'You completed your first workout.',
-          ),
-        AchievementId.totalReps100 => context.tr(
-            'Bạn đã đạt tổng cộng 100 rep.',
-            'You reached 100 total reps.',
-          ),
-        AchievementId.streak7 => context.tr(
-            'Bạn đã tập 7 ngày liên tiếp.',
-            'You trained for 7 days in a row.',
-          ),
-        AchievementId.firstTimeChallenge => context.tr(
-            'Bạn đã hoàn thành trải nghiệm Time Challenge đầu tiên.',
-            'You completed your first Time Challenge experience.',
-          ),
-        AchievementId.newPersonalRecord => context.tr(
-            'Bạn vừa thiết lập một kỷ lục cá nhân mới.',
-            'You just set a new personal record.',
-          ),
-        AchievementId.workouts10 => context.tr(
-            'Bạn đã lưu 10 buổi tập trên thiết bị này.',
-            'You saved 10 workouts on this device.',
-          ),
+        AchievementId.firstWorkout => context.l10n.legacyAchievementEarnedCompletedFirstWorkout,
+        AchievementId.totalReps100 => context.l10n.legacyAchievementEarnedReachedTotalReps,
+        AchievementId.streak7 => context.l10n.legacyAchievementEarnedTrainedDaysRow,
+        AchievementId.firstTimeChallenge => context.l10n.legacyAchievementEarnedCompletedFirstTimeChallenge,
+        AchievementId.newPersonalRecord => context.l10n.legacyAchievementEarnedJustSetNewPersonal,
+        AchievementId.workouts10 => context.l10n.legacyAchievementEarnedSavedWorkoutsDevice,
       };
 }
