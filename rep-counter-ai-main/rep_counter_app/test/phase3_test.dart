@@ -81,6 +81,10 @@ void main() {
     await pump(tester, HistoryPage(onTrain: () => opened = true));
     expect(find.text('Tất cả'), findsOneWidget);
     expect(find.text('Chưa có buổi tập nào'), findsOneWidget);
+    // Filter chips have 48 dp hit areas (D-24), so the CTA may sit below
+    // the fold on a 852 px screen; the list scrolls.
+    await tester.ensureVisible(find.text('Tập ngay'));
+    await tester.pumpAndSettle();
     await tester.tap(find.text('Tập ngay'));
     expect(opened, isTrue);
     expect(tester.takeException(), isNull);

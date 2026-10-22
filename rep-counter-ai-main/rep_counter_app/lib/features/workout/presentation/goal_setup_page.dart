@@ -8,6 +8,7 @@ import '../../../exercise.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
+import '../../../widgets/tap_target.dart';
 import '../domain/workout_mode.dart';
 import '../domain/workout_personal_records.dart';
 import 'exercise_icon.dart';
@@ -490,8 +491,11 @@ class _TimeChip extends StatelessWidget {
   final bool selected;
   final VoidCallback onTap;
 
+  // 40 px visual pill, 48 dp hit area (D-24).
   @override
-  Widget build(BuildContext context) => InkWell(
+  Widget build(BuildContext context) => TapTarget(
+      onTap: onTap,
+      child: InkWell(
         borderRadius: BorderRadius.circular(999),
         onTap: onTap,
         child: AnimatedContainer(
@@ -515,7 +519,7 @@ class _TimeChip extends StatelessWidget {
             ),
           ),
         ),
-      );
+      ));
 }
 
 class _PersonalBestCard extends StatelessWidget {
