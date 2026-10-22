@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../core/config/build_info.dart';
 import '../../core/services/app_links.dart';
 import '../ai/ai_preferences.dart';
 import '../ai/presentation/ai_consent.dart';
@@ -345,7 +346,7 @@ class _SettingsPageState extends State<SettingsPage> {
           SettingsRow(
               icon: LucideIcons.info,
               title: s.versionLabel,
-              trailing: Text('2.0.0 (8)', style: TextStyle(color: p.text2))),
+              trailing: AppVersionText(style: TextStyle(color: p.text2))),
           SettingsRow(
               icon: LucideIcons.fileText,
               title: s.termsOfUse,

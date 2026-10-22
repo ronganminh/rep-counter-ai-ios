@@ -26,6 +26,7 @@ dependencies:
   gal: ^2.3.3
   url_launcher: ^6.3.2
   audioplayers: ^6.8.1
+  package_info_plus: ^10.2.2
 
 dev_dependencies:
   flutter_test:
