@@ -9,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:rep_counter_app/app/app_shell.dart';
 import 'package:rep_counter_app/core/i18n/locale_controller.dart';
 import 'package:rep_counter_app/theme/app_theme.dart';
+import 'support/l10n.dart';
 
 // Optional rendered widget captures, not simulator screenshots.
 // flutter test test/phase3_visual_test.dart \
@@ -27,7 +28,7 @@ void main() {
     }
   });
   for (final scale in [1.0, 2.0]) {
-    testWidgets('three product tabs render with bundled fonts at ${scale}x',
+    testWidgets('product tabs render with bundled fonts at ${scale}x',
         (tester) async {
       SharedPreferences.setMockInitialValues({});
       tester.view.physicalSize = const Size(393, 852);
@@ -40,6 +41,9 @@ void main() {
         controller: locale,
         child: MaterialApp(
           theme: RepCoachTheme.dark(),
+          locale: const Locale('vi'),
+          localizationsDelegates: testLocalizationsDelegates,
+        supportedLocales: testSupportedLocales,
           builder: (context, child) => MediaQuery(
             data: MediaQuery.of(context)
                 .copyWith(textScaler: TextScaler.linear(scale)),
@@ -48,7 +52,7 @@ void main() {
           home: const AppShell(),
         ),
       ));
-      for (final tab in ['Tập', 'Lịch sử', 'Cài đặt']) {
+      for (final tab in ['Trang chủ', 'Bài tập', 'Tiến bộ', 'Hồ sơ']) {
         await tester.pumpAndSettle();
         await tester.tap(find.text(tab).last);
         await tester.pumpAndSettle();
@@ -62,9 +66,10 @@ void main() {
             final bytes =
                 await image.toByteData(format: ui.ImageByteFormat.png);
             final name = {
-              'Tập': 'home',
-              'Lịch sử': 'history',
-              'Cài đặt': 'settings'
+              'Trang chủ': 'home',
+              'Bài tập': 'exercises',
+              'Tiến bộ': 'history',
+              'Hồ sơ': 'profile'
             }[tab];
             await Directory(directory).create(recursive: true);
             await File('$directory/$name.png')

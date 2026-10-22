@@ -178,6 +178,9 @@ class _SettingsPageState extends State<SettingsPage> {
     final s = context.s;
     final p = context.palette;
     return Scaffold(
+        // Settings lives under Profile in v2 (N-1) and is pushed, so it needs
+        // a back button there.
+        appBar: (ModalRoute.of(context)?.canPop ?? false) ? AppBar() : null,
         body: SafeArea(
             child: ListView(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
