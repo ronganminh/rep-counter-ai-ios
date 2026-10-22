@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail closed for deterministic App Store v1 source / metadata regressions."""
+"""Fail closed for deterministic App Store source / metadata regressions."""
 import pathlib
 import plistlib
 import re
@@ -15,7 +15,11 @@ def ensure(condition, message):
 
 def main():
     spec = read("pubspec.yaml")
-    ensure("version: 1.0.0+6" in spec, "Release version/build is not synchronized")
+    version_match = re.search(
+        r"(?m)^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$", spec
+    )
+    ensure(version_match is not None, "Release version/build is not synchronized")
+    release_version, release_build = version_match.groups()
     strings = read("lib/core/i18n/app_strings.dart")
     legal = read("lib/features/legal/legal_page.dart")
     ensure("Gemini" not in strings and "Gemini" not in legal, "Stale Gemini provider text")
@@ -25,7 +29,10 @@ def main():
     picker = read("lib/features/exercises/presentation/exercise_picker_screen.dart")
     ensure("FeatureFlags.visibleExerciseIds.contains" in picker, "Exercise picker must respect release gate")
     settings = read("lib/features/legal/settings_page.dart")
-    ensure("1.0.0 (6)" in settings, "Settings release version mismatched")
+    ensure(
+        f"{release_version} ({release_build})" in settings,
+        "Settings release version mismatched",
+    )
     ensure("AppLinks.hasAppStoreListing" in settings, "iOS review link needs listing gate")
     info = plistlib.loads((ROOT / "ios/Runner/Info.plist").read_bytes())
     for key in ("NSCameraUsageDescription", "NSPhotoLibraryAddUsageDescription"):
@@ -44,12 +51,15 @@ def main():
         ensure("NSCameraUsageDescription" in localized and "NSPhotoLibraryAddUsageDescription" in localized,
                f"Missing native {lang} permission prompts")
     project = read("ios/Runner.xcodeproj/project.pbxproj")
-    ensure(project.count("TARGETED_DEVICE_FAMILY = 1;") == 3, "v1 should target iPhone only")
+    ensure(project.count("TARGETED_DEVICE_FAMILY = 1;") == 3, "Release should target iPhone only")
     ensure("PrivacyInfo.xcprivacy in Resources" in project and "InfoPlist.strings in Resources" in project,
            "iOS privacy and localization resources are not bundled")
     ensure("com.ronganminh.repCounterApp" in project, "Bundle ID changed")
     ensure("NSPrivacyCollectedDataTypeFitness" in str(manifest), "Workout statistics privacy declaration missing")
-    print("PASS: App Store v1 static release gates")
+    print(
+        f"PASS: App Store static release gates for "
+        f"{release_version} ({release_build})"
+    )
 
 if __name__ == "__main__":
     try:
