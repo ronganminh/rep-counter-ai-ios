@@ -21,6 +21,7 @@ import '../workout/data/workout_history_store.dart';
 import '../workout/domain/quality_thresholds.dart';
 import 'legal_page.dart';
 import 'voice_cadence_page.dart';
+import '../../core/i18n/l10n.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -65,8 +66,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(context.tr('Chưa lưu được tùy chọn AI.',
-                'Could not save AI preference.'))));
+            content: Text(context.l10n.legacySettingsPageCouldNotSaveAi)));
       }
     } finally {
       if (mounted) setState(() => _aiBusy = false);
@@ -81,7 +81,7 @@ class _SettingsPageState extends State<SettingsPage> {
     showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-                title: Text(context.tr('Gửi góp ý', 'Send feedback')),
+                title: Text(context.l10n.legacySettingsPageSendFeedback),
                 content: const SelectableText(LegalConfig.contactEmail),
                 actions: [
                   TextButton(
@@ -90,10 +90,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             text: LegalConfig.contactEmail));
                         if (context.mounted) Navigator.pop(context);
                       },
-                      child: Text(context.tr('Sao chép email', 'Copy email'))),
+                      child: Text(context.l10n.legacySettingsPageCopyEmail)),
                   TextButton(
                       onPressed: () => Navigator.pop(context),
-                      child: Text(context.tr('Đóng', 'Close'))),
+                      child: Text(context.l10n.navClose)),
                 ]));
   }
 
@@ -141,8 +141,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(context.tr('Chưa lưu được tùy chọn. Hãy thử lại.',
-                'Could not save preferences. Please retry.'))));
+            content: Text(context.l10n.legacySettingsPageCouldNotSavePreferences)));
       }
     } finally {
       if (mounted) setState(() => _preferenceBusy = false);
@@ -167,8 +166,7 @@ class _SettingsPageState extends State<SettingsPage> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(context.tr('Không thể xóa dữ liệu. Hãy thử lại.',
-                'Could not delete data. Please retry.'))));
+            content: Text(context.l10n.legacySettingsPageCouldNotDeleteData)));
       }
     }
   }
@@ -187,14 +185,11 @@ class _SettingsPageState extends State<SettingsPage> {
       children: [
         Text(s.settings.toUpperCase(), style: AppTypography.display40),
         const SizedBox(height: 28),
-        SettingsGroup(title: context.tr('Tập luyện', 'Training'), children: [
+        SettingsGroup(title: context.l10n.legacySettingsPageTraining, children: [
           SettingsRow(
               icon: LucideIcons.sparkles,
-              title: context.tr(
-                  'Huấn luyện trực tiếp', 'Live coaching'),
-              subtitle: context.tr(
-                  'Mặc định tắt: app chỉ đếm rep. Bật để đọc số và hiện nhận xét nhanh/chậm, độ sâu từng rep.',
-                  'Off by default: the app only counts reps. Enable spoken counts and per-rep pace/depth feedback.'),
+              title: context.l10n.legacySettingsPageLiveCoaching,
+              subtitle: context.l10n.legacySettingsPageOffDefaultAppOnly,
               trailing: Switch(
                   key: const Key('live-coaching-setting'),
                   value: _training?.coachingEnabled ?? false,
@@ -204,10 +199,8 @@ class _SettingsPageState extends State<SettingsPage> {
                           _setTraining(coachingEnabled: value))),
           if (_training?.coachingEnabled ?? false) SettingsRow(
               icon: LucideIcons.volume2,
-              title: context.tr('Đọc số rep', 'Speak rep count'),
-              subtitle: context.tr(
-                  'Giọng hệ thống theo ngôn ngữ app. Cần có giọng đọc đã cài trên máy.',
-                  'System voice follows the app language. Requires a voice installed on your device.'),
+              title: context.l10n.legacySettingsPageSpeakRepCount,
+              subtitle: context.l10n.legacySettingsPageSystemVoiceFollowsApp,
               onTap: _training == null
                   ? null
                   : () async {
@@ -223,9 +216,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       : (value) => _setTraining(voice: value))),
           SettingsRow(
               icon: LucideIcons.vibrate,
-              title: context.tr('Rung phản hồi', 'Haptic feedback'),
-              subtitle: context.tr('Khi đếm ngược, có rep và đạt mục tiêu',
-                  'For countdown, reps and reaching your goal'),
+              title: context.l10n.legacySettingsPageHapticFeedback,
+              subtitle: context.l10n.legacySettingsPageCountdownRepsReachingGoal,
               trailing: Switch(
                   key: const Key('haptics-setting'),
                   value: _training?.haptics ?? true,
@@ -235,8 +227,7 @@ class _SettingsPageState extends State<SettingsPage> {
           SettingsRow(
               icon: LucideIcons.bell,
               title: context.tr('Âm báo set', 'Set sounds'),
-              subtitle: context.tr(
-                  'Báo bắt đầu và kết thúc set', 'Signals set start and end'),
+              subtitle: context.l10n.legacySettingsPageSignalsSetStartEnd,
               trailing: Switch(
                   key: const Key('sound-setting'),
                   value: _training?.sound ?? false,
@@ -245,10 +236,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       : (v) => _setTraining(sound: v))),
           if (_training?.coachingEnabled ?? false) SettingsRow(
               icon: LucideIcons.messageCircle,
-              title: context.tr('Nhắc tư thế', 'Posture reminders'),
-              subtitle: context.tr(
-                  'Dùng giọng đọc, có khoảng nghỉ giữa các lời nhắc',
-                  'Uses voice, with a pause between reminders'),
+              title: context.l10n.legacyVoiceCadencePostureReminders,
+              subtitle: context.l10n.legacySettingsPageUsesVoicePauseBetween,
               trailing: Switch(
                   key: const Key('cues-setting'),
                   value: _training?.cues ?? true,
@@ -257,8 +246,8 @@ class _SettingsPageState extends State<SettingsPage> {
                       : (v) => _setTraining(cues: v))),
           SettingsRow(
               icon: LucideIcons.ruler,
-              title: context.tr('Hiệu chỉnh lại biên độ', 'Reset calibration'),
-              subtitle: context.tr('Theo từng bài tập', 'For each exercise'),
+              title: context.l10n.legacySettingsPageResetCalibration,
+              subtitle: context.l10n.legacySettingsPageEachExercise,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => const CalibrationSettingsPage()))),
           SettingsRow(
@@ -285,25 +274,20 @@ class _SettingsPageState extends State<SettingsPage> {
                   )))),
         ]),
         SettingsGroup(
-            title: context.tr('AI & Quyền riêng tư', 'AI & privacy'),
+            title: context.l10n.legacySettingsPageAiPrivacy,
             children: [
               SettingsRow(
                   icon: LucideIcons.sparkles,
-                  title: context.tr(
-                      'AI tự động sau buổi tập', 'Automatic workout feedback'),
-                  subtitle: context.tr(
-                      'Chỉ bật sau khi bạn đồng ý gửi số liệu tổng hợp',
-                      'Enabled only with consent to send aggregate statistics'),
+                  title: context.l10n.legacySettingsPageAutomaticWorkoutFeedback,
+                  subtitle: context.l10n.legacySettingsPageEnabledOnlyConsentSend,
                   trailing: Switch(
                       key: const Key('auto-ai-setting'),
                       value: _autoAi,
                       onChanged: _aiBusy ? null : _setAi)),
               SettingsRow(
                   icon: LucideIcons.shieldCheck,
-                  title: context.tr('Xử lý trên máy', 'Processed on device'),
-                  subtitle: context.tr(
-                      'Hình ảnh camera không rời điện thoại. Chỉ gửi số liệu tổng hợp khi bạn yêu cầu hoặc bật AI tự động.',
-                      'Camera images stay on your phone. Only aggregate statistics are sent when you request AI or enable automatic feedback.')),
+                  title: context.l10n.legacySettingsPageProcessedDevice,
+                  subtitle: context.l10n.legacySettingsPageCameraImagesStayPhone),
               SettingsRow(
                   icon: LucideIcons.lock,
                   title: s.privacyPolicy,
@@ -311,7 +295,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       builder: (_) =>
                           const LegalPage(kind: LegalKind.privacy)))),
             ]),
-        SettingsGroup(title: context.tr('Dữ liệu', 'Data'), children: [
+        SettingsGroup(title: context.l10n.legacySettingsPageData, children: [
           FutureBuilder<int>(
               future: _count,
               builder: (context, snapshot) => SettingsRow(
@@ -327,24 +311,22 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: LucideIcons.download,
               title: context.tr(
                   'Xuất lịch sử tập luyện', 'Export workout history'),
-              subtitle: context.tr(
-                  'Tạo CSV hoặc JSON trên thiết bị',
-                  'Create CSV or JSON on this device'),
+              subtitle: context.l10n.legacySettingsPageCreateCsvJsonDevice,
               onTap: () => showModalBottomSheet<void>(
                   context: context,
                   isScrollControlled: true,
                   backgroundColor: Colors.transparent,
                   builder: (_) => const ExportDataSheet())),
         ]),
-        SettingsGroup(title: context.tr('Về app', 'About'), children: [
+        SettingsGroup(title: context.l10n.legacySettingsPageAbout, children: [
           SettingsRow(
               icon: LucideIcons.messageCircle,
-              title: context.tr('Gửi góp ý', 'Send feedback'),
+              title: context.l10n.legacySettingsPageSendFeedback,
               onTap: _contact),
           if (!Platform.isIOS || AppLinks.hasAppStoreListing)
             SettingsRow(
                 icon: LucideIcons.star,
-                title: context.tr('Đánh giá app', 'Rate the app'),
+                title: context.l10n.legacySettingsPageRateApp,
                 onTap: _review),
           SettingsRow(
               icon: LucideIcons.info,
@@ -367,7 +349,7 @@ class _SettingsPageState extends State<SettingsPage> {
                         actions: [
                           TextButton(
                               onPressed: () => Navigator.pop(context),
-                              child: Text(context.tr('Đóng', 'Close')))
+                              child: Text(context.l10n.navClose))
                         ],
                       ))),
         ]),
@@ -400,17 +382,14 @@ class _DeleteDataDialogState extends State<_DeleteDataDialog> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-            Text(context.tr(
-                'Buổi tập, nhận xét AI và hiệu chỉnh trên máy sẽ bị xóa. Không thể hoàn tác.',
-                'Sessions, AI feedback and calibration on this device will be deleted. This cannot be undone.')),
+            Text(context.l10n.legacySettingsPageSessionsAiFeedbackCalibration),
             const SizedBox(height: 20),
             TextField(
                 key: const Key('delete-confirmation'),
                 autofocus: true,
                 textCapitalization: TextCapitalization.characters,
                 decoration: InputDecoration(
-                    labelText: context.tr(
-                        'Gõ XÓA để xác nhận', 'Type DELETE to confirm')),
+                    labelText: context.l10n.legacySettingsPageTypeDeleteConfirm),
                 onChanged: (v) => setState(() => _value = v)),
           ])),
       actions: [
@@ -422,7 +401,7 @@ class _DeleteDataDialogState extends State<_DeleteDataDialog> {
             style:
                 FilledButton.styleFrom(backgroundColor: context.palette.danger),
             onPressed: valid ? () => Navigator.pop(context, true) : null,
-            child: Text(context.tr('Xóa vĩnh viễn', 'Delete permanently'))),
+            child: Text(context.l10n.legacySettingsPageDeletePermanently)),
       ],
     );
   }
@@ -454,7 +433,7 @@ class _CalibrationSettingsPageState extends State<CalibrationSettingsPage> {
         context: context,
         builder: (context) => AlertDialog(
               title:
-                  Text(context.tr('Đặt lại hiệu chỉnh?', 'Reset calibration?')),
+                  Text(context.l10n.legacySettingsPageResetCalibration2),
               content: Text(profile.localizedName(context.s)),
               actions: [
                 TextButton(
@@ -462,7 +441,7 @@ class _CalibrationSettingsPageState extends State<CalibrationSettingsPage> {
                     child: Text(context.s.cancel)),
                 TextButton(
                     onPressed: () => Navigator.pop(context, true),
-                    child: Text(context.tr('Đặt lại', 'Reset'))),
+                    child: Text(context.l10n.legacySettingsPageReset)),
               ],
             ));
     if (yes != true || !mounted) return;
@@ -474,14 +453,11 @@ class _CalibrationSettingsPageState extends State<CalibrationSettingsPage> {
         _snapshots = _load();
       });
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(context.tr(
-              'Đã đặt lại. Bấm Hiệu chỉnh ở màn tập để đo lại biên độ.',
-              'Reset. Use Calibrate on the workout screen to measure your range again.'))));
+          content: Text(context.l10n.legacySettingsPageResetUseCalibrateWorkout)));
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(context.tr('Không thể đặt lại. Hãy thử lại.',
-                'Could not reset. Please retry.'))));
+            content: Text(context.l10n.legacySettingsPageCouldNotResetPlease)));
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -491,12 +467,10 @@ class _CalibrationSettingsPageState extends State<CalibrationSettingsPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-            title: Text(context.tr('Hiệu chỉnh biên độ', 'Calibration'))),
+            title: Text(context.l10n.legacySettingsPageCalibration)),
         body: ListView(padding: const EdgeInsets.all(20), children: [
           Text(
-              context.tr(
-                  'Đặt lại khi đổi góc máy hoặc chỗ tập. Trong màn tập, bấm Hiệu chỉnh, làm vài rep tự nhiên rồi bấm hoàn tất.',
-                  'Reset after changing the camera angle or workout location. In the workout screen, tap Calibrate, perform a few natural reps, then finish calibration.'),
+              context.l10n.legacySettingsPageResetAfterChangingCamera,
               style: TextStyle(color: context.palette.text2)),
           const SizedBox(height: 24),
           FutureBuilder<Map<String, CalibrationSnapshot?>>(
@@ -509,30 +483,28 @@ class _CalibrationSettingsPageState extends State<CalibrationSettingsPage> {
                           _snapshots = _load();
                         });
                       },
-                      child: Text(context.tr('Thử lại', 'Retry')));
+                      child: Text(context.l10n.resultAiRetry));
                 }
                 if (!snapshot.hasData) {
                   return const Center(child: CircularProgressIndicator());
                 }
                 return SettingsGroup(
                     title:
-                        context.tr('Đã lưu trên máy', 'Saved on this device'),
+                        context.l10n.legacySettingsPageSavedDevice,
                     children: [
                       for (final profile in allExercises)
                         SettingsRow(
                             icon: LucideIcons.ruler,
                             title: profile.localizedName(context.s),
                             subtitle: snapshot.data![profile.id] == null
-                                ? context.tr(
-                                    'Chưa hiệu chỉnh', 'Not calibrated')
-                                : context.tr(
-                                    'Đã lưu hiệu chỉnh', 'Calibration saved'),
+                                ? context.l10n.legacySettingsPageNotCalibrated
+                                : context.l10n.legacySettingsPageCalibrationSaved,
                             trailing: TextButton(
                                 onPressed:
                                     _busy || snapshot.data![profile.id] == null
                                         ? null
                                         : () => _reset(profile),
-                                child: Text(context.tr('Đặt lại', 'Reset')))),
+                                child: Text(context.l10n.legacySettingsPageReset))),
                     ]);
               }),
         ]),

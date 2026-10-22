@@ -8,6 +8,7 @@ import '../../../widgets/product_ui.dart';
 import '../../workout/data/workout_history_store.dart';
 import '../../workout/data/workout_record.dart';
 import 'workout_export_service.dart';
+import '../../../core/i18n/l10n.dart';
 
 typedef WorkoutExportRecordLoader = Future<List<WorkoutRecord>> Function();
 typedef WorkoutExportShareCallback = Future<void> Function(
@@ -151,17 +152,14 @@ class _ExportDataSheetState extends State<ExportDataSheet> {
         ),
         const SizedBox(height: 24),
         Text(
-          context.tr('XUẤT LỊCH SỬ TẬP LUYỆN', 'EXPORT WORKOUT HISTORY'),
+          context.l10n.legacyExportDataExportWorkoutHistory,
           style: AppTypography.headline28,
         ),
         const SizedBox(height: 28),
         _FormatOption(
           key: const Key('export-format-csv'),
           title: 'CSV',
-          subtitle: context.tr(
-            'Phù hợp với bảng tính',
-            'Spreadsheet-friendly',
-          ),
+          subtitle: context.l10n.legacyExportDataSpreadsheetFriendly,
           selected: _format == WorkoutExportFormat.csv,
           onTap: () => setState(() => _format = WorkoutExportFormat.csv),
         ),
@@ -169,10 +167,7 @@ class _ExportDataSheetState extends State<ExportDataSheet> {
         _FormatOption(
           key: const Key('export-format-json'),
           title: 'JSON',
-          subtitle: context.tr(
-            'Phù hợp để sao lưu hoặc sử dụng kỹ thuật',
-            'Best for backup or technical use',
-          ),
+          subtitle: context.l10n.legacyExportDataBestBackupTechnicalUse,
           selected: _format == WorkoutExportFormat.json,
           onTap: () => setState(() => _format = WorkoutExportFormat.json),
         ),
@@ -189,22 +184,16 @@ class _ExportDataSheetState extends State<ExportDataSheet> {
             value: _includeAi,
             onChanged: (value) => setState(() => _includeAi = value ?? false),
             controlAffinity: ListTileControlAffinity.leading,
-            title: Text(context.tr(
-              'Bao gồm nhận xét AI đã lưu',
-              'Include saved AI feedback',
-            )),
+            title: Text(context.l10n.legacyExportDataIncludeSavedAiFeedback),
             subtitle: Text(
-              context.tr('Mặc định tắt', 'Off by default'),
+              context.l10n.legacyExportDataOffDefault,
               style: AppTypography.caption12.copyWith(color: p.text3),
             ),
           ),
         ),
         const SizedBox(height: 20),
         Semantics(
-          label: context.tr(
-            'Không bao gồm hình ảnh camera, video hoặc tọa độ pose.',
-            'Does not include camera images, video, or pose landmarks.',
-          ),
+          label: context.l10n.legacyExportDataDoesNotIncludeCamera,
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -212,10 +201,7 @@ class _ExportDataSheetState extends State<ExportDataSheet> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  context.tr(
-                    'Không bao gồm hình ảnh camera, video hoặc tọa độ pose.',
-                    'Camera images, video and pose landmarks are not included.',
-                  ),
+                  context.l10n.legacyExportDataCameraImagesVideoPose,
                   style: AppTypography.body14.copyWith(color: p.success),
                 ),
               ),
@@ -227,7 +213,7 @@ class _ExportDataSheetState extends State<ExportDataSheet> {
           return FilledButton(
             key: const Key('create-export'),
             onPressed: () => _createExport(buttonContext),
-            child: Text(context.tr('Tạo file xuất', 'Create export')),
+            child: Text(context.l10n.legacyExportDataCreateExport),
           );
         }),
       ],
@@ -318,7 +304,7 @@ class _PreparingView extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(24, 44, 24, 24),
       children: [
         Text(
-          context.tr('XUẤT LỊCH SỬ', 'EXPORT HISTORY'),
+          context.l10n.legacyExportDataExportHistory,
           style: AppTypography.display40,
         ),
         const SizedBox(height: 72),
@@ -335,7 +321,7 @@ class _PreparingView extends StatelessWidget {
         ),
         const SizedBox(height: 42),
         Text(
-          context.tr('Đang tạo file xuất…', 'Creating export…'),
+          context.l10n.legacyExportDataCreatingExport,
           textAlign: TextAlign.center,
           style: AppTypography.headline28,
         ),
@@ -352,7 +338,7 @@ class _PreparingView extends StatelessWidget {
         OutlinedButton(
           key: const Key('cancel-export'),
           onPressed: onCancel,
-          child: Text(context.tr('Hủy', 'Cancel')),
+          child: Text(context.l10n.commonCancel),
         ),
       ],
     );
@@ -370,7 +356,7 @@ class _EmptyView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 44, 24, 24),
       children: [
-        Text(context.tr('XUẤT LỊCH SỬ', 'EXPORT HISTORY'),
+        Text(context.l10n.legacyExportDataExportHistory,
             style: AppTypography.display40),
         const SizedBox(height: 40),
         Container(
@@ -386,16 +372,13 @@ class _EmptyView extends StatelessWidget {
                   style: AppTypography.metric64.copyWith(color: p.text3)),
               const SizedBox(height: 18),
               Text(
-                context.tr('Chưa có gì để xuất', 'Nothing to export yet'),
+                context.l10n.legacyExportDataNothingExportYet,
                 textAlign: TextAlign.center,
                 style: AppTypography.title20,
               ),
               const SizedBox(height: 8),
               Text(
-                context.tr(
-                  'Hãy hoàn thành một buổi tập trước.',
-                  'Complete a workout first.',
-                ),
+                context.l10n.legacyExportDataCompleteWorkoutFirst,
                 textAlign: TextAlign.center,
                 style: AppTypography.body14.copyWith(color: p.text2),
               ),
@@ -405,7 +388,7 @@ class _EmptyView extends StatelessWidget {
         const SizedBox(height: 28),
         OutlinedButton(
           onPressed: onClose,
-          child: Text(context.tr('Đóng', 'Close')),
+          child: Text(context.l10n.navClose),
         ),
       ],
     );
@@ -424,7 +407,7 @@ class _FailureView extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(24, 44, 24, 24),
       children: [
-        Text(context.tr('XUẤT LỊCH SỬ', 'EXPORT HISTORY'),
+        Text(context.l10n.legacyExportDataExportHistory,
             style: AppTypography.display40),
         const SizedBox(height: 40),
         Container(
@@ -445,18 +428,12 @@ class _FailureView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      context.tr(
-                        'Không thể tạo file xuất',
-                        'Could not create export',
-                      ),
+                      context.l10n.legacyExportDataCouldNotCreateExport,
                       style: AppTypography.title20,
                     ),
                     const SizedBox(height: 10),
                     Text(
-                      context.tr(
-                        'Dữ liệu trên máy vẫn an toàn. Hãy thử lại.',
-                        'Your local workout data is still safe. Please retry.',
-                      ),
+                      context.l10n.legacyExportDataLocalWorkoutDataStill,
                       style: AppTypography.body14.copyWith(color: p.text2),
                     ),
                   ],
@@ -469,12 +446,12 @@ class _FailureView extends StatelessWidget {
         FilledButton(
           key: const Key('retry-export'),
           onPressed: onRetry,
-          child: Text(context.tr('Thử lại', 'Retry')),
+          child: Text(context.l10n.resultAiRetry),
         ),
         const SizedBox(height: 14),
         OutlinedButton(
           onPressed: onClose,
-          child: Text(context.tr('Đóng', 'Close')),
+          child: Text(context.l10n.navClose),
         ),
       ],
     );

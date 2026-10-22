@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../theme/app_colors.dart';
-import '../../widgets/product_ui.dart';
 import '../../theme/app_typography.dart';
 
 import '../../core/i18n/app_strings.dart';
 import '../../core/i18n/locale_controller.dart';
 import '../../core/legal/legal_config.dart';
+import '../../core/i18n/l10n.dart';
 
 enum LegalKind { privacy, terms }
 
@@ -34,11 +34,8 @@ class LegalPage extends StatelessWidget {
         _section(context, s.privAiTitle, s.privAiBody),
         _section(
             context,
-            context.tr(
-                'AI tự động và ảnh chia sẻ', 'Automatic AI and shared images'),
-            context.tr(
-                'AI tự động mặc định tắt. Chỉ sau khi bạn đồng ý, app gửi số liệu tổng hợp của buổi tập mới đã lưu đến máy chủ RepCoach AI để nhận xét bằng GroqCloud. Có thể tắt trong Cài đặt; không tự gửi lại lịch sử cũ. Tắt không thu hồi yêu cầu đã gửi. Ảnh story do app tạo chỉ chứa số liệu và trích nhận xét, không có ảnh camera. Ảnh chỉ được lưu vào thư viện hoặc gửi qua ứng dụng bạn chọn khi bạn bấm thao tác tương ứng.',
-                'Automatic AI is off by default. With your consent, aggregate statistics from newly saved workouts are sent to the RepCoach AI server for GroqCloud feedback. Disable it in Settings; old history is not automatically uploaded. Disabling cannot recall requests already sent. Generated story images contain statistics and feedback excerpts, never camera images. Images are saved to Photos or shared with an app you choose only when you select the corresponding action.')),
+            context.l10n.legacyLegalPageAutomaticAiSharedImages,
+            context.l10n.legacyLegalPageAutomaticAiOffDefault),
         _section(context, s.privRetentionTitle, s.privRetentionBody),
         _section(context, s.privSecurityTitle, s.privSecurityBody),
         _section(context, s.privChildrenTitle, s.privChildrenBody),

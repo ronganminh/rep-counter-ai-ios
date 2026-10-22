@@ -6,6 +6,7 @@ import '../../theme/app_typography.dart';
 import '../../widgets/product_ui.dart';
 import '../onboarding/presentation/onboarding_art.dart';
 import 'legal_page.dart';
+import '../../core/i18n/l10n.dart';
 
 class OnboardingPage extends StatefulWidget {
   const OnboardingPage({super.key, required this.onDone});
@@ -31,8 +32,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
       if (mounted) {
         setState(() => _saving = false);
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text(context.tr('Chưa lưu được. Vui lòng thử lại.',
-                'Could not save. Please retry.'))));
+            content: Text(context.l10n.legacyOnboardingPageCouldNotSavePlease)));
       }
     }
   }
@@ -54,7 +54,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
               if (_page < 2)
                 TextButton(
                     onPressed: _saving ? null : _finish,
-                    child: Text(context.tr('Bỏ qua', 'Skip'),
+                    child: Text(context.l10n.legacyOnboardingPageSkip,
                         style: const TextStyle(color: AppColors.text2))),
               if (_page == 2) const SizedBox(height: 48),
             ])),
@@ -77,8 +77,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(30)),
                         child: Text(
-                            context.tr(
-                                'Đếm rep trực tiếp', 'Live rep counting'),
+                            context.l10n.legacyOnboardingPageLiveRepCounting,
                             style: const TextStyle(
                                 fontSize: 13, color: AppColors.text2))),
                     const Expanded(child: OnboardingArt()),
@@ -86,9 +85,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                   title: context.tr('Điện thoại đếm rep.\nAI chấm và nhận xét.',
                       'Your phone counts.\nAI coaches.'),
                   body: Text(
-                      context.tr(
-                          'Bắt đầu với hít đất. Squat, gập bụng và nhiều bài khác sắp có.',
-                          'Start with push-ups. Squats, sit-ups and more are coming.'),
+                      context.l10n.legacyOnboardingPageStartPushUpsSquats,
                       style: AppTypography.body16
                           .copyWith(color: AppColors.text2))),
               _IntroPage(
@@ -104,7 +101,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             left: 14,
                             right: 14,
                             child: Text(
-                                context.tr('NHÌN TỪ BÊN CẠNH', 'SIDE VIEW'),
+                                context.l10n.legacyOnboardingPageSideView,
                                 style: AppTypography.caption12
                                     .copyWith(color: AppColors.text2))),
                         Positioned(
@@ -112,8 +109,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             top: 100,
                             right: 12,
                             child: Text(
-                                context.tr('Camera trước · máy dọc',
-                                    'Front camera · portrait'),
+                                context.l10n.legacyOnboardingPageFrontCameraPortrait,
                                 style: const TextStyle(
                                     fontSize: 12, color: AppColors.accent))),
                         const Positioned(
@@ -122,23 +118,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             child: Text('~1–1.5 m',
                                 style: TextStyle(fontSize: 12))),
                       ])),
-                  title: context.tr(
-                      'Đặt điện thoại trước mặt, camera trước hướng vào bạn.',
-                      'Place your phone in front, with the front camera facing you.'),
+                  title: context.l10n.legacyOnboardingPagePlacePhoneFrontFront,
                   titleSize: 34,
                   body: Column(children: [
                     _Tip(
                         LucideIcons.smartphone,
-                        context.tr('Dựng máy dọc, cách ~1–1,5 m',
-                            'Phone upright, about 1–1.5 m away')),
+                        context.l10n.legacyOnboardingPagePhoneUprightAboutM),
                     _Tip(
                         LucideIcons.userRound,
-                        context.tr('Thấy rõ vai, hai tay và hông',
-                            'Keep shoulders, arms and hips visible')),
+                        context.l10n.legacyOnboardingPageKeepShouldersArmsHips),
                     _Tip(
                         LucideIcons.sun,
-                        context.tr('Đủ sáng, nền gọn',
-                            'Good lighting, clear background')),
+                        context.l10n.legacyOnboardingPageGoodLightingClearBackground),
                   ])),
               _IntroPage(
                   art: const PrivacyArt(),
@@ -151,28 +142,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
                             child: Column(children: [
                           _Tip(
                               LucideIcons.videoOff,
-                              context.tr('Hình ảnh camera xử lý trên máy',
-                                  'Camera images processed on device'),
+                              context.l10n.legacyOnboardingPageCameraImagesProcessedDevice,
                               privacy: true),
                           const Divider(),
                           _Tip(
                               LucideIcons.wifiOff,
-                              context.tr('Đếm rep không cần mạng',
-                                  'Count reps without internet'),
+                              context.l10n.legacyOnboardingPageCountRepsWithoutInternet,
                               privacy: true),
                           const Divider(),
                           _Tip(
                               LucideIcons.sparkles,
-                              context.tr(
-                                  'AI chỉ nhận số liệu tổng hợp khi bạn yêu cầu hoặc đã bật nhận xét tự động.',
-                                  'AI receives workout statistics only when you request feedback or enable automatic feedback.'),
+                              context.l10n.legacyOnboardingPageAiReceivesWorkoutStatistics,
                               privacy: true),
                         ])),
                         const SizedBox(height: 8),
                         Text(
-                            context.tr(
-                                'Tập theo khả năng và dừng nếu thấy đau.',
-                                'Exercise within your limits. Stop if you feel pain.'),
+                            context.l10n.legacyOnboardingPageExerciseWithinLimitsStop,
                             style: const TextStyle(
                                 color: AppColors.text3, fontSize: 12)),
                         Wrap(alignment: WrapAlignment.center, children: [
@@ -183,8 +168,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                                     MaterialPageRoute(
                                         builder: (_) => LegalPage(kind: kind))),
                                 child: Text(kind == LegalKind.privacy
-                                    ? context.tr('Quyền riêng tư', 'Privacy')
-                                    : context.tr('Điều khoản', 'Terms'))),
+                                    ? context.l10n.legacyOnboardingPagePrivacy
+                                    : context.l10n.legacyOnboardingPageTerms)),
                         ]),
                       ])),
             ])),
@@ -225,8 +210,8 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           }
                         },
                   child: Text(_page == 2
-                      ? context.tr('Bắt đầu tập', 'Start training')
-                      : context.tr('Tiếp tục', 'Continue'))),
+                      ? context.l10n.legacyOnboardingPageStartTraining
+                      : context.l10n.commonContinue)),
             ])),
       ])));
 }
