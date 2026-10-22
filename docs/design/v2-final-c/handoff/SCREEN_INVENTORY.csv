@@ -1,0 +1,537 @@
+source_file,canvas_page,frame_id,screen_label,width,height,mapping_family,route_proposed,status,priority
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,H1,H1 Home,393,1468,H1–H2,/home (tab 0),EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,H2,H2 Home loading,393,852,H1–H2,/home (tab 0),EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P1,1.1 Exercise library,393,852,P1–P3,/exercises (tab 1),PARTIAL,P1
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P2,1.2 Category explorer,393,852,P1–P3,/exercises (tab 1),PARTIAL,P1
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P3,1.3 Search and filters,393,852,P1–P3,/exercises (tab 1),PARTIAL,P1
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P4,1.4 Exercise detail,393,852,P4–P5,/exercises/:exerciseId,PARTIAL,P1
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P5,1.5 Demonstration,393,852,P4–P5,/exercises/:exerciseId,PARTIAL,P1
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P6,1.6 Camera positioning guide,393,852,P6–P7,(inside CameraPage),ENGINE,P0
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P7,1.7 Exercise preparation,393,852,P6–P7,(inside CameraPage),ENGINE,P0
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P8,1.8 Squat HUD,393,852,P8,"(CameraPage, exerciseId=squat)",NEW (engine profile missing; squat is a placeholder),P3
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P9,1.9a Guided timer,393,852,P9 / P9b,/workout/timer · /workout/manual,NEW,P1
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P9b,1.9b Manual log,393,852,P9 / P9b,/workout/timer · /workout/manual,NEW,P1
+RepCoach-AI-v2-Home-Exercises.dc.html,v2,P10,1.10 Completion summary,393,852,P10,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-01,P2-01 Fitness goal,393,852,P2-01–03,/plans/setup,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-02,P2-02 Experience level,393,852,P2-01–03,/plans/setup,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-03,P2-03 Weekly availability,393,852,P2-01–03,/plans/setup,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-03b,P2-03b Availability · no day selected,393,852,P2-01–03,/plans/setup,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-04a,P2-04a Plan overview · Train tab,393,852,P2-04–06,/home/plan · /home/plan/day/:date,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-04b,P2-04b Train tab · no plan yet,393,852,P2-04–06,/home/plan · /home/plan/day/:date,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-04c,P2-04c Plan loading,393,852,P2-04–06,/home/plan · /home/plan/day/:date,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-04d,P2-04d Plan load error,393,852,P2-04–06,/home/plan · /home/plan/day/:date,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-04e,P2-04e Offline · cached plan,393,852,P2-04–06,/home/plan · /home/plan/day/:date,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-05,P2-05 Weekly calendar,393,852,P2-04–06,/home/plan · /home/plan/day/:date,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-06,P2-06 Daily workout detail,393,852,P2-04–06,/home/plan · /home/plan/day/:date,NEW,P1
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-07a,P2-07a Session · active camera set,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-07b,P2-07b Exercise transition,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-07c,P2-07c Resume session prompt,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-07d,P2-07d Camera unavailable · manual fallback,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-08,P2-08 Set tracker,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-08b,P2-08b Edit logged set,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-09,P2-09 Rest timer · live,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-09b,P2-09b Rest minimized · mini timer,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-09c,P2-09c Locked phone · rest over,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-10a,P2-10a Paused sheet,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-10b,P2-10b Skip confirmation,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-10c,P2-10c End early confirmation,393,852,P2-07–10,(CameraPage with routine),ENGINE + PARTIAL (routines exist),P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-11a,P2-11a Workout completion,393,852,P2-11,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-11b,P2-11b Completion · ended early,393,852,P2-11,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-11c,P2-11c Completion · save failed,393,852,P2-11,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-12a,P2-12a Reschedule sheet · missed session,393,852,P2-12,/home/plan/reschedule (sheet),NEW,P2
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-12b,P2-12b Recovery day,393,852,P2-12,/home/plan/reschedule (sheet),NEW,P2
+RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html,v2,P2-12c,P2-12c Updated calendar,393,852,P2-12,/home/plan/reschedule (sheet),NEW,P2
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-01a,P3-01a Progress overview,393,852,P3-01,/progress (tab 3),PARTIAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-01b,P3-01b Progress · new user,393,852,P3-01,/progress (tab 3),PARTIAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-02a,P3-02a Weekly statistics,393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-02b,P3-02b Weekly statistics · loading,393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-02c,P3-02c Weekly statistics · error,393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-02d,P3-02d Weekly statistics · offline,393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-03a,P3-03a Monthly activity calendar,393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-03b,P3-03b Monthly calendar · empty month,393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-04a,P3-04a Exercise progress · Push-up (reps),393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-04b,P3-04b Exercise progress · Plank (duration),393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-04c,P3-04c Exercise progress · Squat (manual),393,852,P3-02–04,/progress/week · /progress/calendar · /progress/exercise/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-05a,P3-05a Personal records,393,852,P3-05,/progress/records,PARTIAL (logic exists),P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-05b,P3-05b Personal records · none yet,393,852,P3-05,/progress/records,PARTIAL (logic exists),P1
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-06a,P3-06a Form score trends,393,852,P3-06,/progress/form,PARTIAL,P2
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-06b,P3-06b Form score · not enough camera data,393,852,P3-06,/progress/form,PARTIAL,P2
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-07a,P3-07a Workout history,393,852,P3-07–08,/progress/history · /progress/history/:workoutId,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-07b,P3-07b History · empty,393,852,P3-07–08,/progress/history · /progress/history/:workoutId,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-07c,P3-07c History · loading,393,852,P3-07–08,/progress/history · /progress/history/:workoutId,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-07d,P3-07d History · error,393,852,P3-07–08,/progress/history · /progress/history/:workoutId,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-07e,P3-07e History · offline,393,852,P3-07–08,/progress/history · /progress/history/:workoutId,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-08a,P3-08a Workout detail · partial,393,852,P3-07–08,/progress/history · /progress/history/:workoutId,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-08b,P3-08b Workout detail · not synced,393,852,P3-07–08,/progress/history · /progress/history/:workoutId,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-09,P3-09 Consistency + streaks,393,852,P3-09–10,/progress/streaks · /progress/compare,NEW,P2
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-09b,P3-09b How streaks count · sheet,393,852,P3-09–10,/progress/streaks · /progress/compare,NEW,P2
+RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html,v2,P3-10,P3-10 Compare + highlights,393,852,P3-09–10,/progress/streaks · /progress/compare,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-01a,P4-01a AI Coach overview,393,852,P4-01,/coach,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-01b,P4-01b AI Coach · first use,393,852,P4-01,/coach,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-02a,P4-02a AI workout feedback,393,852,P4-02,(ResultPage card) · /workout/:id/feedback,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-02b,P4-02b Feedback · no camera data,393,852,P4-02,(ResultPage card) · /workout/:id/feedback,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-02c,"P4-02c Feedback · partial, limited camera data",393,852,P4-02,(ResultPage card) · /workout/:id/feedback,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-03a,P4-03a Historical progress analysis,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-03b,P4-03b Progress review · not enough history,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-04a,P4-04a Recommended next workout,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-04b,P4-04b Adjust recommendation · sheet,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-04c,P4-04c Recommendation unavailable,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-05a,P4-05a Personalized goal suggestions,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-05b,P4-05b Customize goal · sheet,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-06a,P4-06a Coach chat · empty,393,852,P4-06,/coach/chat,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-06b,P4-06b Coach chat · active,393,852,P4-06,/coach/chat,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-06c,P4-06c Coach chat · generating,393,852,P4-06,/coach/chat,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-06d,P4-06d Coach chat · failed reply,393,852,P4-06,/coach/chat,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-06e,P4-06e Coach chat · allowance used,393,852,P4-06,/coach/chat,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-06f,P4-06f Coach chat · offline,393,852,P4-06,/coach/chat,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-07a,P4-07a AI insight detail,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-07b,P4-07b Insight · limited evidence,393,852,"P4-03–05, P4-07",/coach/analysis · /coach/next · /coach/goals · /coach/insight/:id,NEW,P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-08a,P4-08a AI consent · first use,393,852,P4-08,(dialog/sheet),EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-08b,P4-08b Consent · feedback for this workout,393,852,P4-08,(dialog/sheet),EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-08c,P4-08c Consent · history analysis,393,852,P4-08,(dialog/sheet),EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-08d,P4-08d AI coaching off · declined,393,852,P4-08,(dialog/sheet),EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-08e,P4-08e AI privacy settings,393,852,P4-08,(dialog/sheet),EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-09a,P4-09a AI usage,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-09b,P4-09b AI usage · allowance used,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10a,P4-10a Network unavailable,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10b,P4-10b Request timeout,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10c,P4-10c Provider temporary error,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10d,P4-10d Rate limit,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10e,P4-10e Not enough workout data,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10f,P4-10f Consent required,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10g,P4-10g Feedback generation failed,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html,v2,P4-10h,P4-10h Saved feedback · offline,393,852,P4-09–10,/coach/usage,PARTIAL (failure enum only),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-01a,P5-01a Challenge discovery,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-01b,P5-01b Discovery · loading,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-01c,P5-01c Discovery · nothing to join,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-01d,P5-01d Discovery · offline,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-01e,P5-01e Discovery · error,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-02a,P5-02a Challenge detail,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-02b,P5-02b Challenge detail · locked,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-02c,P5-02c Challenge detail · completed,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-03a,P5-03a Join challenge · sheet,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-03b,P5-03b Join · confirmation toast,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-03c,P5-03c Join · limit reached,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-04a,P5-04a Active challenge progress,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-04b,P5-04b Active challenge · offline,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-04c,P5-04c Leave challenge · confirm,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-05a,P5-05a Challenge complete,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-05b,P5-05b Challenge ended · not completed,393,852,P5-01–05,/challenges · /challenges/:id,NEW (Time Challenge mode is different),P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-06a,P5-06a XP + level,393,852,P5-06,/profile/level,NEW,P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-06b,P5-06b Level up,393,852,P5-06,/profile/level,NEW,P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-06c,P5-06c How XP works,393,852,P5-06,/profile/level,NEW,P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-07a,P5-07a Achievement collection,393,852,P5-07–09,/progress/achievements · /progress/achievements/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-07b,P5-07b Achievements · none yet,393,852,P5-07–09,/progress/achievements · /progress/achievements/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-08a,P5-08a Achievement detail · unlocked,393,852,P5-07–09,/progress/achievements · /progress/achievements/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-08b,P5-08b Achievement detail · locked,393,852,P5-07–09,/progress/achievements · /progress/achievements/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-08c,P5-08c Achievement unlocked · after results,393,852,P5-07–09,/progress/achievements · /progress/achievements/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-09a,P5-09a Personal milestones,393,852,P5-07–09,/progress/achievements · /progress/achievements/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-09b,P5-09b Milestones · empty,393,852,P5-07–09,/progress/achievements · /progress/achievements/:id,PARTIAL,P1
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-10a,P5-10a Streak + motivation,393,852,P5-10,/progress/streaks,NEW,P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-10b,P5-10b Streak · new streak started,393,852,P5-10,/progress/streaks,NEW,P2
+RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html,v2,P5-10c,P5-10c How your streak counts · sheet,393,852,P5-10,/progress/streaks,NEW,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-01a,P6-01a Voice Coach intro · first use,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-01b,P6-01b Voice Coach intro · returning,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-02a,P6-02a Voice Coach settings,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-02b,P6-02b Settings · Voice Coach off,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-02c,P6-02c Settings · voice unavailable,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-03a,P6-03a Voice + language,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-03b,P6-03b Voice missing · fallback notice,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-04a,P6-04a Live voice overlay,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-04b,P6-04b Live · muted,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-04c,P6-04c Live · speaking with form cue,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-04d,P6-04d Live · audio unavailable,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-04e,P6-04e Camera denied · manual with voice,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-04f,P6-04f Live · Vietnamese,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-05a,P6-05a Guidance · ready countdown,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-05b,P6-05b Guidance · nearly complete,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-05c,P6-05c Guidance · set complete,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-05d,P6-05d Guidance · pacing cue,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-05e,P6-05e Guidance · workout complete,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-06a,P6-06a Rest · voice coach,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-06b,P6-06b Rest · paused,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-06c,P6-06c Rest minimized · voice off,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-06d,P6-06d Rest · screen locked,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-06e,P6-06e Rest complete,393,852,P6-04–06,(CameraPage overlay),ENGINE + PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-07a,P6-07a Coaching history,393,852,"P6-07, P6-10",/profile/settings/voice/history,PARTIAL (speech-unavailable message exists),P3
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-07b,P6-07b History · empty,393,852,"P6-07, P6-10",/profile/settings/voice/history,PARTIAL (speech-unavailable message exists),P3
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-07c,P6-07c History · turned off,393,852,"P6-07, P6-10",/profile/settings/voice/history,PARTIAL (speech-unavailable message exists),P3
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-08a,P6-08a Audio + accessibility,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-08b,P6-08b Haptics only · large captions,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-08c,P6-08c Audio interrupted,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-09a,P6-09a Personalized coaching,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-09b,P6-09b Coaching style · AI off,393,852,"P6-01–03, P6-08–09",/profile/settings/voice,PARTIAL,P2
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-10a,P6-10a Error · speech unavailable,393,852,"P6-07, P6-10",/profile/settings/voice/history,PARTIAL (speech-unavailable message exists),P3
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-10b,P6-10b Error · language unsupported,393,852,"P6-07, P6-10",/profile/settings/voice/history,PARTIAL (speech-unavailable message exists),P3
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-10c,P6-10c Another app is playing audio,393,852,"P6-07, P6-10",/profile/settings/voice/history,PARTIAL (speech-unavailable message exists),P3
+RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html,v2,P6-10d,P6-10d Offline · preview failed,393,852,"P6-07, P6-10",/profile/settings/voice/history,PARTIAL (speech-unavailable message exists),P3
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-01a,P7-01a Friends overview,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-01b,P7-01b Friends · first time,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-01c,P7-01c Friends · loading,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-01d,P7-01d Friends · offline,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-01e,P7-01e Friends · error,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-02a,P7-02a Find friends,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-02b,P7-02b Find friends · not found,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-02c,P7-02c Invite · code and link,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-03a,P7-03a Friend profile,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-03b,P7-03b Profile · private,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-03c,P7-03c Profile · blocked,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-03d,P7-03d Profile · limited + request pending,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-04a,P7-04a Friend requests,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-04b,P7-04b Requests · empty,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-04c,P7-04c Requests · already handled + error,393,852,P7-01–04,/profile/friends · /profile/friends/find · /profile/friends/:userId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-05a,P7-05a Weekly leaderboard,393,852,P7-05,/profile/friends/leaderboard,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-05b,P7-05b Leaderboard · not enough friends,393,852,P7-05,/profile/friends/leaderboard,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-05c,P7-05c Leaderboard · opted out,393,852,P7-05,/profile/friends/leaderboard,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-05d,P7-05d Leaderboard · offline snapshot,393,852,P7-05,/profile/friends/leaderboard,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-05e,P7-05e Leaderboard · week results,393,852,P7-05,/profile/friends/leaderboard,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-06a,P7-06a Challenge a friend,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-06b,P7-06b Invitation received,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-06c,P7-06c Invitation declined · expired,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-07a,P7-07a Head-to-head,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-07b,P7-07b Head-to-head · waiting to start,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-07c,P7-07c Head-to-head · contribution not counted,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-07d,P7-07d Head-to-head · sync conflict,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-08a,P7-08a Result · win,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-08b,P7-08b Result · loss,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-08c,P7-08c Result · tie,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-08d,P7-08d Result · ended early,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-08e,P7-08e Result · pending check,393,852,P7-06–08,/profile/friends/challenge/new · /races/:raceId,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-09a,P7-09a Share achievement,393,852,P7-09,/share/:kind/:id,PARTIAL,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-09b,P7-09b Share · manual record label,393,852,P7-09,/share/:kind/:id,PARTIAL,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-10a,P7-10a Social privacy,393,852,P7-10,/profile/settings/social-privacy,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-10b,P7-10b Block confirmation,393,852,P7-10,/profile/settings/social-privacy,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-10c,P7-10c Report user,393,852,P7-10,/profile/settings/social-privacy,NEW,P2
+RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html,v2,P7-10d,P7-10d Social off · access denied,393,852,P7-10,/profile/settings/social-privacy,NEW,P2
+RepCoach-AI-Design-System.dc.html,ds,dc-root,Màn tập,393,852,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-Flow.dc.html,v1,dc-root,A1 Đếm rep,393,852,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-Onboarding.dc.html,v1,dc-root,A1 Đếm rep,393,852,"Onboarding A1–A3, B1",/onboarding,IMPLEMENTED (v1),P0 (restyle to v2)
+RepCoach-AI-Onboarding.dc.html,v1,dc-root,A2 Đặt máy,393,852,"Onboarding A1–A3, B1",/onboarding,IMPLEMENTED (v1),P0 (restyle to v2)
+RepCoach-AI-Onboarding.dc.html,v1,dc-root,A3 Riêng tư,393,852,"Onboarding A1–A3, B1",/onboarding,IMPLEMENTED (v1),P0 (restyle to v2)
+RepCoach-AI-Onboarding.dc.html,v1,dc-root,B1 Pre-permission,393,852,"Onboarding A1–A3, B1",/onboarding,IMPLEMENTED (v1),P0 (restyle to v2)
+RepCoach-AI-Onboarding.dc.html,v1,dc-root,B2 Chưa có quyền camera,393,852,"Onboarding A1–A3, B1",/onboarding,IMPLEMENTED (v1),P0 (restyle to v2)
+RepCoach-AI-Home.dc.html,v1,A0,A0 Chọn bài tập,393,852,"Home A0–A2, B1–B3",/home (superseded by v2 H1),IMPLEMENTED (v1) · superseded visually by v2,P0
+RepCoach-AI-Home.dc.html,v1,A1,A1 Home,393,852,"Home A0–A2, B1–B3",/home (superseded by v2 H1),IMPLEMENTED (v1) · superseded visually by v2,P0
+RepCoach-AI-Home.dc.html,v1,A2,A2 Home trống,393,852,"Home A0–A2, B1–B3",/home (superseded by v2 H1),IMPLEMENTED (v1) · superseded visually by v2,P0
+RepCoach-AI-Home.dc.html,v1,B1,B1 Sheet mặc định,393,852,"Home A0–A2, B1–B3",/home (superseded by v2 H1),IMPLEMENTED (v1) · superseded visually by v2,P0
+RepCoach-AI-Home.dc.html,v1,B2,B2 Sheet đang nhập,393,852,"Home A0–A2, B1–B3",/home (superseded by v2 H1),IMPLEMENTED (v1) · superseded visually by v2,P0
+RepCoach-AI-Home.dc.html,v1,B3,B3 Sheet lỗi,393,852,"Home A0–A2, B1–B3",/home (superseded by v2 H1),IMPLEMENTED (v1) · superseded visually by v2,P0
+RepCoach-AI-Camera.dc.html,v1,C1,1 Positioning,393,852,Camera C0–C4,(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-Camera.dc.html,v1,C2,2 Ready,393,852,Camera C0–C4,(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-Camera.dc.html,v1,C3,3 Calibrating,393,852,Camera C0–C4,(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-Camera.dc.html,v1,C4,4 Countdown,393,852,Camera C0–C4,(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-Camera.dc.html,v1,C0,Khung bố cục,393,852,Camera C0–C4,(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,A0,A0 Live,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,A1,A1 Active mục tiêu,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,A2,A2 Mất tư thế,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,A3,A3 Giữ để kết thúc,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,Z,Z Vùng HUD,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,B1,B1 Tự do,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,C1,C1 Tạm dừng,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,D1,D1 Đạt mục tiêu,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,E1,E1 Vượt mục tiêu,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-HUD.dc.html,v1,F1,F1 Đã lưu,393,852,"HUD A0–F1, Z",(CameraPage),ENGINE / IMPLEMENTED,P0
+RepCoach-AI-Results.dc.html,v1,R1,R1 Kết quả đạt,393,1670,"Results R1–R2, S1",/workout/:id/results · /share/workout/:id,IMPLEMENTED (v1),P0
+RepCoach-AI-Results.dc.html,v1,R2,R2 Kết quả dừng sớm,393,1755,"Results R1–R2, S1",/workout/:id/results · /share/workout/:id,IMPLEMENTED (v1),P0
+RepCoach-AI-Results.dc.html,v1,S1,S1 Story,393,699,"Results R1–R2, S1",/workout/:id/results · /share/workout/:id,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,H1,H1 Lịch sử,393,1711,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,H2,H2 Chi tiết,393,1670,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,H3,H3 Lịch sử trống,393,852,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,S1,S1 Cài đặt,393,1344,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,S2,S2 Hiệu chỉnh biên độ,393,852,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,S3a,S3 Xóa · đang gõ,393,852,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,S3b,S3 Xóa · sẵn sàng,393,852,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-History-Settings.dc.html,v1,C1,C1 Consent AI,393,852,"History-Settings H1–H3, S1–S3, C1",/progress/history · /profile/settings,IMPLEMENTED (v1),P0
+RepCoach-AI-App-Icon.dc.html,v1,play,Feature graphic,1024,500,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-App-Store-Screenshots-EN.dc.html,v1,1a,01 Counting,1290,2796,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-App-Store-Screenshots-EN.dc.html,v1,1b,02 AI Feedback,1290,2796,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-App-Store-Screenshots-EN.dc.html,v1,1c,03 Progress,1290,2796,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-App-Store-Screenshots-EN.dc.html,v1,1d,04 Share Results,1290,2796,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-App-Store-Screenshots-EN.dc.html,v1,1e,05 Privacy,1290,2796,"Design System, Flow, App Icon, App Store screenshots",—,DESIGN-ONLY,—
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-01a,P8-01a Pro introduction,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-01b,P8-01b Pro introduction returning,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-01c,P8-01c Pro active,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-02a,P8-02a Free vs Pro · standard,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-02b,P8-02b Free vs Pro · feature details,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-02c,P8-02c Free vs Pro · existing Pro,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-03a,P8-03a Plan selection,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-03b,P8-03b Plans · loading prices,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-03c,P8-03c Plans · store unavailable,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-03d,P8-03d Plans · no eligible trial,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-03e,P8-03e Plans · introductory offer,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-03f,P8-03f Plans · already subscribed,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-04a,P8-04a Paywall · advanced AI feedback,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-04b,P8-04b Paywall · premium workout plan,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-04c,P8-04c Paywall · advanced analytics,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-04d,P8-04d Paywall · coaching customization,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-04e,P8-04e Paywall · AI allowance used,393,852,P8-01–04,/pro · /pro/plans (modal),NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-05a,P8-05a AI usage credits available,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-05b,P8-05b AI usage · low balance,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-05c,P8-05c AI usage · no credits left,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-05d,P8-05d AI usage · Pro,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-05e,P8-05e AI usage · reward granted,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-05f,P8-05f AI usage · offline,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-05g,P8-05g AI usage · pending reconciliation,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06a,P8-06a Rewarded ad offer,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06b,P8-06b Rewarded ad showing,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06c,P8-06c Rewarded ad · credit added,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06d,P8-06d Rewarded ad · unavailable,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06e,P8-06e Rewarded ad · failed,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06f,P8-06f Rewarded ad · closed early,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06g,P8-06g Rewarded ad · reward pending,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06h,P8-06h Rewarded ad · already added,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06i,P8-06i Rewarded ad · daily limit,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-06j,P8-06j Rewarded ad · offline,393,852,P8-05–06,/coach/usage · (sheet),NEW,P3
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07a,P8-07a Purchase interactive,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07b,P8-07b Purchase · initiated,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07c,P8-07c Purchase · processing,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07d,P8-07d Purchase · verifying entitlement,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07e,P8-07e Purchase · successful,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07f,P8-07f Purchase · cancelled,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07g,P8-07g Purchase · store unavailable,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07h,P8-07h Purchase · failed,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07i,P8-07i Purchase · pending approval,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07j,P8-07j Purchase · restoring,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07k,P8-07k Purchase · already subscribed,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-07l,P8-07l Purchase · linked to another account,393,852,P8-07,(store sheet) → /pro/status,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-08a,P8-08a Manage · active (iOS),393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-08b,P8-08b Manage · active (Android),393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-08c,"P8-08c Manage · cancelled, still active",393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-08d,P8-08d Manage · expired,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-08e,P8-08e Manage · grace period / billing issue,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-08f,P8-08f Refund information,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-09a,P8-09a Profile · membership · Free,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-09b,P8-09b Profile Pro,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-09c,P8-09c Profile · membership · trial,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-09d,P8-09d Profile · membership · expired,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-09e,P8-09e Profile · membership · offline cache,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10a,P8-10a Restore purchases,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10b,P8-10b Restore · nothing to restore,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10c,P8-10c Restore · successful,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10d,P8-10d Restore · failed,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10e,P8-10e Billing · server verification unavailable,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10f,P8-10f Billing · status mismatch,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10g,P8-10g Billing · account changed,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html,v2,P8-10h,P8-10h Help privacy support,393,852,P8-08–10,/profile/membership · /profile/membership/restore,NEW,P2
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-01a,P9-01a Welcome first launch,393,852,P9-01,/auth/welcome · /auth/gate?returnTo=,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-01b,P9-01b Welcome returning guest,393,852,P9-01,/auth/welcome · /auth/gate?returnTo=,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-01c,P9-01c Welcome signed in,393,852,P9-01,/auth/welcome · /auth/gate?returnTo=,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-01d,P9-01d Welcome offline,393,852,P9-01,/auth/welcome · /auth/gate?returnTo=,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-01e,P9-01e Account required gateway,393,852,P9-01,/auth/welcome · /auth/gate?returnTo=,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02a,P9-02a Sign in interactive,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02b,P9-02b Sign in · loading,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02c,P9-02c Sign in · validation,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02d,P9-02d Sign in · invalid credentials,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02e,P9-02e Sign in · network failure,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02f,P9-02f Sign in · rate limited,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02g,P9-02g Sign in account unavailable,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-02h,P9-02h Sign in keyboard open,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-03a,P9-03a Create account interactive,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-03b,P9-03b Create account · validation,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-03c,P9-03c Create account · email already used,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-03d,P9-03d Create account · creating,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-03e,P9-03e Create account · registration successful,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-03f,P9-03f Create account · network failure,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04a,P9-04a Verification pending,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04b,P9-04b Email verified,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04c,P9-04c Verification link expired,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04d,P9-04d Forgot password,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04e,P9-04e Reset requested,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04f,P9-04f Set new password,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04g,P9-04g Password updated,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-04h,P9-04h Reset link expired,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-05a,P9-05a Social sign-in,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-05b,P9-05b Provider sign-in cancelled,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-05c,P9-05c Provider sign-in failed,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-05d,P9-05d Email already uses another sign-in method,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-05e,P9-05e Reauthenticate to link,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-05f,P9-05f Account linking success,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-05g,P9-05g Account linking conflict,393,852,P9-02–05,/auth/sign-in · /auth/sign-up · /auth/verify,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-06a,P9-06a Guest upgrade why,393,852,P9-06,/auth/merge,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-06b,P9-06b Guest merge preview,393,852,P9-06,/auth/merge,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-06c,P9-06c Guest sync progress,393,852,P9-06,/auth/merge,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-06d,P9-06d Guest merge conflict,393,852,P9-06,/auth/merge,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-06e,P9-06e Guest upgrade · completed,393,852,P9-06,/auth/merge,NEW,P1
+RepCoach-AI-v2-Phase-9-Auth.dc.html,v2,P9-06f,P9-06f Guest upgrade · migration failed,393,852,P9-06,/auth/merge,NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-07a,P9-07a Profile signed in free,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-07b,"P9-07b Profile · signed in, Pro",393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-07c,P9-07c Profile · guest,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-07d,P9-07d Profile · new account,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-07e,P9-07e Profile · offline,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-07f,P9-07f Profile · loading,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-08a,P9-08a Edit profile interactive,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-08b,P9-08b Edit profile · validation + duplicate,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-08c,P9-08c Edit profile · saved,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-08d,P9-08d Edit profile upload error,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-08e,P9-08e Edit profile · offline,393,852,P9-07–08,/profile (tab 4) · /profile/edit,NEW (Settings tab exists instead),P0 (tab shell) / P1 (account content)
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-09a,P9-09a Settings hub,393,852,P9-09,/profile/settings,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-09b,P9-09b Language selector,393,852,P9-09,/profile/settings,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-09c,P9-09c Settings Vietnamese,393,852,P9-09,/profile/settings,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-09d,P9-09d Data and storage,393,852,P9-09,/profile/settings,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-09e,P9-09e Help and support,393,852,P9-09,/profile/settings,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-10a,P9-10a Account and security,393,852,P9-10,/profile/settings/account,NEW,P2
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-10b,P9-10b Change email,393,852,P9-10,/profile/settings/account,NEW,P2
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-10c,P9-10c Reauthentication,393,852,P9-10,/profile/settings/account,NEW,P2
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-10d,P9-10d Change password,393,852,P9-10,/profile/settings/account,NEW,P2
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-10e,P9-10e Sign out,393,852,P9-10,/profile/settings/account,NEW,P2
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-10f,P9-10f Security notification,393,852,P9-10,/profile/settings/account,NEW,P2
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-11a,P9-11a Privacy overview,393,852,P9-11,/profile/privacy · /profile/privacy/export · /profile/privacy/delete-account,PARTIAL (local export + local delete exist),P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-11b,P9-11b Export interactive,393,852,P9-11,/profile/privacy · /profile/privacy/export · /profile/privacy/delete-account,PARTIAL (local export + local delete exist),P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-11c,P9-11c Export ready,393,852,P9-11,/profile/privacy · /profile/privacy/export · /profile/privacy/delete-account,PARTIAL (local export + local delete exist),P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-11d,P9-11d Delete scope,393,852,P9-11,/profile/privacy · /profile/privacy/export · /profile/privacy/delete-account,PARTIAL (local export + local delete exist),P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-11e,P9-11e Delete account confirm,393,852,P9-11,/profile/privacy · /profile/privacy/export · /profile/privacy/delete-account,PARTIAL (local export + local delete exist),P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-11f,P9-11f Deletion pending,393,852,P9-11,/profile/privacy · /profile/privacy/export · /profile/privacy/delete-account,PARTIAL (local export + local delete exist),P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-11g,P9-11g Deletion failed,393,852,P9-11,/profile/privacy · /profile/privacy/export · /profile/privacy/delete-account,PARTIAL (local export + local delete exist),P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12a,P9-12a Session expired,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12b,P9-12b Account disabled,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12c,P9-12c Offline · signed in,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12d,P9-12d Cloud sync pending,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12e,P9-12e Sync error,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12f,P9-12f Device conflict,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12g,P9-12g Duplicate records detected,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12h,P9-12h Server unavailable,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12i,P9-12i Auth provider unavailable,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12j,P9-12j Entitlement temporarily unavailable,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html,v2,P9-12k,P9-12k Signed-in state restored,393,852,P9-12,(global banners),NEW,P1
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01a,P10-01a Notification Center,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01b,P10-01b Inbox · unread only,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01c,P10-01c Notification detail,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01d,P10-01d Inbox empty,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01e,P10-01e Inbox · loading,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01f,P10-01f Inbox · offline,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01g,P10-01g Inbox error,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01h,P10-01h Row actions,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-01i,P10-01i Home bell entry,393,852,P10-01,/home/inbox,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-02a,P10-02a Permission intro,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-02b,P10-02b Permission · denied,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-02c,P10-02c Permission · allowed,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-02d,P10-02d Permission · changed in Settings,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-02e,P10-02e Permission · unavailable,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-02f,P10-02f Permission · delivered quietly (iOS),393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-03a,P10-03a Workout reminders,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-03b,P10-03b Unsaved changes,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-03c,P10-03c Reminder rescheduled,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-03d,P10-03d Schedule conflict,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-03e,P10-03e Schedule deleted,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-04a,P10-04a Smart reminders,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-04b,P10-04b Smart reminders · customized,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-04c,P10-04c Smart reminders · paused,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-04d,P10-04d Smart reminders · off,393,852,P10-03–04,/profile/settings/notifications/reminders,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05a,P10-05a AI feedback ready,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05b,P10-05b Progress review ready,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05c,P10-05c Coach suggestion available,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05d,P10-05d AI request failed,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05e,P10-05e AI feedback unavailable,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05f,P10-05f AI credit balance warning,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05g,P10-05g AI allowance reset,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-05h,P10-05h Lock screen AI privacy,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-06a,P10-06a Challenge variants,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-06b,P10-06b Achievement reopen,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-06c,P10-06c Challenge completed,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-06d,P10-06d Level milestone,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-06e,P10-06e Recovery day note,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-06f,P10-06f Ending soon,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications.dc.html,v2,P10-06g,P10-06g Offline pending,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07a,P10-07a Friend request,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07b,P10-07b Request accepted,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07c,P10-07c Challenge invite,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07d,P10-07d Head-to-head update,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07e,P10-07e Competition finished,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07f,P10-07f Weekly results,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07g,P10-07g Invitation expired,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07h,P10-07h Friend unavailable,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-07i,P10-07i Social privacy,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08a,P10-08a Payment issue,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08b,P10-08b Renewal reminder,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08c,P10-08c Subscription expired,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08d,P10-08d Purchase verified,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08e,P10-08e Credit allowance reset,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08f,P10-08f Account security alert,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08g,P10-08g Data export ready,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08h,P10-08h Account deletion status,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-08i,P10-08i Transactional vs optional,393,852,P10-05–08,(push → deep link),NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-09a,P10-09a Notification settings,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-09b,P10-09b Settings OS off,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-09c,P10-09c Channels,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-10a,P10-10a Quiet hours,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-10b,P10-10b Invalid times,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-10c,P10-10c Quiet hours · active now,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-10d,P10-10d Device time zone change,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-10e,P10-10e DST handling,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-10f,P10-10f OS Focus / DND conflict,393,852,P10-09–10,/profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11a,P10-11a Deep link simulator,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11b,P10-11b Lock screen tap,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11c,P10-11c Foreground banner,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11d,P10-11d Cold start,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11e,P10-11e Auth gateway resume,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11f,P10-11f Expired session,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11g,P10-11g Offline open,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-11h,P10-11h Fallback,393,852,P10-11,—,DESIGN-ONLY (use for deep-link test matrix),—
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12a,P10-12a Denied recovery,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12b,P10-12b Push token unavailable,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12c,P10-12c Device offline,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12d,P10-12d Reminder scheduling failed,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12e,P10-12e Push subscription expired,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12f,P10-12f Invalid deep link,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12g,P10-12g Notification target missing,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12h,P10-12h Delivery delayed,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12i,P10-12i Duplicated event,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12j,P10-12j Preference sync failed,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12k,P10-12k Account switched,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12l,P10-12l Server unavailable,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html,v2,P10-12m,P10-12m Notification history,393,852,"P10-02, P10-12",(sheet) /profile/settings/notifications,NEW,P2
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-01a,FA-01a Launch interactive,393,852,FA-01,/ (startup),PARTIAL (onboarding gate),P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-01b,FA-01b Splash,393,852,FA-01,/ (startup),PARTIAL (onboarding gate),P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-01c,FA-01c Initializing · restoring session,393,852,FA-01,/ (startup),PARTIAL (onboarding gate),P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-01d,FA-01d Guest startup,393,852,FA-01,/ (startup),PARTIAL (onboarding gate),P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-01e,FA-01e Offline startup,393,852,FA-01,/ (startup),PARTIAL (onboarding gate),P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-01f,FA-01f Startup failure,393,852,FA-01,/ (startup),PARTIAL (onboarding gate),P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-02a,FA-02a First workout,393,852,FA-02,/onboarding → /workout,PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-02d,FA-02d Resume interrupted onboarding,393,852,FA-02,/onboarding → /workout,PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-03a,FA-03a Free results,393,852,FA-03,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-03b,FA-03b Manually stopped,393,852,FA-03,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-03c,FA-03c Logged by hand,393,852,FA-03,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-03d,FA-03d Not saved · discarded,393,852,FA-03,/workout/:sessionId/results,EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-04a,FA-04a Save and sync,393,852,FA-04,(results + global badge),PARTIAL (local save only),P1
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-04b,FA-04b Backgrounded during save,393,852,FA-04,(results + global badge),PARTIAL (local save only),P1
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-04c,FA-04c Signed out / session expired during save,393,852,FA-04,(results + global badge),PARTIAL (local save only),P1
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-05a,FA-05a AI card states,393,852,FA-05,(ResultPage),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-05b,FA-05b Consent not granted,393,852,FA-05,(ResultPage),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-05c,FA-05c Deeper analysis · allowance used,393,852,FA-05,(ResultPage),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-05d,FA-05d Premium analysis locked,393,852,FA-05,(ResultPage),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-06a,FA-06a Share preview,393,852,FA-06,/share/workout/:id,PARTIAL,P1
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-06b,FA-06b Export successful,393,852,FA-06,/share/workout/:id,PARTIAL,P1
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-06c,FA-06c Export failed / unavailable,393,852,FA-06,/share/workout/:id,PARTIAL,P1
+RepCoach-AI-Final-A-Missing-Screens.dc.html,finala,FA-06d,FA-06d Share cancelled,393,852,FA-06,/share/workout/:id,PARTIAL,P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-07a,FA-07a History delete,393,852,FA-07,/progress/history,PARTIAL (delete+undo exist),P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-07b,FA-07b Deletion in progress,393,852,FA-07,/progress/history,PARTIAL (delete+undo exist),P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-07c,FA-07c Undo expired,393,852,FA-07,/progress/history,PARTIAL (delete+undo exist),P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-07d,FA-07d Delete failed,393,852,FA-07,/progress/history,PARTIAL (delete+undo exist),P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-07e,FA-07e Offline deletion pending,393,852,FA-07,/progress/history,PARTIAL (delete+undo exist),P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-07f,FA-07f Deleted on another device,393,852,FA-07,/progress/history,PARTIAL (delete+undo exist),P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-08a,FA-08a Delete data hub,393,852,FA-08,/profile/privacy/delete,PARTIAL (phone scope exists),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-08e,FA-08e Delete local history,393,852,FA-08,/profile/privacy/delete,PARTIAL (phone scope exists),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-08f,FA-08f Delete cloud history,393,852,FA-08,/profile/privacy/delete,PARTIAL (phone scope exists),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-08g,FA-08g Clear all history,393,852,FA-08,/profile/privacy/delete,PARTIAL (phone scope exists),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-08b,FA-08b Partial sync failure,393,852,FA-08,/profile/privacy/delete,PARTIAL (phone scope exists),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-08c,FA-08c Deletion failed,393,852,FA-08,/profile/privacy/delete,PARTIAL (phone scope exists),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-09a,FA-09a Calibration reset,393,852,FA-09,/profile/settings/calibration · (CameraPage),ENGINE + EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-09b,FA-09b No person detected,393,852,FA-09,/profile/settings/calibration · (CameraPage),ENGINE + EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-09c,FA-09c Camera denied (can ask again),393,852,FA-09,/profile/settings/calibration · (CameraPage),ENGINE + EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-09d,FA-09d Tracking temporarily unavailable,393,852,FA-09,/profile/settings/calibration · (CameraPage),ENGINE + EXISTS-REPLACE-VISUAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-10a,FA-10a Workout HUD exit and pause,393,852,FA-10,(CameraPage) · /workout/recover,"PARTIAL (hold, pause, exit, lifecycle exist; recovery NEW)",P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-10b,FA-10b Interrupted by app lifecycle,393,852,FA-10,(CameraPage) · /workout/recover,"PARTIAL (hold, pause, exit, lifecycle exist; recovery NEW)",P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-10c,FA-10c Save partial workout,393,852,FA-10,(CameraPage) · /workout/recover,"PARTIAL (hold, pause, exit, lifecycle exist; recovery NEW)",P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-10d,FA-10d Discard confirmation,393,852,FA-10,(CameraPage) · /workout/recover,"PARTIAL (hold, pause, exit, lifecycle exist; recovery NEW)",P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-10e,FA-10e Recover session,393,852,FA-10,(CameraPage) · /workout/recover,"PARTIAL (hold, pause, exit, lifecycle exist; recovery NEW)",P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-11a,"FA-11a Toasts, banners, sync badges",393,852,FA-11,(global),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-11b,FA-11b No search results,393,852,FA-11,(global),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-11c,FA-11c General retry state,393,852,FA-11,(global),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-11d,FA-11d Access denied,393,852,FA-11,(global),PARTIAL,P0
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12a,FA-12a Help home,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12c,FA-12c Contact support,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12d,FA-12d Report an app problem,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12e,FA-12e About · version + legal,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12f,FA-12f Feedback sent,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
+RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12g,FA-12g Offline support fallback,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
+RepCoach-AI-Final-B-Integrated-Prototype.dc.html,finalb,dc-root,FB-00 Integrated prototype,393,852,FB-00,reference only,DESIGN-ONLY (behaviour reference),—

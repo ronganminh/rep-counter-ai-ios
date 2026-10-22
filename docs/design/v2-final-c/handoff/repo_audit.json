@@ -1,0 +1,880 @@
+{
+  "repo": "rep-counter-ai-ios (local clone; legacy engine repo Juliolayme/rep-counter-ai referenced in rep-counter-ai-main/docs/CHUYEN_MAY.md:3, not accessible)",
+  "commit": {
+    "hash": "3594d8a7de6ab2c55ce72e0cb54341ea82183a9a",
+    "date": "2026-10-19T14:11:17+07:00"
+  },
+  "pubspec": {
+    "name": "rep_counter_app",
+    "version": "2.0.0+8",
+    "sdk": ">=3.4.0 <4.0.0",
+    "lock_sdks": {
+      "dart": ">=3.12.0 <4.0.0",
+      "flutter": ">=3.44.0"
+    },
+    "deps": {
+      "camera": "^0.11.0 (0.11.4)",
+      "google_mlkit_pose_detection": "^0.15.0 (0.15.0)",
+      "permission_handler": "^11.3.1 (11.4.0)",
+      "file_picker": "^12.2.0 (12.3.0)",
+      "image": "^4.3.0 (4.10.1)",
+      "video_player": "^2.9.2 (2.14.0)",
+      "shared_preferences": "^2.3.3 (2.5.5)",
+      "http": "^1.2.2 (1.6.0)",
+      "lucide_icons_flutter": "^3.1.20",
+      "flutter_tts": "^4.2.5",
+      "share_plus": "^13.3.0",
+      "gal": "^2.3.3",
+      "url_launcher": "^6.3.2",
+      "audioplayers": "^6.8.1"
+    },
+    "dev_deps": {
+      "camera_platform_interface": "^2.14.0",
+      "flutter_lints": "^4.0.0",
+      "flutter_launcher_icons": "^0.14.4"
+    }
+  },
+  "navigation": {
+    "system": "Navigator 1.0 imperative (MaterialPageRoute), no named routes, no go_router",
+    "route_observer": "rep-counter-ai-main/rep_counter_app/lib/app/route_observer.dart appRouteObserver",
+    "bottom_tabs": [
+      {
+        "index": 0,
+        "label": "Tập/Train",
+        "widget": "HomeScreen"
+      },
+      {
+        "index": 1,
+        "label": "History",
+        "widget": "HistoryPage"
+      },
+      {
+        "index": 2,
+        "label": "Settings",
+        "widget": "SettingsPage"
+      }
+    ],
+    "tabs_file": "rep-counter-ai-main/rep_counter_app/lib/app/app_shell.dart"
+  },
+  "routes": [
+    {
+      "name": null,
+      "widget": "RepCounterApp home -> OnboardingPage | AppShell | CameraPage(ciVideoPath)",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/main.dart"
+    },
+    {
+      "name": null,
+      "widget": "ExercisePickerScreen",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/exercises/presentation/exercise_picker_screen.dart"
+    },
+    {
+      "name": null,
+      "widget": "GoalSetupPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/goal_setup_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "showPlanTodaySheet (modal) -> CameraPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/plan/presentation/plan_today_sheet.dart"
+    },
+    {
+      "name": null,
+      "widget": "CameraPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/camera_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "ResultPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/result_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "_FormScoreDetailsPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/widgets/form_score_details.dart"
+    },
+    {
+      "name": null,
+      "widget": "StoryPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/share/story_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "RoutineEditorPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/routine/presentation/routine_editor_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "VoiceCadencePage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/voice_cadence_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "CalibrationSettingsPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/settings_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "LegalPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/legal_page.dart"
+    },
+    {
+      "name": null,
+      "widget": "ExportDataSheet (modal)",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/history/export/export_data_sheet.dart"
+    },
+    {
+      "name": null,
+      "widget": "LocalVideoTestPage (kDebugMode only)",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/local_video_test_page.dart"
+    }
+  ],
+  "screens": [
+    {
+      "widget": "OnboardingPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/onboarding_page.dart",
+      "purpose": "3-page intro; sets onboarding_v1"
+    },
+    {
+      "widget": "AppShell",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/app/app_shell.dart",
+      "purpose": "3-tab NavigationBar shell"
+    },
+    {
+      "widget": "HomeScreen",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/home/presentation/home_screen.dart",
+      "purpose": "Train tab: push-up card, plan sheet, routines, latest result"
+    },
+    {
+      "widget": "ExercisePickerScreen",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/exercises/presentation/exercise_picker_screen.dart",
+      "purpose": "exercise grid; only push_up available"
+    },
+    {
+      "widget": "GoalSetupPage/GoalSetupContent",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/goal_setup_page.dart",
+      "purpose": "free / target reps / timed challenge setup"
+    },
+    {
+      "widget": "RoutineListSection/RoutineEditorPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/routine/presentation/",
+      "purpose": "routine presets (sets x reps + rest)"
+    },
+    {
+      "widget": "CameraPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/camera_page.dart",
+      "purpose": "camera, pose detection, HUD, pause, finish"
+    },
+    {
+      "widget": "WorkoutHud",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/widgets/workout_hud.dart",
+      "purpose": "in-workout HUD incl. timed challenge, hold-to-finish"
+    },
+    {
+      "widget": "CameraPermissionView",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/widgets/camera_permission_view.dart",
+      "purpose": "pre-permission / denied"
+    },
+    {
+      "widget": "RoutineRestOverlay",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/routine/presentation/rest_overlay.dart",
+      "purpose": "rest between routine sets"
+    },
+    {
+      "widget": "ResultPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/result_page.dart",
+      "purpose": "workout results, AI feedback, achievements, share, delete"
+    },
+    {
+      "widget": "StoryPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/share/story_page.dart",
+      "purpose": "share/save story image"
+    },
+    {
+      "widget": "HistoryPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/history_page.dart",
+      "purpose": "history + progress analytics (ranges, PRs, trend, heatmap)"
+    },
+    {
+      "widget": "SettingsPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/settings_page.dart",
+      "purpose": "language, training prefs, calibration, legal, export, delete local data"
+    },
+    {
+      "widget": "VoiceCadencePage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/voice_cadence_page.dart",
+      "purpose": "TTS rep cadence"
+    },
+    {
+      "widget": "CalibrationSettingsPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/settings_page.dart",
+      "purpose": "calibration view/reset"
+    },
+    {
+      "widget": "LegalPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/legal/legal_page.dart",
+      "purpose": "privacy/terms"
+    },
+    {
+      "widget": "ExportDataSheet",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/features/history/export/export_data_sheet.dart",
+      "purpose": "CSV/JSON export"
+    },
+    {
+      "widget": "LocalVideoTestPage",
+      "file": "rep-counter-ai-main/rep_counter_app/lib/local_video_test_page.dart",
+      "purpose": "debug video replay"
+    }
+  ],
+  "engine": {
+    "packages": [
+      "camera",
+      "google_mlkit_pose_detection",
+      "permission_handler",
+      "flutter_tts",
+      "audioplayers"
+    ],
+    "classes": [
+      "CameraPage/_CameraPageState",
+      "PoseMapper",
+      "ExerciseProfile",
+      "Landmarks",
+      "CountGateLatch",
+      "GuideZone",
+      "StatusDebouncer",
+      "RollingMean",
+      "RepCounter",
+      "TwoArmMerger",
+      "SessionTracker",
+      "SetSummary",
+      "Calibrator",
+      "RepTracker",
+      "PoseSample",
+      "RepObservation",
+      "RepMetric",
+      "RepQualityAnalyzer",
+      "WorkoutAggregator",
+      "WorkoutSummary",
+      "PoseQualityStats",
+      "QualityScore",
+      "SetMetric",
+      "QualityThresholds",
+      "CalibrationSnapshot",
+      "WorkoutController",
+      "WorkoutClock",
+      "StopwatchWorkoutClock",
+      "WorkoutUiState",
+      "WorkoutStartConfig",
+      "TimedChallengeConfig",
+      "RepFeedback",
+      "WorkoutFeedback",
+      "SystemSpeechDriver",
+      "RuleBasedFeedback",
+      "WorkoutRecord",
+      "WorkoutHistoryStore",
+      "CalibrationStore"
+    ],
+    "states": {
+      "WorkoutUiPhase": [
+        "positioning",
+        "ready",
+        "calibrating",
+        "countdown",
+        "active",
+        "resting",
+        "paused",
+        "ending",
+        "saving",
+        "done",
+        "aborted"
+      ],
+      "WorkoutPhase (tests only)": [
+        "idle",
+        "initializingCamera",
+        "positioning",
+        "calibrating",
+        "countdown",
+        "active",
+        "paused",
+        "completing",
+        "completed",
+        "failed"
+      ],
+      "_CameraState": [
+        "awaitingConsent",
+        "initializing",
+        "ready",
+        "denied",
+        "unavailable",
+        "suspended"
+      ],
+      "SessionState": [
+        "idle",
+        "working",
+        "resting"
+      ],
+      "RepCounter._Phase": [
+        "unknown",
+        "down",
+        "up"
+      ],
+      "CountGateState": [
+        "open",
+        "holding",
+        "closed"
+      ],
+      "WorkoutMode": [
+        "free",
+        "targetReps",
+        "timed"
+      ],
+      "ResultFeedbackPhase": [
+        "idle",
+        "loading",
+        "ready",
+        "offline",
+        "error",
+        "unavailable"
+      ],
+      "PlacementStatus": "see placement.dart:17"
+    },
+    "events": [
+      "RepStarted",
+      "RepReachedBottom",
+      "RepCompleted",
+      "RepAborted(RepAbortReason.signalLost|placementLost|reset)",
+      "WorkoutController.cameraStarted/pause/calibrationChanged/frameProcessed/acceptRep/requestStart/reportRepAborted/repSignalRestored/skipRoutineRest/finish/abort",
+      "AppLifecycleState -> _suspendCamera/_resumeCamera"
+    ],
+    "quality_flags": [
+      "shallow",
+      "incompleteLockout",
+      "tooFast",
+      "tooSlow",
+      "leftRightUneven",
+      "bodyAlignmentLost",
+      "poseUnreliable"
+    ],
+    "files": [
+      "rep-counter-ai-main/rep_counter_app/lib/camera_page.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/rep_counter.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/exercise.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/placement.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/pose/domain/pose_mapper.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/workout/domain/rep_tracker.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/workout/domain/workout_state.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/workout/domain/workout_mode.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/workout/domain/workout_aggregator.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/workout/domain/rep_quality_analyzer.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/workout/application/workout_controller.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/features/workout/application/workout_ui_state.dart",
+      "rep-counter-ai-main/rep_counter_app/lib/core/services/workout_feedback.dart"
+    ],
+    "session_recovery": "NOT IMPLEMENTED"
+  },
+  "persistence": {
+    "mechanism": "SharedPreferences (JSON strings)",
+    "keys": [
+      "workout_history_v1",
+      "onboarding_v1",
+      "app_language",
+      "routine_presets_v1",
+      "earned_achievements_v1",
+      "automatic_ai_consent_2026_10_01_groq",
+      "training_live_coaching_v1",
+      "training_voice_v1",
+      "training_sound_v1",
+      "training_cues_v1",
+      "training_haptics_v1",
+      "training_rep_speech_cadence_v1",
+      "calibration (CalibrationStore)"
+    ],
+    "WorkoutRecord_fields": [
+      "id",
+      "exerciseId",
+      "exerciseName",
+      "startedAt",
+      "durationSeconds",
+      "reps",
+      "sets",
+      "targetReps",
+      "poseFrames",
+      "readyFrames",
+      "lostFrames",
+      "mode",
+      "challengeSeconds",
+      "aiFeedback",
+      "quality",
+      "repDetails",
+      "routine"
+    ]
+  },
+  "ai": {
+    "client": "rep-counter-ai-main/rep_counter_app/lib/features/ai/ai_feedback_service.dart AiFeedbackService.analyze",
+    "endpoint": "POST {AI_BASE_URL}/v1/workout-feedback",
+    "caller": "rep-counter-ai-main/rep_counter_app/lib/features/workout/application/result_controller.dart ResultController.request (from ResultPage)",
+    "consent": "rep-counter-ai-main/rep_counter_app/lib/features/ai/presentation/ai_consent.dart",
+    "provider": "Groq (backend), Gemini legacy",
+    "credits": "NOT IMPLEMENTED",
+    "entitlements": "NOT IMPLEMENTED"
+  },
+  "auth": "NOT IMPLEMENTED (anonymous, local-only)",
+  "config_keys": {
+    "mobile_dart_defines": [
+      "AI_BASE_URL",
+      "APP_STORE_ID",
+      "ENABLE_ALL_EXERCISES",
+      "ENABLE_AI_FEEDBACK (declared, unused)",
+      "ENABLE_PULL_UP",
+      "REPCOACH_CI_VIDEO_ASSET"
+    ],
+    "backend_env": [
+      "AI_PROVIDER",
+      "GROQ_API_KEY",
+      "GROQ_MODEL",
+      "GEMINI_API_KEY",
+      "GEMINI_MODEL",
+      "GEMINI_SERVICE_MODE",
+      "PORT",
+      "BIND_HOST"
+    ],
+    "ci_env": [
+      "STAGING_BASE_URL"
+    ],
+    "ci_secrets_by_name": [
+      "VPS_SSH_KEY"
+    ]
+  },
+  "backend": {
+    "framework": "Python 3 stdlib http.server (ThreadingHTTPServer), no DB",
+    "files": [
+      "rep-counter-ai-main/backend/server.py",
+      "rep-counter-ai-main/backend/ai_provider.py"
+    ],
+    "deployment": [
+      "backend/deploy/repcoach-ai.nginx (TLS, limit_req 10r/m)",
+      "backend/deploy/repcoach-rate-limit.conf",
+      "backend/deploy/repcoach-backend.service (systemd)",
+      "backend/deploy/repcoach-ai.logrotate",
+      "backend/deploy/b7_apply.sh",
+      "backend/deploy/b7_rollback.sh"
+    ],
+    "webhooks_purchase_verification": "NOT IMPLEMENTED",
+    "endpoints": [
+      {
+        "method": "GET",
+        "path": "/health",
+        "auth": "none",
+        "file": "rep-counter-ai-main/backend/server.py:327",
+        "request": null,
+        "response": {
+          "200": {
+            "status": "ok"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/ready",
+        "auth": "none",
+        "file": "rep-counter-ai-main/backend/server.py:366",
+        "request": null,
+        "response": {
+          "200": {
+            "status": "ready"
+          },
+          "503": {
+            "status": "not_ready"
+          }
+        }
+      },
+      {
+        "method": "GET",
+        "path": "/privacy-policy.html",
+        "auth": "none",
+        "file": "rep-counter-ai-main/backend/server.py:330",
+        "request": null,
+        "response": "text/html from backend/static/"
+      },
+      {
+        "method": "GET",
+        "path": "/support.html",
+        "auth": "none",
+        "file": "rep-counter-ai-main/backend/server.py:342",
+        "request": null,
+        "response": "text/html"
+      },
+      {
+        "method": "GET",
+        "path": "/terms.html",
+        "auth": "none",
+        "file": "rep-counter-ai-main/backend/server.py:354",
+        "request": null,
+        "response": "text/html"
+      },
+      {
+        "method": "POST",
+        "path": "/v1/workout-feedback",
+        "auth": "none (nginx IP rate limit)",
+        "file": "rep-counter-ai-main/backend/server.py:378",
+        "request": {
+          "content_type": "application/json",
+          "max_bytes": 16384,
+          "schema_version": "1|2 (2 requires consent_version)",
+          "core": [
+            "exercise",
+            "duration_seconds",
+            "reps",
+            "sets",
+            "target_reps",
+            "goal_reached",
+            "placement_score",
+            "pose_frames",
+            "pose_lost_frames",
+            "locale(vi|en)"
+          ],
+          "quality": [
+            "flagged_reps",
+            "avg_rep_sec",
+            "avg_amplitude",
+            "amplitude_drop_percent",
+            "left_right_diff_percent",
+            "quality_score",
+            "has_enough_data"
+          ],
+          "example": "rep-counter-ai-main/contracts/workout_feedback_v2.json"
+        },
+        "response": {
+          "200": {
+            "schema_version": 1,
+            "feedback": "string"
+          },
+          "errors": {
+            "400": "INVALID_REQUEST",
+            "405": "INVALID_REQUEST",
+            "413": "INVALID_REQUEST",
+            "404": "NOT_FOUND",
+            "502": "AI_RESPONSE_INVALID",
+            "503": "AI_UNAVAILABLE",
+            "504": "AI_TIMEOUT",
+            "500": "SERVER_ERROR"
+          }
+        }
+      }
+    ]
+  },
+  "platforms": {
+    "ios": {
+      "bundle_id": "com.ronganminh.repCounterApp",
+      "deployment_target": "15.5",
+      "usage_strings": [
+        "NSCameraUsageDescription",
+        "NSPhotoLibraryAddUsageDescription"
+      ],
+      "lproj": [
+        "en",
+        "vi"
+      ],
+      "privacy_manifest": "ios/Runner/PrivacyInfo.xcprivacy"
+    },
+    "android": {
+      "application_id": "com.ronganminh.repcoach",
+      "flavors": [
+        "store",
+        "diag"
+      ],
+      "permissions_main": [
+        "CAMERA",
+        "INTERNET",
+        "RECORD_AUDIO(removed)",
+        "WRITE_EXTERNAL_STORAGE(maxSdk override)"
+      ],
+      "permissions_diag": [
+        "FOREGROUND_SERVICE",
+        "POST_NOTIFICATIONS"
+      ]
+    }
+  },
+  "features": [
+    {
+      "feature": "navigation 5 tabs",
+      "status": "PARTIALLY IMPLEMENTED",
+      "evidence": "3 tabs Train/History/Settings in rep-counter-ai-main/rep_counter_app/lib/app/app_shell.dart"
+    },
+    {
+      "feature": "exercise library",
+      "status": "PARTIALLY IMPLEMENTED",
+      "evidence": "ExercisePickerScreen; only push_up enabled (FeatureFlags), pull_up diag-only, others placeholders"
+    },
+    {
+      "feature": "camera pose detection",
+      "status": "IMPLEMENTED",
+      "evidence": "google_mlkit_pose_detection PoseDetector, camera_page.dart:249"
+    },
+    {
+      "feature": "rep counting",
+      "status": "IMPLEMENTED",
+      "evidence": "RepCounter/RepTracker/CountGateLatch/SessionTracker; video replay CI"
+    },
+    {
+      "feature": "workout session pause/resume",
+      "status": "IMPLEMENTED",
+      "evidence": "WorkoutController.pause(); _pauseWorkout/_resumeWorkout camera_page.dart:1552; lifecycle suspend/resume camera_page.dart:428"
+    },
+    {
+      "feature": "session recovery",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "no in-progress session persistence"
+    },
+    {
+      "feature": "results page",
+      "status": "IMPLEMENTED",
+      "evidence": "rep-counter-ai-main/rep_counter_app/lib/features/workout/presentation/result_page.dart"
+    },
+    {
+      "feature": "history",
+      "status": "IMPLEMENTED",
+      "evidence": "HistoryPage + WorkoutHistoryStore (delete/undo)"
+    },
+    {
+      "feature": "local persistence",
+      "status": "IMPLEMENTED",
+      "evidence": "SharedPreferences stores"
+    },
+    {
+      "feature": "cloud sync",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "no auth/storage backend"
+    },
+    {
+      "feature": "workout plans",
+      "status": "PARTIALLY IMPLEMENTED",
+      "evidence": "PlanTodaySheet (single session) + routine presets features/routine/"
+    },
+    {
+      "feature": "analytics/progress",
+      "status": "IMPLEMENTED",
+      "evidence": "progress_statistics.dart ranges 7d/30d/90d/all, trend, heatmap, PRs in HistoryPage (local only)"
+    },
+    {
+      "feature": "AI feedback",
+      "status": "IMPLEMENTED",
+      "evidence": "AiFeedbackService -> /v1/workout-feedback (Groq); consent; RuleBasedFeedback fallback"
+    },
+    {
+      "feature": "AI coach chat",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "none"
+    },
+    {
+      "feature": "AI credits",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "none"
+    },
+    {
+      "feature": "XP/achievements/challenges",
+      "status": "PARTIALLY IMPLEMENTED",
+      "evidence": "6 local AchievementId + Time Challenge mode; no XP (achievement_service.dart:11)"
+    },
+    {
+      "feature": "voice coach",
+      "status": "PARTIALLY IMPLEMENTED",
+      "evidence": "flutter_tts rep cadence/posture cues WorkoutFeedback; coachingEnabled default false"
+    },
+    {
+      "feature": "friends/leaderboards",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "none; only StoryPage share"
+    },
+    {
+      "feature": "billing iOS",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "no StoreKit/in_app_purchase"
+    },
+    {
+      "feature": "billing Android",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "no Play Billing"
+    },
+    {
+      "feature": "entitlement verification",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "no endpoint/webhook"
+    },
+    {
+      "feature": "auth",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "none"
+    },
+    {
+      "feature": "guest mode",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "app is anonymous-only; no account distinction"
+    },
+    {
+      "feature": "account deletion",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "no accounts; local data delete in SettingsPage._deleteData"
+    },
+    {
+      "feature": "data export",
+      "status": "IMPLEMENTED",
+      "evidence": "WorkoutExportService CSV/JSON + ExportDataSheet (local share)"
+    },
+    {
+      "feature": "notifications/reminders",
+      "status": "NOT IMPLEMENTED",
+      "evidence": "no notification packages; POST_NOTIFICATIONS only in diag manifest"
+    },
+    {
+      "feature": "localization EN",
+      "status": "IMPLEMENTED",
+      "evidence": "S.en app_strings.dart:742, context.tr, en.lproj"
+    },
+    {
+      "feature": "localization VI",
+      "status": "IMPLEMENTED",
+      "evidence": "S.vi app_strings.dart:499 (default), vi.lproj"
+    },
+    {
+      "feature": "accessibility",
+      "status": "PARTIALLY IMPLEMENTED",
+      "evidence": "Semantics in ~15 files; text-scale-aware layouts"
+    },
+    {
+      "feature": "tests",
+      "status": "IMPLEMENTED",
+      "evidence": "333 Dart tests (41 files) + 94 Python backend tests"
+    },
+    {
+      "feature": "CI",
+      "status": "IMPLEMENTED",
+      "evidence": "8 workflows in .github/workflows"
+    }
+  ],
+  "tests": {
+    "dart": {
+      "files": 41,
+      "cases": 333,
+      "unit_test_calls": 239,
+      "widget_test_calls": 94,
+      "integration_test_dir": false,
+      "fixtures": [
+        "test/rep_vector.json",
+        "test/fixtures/video_ground_truth.json",
+        "test/fixtures/pull_up_front.json",
+        "test/fixtures/pull_up_back_closeup.json",
+        "test/fixtures/pull_up_validation_manifest.json",
+        "test/fixtures/a9_stabilization_manifest.json"
+      ]
+    },
+    "python_backend": {
+      "files": 9,
+      "cases": 94
+    },
+    "replay": "CI plays real push-up videos through CameraPage (REPCOACH_CI_VIDEO_ASSET) on iOS simulator (pushup-1, pushup-2, pushup-rest-regression) and Android emulator (pushup-1, pushup-rest-regression); checks tool/check_video_rep_baseline.py and tool/check_video_rest_timeline.py"
+  },
+  "ci": [
+    {
+      "file": ".github/workflows/ios-ci.yml",
+      "triggers": [
+        "push main/master (paths)",
+        "pull_request (paths)",
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "quality: flutter analyze --fatal-infos + flutter test --coverage",
+        "App Store unsigned release build (macos-26)",
+        "iOS simulator video replay matrix (non-PR)"
+      ]
+    },
+    {
+      "file": ".github/workflows/android-replay.yml",
+      "triggers": [
+        "push main/master (paths)",
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "Android emulator replay matrix (informational)"
+      ]
+    },
+    {
+      "file": ".github/workflows/android-test-release.yml",
+      "triggers": [
+        "push main (paths)",
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "build store-flavor test APK, verify signature, GitHub prerelease"
+      ]
+    },
+    {
+      "file": ".github/workflows/app-store-readiness.yml",
+      "triggers": [
+        "pull_request (paths)",
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "contract: check_app_store_readiness.py",
+        "Xcode 26 unsigned iPhone release"
+      ]
+    },
+    {
+      "file": ".github/workflows/backend-ci.yml",
+      "triggers": [
+        "push main/master (paths)",
+        "pull_request (paths)",
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "compileall + unittest discover"
+      ]
+    },
+    {
+      "file": ".github/workflows/staging-integration-ci.yml",
+      "triggers": [
+        "push main/master (paths)",
+        "pull_request (paths)",
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "fake staging backend + dart run tool/staging_contract_smoke.dart + AI Flutter tests"
+      ]
+    },
+    {
+      "file": ".github/workflows/production-readiness.yml",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "tools/production_smoke.py against public host"
+      ]
+    },
+    {
+      "file": ".github/workflows/production-ops-check.yml",
+      "triggers": [
+        "workflow_dispatch"
+      ],
+      "jobs": [
+        "SSH read-only production verification (secret VPS_SSH_KEY by name)"
+      ]
+    }
+  ],
+  "locales": [
+    "vi",
+    "en"
+  ],
+  "l10n_mechanism": "hand-written class S (const S.vi / S.en) + context.tr(vi,en); no ARB, no flutter_localizations",
+  "design_handoff": {
+    "path": "design-handoff/",
+    "added": "2026-09-29",
+    "contents": [
+      "README.md",
+      "docs/DESIGN_HANDOFF.md (1735 lines)",
+      "design/*.dc.html (9 files)",
+      "design/support.js"
+    ],
+    "scope": "earlier 3-tab design (Tập/Lịch sử/Cài đặt); no auth/premium/credits/social/notifications"
+  },
+  "secrets_present_in": [],
+  "secrets_note": "No secret values found in tracked files. backend/.env.example keys are empty; signing files (key.properties, upload-keystore.jks) and backend/.env are not committed; CI references secrets.VPS_SSH_KEY by name only."
+}

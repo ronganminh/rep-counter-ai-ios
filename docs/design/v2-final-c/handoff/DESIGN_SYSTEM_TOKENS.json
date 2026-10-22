@@ -1,0 +1,631 @@
+{
+ "$schema": "https://design-tokens.github.io/community-group/format/ (shape inspired; values are literal)",
+ "meta": {
+  "name": "RepCoach AI · PushPro design tokens",
+  "version": "final-c-2026-10-22",
+  "status": "Approved values from the v1 PushPro Design System and v2 phases; items marked proposed:true are Final C proposals that need sign-off",
+  "sources": [
+   "Claude Design: RepCoach-AI-Design-System.dc.html (PushPro)",
+   "Phase 8 generator lib (shared v2 primitives)",
+   "Flutter repo rep-counter-ai-main/rep_counter_app/lib/theme/app_colors.dart / app_spacing.dart / app_radius.dart / app_motion.dart / app_typography.dart (commit 3594d8a)"
+  ],
+  "verifiedAgainstRepo": "Color, spacing, radius, motion and type-scale values below match the repo theme files at commit 3594d8a unless a note says otherwise.",
+  "referenceFrame": {
+   "device": "iPhone 15",
+   "width": 393,
+   "height": 852,
+   "statusBar": 54,
+   "homeIndicatorInset": 34
+  }
+ },
+ "color": {
+  "dark": {
+   "bg": "#0B0B0C",
+   "surface": "#161618",
+   "surface2": "#202023",
+   "surface3": "#2A2A2E",
+   "surfaceHover": "#1B1B1E",
+   "track": "#3A3A3F",
+   "border": "rgba(255,255,255,0.08)",
+   "borderStrong": "rgba(255,255,255,0.14)",
+   "text": "#F4F4F0",
+   "text2": "#A1A1A6",
+   "text3": "#7C7C82",
+   "textMuted": "#C9C9CE",
+   "textDisabled": "#5C5C62",
+   "accent": "#C8FF2E",
+   "accentHover": "#D6FF5C",
+   "onAccent": "#0B0B0C",
+   "accentTint": "rgba(200,255,46,0.12)",
+   "accentTintSoft": "rgba(200,255,46,0.08)",
+   "accentBorder": "rgba(200,255,46,0.32)",
+   "success": "#3DDC97",
+   "successTint": "rgba(61,220,151,0.12)",
+   "warning": "#FF8A3D",
+   "warningText": "#FFB27F",
+   "warningTint": "rgba(255,138,61,0.12)",
+   "danger": "#FF5A5F",
+   "dangerText": "#FF6B70",
+   "dangerTint": "rgba(255,90,95,0.12)",
+   "info": "#8AB4FF",
+   "scrim": "rgba(0,0,0,0.55)",
+   "scrimStrong": "rgba(0,0,0,0.62)",
+   "canvasBackdrop": "#1A1A1C",
+   "_notes": {
+    "border": "Repo app_colors.dart uses 0x14FFFFFF (8%) and borderStrong 0x24FFFFFF (14%) — same values.",
+    "textMuted": "#C9C9CE is used across v2 designs for secondary body copy; not yet in app_colors.dart → add (proposed).",
+    "info": "#8AB4FF used for EXTENDED badges and OS-prompt link text only.",
+    "canvasBackdrop": "Canvas only, never in the app."
+   }
+  },
+  "light": {
+   "applicability": "Repo defines a light palette (AppPalette.light). All approved v2 designs are dark-only; light mode is NOT designed or approved. Ship dark (ThemeMode.dark, as main.dart does today).",
+   "bg": "#F6F6F3",
+   "surface": "#FFFFFF",
+   "surface2": "#EDEDEA",
+   "text": "#111112",
+   "text2": "#5C5C62",
+   "text3": "#7C7C82",
+   "accentInk": "#4A6B00",
+   "success": "#0F7A4F",
+   "warning": "#B24A00",
+   "status": "repo-only, not design-approved"
+  },
+  "semantic": {
+   "primaryAction": "accent / onAccent",
+   "destructive": "dangerTint bg + dangerText (secondary) · danger bg + onAccent (confirmed destructive)",
+   "sync.synced": "success",
+   "sync.pending": "warningText",
+   "sync.guest": "text2",
+   "record": "accent",
+   "pro": "accent (crown)",
+   "simulatedTag": "warningText (canvas/prototype only)",
+   "focusRing": "accent 2px, offset 2px"
+  }
+ },
+ "typography": {
+  "families": {
+   "display": "Barlow Condensed (600/700/800) — headings, metrics, counters, uppercase titles",
+   "ui": "Inter (400/500/600/700) — all interface and body text",
+   "mono": "ui-monospace, Menlo (design annotations and placeholders like [APP_VERSION] only)"
+  },
+  "vietnamese": "Both families ship the vietnamese subset (Google Fonts unicode-range U+0102-0103, U+0110-0111, U+01A0-01A1, U+01AF-01B0, U+1EA0-1EF9). Verified in Final C by rendering Vietnamese uppercase headings. Bundle the vietnamese subsets in the app (repo bundles Inter + Barlow Condensed 800).",
+  "scale": {
+   "hero": {
+    "family": "Barlow Condensed",
+    "size": 200,
+    "weight": 800,
+    "lineHeight": 0.85,
+    "letterSpacingEm": -0.02,
+    "use": "HUD rep counter (repo AppTypography.hero); v2 HUD uses 120"
+   },
+   "hudCounter": {
+    "family": "Barlow Condensed",
+    "size": 120,
+    "weight": 800,
+    "lineHeight": 0.9,
+    "tabular": true,
+    "use": "v2/Final B HUD counter"
+   },
+   "metric96": {
+    "family": "Barlow Condensed",
+    "size": 96,
+    "weight": 800,
+    "lineHeight": 0.9,
+    "use": "Results total"
+   },
+   "metric64": {
+    "family": "Barlow Condensed",
+    "size": 64,
+    "weight": 800,
+    "lineHeight": 0.9
+   },
+   "metric40": {
+    "family": "Barlow Condensed",
+    "size": 40,
+    "weight": 800,
+    "lineHeight": 0.9
+   },
+   "display40": {
+    "family": "Barlow Condensed",
+    "size": 40,
+    "weight": 800,
+    "lineHeight": 0.95,
+    "transform": "uppercase",
+    "use": "screen titles"
+   },
+   "stat30": {
+    "family": "Barlow Condensed",
+    "size": 30,
+    "weight": 800,
+    "lineHeight": 1,
+    "use": "stat tiles"
+   },
+   "headline28": {
+    "family": "Inter",
+    "size": 28,
+    "weight": 700,
+    "lineHeight": 1.2,
+    "letterSpacingEm": -0.01
+   },
+   "title22": {
+    "family": "Inter",
+    "size": 22,
+    "weight": 700,
+    "lineHeight": 1.25,
+    "use": "sheet titles, greetings"
+   },
+   "title20": {
+    "family": "Inter",
+    "size": 20,
+    "weight": 600,
+    "lineHeight": 1.3
+   },
+   "label16": {
+    "family": "Inter",
+    "size": 16,
+    "weight": 700,
+    "lineHeight": 1,
+    "use": "primary buttons"
+   },
+   "body16": {
+    "family": "Inter",
+    "size": 16,
+    "weight": 400,
+    "lineHeight": 1.5
+   },
+   "row15": {
+    "family": "Inter",
+    "size": 15,
+    "weight": 600,
+    "lineHeight": 1.35,
+    "use": "list row titles"
+   },
+   "body14": {
+    "family": "Inter",
+    "size": 14,
+    "weight": 500,
+    "lineHeight": 1.45
+   },
+   "caption12": {
+    "family": "Inter",
+    "size": 12,
+    "weight": 600,
+    "lineHeight": 1.4,
+    "letterSpacingEm": 0.06,
+    "transform": "uppercase (section caps)"
+   },
+   "tab11": {
+    "family": "Inter",
+    "size": 11,
+    "weight": 600,
+    "use": "tab labels"
+   }
+  },
+  "rules": [
+   "Numbers use tabular figures",
+   "Minimum text size 11 (tab labels) / 12 elsewhere",
+   "Support Dynamic Type / textScaler up to 200%: stat tiles wrap, buttons grow in height, never truncate primary actions"
+  ]
+ },
+ "spacing": {
+  "unit": 4,
+  "scale": {
+   "s1": 4,
+   "s2": 8,
+   "s3": 12,
+   "s4": 16,
+   "s5": 20,
+   "s6": 24,
+   "s8": 32,
+   "s10": 40,
+   "s12": 48,
+   "s14": 56
+  },
+  "screenPaddingH": {
+   "design": 20,
+   "repo": 24,
+   "note": "v2 designs use 20px side padding; repo AppSpacing.screenPadding is 24. Canonical: 20 for v2 screens (proposed alignment; low risk)",
+   "proposed": true
+  },
+  "cardPadding": {
+   "design": "14–16",
+   "repo": 20
+  },
+  "listRowMinHeight": 56,
+  "sectionGap": 12
+ },
+ "radius": {
+  "r6": 6,
+  "r8": 8,
+  "r10": 10,
+  "r12": 12,
+  "r14": 14,
+  "card": 16,
+  "r20": 20,
+  "r24": 24,
+  "sheet": 28,
+  "phoneFrame": 56,
+  "pill": 999,
+  "_notes": "r10 (icon tiles, segmented items) and r14 (inputs) are used in v2 designs but missing from repo AppRadius → add (proposed)."
+ },
+ "border": {
+  "hairline": "1px solid border",
+  "strong": "1px solid borderStrong",
+  "input": "1.5px solid borderStrong; focus 1.5px accent; error 1.5px danger",
+  "accentCard": "1px solid accentBorder",
+  "dashedReuse": "1px dashed rgba(61,220,151,0.45) (canvas only)"
+ },
+ "elevation": {
+  "policy": "Flat. Elevation is expressed by surface steps (bg → surface → surface2 → surface3), not shadows. Repo theme sets elevation 0 everywhere.",
+  "overlay": {
+   "sheetScrim": "rgba(0,0,0,0.55)",
+   "dialogScrim": "rgba(0,0,0,0.6)",
+   "hudGlass": "rgba(11,11,12,0.55) + backdrop blur 10",
+   "toast": "surface2 + 1px borderStrong"
+  },
+  "shadows": {
+   "phoneFrame": "0 0 0 1px rgba(255,255,255,0.1), 0 30px 60px rgba(0,0,0,0.5) (canvas presentation only)",
+   "trainButtonRing": "0 0 0 5px bg"
+  }
+ },
+ "iconography": {
+  "set": "Lucide (lucide_icons_flutter ^3.1.20 in repo)",
+  "stroke": 2,
+  "sizes": {
+   "tab": 24,
+   "navBar": 24,
+   "listTile": 18,
+   "inline": 14,
+   "chip": 14,
+   "hero": 44,
+   "hudGlass": 26
+  },
+  "tile": {
+   "size": 36,
+   "radius": 10,
+   "bg": "surface2"
+  }
+ },
+ "layout": {
+  "grid": "Single column, 20px gutters on 393pt; content max width = device width",
+  "breakpoints": {
+   "compactPhone": "≤375×667 (iPhone SE) — verified: no overflow on 34 journey end screens",
+   "base": "393×852",
+   "largePhone": "430×932 — verified",
+   "tablet": "Not designed; keep phone layout centred at max 600pt (proposed)"
+  },
+  "safeArea": {
+   "top": "status bar 54 (Dynamic Island) — use SafeArea/MediaQuery.padding",
+   "bottom": "home indicator 34; pinned footers add 34 bottom padding; tab screens add 83 tab bar + 12"
+  },
+  "bottomTabs": {
+   "height": 83,
+   "items": [
+    "Home",
+    "Exercises",
+    "Train",
+    "Progress",
+    "Profile"
+   ],
+   "train": {
+    "diameter": 52,
+    "offsetY": -22,
+    "fill": "accent",
+    "icon": "camera 24",
+    "ring": "5px bg"
+   },
+   "inactive": "text3",
+   "active": "accent",
+   "label": "tab11",
+   "hiddenOn": [
+    "onboarding",
+    "auth/gateway/merge",
+    "camera explanation/denied",
+    "HUD",
+    "manual tracking",
+    "recovery",
+    "results/AI feedback/share",
+    "paywall/pro/store/restore",
+    "destructive confirms",
+    "permission pre-prompts",
+    "AI Coach chat"
+   ]
+  }
+ },
+ "components": {
+  "button": {
+   "heights": {
+    "primary": 56,
+    "secondary": 48,
+    "compact": 44
+   },
+   "radius": "pill",
+   "variants": {
+    "primary": "accent bg, onAccent text, label16",
+    "secondary": "surface2 bg, 1px borderStrong, text",
+    "ghost": "transparent, textMuted",
+    "danger": "dangerTint bg, dangerText",
+    "destructiveConfirmed": "danger bg, onAccent (only after typed confirm)",
+    "disabled": "surface3 bg, text3, aria-disabled"
+   },
+   "rules": [
+    "One primary action per screen",
+    "Destructive actions never primary until confirmed",
+    "Min touch target 44 design / 48 repo (AppSpacing.minTouch) — implement 48"
+   ]
+  },
+  "card": {
+   "radius": 16,
+   "bg": "surface",
+   "border": "hairline",
+   "padding": 16,
+   "accentVariant": "border accentBorder for 'today' and upgrade cards"
+  },
+  "listRow": {
+   "minHeight": 56,
+   "padding": "8 14",
+   "iconTile": 36,
+   "divider": "hairline between rows"
+  },
+  "input": {
+   "height": 52,
+   "radius": 14,
+   "bg": "surface",
+   "border": "input",
+   "label": "13/600 textMuted above",
+   "helper": "12/500 below, icon for error/ok"
+  },
+  "switch": {
+   "visual": "52×32 track, 28 thumb",
+   "hitArea": "56×44 (Final B fix)",
+   "on": "accent",
+   "off": "track"
+  },
+  "segmented": {
+   "height": 44,
+   "radius": "14 container / 10 item",
+   "role": "radiogroup"
+  },
+  "sheet": {
+   "radius": "28 top",
+   "grabber": "36×5 track",
+   "padding": "10 20 34",
+   "scrim": "sheetScrim",
+   "role": "dialog"
+  },
+  "dialogOS": {
+   "note": "System alerts are platform-rendered; designs tag them SIMULATED"
+  },
+  "toast": {
+   "position": "bottom, above tab bar (bottom 100)",
+   "radius": 14,
+   "dismiss": "auto 4s (proposed) + close 44×44"
+  },
+  "banner": {
+   "radius": 16,
+   "tones": [
+    "ok",
+    "warn",
+    "err",
+    "lime",
+    "neutral"
+   ],
+   "role": "status"
+  },
+  "statusHero": {
+   "icon": 96,
+   "title": "26/700",
+   "use": "empty, error, success full states"
+  },
+  "progress": {
+   "meterHeight": 8,
+   "radius": "pill",
+   "track": "surface2",
+   "fill": "accent",
+   "ring": "hero ring motif (app icon)"
+  },
+  "loading": {
+   "spinner": "lucide loader, accent, 0.9s linear",
+   "skeleton": "shimmer surface→surface2 (Phase 8)",
+   "rule": "Never block training on network"
+  },
+  "error": {
+   "pattern": "statusHero + one recovery action; say what is safe ('Your workout is saved')",
+   "copy": "no error codes in UI; codes go to diagnostics"
+  },
+  "hud": {
+   "background": "live camera",
+   "glassButton": "64 circle hudGlass",
+   "counter": "hudCounter accent",
+   "privacyBadge": "'On-device' shield, success icon",
+   "holdToFinish": "76 circle, 1s fill",
+   "bannerTop": 300,
+   "rule": "Nothing overlays the HUD: no tab bar, paywall, ad, toast or push"
+  },
+  "badge": {
+   "pro": "crown + PRO accent",
+   "chip": "26 height, r8, tone tints"
+  }
+ },
+ "motion": {
+  "durations": {
+   "press": 120,
+   "fade": 160,
+   "repPulse": 240,
+   "progress": 320,
+   "repFlash": 400,
+   "sheet": 280,
+   "page": 300,
+   "holdToFinish": 1000,
+   "readyHold": 1500
+  },
+  "curves": {
+   "repPulse": "cubic-bezier(0.34,1.56,0.64,1)",
+   "progress": "cubic-bezier(0.34,1.3,0.64,1)",
+   "standard": "easeOutCubic (proposed)"
+  },
+  "reducedMotion": "When MediaQuery.disableAnimations / prefers-reduced-motion: no pulses, scale or shimmer; use instant state changes and fades ≤160ms. Hold-to-finish keeps its 1s timing but shows a static fill.",
+  "_notes": {
+   "sheet": "280 proposed (not in repo)",
+   "page": "300 proposed (Material default)"
+  }
+ },
+ "accessibility": {
+  "contrast": {
+   "text on bg": {
+    "ratio": 17.84,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "text on surface": {
+    "ratio": 16.39,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "text on surface2": {
+    "ratio": 14.74,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "text2 on bg": {
+    "ratio": 7.65,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "text2 on surface": {
+    "ratio": 7.03,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "text2 on surface2": {
+    "ratio": 6.32,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "text3 on bg": {
+    "ratio": 4.74,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "text3 on surface": {
+    "ratio": 4.36,
+    "AA_body": false,
+    "AA_large": true
+   },
+   "text3 on surface2": {
+    "ratio": 3.92,
+    "AA_body": false,
+    "AA_large": true
+   },
+   "textDisabled on bg": {
+    "ratio": 2.96,
+    "AA_body": false,
+    "AA_large": false
+   },
+   "textDisabled on surface": {
+    "ratio": 2.72,
+    "AA_body": false,
+    "AA_large": false
+   },
+   "textDisabled on surface2": {
+    "ratio": 2.45,
+    "AA_body": false,
+    "AA_large": false
+   },
+   "accent on bg": {
+    "ratio": 16.68,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "accent on surface": {
+    "ratio": 15.32,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "accent on surface2": {
+    "ratio": 13.77,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "success on bg": {
+    "ratio": 11.13,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "success on surface": {
+    "ratio": 10.23,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "success on surface2": {
+    "ratio": 9.19,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "warningText on bg": {
+    "ratio": 11.17,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "warningText on surface": {
+    "ratio": 10.26,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "warningText on surface2": {
+    "ratio": 9.23,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "dangerText on bg": {
+    "ratio": 7.11,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "dangerText on surface": {
+    "ratio": 6.53,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "dangerText on surface2": {
+    "ratio": 5.87,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "info on bg": {
+    "ratio": 9.42,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "info on surface": {
+    "ratio": 8.65,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "info on surface2": {
+    "ratio": 7.78,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "onAccent on accent": {
+    "ratio": 16.68,
+    "AA_body": true,
+    "AA_large": true
+   },
+   "onAccent (#0B0B0C) on danger #FF5A5F": {
+    "ratio": 6.45,
+    "AA_body": true,
+    "AA_large": true
+   }
+  },
+  "rules": [
+   "text3 (#7C7C82) on bg passes AA only for large text — use for captions ≥12/600 and non-essential metadata only",
+   "textDisabled is never used for information",
+   "Every icon-only button has a label (Semantics label / aria-label)",
+   "Live regions: rep counter and sync/status banners",
+   "Focus ring accent 2px",
+   "Touch targets ≥ 44pt (iOS) / 48dp (Android)"
+  ]
+ }
+}
