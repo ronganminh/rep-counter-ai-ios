@@ -72,14 +72,16 @@ class FeedbackCard extends StatelessWidget {
                 AppColors.success),
           if (f.improvements.isNotEmpty)
             _section(s.fbImprovements, f.improvements, s,
-                LucideIcons.trendingUp, AppColors.warning),
+                LucideIcons.circleArrowUp, AppColors.warning),
           if (f.isEmpty && f.hasEnoughData)
             Text(s.fbNothingYet,
                 style: const TextStyle(color: AppColors.text2)),
 
           if (f.nextGoalReps != null) ...[
             const SizedBox(height: 6),
+            // "Next session" box (Results AI2): target icon, caption, value.
             Container(
+                key: const Key('feedback-next-goal'),
                 padding: EdgeInsets.all(embedded ? 14 : 0),
                 decoration: embedded
                     ? BoxDecoration(
@@ -88,13 +90,21 @@ class FeedbackCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(12))
                     : null,
                 child: Row(children: [
-                  const Icon(LucideIcons.flag,
-                      size: 18, color: AppColors.accent),
-                  const SizedBox(width: 8),
+                  const Icon(LucideIcons.target,
+                      size: 22, color: AppColors.accent),
+                  const SizedBox(width: 12),
                   Expanded(
-                    child: Text(
-                        '${s.fbNextGoal}: ${f.nextGoalReps} ${s.repsShort}',
-                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(s.fbNextGoal.toUpperCase(),
+                              style: AppTypography.caption12
+                                  .copyWith(color: AppColors.textMuted)),
+                          const SizedBox(height: 2),
+                          Text('${f.nextGoalReps} ${s.repsShort}',
+                              style: AppTypography.label16
+                                  .copyWith(height: 1.3)),
+                        ]),
                   ),
                 ])),
           ],

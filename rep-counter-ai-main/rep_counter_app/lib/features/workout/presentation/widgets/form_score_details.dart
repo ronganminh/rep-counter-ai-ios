@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../../core/i18n/l10n.dart';
 import '../../../../core/i18n/locale_controller.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_typography.dart';
@@ -68,21 +70,53 @@ class FormScoreSection extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text.rich(
-              TextSpan(
-                text: '${quality.qualityScore}',
-                style: AppTypography.metric64.copyWith(
-                  color: AppColors.accent,
-                ),
-                children: [
-                  TextSpan(
-                    text: ' / 100',
-                    style: AppTypography.title20.copyWith(
-                      color: AppColors.text3,
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text.rich(
+                    TextSpan(
+                      text: '${quality.qualityScore}',
+                      style: AppTypography.metric64.copyWith(
+                        color: AppColors.accent,
+                      ),
+                      children: [
+                        TextSpan(
+                          text: ' / 100',
+                          style: AppTypography.title20.copyWith(
+                            color: AppColors.text3,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                ],
-              ),
+                ),
+                // Results R1: the score is an estimate from camera data.
+                Container(
+                  key: const Key('form-score-estimated'),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppColors.surface2,
+                    borderRadius: BorderRadius.circular(6),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(LucideIcons.info,
+                          size: 12, color: AppColors.textMuted),
+                      const SizedBox(width: 4),
+                      Text(
+                        context.l10n.commonHomeEstimated,
+                        style: AppTypography.caption12.copyWith(
+                          letterSpacing: 0,
+                          color: AppColors.textMuted,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             TextButton(

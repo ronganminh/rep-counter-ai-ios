@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../../../core/i18n/locale_controller.dart';
 import '../../../../theme/app_colors.dart';
+import '../../../../theme/app_typography.dart';
 import '../../../../widgets/product_ui.dart';
 import '../../../ai/ai_feedback_service.dart';
 import '../../../ai/presentation/ai_consent.dart';
@@ -46,7 +47,9 @@ class ResultFeedbackCard extends StatelessWidget {
           ]),
       padding: const EdgeInsets.all(20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-        Row(children: [
+        // AI1–AI4 header: source tag on the right ("AI" chip or the grey
+        // quick-feedback tag).
+        Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
           Container(
               padding: const EdgeInsets.all(7),
               decoration: BoxDecoration(
@@ -58,41 +61,52 @@ class ResultFeedbackCard extends StatelessWidget {
           Expanded(
               child: Text(
                   context.tr('RepCoach AI nhận xét', 'RepCoach AI feedback'),
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w700))),
+                  style: AppTypography.label16.copyWith(height: 1.25))),
+          const SizedBox(width: 8),
+          Flexible(
+              child: Container(
+                  key: const Key('feedback-source'),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                      color: c.hasFeedback
+                          ? AppColors.accentTint
+                          : AppColors.surface3,
+                      borderRadius: BorderRadius.circular(6)),
+                  child: Text(
+                      c.hasFeedback
+                          ? context.tr('Nhận xét AI', 'AI feedback')
+                          : context.tr('Nhận xét nhanh · trên máy',
+                              'Quick feedback · on device'),
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: c.hasFeedback
+                              ? AppColors.accent
+                              : AppColors.text2)))),
         ]),
-        const SizedBox(height: 12),
-        Align(
-            alignment: Alignment.centerLeft,
-            child: Container(
-                key: const Key('feedback-source'),
-                padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 5),
-                decoration: BoxDecoration(
-                    color: c.hasFeedback
-                        ? AppColors.accentTint
-                        : AppColors.surface3,
-                    borderRadius: BorderRadius.circular(6)),
-                child: Text(
-                    c.hasFeedback
-                        ? context.tr('Nhận xét AI', 'AI feedback')
-                        : context.tr('Nhận xét nhanh · trên máy',
-                            'Quick feedback · on device'),
-                    style: TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: c.hasFeedback
-                            ? AppColors.accent
-                            : AppColors.text2)))),
         const SizedBox(height: 16),
         if (loading) ...[
-          Semantics(
-              liveRegion: true,
-              child: Text(context.tr(
-                  'AI đang đọc số liệu…', 'AI is reviewing your statistics…'))),
-          const SizedBox(height: 10),
           LinearProgressIndicator(
               key: const Key('ai-loading'),
+              minHeight: 3,
+              borderRadius: BorderRadius.circular(999),
+              backgroundColor: AppColors.surface3,
               value: MediaQuery.disableAnimationsOf(context) ? 0 : null),
+          const SizedBox(height: 16),
+          // AI1: skeleton of the ready card so the screen does not jump.
+          if (!c.hasFeedback) ...[
+            const _Skeleton(),
+            const SizedBox(height: 16),
+          ],
+          Semantics(
+              liveRegion: true,
+              child: Text(
+                  context.tr('AI đang đọc số liệu…',
+                      'AI is reviewing your statistics…'),
+                  style: AppTypography.body14
+                      .copyWith(color: AppColors.textMuted))),
           const SizedBox(height: 16),
         ],
         if (hasError || unavailable) ...[
@@ -107,8 +121,8 @@ class ResultFeedbackCard extends StatelessWidget {
         if (c.hasFeedback)
           Text(c.record.aiFeedback!,
               key: const Key('ai-feedback-text'),
-              style: const TextStyle(fontSize: 18, height: 1.4))
-        else
+              style: AppTypography.title20.copyWith(height: 1.4))
+        else if (!loading)
           FeedbackCard(record: c.record, embedded: true),
         if (c.saveFailed) ...[
           const SizedBox(height: 16),
@@ -184,4 +198,45 @@ class _Notice extends StatelessWidget {
                     style: const TextStyle(
                         color: AppColors.warningText, height: 1.4))),
           ])));
+}
+
+class _Skeleton extends StatelessWidget {
+  const _Skeleton();
+  @override
+  Widget build(BuildContext context) {
+    Widget bar(double widthFactor, {double height = 12}) => FractionallySizedBox(
+        alignment: Alignment.centerLeft,
+        widthFactor: widthFactor,
+        child: Container(
+            height: height,
+            decoration: BoxDecoration(
+                color: AppColors.surface3,
+                borderRadius: BorderRadius.circular(999))));
+    return ExcludeSemantics(
+        key: const Key('ai-skeleton'),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          bar(.95, height: 14),
+          const SizedBox(height: 10),
+          bar(.7, height: 14),
+          const SizedBox(height: 18),
+          for (final w in [.75, .8, .65]) ...[
+            Row(children: [
+              Container(
+                  width: 18,
+                  height: 18,
+                  decoration: const BoxDecoration(
+                      color: AppColors.surface3, shape: BoxShape.circle)),
+              const SizedBox(width: 10),
+              Expanded(child: bar(w)),
+            ]),
+            const SizedBox(height: 12),
+          ],
+          const SizedBox(height: 4),
+          Container(
+              height: 62,
+              decoration: BoxDecoration(
+                  color: AppColors.surface2,
+                  borderRadius: BorderRadius.circular(12))),
+        ]));
+  }
 }

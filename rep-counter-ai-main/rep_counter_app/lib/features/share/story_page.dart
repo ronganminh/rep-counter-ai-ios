@@ -161,95 +161,133 @@ class StoryCard extends StatelessWidget {
             .firstOrNull
             ?.localizedName(context.s) ??
         r.exerciseName;
+    final form = r.quality?.hasEnoughData == true
+        ? '${r.quality!.qualityScore}'
+        : null;
+    final (goalValue, goalLabel) = goal == null
+        ? ('∞', context.l10n.legacyStoryPageFreeWorkout)
+        : r.reps == goal
+            ? ('100%', context.l10n.legacyStoryPageGoalReached)
+            : r.reps > goal
+                ? ('+${r.reps - goal}', context.l10n.legacyStoryPageAboveGoal)
+                : (
+                    '${(r.reps / goal * 100).round()}%',
+                    context.l10n.legacyStoryPageGoalProgress
+                  );
+    // S1: left-aligned 9:16 card, numbers only (no camera image or face).
     return ColoredBox(
         color: AppColors.bg,
         child: Padding(
-            padding: const EdgeInsets.all(28),
+            padding: const EdgeInsets.fromLTRB(28, 32, 28, 28),
             child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                      '${r.startedAt.day}.${r.startedAt.month}.${r.startedAt.year}',
-                      style: const TextStyle(
-                          color: AppColors.text2, fontSize: 14)),
+                      '${r.startedAt.day.toString().padLeft(2, '0')}.${r.startedAt.month.toString().padLeft(2, '0')}.${r.startedAt.year}',
+                      style: AppTypography.caption12.copyWith(
+                          fontSize: 13, color: AppColors.textMuted)),
                   const Spacer(),
                   SizedBox(
-                      height: 150,
+                      height: 170,
                       child: FittedBox(
                           fit: BoxFit.contain,
+                          alignment: Alignment.bottomLeft,
                           child: Text('${r.reps}',
                               style: AppTypography.hero.copyWith(
                                   fontSize: 220, color: AppColors.accent)))),
-                  Text('REP · ${name.toUpperCase()}',
+                  const SizedBox(height: 8),
+                  Text('REP ${name.toUpperCase()}',
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      textAlign: TextAlign.center,
-                      style: AppTypography.display40.copyWith(fontSize: 26)),
-                  const SizedBox(height: 14),
+                      style: AppTypography.display40
+                          .copyWith(fontSize: 44, height: 1)),
+                  const SizedBox(height: 6),
                   Text(
                       '${r.sets} set · ${workoutTime(Duration(seconds: r.durationSeconds))}',
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(color: AppColors.text2)),
-                  const SizedBox(height: 14),
-                  Row(children: [
-                    Expanded(
-                        child: _Metric(
-                            r.quality?.hasEnoughData == true
-                                ? '${r.quality!.qualityScore}/100'
-                                : '—',
-                            context.l10n.legacyStoryPageFormScore)),
-                    Expanded(
-                        child: _Metric(
-                            goal == null
-                                ? '∞'
-                                : r.reps == goal
-                                    ? '100%'
-                                    : r.reps > goal
-                                        ? '+${r.reps - goal}'
-                                        : '${(r.reps / goal * 100).round()}%',
-                            goal == null
-                                ? context.l10n.legacyStoryPageFreeWorkout
-                                : r.reps == goal
-                                    ? context.l10n.legacyStoryPageGoalReached
-                                    : r.reps > goal
-                                        ? context.l10n.legacyStoryPageAboveGoal
-                                        : context.l10n.legacyStoryPageGoalProgress)),
-                  ]),
-                  const SizedBox(height: 14),
+                      style: AppTypography.body14
+                          .copyWith(color: AppColors.textMuted)),
+                  const SizedBox(height: 20),
+                  IntrinsicHeight(
+                      child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                        Flexible(
+                            child: _Metric(form ?? '—',
+                                context.l10n.legacyStoryPageFormScore,
+                                suffix: form == null ? null : '/100')),
+                        const Padding(
+                            padding: EdgeInsets.symmetric(horizontal: 20),
+                            child: VerticalDivider(
+                                width: 1, color: AppColors.borderStrong)),
+                        Flexible(child: _Metric(goalValue, goalLabel)),
+                      ])),
+                  const SizedBox(height: 24),
                   if (r.aiFeedback?.trim().isNotEmpty == true)
                     Container(
-                        padding: const EdgeInsets.all(14),
+                        padding: const EdgeInsets.fromLTRB(14, 12, 16, 12),
                         decoration: BoxDecoration(
                             color: AppColors.surface,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(color: AppColors.accentBorder)),
-                        child: Text(r.aiFeedback!,
-                            maxLines: 3,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(fontSize: 14, height: 1.4))),
+                        child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                  padding: EdgeInsets.only(top: 1),
+                                  child: Icon(LucideIcons.sparkles,
+                                      size: 18, color: AppColors.accent)),
+                              const SizedBox(width: 10),
+                              Expanded(
+                                  child: Text(r.aiFeedback!,
+                                      maxLines: 3,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: AppTypography.body14
+                                          .copyWith(height: 1.4))),
+                            ])),
                   const Spacer(),
-                  Text('REPCOACH AI',
-                      textAlign: TextAlign.center,
-                      style: AppTypography.display40.copyWith(fontSize: 24)),
-                  const SizedBox(height: 8),
-                  Text(context.l10n.legacyStoryPageEveryRepCounts,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontSize: 12, color: AppColors.text3)),
+                  Center(
+                      child: Text.rich(
+                          const TextSpan(children: [
+                            TextSpan(text: 'REPCOACH '),
+                            TextSpan(
+                                text: 'AI',
+                                style: TextStyle(color: AppColors.accent)),
+                          ]),
+                          style:
+                              AppTypography.display40.copyWith(fontSize: 24))),
+                  const SizedBox(height: 6),
+                  Center(
+                      child: Text(context.l10n.legacyStoryPageEveryRepCounts,
+                          textAlign: TextAlign.center,
+                          style: AppTypography.caption12.copyWith(
+                              letterSpacing: 0, color: AppColors.text2))),
                 ])));
   }
 }
 
 class _Metric extends StatelessWidget {
-  const _Metric(this.value, this.label);
+  const _Metric(this.value, this.label, {this.suffix});
   final String value, label;
+  final String? suffix;
   @override
-  Widget build(BuildContext context) => Column(children: [
-        FittedBox(
-            child: Text(value,
-                style: AppTypography.display40.copyWith(fontSize: 32))),
-        Text(label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontSize: 12, color: AppColors.text2)),
-      ]);
+  Widget build(BuildContext context) => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text.rich(TextSpan(children: [
+                  TextSpan(text: value),
+                  if (suffix != null)
+                    TextSpan(
+                        text: suffix,
+                        style: AppTypography.display40.copyWith(
+                            fontSize: 18, color: AppColors.textMuted)),
+                ]), style: AppTypography.display40.copyWith(fontSize: 36))),
+            const SizedBox(height: 2),
+            Text(label,
+                style: AppTypography.body14
+                    .copyWith(fontSize: 13, color: AppColors.textMuted)),
+          ]);
 }

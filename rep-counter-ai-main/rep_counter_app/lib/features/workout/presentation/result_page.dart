@@ -203,6 +203,7 @@ class _ResultPageState extends State<ResultPage> {
                       padding: const EdgeInsets.fromLTRB(20, 12, 20, 16),
                       child: Row(children: [
                         Expanded(
+                            flex: 3,
                             child: FilledButton(
                                 key: const Key('result-done'),
                                 onPressed: _deleting ? null : _close,
@@ -221,18 +222,30 @@ class _ResultPageState extends State<ResultPage> {
                               icon: const Icon(LucideIcons.trash2)),
                         ],
                         if (!timed || widget.readOnly) ...[
-                          const SizedBox(width: 8),
-                          IconButton.filledTonal(
-                              key: const Key('open-story'),
-                              tooltip: context.tr('Chia sẻ', 'Share'),
-                              onPressed: _deleting
-                                  ? null
-                                  : () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute<void>(
-                                          builder: (_) => StoryPage(
-                                              record: _controller.record))),
-                              icon: const Icon(LucideIcons.share2)),
+                          const SizedBox(width: 10),
+                          // R1/R2: labelled secondary "Share" next to Done.
+                          Flexible(
+                              flex: 2,
+                              child: OutlinedButton.icon(
+                                  key: const Key('open-story'),
+                                  style: OutlinedButton.styleFrom(
+                                      minimumSize: const Size(56, 56),
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      backgroundColor: AppColors.surface2,
+                                      foregroundColor: AppColors.text,
+                                      side: const BorderSide(
+                                          color: AppColors.borderStrong)),
+                                  onPressed: _deleting
+                                      ? null
+                                      : () => Navigator.push(
+                                          context,
+                                          MaterialPageRoute<void>(
+                                              builder: (_) => StoryPage(
+                                                  record: _controller.record))),
+                                  icon: const Icon(LucideIcons.share, size: 20),
+                                  label: Text(context.tr('Chia sẻ', 'Share'),
+                                      overflow: TextOverflow.ellipsis))),
                         ],
                       ])))),
           body: timed

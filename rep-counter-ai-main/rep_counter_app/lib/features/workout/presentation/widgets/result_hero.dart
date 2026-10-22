@@ -58,22 +58,40 @@ class ResultHero extends StatelessWidget {
                               backgroundColor: Colors.transparent)),
                     Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child:
-                            Column(mainAxisSize: MainAxisSize.min, children: [
-                          FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text('${r.reps}',
-                                  textScaler: TextScaler.noScaling,
-                                  style: AppTypography.hero
-                                      .copyWith(fontSize: 112))),
-                          const SizedBox(height: 8),
-                          FittedBox(
-                              fit: BoxFit.scaleDown,
-                              child: Text(
-                                  goal == null ? s.repsShort : '/ $goal',
-                                  style: AppTypography.display40.copyWith(
-                                      fontSize: 32, color: AppColors.text3))),
-                        ])),
+                        // R1/R2: the goal sits on the count's baseline;
+                        // free workouts label the count underneath (FA-03a).
+                        child: FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: goal == null
+                                ? Column(mainAxisSize: MainAxisSize.min, children: [
+                                    Text('${r.reps}',
+                                        textScaler: TextScaler.noScaling,
+                                        style: AppTypography.hero
+                                            .copyWith(fontSize: 112)),
+                                    const SizedBox(height: 8),
+                                    Text(s.repsShort,
+                                        style: AppTypography.body16.copyWith(
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.textMuted)),
+                                  ])
+                                : Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                                    textBaseline: TextBaseline.alphabetic,
+                                    children: [
+                                        Text('${r.reps}',
+                                            textScaler: TextScaler.noScaling,
+                                            style: AppTypography.hero
+                                                .copyWith(fontSize: 112)),
+                                        const SizedBox(width: 2),
+                                        Text('/$goal',
+                                            textScaler: TextScaler.noScaling,
+                                            style: AppTypography.display40
+                                                .copyWith(
+                                                    fontSize: 34,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: AppColors.textMuted)),
+                                      ]))),
                   ])))),
       const SizedBox(height: 24),
       Container(
