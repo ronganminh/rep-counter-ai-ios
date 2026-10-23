@@ -8,20 +8,29 @@ import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../../../widgets/status_badges.dart';
+import '../../../widgets/app_button.dart';
+import '../../../widgets/app_feedback.dart';
+import '../../auth/application/auth_controller.dart';
+import '../../auth/application/auth_scope.dart';
+import '../../auth/presentation/auth_welcome_page.dart';
+import '../../auth/presentation/sign_in_page.dart';
+import '../../auth/presentation/verify_email_page.dart';
 import '../../legal/settings_page.dart';
 
 /// Profile tab root (P9-07, N-1).
 ///
-/// Accounts do not exist yet (A-1 is blocked on an auth provider, D-12), so
-/// this is the guest variant: it states that data stays on this phone and
-/// leads to the existing Settings and support. No sign-in entry is shown
-/// until a real provider exists.
+/// Without accounts (no [AuthScope]: `FeatureFlags.enableAccounts` is off,
+/// the production default) this is the guest variant: data stays on this
+/// phone, plus the existing Settings and support. With accounts on it adds
+/// sign-in, the signed-in account and the expired-session banner (A-1).
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final auth = AuthScope.maybeOf(context);
+    final state = auth?.state;
     return Scaffold(
       body: SafeArea(
         child: ListView(
@@ -33,6 +42,20 @@ class ProfilePage extends StatelessWidget {
                   style: AppTypography.display40),
             ),
             const SizedBox(height: 20),
+            if (auth != null && state is AuthExpired) ...[
+              AppBanner(
+                key: const Key('profile-session-expired'),
+                title: l.authSessionExpired,
+                tone: AppBannerTone.warn,
+                actionLabel: l.authSignIn,
+                onAction: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => SignInPage(controller: auth))),
+              ),
+              const SizedBox(height: 16),
+            ],
+            if (auth != null && state is AuthSignedIn)
+              _AccountCard(controller: auth, state: state)
+            else
             Container(
               key: const Key('profile-guest-card'),
               padding: AppSpacing.cardPaddingV2,
@@ -49,6 +72,18 @@ class ProfilePage extends StatelessWidget {
                   Text(l.authTrainWithoutAccount,
                       style: AppTypography.body14
                           .copyWith(color: AppColors.text2)),
+                  if (auth != null && state is AuthGuest) ...[
+                    const SizedBox(height: 16),
+                    AppButton(
+                      key: const Key('profile-sign-in'),
+                      label: l.authSignIn,
+                      icon: LucideIcons.logIn,
+                      onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<bool>(
+                              builder: (_) =>
+                                  AuthWelcomePage(controller: auth))),
+                    ),
+                  ],
                 ],
               ),
             ),
@@ -77,6 +112,48 @@ class ProfilePage extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _AccountCard extends StatelessWidget {
+  const _AccountCard({required this.controller, required this.state});
+  final AuthController controller;
+  final AuthSignedIn state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Card(
+      key: const Key('profile-account-card'),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: [
+        SettingsRow(
+          icon: LucideIcons.circleUser,
+          title: state.user.email ?? l.authSignedPhone,
+          subtitle: l.authSignedPhone,
+        ),
+        if (state.needsVerification) ...[
+          const Divider(indent: 52, endIndent: 16),
+          SettingsRow(
+            key: const Key('profile-verify-email'),
+            icon: LucideIcons.mailWarning,
+            title: l.authVerifyEmail,
+            subtitle: l.authCanStartTrainingNow,
+            trailing: const Icon(LucideIcons.chevronRight,
+                size: 18, color: AppColors.text2),
+            onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                builder: (_) => VerifyEmailPage(controller: controller))),
+          ),
+        ],
+        const Divider(indent: 52, endIndent: 16),
+        SettingsRow(
+          key: const Key('profile-sign-out'),
+          icon: LucideIcons.logOut,
+          title: l.authSignOut,
+          onTap: controller.signOut,
+        ),
+      ]),
     );
   }
 }
