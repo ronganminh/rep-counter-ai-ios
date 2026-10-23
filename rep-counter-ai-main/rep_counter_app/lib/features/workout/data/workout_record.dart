@@ -21,6 +21,8 @@ class WorkoutRecord {
     this.quality,
     this.repDetails,
     this.routine,
+    this.partial = false,
+    this.manual = false,
   }) : _mode = mode;
 
   /// Số liệu chất lượng lấy từ `WorkoutSummary`.
@@ -86,6 +88,14 @@ class WorkoutRecord {
   final WorkoutQuality? quality;
   final RoutineSnapshot? routine;
 
+  /// Saved from a recovered draft (F-4/W-5): the workout ended before
+  /// Finish, so it has counted reps but no form data.
+  final bool partial;
+
+  /// Logged by hand (W-4): no camera, so no form data, and never counted
+  /// toward timed challenges or personal bests.
+  final bool manual;
+
   /// Optional local-only timing detail; legacy records remain readable.
   final List<StoredRep>? repDetails;
 
@@ -128,6 +138,8 @@ class WorkoutRecord {
         if (repDetails != null)
           'rep_details': repDetails!.map((r) => r.toJson()).toList(),
         if (repDetails != null) 'rep_details_version': 2,
+        if (partial) 'partial': true,
+        if (manual) 'source': 'manual',
       };
 
   /// Aggregate workout fields only. API contract metadata such as
@@ -168,6 +180,8 @@ class WorkoutRecord {
         quality: quality,
         repDetails: repDetails,
         routine: routine,
+        partial: partial,
+        manual: manual,
       );
 
   factory WorkoutRecord.fromJson(Map<String, dynamic> j) {
@@ -191,6 +205,8 @@ class WorkoutRecord {
       repDetails: _readRepDetails(j),
       quality: _readQuality(j['quality']),
       routine: _readRoutine(j['routine']),
+      partial: j['partial'] == true,
+      manual: j['source'] == 'manual',
     );
   }
 

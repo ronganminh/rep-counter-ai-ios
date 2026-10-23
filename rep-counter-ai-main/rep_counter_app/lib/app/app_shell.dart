@@ -6,6 +6,9 @@ import '../features/profile/presentation/profile_page.dart';
 import '../features/workout/presentation/history_page.dart';
 import '../exercise.dart';
 import '../features/plan/presentation/plan_today_sheet.dart';
+import '../core/i18n/l10n.dart';
+import '../features/workout/presentation/recovery_page.dart';
+import '../widgets/app_feedback.dart';
 import 'app_tab_bar.dart';
 import 'route_observer.dart';
 
@@ -19,6 +22,26 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> with RouteAware {
   AppTab _tab = AppTab.home;
   int _revision = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // W-5: offer an unfinished workout once the shell is on screen.
+    WidgetsBinding.instance.addPostFrameCallback((_) => _recover());
+  }
+
+  Future<void> _recover() async {
+    try {
+      final outcome = await RecoveryPage.showIfPending(context);
+      if (!mounted || outcome == null) return;
+      if (outcome == RecoveryOutcome.savedPartial) {
+        AppToast.show(context, context.l10n.resultsSavedPartial);
+      }
+      setState(() => _revision++);
+    } catch (_) {
+      // Recovery must never stop the app from opening; the draft stays.
+    }
+  }
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();

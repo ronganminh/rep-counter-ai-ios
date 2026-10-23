@@ -27,6 +27,8 @@ dependencies:
   url_launcher: ^6.3.2
   audioplayers: ^6.8.1
   package_info_plus: ^10.2.2
+  path: ^1.9.1
+  sqflite: ^2.4.5
 
 dev_dependencies:
   flutter_test:
@@ -34,7 +36,7 @@ dev_dependencies:
   camera_platform_interface: ^2.14.0
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.4
-
+  sqflite_common_ffi: ^2.4.5
 flutter:
   generate: true
   config:

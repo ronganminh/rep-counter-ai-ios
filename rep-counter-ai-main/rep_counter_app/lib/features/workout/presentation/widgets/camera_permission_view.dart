@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import '../../../../core/i18n/l10n.dart';
 import '../../../../core/i18n/locale_controller.dart';
 import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_typography.dart';
@@ -15,11 +16,15 @@ class CameraPermissionView extends StatelessWidget {
       required this.actionLabel,
       required this.onAction,
       required this.onExit,
-      this.onRetry});
+      this.onRetry,
+      this.onManual});
   final String title, body, actionLabel;
   final bool denied, loading;
   final VoidCallback onAction, onExit;
   final VoidCallback? onRetry;
+
+  /// W-4: log reps by hand instead of using the camera.
+  final VoidCallback? onManual;
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
@@ -114,6 +119,13 @@ class CameraPermissionView extends StatelessWidget {
                                               onPressed: onRetry,
                                               child: Text(context
                                                   .s.cameraGrantedRetry)),
+                                        if (onManual != null)
+                                          TextButton(
+                                              key: const Key(
+                                                  'camera-track-manually'),
+                                              onPressed: onManual,
+                                              child: Text(context
+                                                  .l10n.cameraTrackManually)),
                                         TextButton(
                                             onPressed: onExit,
                                             child: Text(
