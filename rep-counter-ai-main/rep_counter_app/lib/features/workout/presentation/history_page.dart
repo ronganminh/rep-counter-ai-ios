@@ -14,10 +14,42 @@ import '../domain/workout_mode.dart';
 import 'exercise_icon.dart';
 import 'result_page.dart';
 
-class HistoryPage extends StatefulWidget {
-  const HistoryPage({super.key, this.onTrain});
+/// Which parts of the history/progress screen to show.
+///
+/// v2 (roadmap H-1) splits the v1 History tab: the Progress tab shows the
+/// analytics ([progress]) and opens the session list ([list]) as a child
+/// route. Both read the same store and the same [ProgressStatistics], so
+/// totals have a single source. [all] is the v1 combined screen.
+enum HistorySections { all, progress, list }
+
+/// Progress tab root (P3-01): analytics only, with a link to the list.
+class ProgressPage extends StatelessWidget {
+  const ProgressPage({super.key, this.onTrain});
 
   final VoidCallback? onTrain;
+
+  @override
+  Widget build(BuildContext context) =>
+      HistoryPage(onTrain: onTrain, sections: HistorySections.progress);
+}
+
+/// Workout history list (P3-07): sessions with open, delete and undo.
+class HistoryListPage extends StatelessWidget {
+  const HistoryListPage({super.key, this.onTrain});
+
+  final VoidCallback? onTrain;
+
+  @override
+  Widget build(BuildContext context) =>
+      HistoryPage(onTrain: onTrain, sections: HistorySections.list);
+}
+
+class HistoryPage extends StatefulWidget {
+  const HistoryPage(
+      {super.key, this.onTrain, this.sections = HistorySections.all});
+
+  final VoidCallback? onTrain;
+  final HistorySections sections;
 
   @override
   State<HistoryPage> createState() => _HistoryPageState();
@@ -112,9 +144,66 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+  bool get _showAnalytics => widget.sections != HistorySections.list;
+  bool get _showSessions => widget.sections != HistorySections.progress;
+
+  Future<void> _openHistoryList() async {
+    await Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => HistoryListPage(onTrain: widget.onTrain)));
+    // Deletions in the list change the totals shown here.
+    if (mounted) await _reload();
+  }
+
+  Widget _header(BuildContext context) {
+    if (widget.sections == HistorySections.progress) {
+      return Row(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Expanded(
+            child: Semantics(
+              header: true,
+              child: Text(
+                context.tr('Tiến bộ', 'Progress').toUpperCase(),
+                style: AppTypography.display40,
+              ),
+            ),
+          ),
+          TextButton.icon(
+            key: const Key('open-history-list'),
+            onPressed: _openHistoryList,
+            icon: const Icon(LucideIcons.history, size: 18),
+            label: Text(context.s.historyTitle),
+          ),
+        ],
+      );
+    }
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Expanded(
+          child: Text(
+            context.s.historyTitle.toUpperCase(),
+            style: AppTypography.display40,
+          ),
+        ),
+        if (widget.sections == HistorySections.all)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 5),
+            child: Text(
+              context.tr('Tiến bộ', 'Progress'),
+              style: AppTypography.body14.copyWith(
+                color: context.palette.accentInk,
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: widget.sections == HistorySections.list ? AppBar() : null,
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: _reload,
@@ -122,26 +211,7 @@ class _HistoryPageState extends State<HistoryPage> {
             physics: const AlwaysScrollableScrollPhysics(),
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 32),
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Expanded(
-                    child: Text(
-                      context.s.historyTitle.toUpperCase(),
-                      style: AppTypography.display40,
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 5),
-                    child: Text(
-                      context.tr('Tiến bộ', 'Progress'),
-                      style: AppTypography.body14.copyWith(
-                        color: context.palette.accentInk,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              _header(context),
               const SizedBox(height: 20),
               _RangeSelector(
                 selected: _range,
@@ -217,21 +287,23 @@ class _HistoryPageState extends State<HistoryPage> {
           onSelected: (value) => setState(() => _filter = value),
         ),
         const SizedBox(height: 18),
-        _SummaryMetrics(stats: stats),
-        const SizedBox(height: 22),
-        _PersonalRecordsCard(stats: stats),
-        const SizedBox(height: 16),
-        _TrendCard(
-          stats: stats,
-          selected: _trend,
-          onSelected: (value) => setState(() => _trend = value),
-        ),
-        const SizedBox(height: 16),
-        _HeatmapCard(stats: stats),
-        const SizedBox(height: 24),
+        if (_showAnalytics) ...[
+          _SummaryMetrics(stats: stats),
+          const SizedBox(height: 22),
+          _PersonalRecordsCard(stats: stats),
+          const SizedBox(height: 16),
+          _TrendCard(
+            stats: stats,
+            selected: _trend,
+            onSelected: (value) => setState(() => _trend = value),
+          ),
+          const SizedBox(height: 16),
+          _HeatmapCard(stats: stats),
+          const SizedBox(height: 24),
+        ],
         if (stats.records.isEmpty)
           _RangeEmptyMessage(onTrain: _startTraining)
-        else ...[
+        else if (_showSessions) ...[
           SectionLabel(context.tr('Buổi tập', 'Sessions')),
           for (final group in groups.entries) ...[
             Padding(

@@ -443,6 +443,9 @@ void main() {
       expect(tester.takeException(), isNull, reason: 'Home at $scale text');
       await tester.tap(find.text('Tiến bộ').last);
       await tester.pumpAndSettle();
+      // v2 (H-1): sessions live in History under the Progress tab.
+      await tester.tap(find.byKey(const Key('open-history-list')));
+      await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.byType(ListTile), 250,
           scrollable: find.byType(Scrollable).first);
       await tester.pumpAndSettle();
