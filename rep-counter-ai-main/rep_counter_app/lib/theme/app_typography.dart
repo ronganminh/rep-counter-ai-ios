@@ -38,6 +38,22 @@ abstract final class AppTypography {
   static TextStyle get caption12 =>
       _inter(12, FontWeight.w600, 1.4, spacingEm: .06);
 
+  // Final C additions. Barlow Condensed uses line height >= 1.0 with even
+  // leading so numerals and stacked Vietnamese diacritics are not clipped
+  // (COMPONENT_REGISTRY V-9).
+  static TextStyle _barlowV2(double size, FontWeight weight) =>
+      _barlow(size, weight, 1)
+          .copyWith(leadingDistribution: TextLeadingDistribution.even);
+
+  static TextStyle get hudCounter => _barlowV2(120, FontWeight.w800);
+  static TextStyle get metric96 => _barlowV2(96, FontWeight.w800);
+  static TextStyle get stat30 => _barlowV2(30, FontWeight.w800);
+  static TextStyle get title22 => _inter(22, FontWeight.w700, 1.25);
+  static TextStyle get row15 => _inter(15, FontWeight.w600, 1.35);
+  // The token file gives no line height for tab labels; keep the font default.
+  static TextStyle get tab11 => const TextStyle(
+      fontFamily: 'Inter', fontSize: 11, fontWeight: FontWeight.w600);
+
   static TextTheme textTheme(Color text, Color text2) => TextTheme(
         displayLarge: hero.copyWith(color: text),
         displayMedium: metric64.copyWith(color: text),

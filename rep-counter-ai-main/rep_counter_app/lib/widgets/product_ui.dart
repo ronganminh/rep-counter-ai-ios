@@ -86,7 +86,8 @@ class SettingsRow extends StatelessWidget {
                     if (subtitle != null) ...[
                       const SizedBox(height: 4),
                       Text(subtitle!,
-                          style: TextStyle(color: p.text3, fontSize: 13)),
+                          // Body-size text on a card: text3 is 4.36:1 here (D-25).
+                          style: TextStyle(color: p.text2, fontSize: 13)),
                     ],
                     if (stacked) ...[const SizedBox(height: 8), end!],
                   ])),
@@ -96,7 +97,6 @@ class SettingsRow extends StatelessWidget {
     });
   }
 }
-
 
 /// Shared single-choice pill from the vNext design system.
 ///
@@ -183,7 +183,7 @@ class MetricCard extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: AppTypography.caption12.copyWith(color: p.text3),
+            style: AppTypography.caption12.copyWith(color: p.text2),
           ),
           const SizedBox(height: 10),
           Text(
