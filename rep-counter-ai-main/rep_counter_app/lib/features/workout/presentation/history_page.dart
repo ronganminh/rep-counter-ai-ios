@@ -1131,6 +1131,12 @@ class _SessionRow extends StatelessWidget {
                 color: r.goalReached ? p.success : p.text2,
               ),
             ),
+            if (r.partial)
+              Text(
+                context.l10n.progressPartial,
+                key: const Key('history-partial'),
+                style: TextStyle(fontSize: 12, color: p.warningText),
+              ),
           ],
         ),
         subtitle: Column(
