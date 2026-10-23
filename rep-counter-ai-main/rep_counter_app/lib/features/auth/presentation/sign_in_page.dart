@@ -7,6 +7,7 @@ import '../application/auth_controller.dart';
 import '../domain/auth_repository.dart';
 import '../domain/auth_validation.dart';
 import 'auth_widgets.dart';
+import 'password_reset_pages.dart';
 import 'sign_up_page.dart';
 
 /// Phase 9 sign-in: providers, then email + password. Pops `true` when
@@ -91,7 +92,19 @@ class _SignInPageState extends State<SignInPage> {
                 label: l.authEnterPassword,
                 errorText: _passwordError,
                 onSubmitted: _submit),
-            const SizedBox(height: 20),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                  key: const Key('auth-forgot-password'),
+                  onPressed: c.busy
+                      ? null
+                      : () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              builder: (_) => ForgotPasswordPage(
+                                  controller: c, initialEmail: _email.text))),
+                  child: Text(l.authForgotPassword)),
+            ),
+            const SizedBox(height: 8),
             AppButton(
                 key: const Key('auth-submit'),
                 label: c.busy ? l.authSigning : l.authSignIn,

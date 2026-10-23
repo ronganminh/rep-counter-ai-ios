@@ -46,6 +46,14 @@ String authProviderName(AuthProvider p) => switch (p) {
             : l.authValueConfirmedEmailWhich(
                 authProviderName(provider), authProviderName(provider))
       ),
+    AuthFailureKind.emailNotConfirmed => (
+        l.authConfirmEmail,
+        l.authCanStartTrainingNow
+      ),
+    AuthFailureKind.recoveryLinkInvalid => (
+        l.authResetLinkNoLonger,
+        l.authMayHaveExpiredAlready
+      ),
     AuthFailureKind.weakPassword => (
         l.authNotCommonlyUsedLeaked,
         l.authUseLeastCharacters

@@ -27,6 +27,11 @@ dependencies:
   url_launcher: ^6.3.2
   audioplayers: ^6.8.1
   package_info_plus: ^10.2.2
+  supabase_flutter: ^2.18.3
+  flutter_secure_storage: ^11.2.0
+  sign_in_with_apple: ^8.2.0
+  google_sign_in: ^7.2.0
+  crypto: ^3.0.7
 
 dev_dependencies:
   flutter_test:

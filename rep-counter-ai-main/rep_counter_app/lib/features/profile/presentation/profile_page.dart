@@ -13,6 +13,7 @@ import '../../../widgets/app_feedback.dart';
 import '../../auth/application/auth_controller.dart';
 import '../../auth/application/auth_scope.dart';
 import '../../auth/presentation/auth_welcome_page.dart';
+import '../../auth/presentation/password_reset_pages.dart';
 import '../../auth/presentation/sign_in_page.dart';
 import '../../auth/presentation/verify_email_page.dart';
 import '../../legal/settings_page.dart';
@@ -152,6 +153,16 @@ class _AccountCard extends StatelessWidget {
           icon: LucideIcons.logOut,
           title: l.authSignOut,
           onTap: controller.signOut,
+        ),
+        const Divider(indent: 52, endIndent: 16),
+        SettingsRow(
+          key: const Key('profile-delete-account'),
+          icon: LucideIcons.userX,
+          title: l.commonPremiumDeleteAccount,
+          trailing: const Icon(LucideIcons.chevronRight,
+              size: 18, color: AppColors.text2),
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => DeleteAccountPage(controller: controller))),
         ),
       ]),
     );
