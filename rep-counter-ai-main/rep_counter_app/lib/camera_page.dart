@@ -23,6 +23,7 @@ import 'features/pose/domain/pose_mapper.dart';
 import 'features/workout/data/calibration_store.dart';
 import 'features/routine/domain/routine_preset.dart';
 import 'features/routine/presentation/rest_overlay.dart';
+import 'features/workout/application/workout_draft_recorder.dart';
 import 'features/workout/application/workout_controller.dart';
 import 'features/workout/application/workout_ui_state.dart';
 import 'features/workout/domain/quality_thresholds.dart';
@@ -34,6 +35,7 @@ import 'theme/app_colors.dart';
 import 'features/workout/presentation/widgets/workout_hud.dart';
 import 'features/workout/presentation/widgets/camera_permission_view.dart';
 import 'features/workout/presentation/widgets/discard_confirm.dart';
+import 'features/workout/presentation/manual_log_page.dart';
 import 'features/workout/presentation/result_page.dart';
 import 'overlay_painter.dart';
 import 'placement.dart';
@@ -211,6 +213,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   ExerciseProfile get p => widget.profile;
   WorkoutUiState get _ui => _workout.state;
+  WorkoutDraftRecorder? _draftRecorder;
   bool get _finishing => _ui.isFinishing;
   TrainingPreferences get _feedbackPreferences => TrainingPreferences(
         coachingEnabled: _preferences.coachingEnabled,
@@ -243,6 +246,11 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       trackingClock: widget.ciVideoPath == null ? null : _ciTrackingClock,
       clock: widget.ciVideoPath == null ? null : _ciSessionClock,
     )..addListener(_workoutChanged);
+    // F-4: keep a recovery draft from the read-only UI state. Off for the CI
+    // video replay so replay runs write nothing extra.
+    if (widget.ciVideoPath == null) {
+      _draftRecorder = WorkoutDraftRecorder(_workout);
+    }
     // Ban store tra ve false ngay, nen nut ghi khong bao gio hien o ban do.
     DiagRecorder.instance.available.then((ok) {
       if (mounted && ok) setState(() => _diagAvailable = true);
@@ -1255,6 +1263,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     }
   }
 
+  /// W-4: offered on the camera gate only, before any rep is counted.
+  void _openManualLog() => Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => ManualLogPage(profile: p)));
+
   Future<void> _confirmExit() async {
     if (_finishing || !mounted) return;
     final choice = await showDialog<String>(
@@ -1387,6 +1399,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _cameraEpoch++;
     _workout.removeListener(_workoutChanged);
+    _draftRecorder?.dispose();
     _workout.dispose();
     // Roi man hinh ma con dang quay thi MediaProjection se treo lai cung thong
     // bao "dang ghi" -> dung han truoc khi di.
@@ -1526,6 +1539,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           onAction:
               _cameraState == _CameraState.denied ? openAppSettings : _start,
           onRetry: _cameraState == _CameraState.denied ? _start : null,
+          onManual: _openManualLog,
           onExit: _confirmExit,
         ),
       );
