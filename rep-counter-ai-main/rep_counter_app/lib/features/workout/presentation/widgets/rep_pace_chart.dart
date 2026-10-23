@@ -190,7 +190,7 @@ class _RepPaceChartState extends State<RepPaceChart> {
                           'Cam: có lưu ý chất lượng · Đường ngang: nhịp trung bình đã lưu',
                           'Orange: quality note · Horizontal line: recorded average'),
                       style: const TextStyle(
-                          fontSize: 12, color: AppColors.text3)),
+                          fontSize: 12, color: AppColors.text2)),
                   const SizedBox(height: 12),
                   if (knownFlags == reps.length)
                     Text(
@@ -212,7 +212,7 @@ class _RepPaceChartState extends State<RepPaceChart> {
                             'Bản ghi chưa lưu đủ loại lưu ý để kết luận số rep quá nhanh.',
                             'Not enough note categories were saved to determine the fast-rep count.'),
                         key: const Key('pace-flags-unavailable'),
-                        style: const TextStyle(color: AppColors.text3)),
+                        style: const TextStyle(color: AppColors.text2)),
                   if (selected != null) ...[
                     const SizedBox(height: 16),
                     Semantics(

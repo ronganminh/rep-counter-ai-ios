@@ -10,14 +10,20 @@ extension ProductCopy on BuildContext {
 }
 
 class SectionLabel extends StatelessWidget {
-  const SectionLabel(this.text, {super.key});
+  const SectionLabel(this.text, {super.key, this.onSurface = false});
   final String text;
+
+  /// Inside a card `text3` is 4.36:1 (below AA); use `text2` there (D-25).
+  /// On the page background `text3` is 4.74:1 and stays.
+  final bool onSurface;
   @override
   Widget build(BuildContext context) => Padding(
         padding: const EdgeInsets.only(bottom: 12),
         child: Text(text.toUpperCase(),
-            style:
-                AppTypography.caption12.copyWith(color: context.palette.text3)),
+            style: AppTypography.caption12.copyWith(
+                color: onSurface
+                    ? context.palette.text2
+                    : context.palette.text3)),
       );
 }
 

@@ -157,7 +157,7 @@ class ResultFeedbackCard extends StatelessWidget {
                       'Chỉ gửi số liệu tổng hợp khi bạn yêu cầu hoặc đã bật AI tự động. Video không rời máy.',
                       'Only aggregate statistics are sent when you request AI or enable automatic feedback. Video stays on your device.'),
                   style: const TextStyle(
-                      fontSize: 12, color: AppColors.text3, height: 1.4))),
+                      fontSize: 12, color: AppColors.text2, height: 1.4))),
         ]),
       ]),
     );
