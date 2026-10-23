@@ -58,8 +58,13 @@ logcat_pid=$!
 adb shell am start -n "$ACTIVITY" >/dev/null 2>&1 \
   || adb shell monkey -p "$PKG" -c android.intent.category.LAUNCHER 1 >/dev/null 2>&1
 
+# Wait by wall clock, not by poll count: each poll also spends time in adb,
+# so a fixed count gave a variable budget (~2.6 h) and cut slow emulators off
+# seconds before the end of the 30-min rest fixture. Override with
+# REPLAY_WAIT_SECONDS; keep it below the job's timeout-minutes.
+deadline=$(( $(date +%s) + ${REPLAY_WAIT_SECONDS:-12600} ))
 found=0
-for _ in $(seq 1 1500); do
+while [ "$(date +%s)" -lt "$deadline" ]; do
   cur="$(adb shell "run-as $PKG sh -c 'cat \"$tmp_dir/$RESULT\" 2>/dev/null'" 2>/dev/null || true)"
   if printf '%s' "$cur" | grep -q '\[CI_VIDEO_RESULT\]'; then
     found=1
