@@ -5,11 +5,21 @@ import '../../../exercise.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
-import '../../plan/presentation/plan_today_sheet.dart';
+import '../../../l10n/app_localizations.dart';
+import '../../../widgets/app_feedback.dart';
+import 'exercise_detail_page.dart';
 import '../../workout/presentation/exercise_icon.dart';
 
-class ExercisePickerScreen extends StatelessWidget {
+class ExercisePickerScreen extends StatefulWidget {
   const ExercisePickerScreen({super.key});
+
+  @override
+  State<ExercisePickerScreen> createState() => _ExercisePickerScreenState();
+}
+
+class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
+  String _query = '';
+
   @override
   Widget build(BuildContext context) {
     final available = allExercises
@@ -24,7 +34,8 @@ class ExercisePickerScreen extends StatelessWidget {
       ('situp', context.tr('Gập bụng', 'Sit-up')),
       ('jumping_jack', 'Jumping jack'),
       ('lunge', context.tr('Chùng chân', 'Lunge')),
-    ];
+    ].where((item) => matchesExerciseQuery(item.$2, _query)).toList();
+    final l = AppLocalizations.of(context);
     return Scaffold(
         appBar: AppBar(
             title: Text(context.tr('CHỌN BÀI TẬP', 'CHOOSE EXERCISE'),
@@ -35,7 +46,24 @@ class ExercisePickerScreen extends StatelessWidget {
           final width = (box.maxWidth - 32 - (columns - 1) * 12) / columns;
           return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
-              child: Wrap(spacing: 12, runSpacing: 12, children: [
+              child: Column(children: [
+              TextField(
+                key: const Key('exercise-search'),
+                onChanged: (value) => setState(() => _query = value),
+                decoration: InputDecoration(
+                  hintText: l.homeSearchExercises,
+                  prefixIcon: const Icon(Icons.search_rounded),
+                ),
+              ),
+              const SizedBox(height: 16),
+              if (items.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.only(top: 48),
+                  child: StatusHero(
+                      icon: Icons.search_off_rounded,
+                      title: l.emptySearch(_query.trim())),
+                ),
+              Wrap(spacing: 12, runSpacing: 12, children: [
                 for (final item in items)
                   SizedBox(
                       width: width,
@@ -48,7 +76,9 @@ class ExercisePickerScreen extends StatelessWidget {
                               .where((p) => p.id == item.$1)
                               .firstOrNull;
                           if (profile != null && available.contains(profile.id)) {
-                            showPlanTodaySheet(context, profile);
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (_) =>
+                                    ExerciseDetailPage(profile: profile)));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                                 content: Text(context.tr(
@@ -99,7 +129,35 @@ class ExercisePickerScreen extends StatelessWidget {
                                           color: AppColors.text3)),
                                 ])),
                       ))),
+              ]),
               ]));
         }));
   }
+}
+
+/// Case-insensitive match that also ignores Vietnamese diacritics, so
+/// "hit dat" finds "Hít đất".
+bool matchesExerciseQuery(String name, String query) {
+  final q = foldVietnamese(query.trim());
+  return q.isEmpty || foldVietnamese(name).contains(q);
+}
+
+String foldVietnamese(String input) {
+  const groups = {
+    'a': 'àáạảãâầấậẩẫăằắặẳẵ',
+    'e': 'èéẹẻẽêềếệểễ',
+    'i': 'ìíịỉĩ',
+    'o': 'òóọỏõôồốộổỗơờớợởỡ',
+    'u': 'ùúụủũưừứựửữ',
+    'y': 'ỳýỵỷỹ',
+    'd': 'đ',
+  };
+  final buffer = StringBuffer();
+  for (final rune in input.toLowerCase().runes) {
+    final char = String.fromCharCode(rune);
+    final base =
+        groups.entries.where((e) => e.value.contains(char)).firstOrNull?.key;
+    buffer.write(base ?? char);
+  }
+  return buffer.toString();
 }

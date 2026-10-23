@@ -23,6 +23,8 @@ import 'package:rep_counter_app/features/workout/presentation/result_page.dart';
 import 'package:rep_counter_app/theme/app_theme.dart';
 import 'phase6_test.dart' show FakeSpeech;
 import 'phase7_test.dart' show record;
+import 'support/l10n.dart';
+import 'package:rep_counter_app/features/exercises/presentation/exercise_detail_page.dart';
 
 class FakeExporter extends StoryExporter {
   Uint8List? bytes;
@@ -73,6 +75,9 @@ void main() {
         controller: locale,
         child: MaterialApp(
             theme: RepCoachTheme.dark(),
+            locale: language.locale,
+            supportedLocales: testSupportedLocales,
+            localizationsDelegates: testLocalizationsDelegates,
             builder: (context, child) => MediaQuery(
                 data: MediaQuery.of(context)
                     .copyWith(textScaler: TextScaler.linear(scale)),
@@ -253,8 +258,13 @@ void main() {
         (tester) async {
       await pump(tester, const ExercisePickerScreen());
       final tile = find.byKey(Key('exercise-${profile.id}'));
-      await tester.scrollUntilVisible(tile, 300);
+      await tester.scrollUntilVisible(tile, 300,
+          scrollable: find.byType(Scrollable).first);
       await tester.tap(tile);
+      await tester.pumpAndSettle();
+      // v2 (E-1): the library opens the exercise detail, Start opens setup.
+      expect(find.byType(ExerciseDetailPage), findsOneWidget);
+      await tester.tap(find.byKey(const Key('exercise-start')));
       await tester.pumpAndSettle();
       expect(find.byType(GoalSetupContent), findsOneWidget);
       expect(
@@ -271,7 +281,8 @@ void main() {
     testWidgets('exercise picker gates unfinished ${profile.id}', (tester) async {
       await pump(tester, const ExercisePickerScreen());
       final tile = find.byKey(Key('exercise-${profile.id}'));
-      await tester.scrollUntilVisible(tile, 300);
+      await tester.scrollUntilVisible(tile, 300,
+          scrollable: find.byType(Scrollable).first);
       await tester.tap(tile);
       await tester.pumpAndSettle();
       expect(find.byType(GoalSetupContent), findsNothing);
@@ -282,7 +293,8 @@ void main() {
   testWidgets('unsupported exercise stays marked coming soon', (tester) async {
     await pump(tester, const ExercisePickerScreen());
     final tile = find.byKey(const Key('exercise-squat'));
-    await tester.scrollUntilVisible(tile, 300);
+    await tester.scrollUntilVisible(tile, 300,
+          scrollable: find.byType(Scrollable).first);
     await tester.tap(tile);
     await tester.pumpAndSettle();
     expect(find.byType(GoalSetupContent), findsNothing);

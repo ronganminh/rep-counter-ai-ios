@@ -21,6 +21,7 @@ import 'package:rep_counter_app/placement.dart';
 import 'package:rep_counter_app/rep_counter.dart';
 import 'package:rep_counter_app/exercise.dart';
 import 'package:rep_counter_app/theme/app_theme.dart';
+import 'support/l10n.dart';
 
 // All sample records below exist only in tests and rendered widget previews.
 WorkoutRecord fixture({bool legacy = false}) => WorkoutRecord(
@@ -122,6 +123,9 @@ void main() {
         controller: locale,
         child: MaterialApp(
             theme: RepCoachTheme.dark(),
+            locale: language.locale,
+            supportedLocales: testSupportedLocales,
+            localizationsDelegates: testLocalizationsDelegates,
             builder: (context, child) => MediaQuery(
                 data: MediaQuery.of(context)
                     .copyWith(textScaler: TextScaler.linear(scale)),
