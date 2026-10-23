@@ -1137,6 +1137,12 @@ class _SessionRow extends StatelessWidget {
                 key: const Key('history-partial'),
                 style: TextStyle(fontSize: 12, color: p.warningText),
               ),
+            if (r.manual)
+              Text(
+                context.l10n.commonProgressManual,
+                key: const Key('history-manual'),
+                style: TextStyle(fontSize: 12, color: p.text2),
+              ),
           ],
         ),
         subtitle: Column(

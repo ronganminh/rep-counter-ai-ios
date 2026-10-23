@@ -35,6 +35,7 @@ import 'theme/app_colors.dart';
 import 'features/workout/presentation/widgets/workout_hud.dart';
 import 'features/workout/presentation/widgets/camera_permission_view.dart';
 import 'features/workout/presentation/widgets/discard_confirm.dart';
+import 'features/workout/presentation/manual_log_page.dart';
 import 'features/workout/presentation/result_page.dart';
 import 'overlay_painter.dart';
 import 'placement.dart';
@@ -1262,6 +1263,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     }
   }
 
+  /// W-4: offered on the camera gate only, before any rep is counted.
+  void _openManualLog() => Navigator.of(context).pushReplacement(
+      MaterialPageRoute(builder: (_) => ManualLogPage(profile: p)));
+
   Future<void> _confirmExit() async {
     if (_finishing || !mounted) return;
     final choice = await showDialog<String>(
@@ -1534,6 +1539,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           onAction:
               _cameraState == _CameraState.denied ? openAppSettings : _start,
           onRetry: _cameraState == _CameraState.denied ? _start : null,
+          onManual: _openManualLog,
           onExit: _confirmExit,
         ),
       );
