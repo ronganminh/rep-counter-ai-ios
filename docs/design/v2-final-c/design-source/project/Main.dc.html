@@ -1,0 +1,209 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Migration and Phase 7 QA</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&amp;family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0B0C}
+a{color:#C8FF2E}a:hover{color:#F4F4F0}
+</style>
+</helmet>
+<div style="background:#0B0B0C;color:#F4F4F0;font-family:Inter,system-ui,sans-serif;min-height:100%;box-sizing:border-box;padding:56px 24px 80px">
+<div style="max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:40px;min-width:0">
+
+<header style="display:flex;flex-direction:column;gap:14px">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+<span style="font:600 11px ui-monospace,Menlo,monospace;padding:3px 7px;background:#C8FF2E;color:#0B0B0C;border-radius:4px">MIGRATION · P7 QA</span>
+<span style="font:600 12px Inter;letter-spacing:0.06em;text-transform:uppercase;color:#7C7C82">RepCoach AI · Thu, Oct 22, 2026 · final verification</span>
+</div>
+<h1 style="margin:0;font:800 clamp(40px, 9vw, 64px)/0.95 'Barlow Condensed',sans-serif;text-transform:uppercase;overflow-wrap:break-word">Migration complete · Phase 7 merged</h1>
+<p style="margin:0;max-width:860px;font:400 16px/1.5 Inter;color:#A1A1A6">All 17 source files are on this canvas with untouched backups. Cross-file links and the Flow board now resolve to the new file names. The verified Phase 7 fixes are merged into the main Phase 7 file. Oversized artboards fit the 8,000 px frame limit, and every screen stays editable in place.</p>
+<div style="display:flex;gap:10px;flex-wrap:wrap">
+<a href="RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html" style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:999px;background:#C8FF2E;color:#0B0B0C;font:700 14px Inter;text-decoration:none">Open Phase 7 (merged)</a>
+<a href="RepCoach-AI-Flow.dc.html" style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);color:#F4F4F0;font:600 14px Inter;text-decoration:none">Open Flow</a>
+<a href="RepCoach-AI-v2-Phase-7-Social-and-Competition.orig-2026-10-22.dc.html" style="display:inline-flex;align-items:center;height:44px;padding:0 18px;border-radius:999px;border:1px solid rgba(255,255,255,0.14);color:#F4F4F0;font:600 14px Inter;text-decoration:none">Pre-merge original (backup)</a>
+</div>
+</header>
+
+<section style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(180px,100%),1fr));gap:12px">
+<sc-for list="{{ stats }}" as="st" hint-placeholder-count="6">
+<div style="padding:18px 20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:6px">
+<span style="font:600 12px Inter;letter-spacing:0.06em;text-transform:uppercase;color:#7C7C82">{{ st.label }}</span>
+<span style="font:800 44px/1 'Barlow Condensed',sans-serif;font-variant-numeric:tabular-nums;color:{{ st.color }}">{{ st.value }}</span>
+<span style="font:500 13px/1.4 Inter;color:#A1A1A6">{{ st.note }}</span>
+</div>
+</sc-for>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:14px;min-width:0">
+<h2 style="margin:0;font:700 32px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Final verification</h2>
+<div style="border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08)">
+<sc-for list="{{ checks }}" as="c" hint-placeholder-count="8">
+<div style="display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:start;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+<span style="display:inline-flex;align-items:center;gap:6px;justify-self:start;height:28px;padding:0 10px;border-radius:8px;background:rgba(61,220,151,0.12);color:#3DDC97;font:700 13px Inter"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>PASS</span>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 15px/1.4 Inter">{{ c.title }}</span><span style="font:400 14px/1.45 Inter;color:#A1A1A6">{{ c.body }}</span></div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:14px;min-width:0">
+<h2 style="margin:0;font:700 32px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Files changed and preserved</h2>
+<div style="overflow-x:auto;min-width:0;max-width:100%;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:#161618">
+<div style="min-width:860px">
+<div style="display:grid;grid-template-columns:1.3fr 120px 2fr;gap:16px;padding:12px 20px;font:600 12px Inter;letter-spacing:0.06em;text-transform:uppercase;color:#7C7C82;border-bottom:1px solid rgba(255,255,255,0.08)">
+<span>File</span><span>Status</span><span>What changed</span>
+</div>
+<sc-for list="{{ files }}" as="f" hint-placeholder-count="17">
+<div style="display:grid;grid-template-columns:1.3fr 120px 2fr;gap:16px;align-items:center;padding:12px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+<a href="{{ f.href }}" style="font:600 14px/1.35 Inter;color:#F4F4F0;text-decoration:none;overflow-wrap:anywhere">{{ f.name }}</a>
+<span style="display:inline-flex;align-items:center;gap:6px;justify-self:start;height:26px;padding:0 9px;border-radius:8px;background:{{ f.bg }};color:{{ f.fg }};font:700 12px Inter">
+<sc-if value="{{ f.changed }}" hint-placeholder-val="{{ true }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"></path><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg></sc-if>
+<sc-if value="{{ f.same }}" hint-placeholder-val="{{ false }}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg></sc-if>
+{{ f.status }}</span>
+<span style="font:400 14px/1.45 Inter;color:#C9C9CE">{{ f.what }}</span>
+</div>
+</sc-for>
+</div>
+</div>
+<p style="margin:0;font:400 13px/1.5 Inter;color:#7C7C82">Every changed file was checked by reverting its migration edits: the result equals the ZIP source byte for byte. Backups are on the "Backups" page as RepCoach-AI-*.orig-2026-10-22, plus the QA working copy r1, all unchanged.</p>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:14px;min-width:0">
+<h2 style="margin:0;font:700 32px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Phase 7 results by section</h2>
+<div style="overflow-x:auto;min-width:0;max-width:100%;border-radius:16px;border:1px solid rgba(255,255,255,0.08);background:#161618">
+<div style="min-width:900px">
+<div style="display:grid;grid-template-columns:150px 1fr 120px 1.4fr 120px;gap:16px;padding:12px 20px;font:600 12px Inter;letter-spacing:0.06em;text-transform:uppercase;color:#7C7C82;border-bottom:1px solid rgba(255,255,255,0.08)">
+<span>Section</span><span>Covered</span><span>Pre-merge</span><span>Defects</span><span>Merged</span>
+</div>
+<sc-for list="{{ rows }}" as="r" hint-placeholder-count="10">
+<div style="display:grid;grid-template-columns:150px 1fr 120px 1.4fr 120px;gap:16px;align-items:center;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+<a href="{{ r.href }}" style="display:flex;flex-direction:column;gap:2px;text-decoration:none"><span style="font:800 22px/1 'Barlow Condensed',sans-serif;color:#F4F4F0">{{ r.id }}</span><span style="font:500 13px Inter;color:#A1A1A6">{{ r.name }}</span></a>
+<span style="font:400 14px/1.45 Inter;color:#C9C9CE">{{ r.covered }}</span>
+<span style="display:inline-flex;align-items:center;gap:6px;justify-self:start;height:28px;padding:0 10px;border-radius:8px;background:{{ r.oBg }};color:{{ r.oFg }};font:700 13px Inter">
+<sc-if value="{{ r.oPass }}" hint-placeholder-val="{{ true }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg></sc-if>
+<sc-if value="{{ r.oFail }}" hint-placeholder-val="{{ false }}"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg></sc-if>
+{{ r.orig }}</span>
+<span style="font:500 14px/1.45 Inter;color:#C9C9CE">{{ r.defects }}</span>
+<span style="display:inline-flex;align-items:center;gap:6px;justify-self:start;height:28px;padding:0 10px;border-radius:8px;background:rgba(61,220,151,0.12);color:#3DDC97;font:700 13px Inter"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></svg>PASS</span>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:14px;min-width:0">
+<h2 style="margin:0;font:700 32px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Defects fixed (merged)</h2>
+<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(360px,100%),1fr));gap:12px">
+<sc-for list="{{ defects }}" as="d" hint-placeholder-count="9">
+<div style="padding:18px 20px;border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="font:800 22px/1 'Barlow Condensed',sans-serif;color:#C8FF2E">{{ d.id }}</span><span style="height:22px;padding:0 8px;border-radius:6px;background:#202023;color:#C9C9CE;font:600 11px/22px Inter">{{ d.where }}</span><span style="height:22px;padding:0 8px;border-radius:6px;background:#202023;color:#C9C9CE;font:600 11px/22px Inter">{{ d.kind }}</span></div>
+<span style="font:600 15px/1.4 Inter">{{ d.problem }}</span>
+<span style="font:400 14px/1.45 Inter;color:#A1A1A6">Fix: {{ d.fix }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:14px;min-width:0">
+<h2 style="margin:0;font:700 32px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">Open items · not changed</h2>
+<p style="margin:0;font:400 14px/1.5 Inter;color:#A1A1A6">These need a product decision or belong to a later roadmap step, so the design was left as is.</p>
+<div style="border-radius:16px;background:#161618;border:1px solid rgba(255,255,255,0.08)">
+<sc-for list="{{ open }}" as="o" hint-placeholder-count="5">
+<div style="display:grid;grid-template-columns:48px 1fr;gap:12px;padding:14px 20px;border-bottom:1px solid rgba(255,255,255,0.06)">
+<span style="font:800 20px/1.2 'Barlow Condensed',sans-serif;color:#FFB27F">{{ o.id }}</span>
+<div style="display:flex;flex-direction:column;gap:4px"><span style="font:600 15px/1.4 Inter">{{ o.title }}</span><span style="font:400 14px/1.45 Inter;color:#A1A1A6">{{ o.body }}</span></div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="display:flex;flex-direction:column;gap:10px">
+<h2 style="margin:0;font:700 32px/1 'Barlow Condensed',sans-serif;text-transform:uppercase">How it was verified</h2>
+<p style="margin:0;max-width:900px;font:400 14px/1.6 Inter;color:#A1A1A6">Headless Chromium running this canvas's own DC runtime, React 18.3.1, Barlow Condensed and Inter, against the exact files published here. Each file was rendered at its board width and at the single-column width. Every phone frame was compared with its backup by screenshot, text and element geometry. Remaining differences are 1 px rounding of hairline icons and one live rest timer, apart from the five intended Phase 7 fixes. Links were checked by resolving every reference and by clicking one link per destination in each file.</p>
+</section>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":4600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P7 = 'RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html#';
+    const fail = (d) => ({ orig: 'FAIL', oPass: false, oFail: true, oBg: 'rgba(255,90,95,0.12)', oFg: '#FF6B70', defects: d });
+    const pass = (d) => ({ orig: 'PASS', oPass: true, oFail: false, oBg: 'rgba(61,220,151,0.12)', oFg: '#3DDC97', defects: d });
+    const stats = [
+      { label: 'Source files', value: '17 / 17', note: 'on the canvas · 17 backups + QA r1 kept', color: '#F4F4F0' },
+      { label: 'Screens', value: '248', note: 'phone frames · none missing vs backups', color: '#F4F4F0' },
+      { label: 'Links repaired', value: '405', note: '399 cross-file + 6 Flow references · 0 broken', color: '#3DDC97' },
+      { label: 'Phase 7', value: '10 / 10', note: 'sections pass · 51 / 51 interaction checks', color: '#3DDC97' },
+      { label: 'Tallest artboard', value: '7,105', note: 'px (limit 8,000) · was 19,021', color: '#3DDC97' },
+      { label: 'Console', value: '0', note: 'errors or warnings across all 17 files', color: '#F4F4F0' }
+    ];
+    const checks = [
+      { title: 'All 17 files remain available', body: '17 artboards with the new names, 17 byte-identical backups and the untouched QA r1 copy, all on this canvas.' },
+      { title: 'All Phase 1–7 screens accessible and editable', body: 'Phase 2–7 and the Design System were taller than the frame limit. On a frame as wide as the board, their sections now flow into 2–3 columns, so every screen sits inside the frame and is edited in place. Full-window and narrower views keep the original single column.' },
+      { title: 'Cross-file navigation works', body: '36 destinations (399 references) all exist with their anchors. In each file, one link to each other file was clicked: 19 of 19 landed on the right screen.' },
+      { title: 'Flow board works', body: 'All 23 steps load their screen from the source files. Each step was opened in turn with no "screen not found" message and no console errors.' },
+      { title: 'Phase 7 passes all 10 families', body: 'The merged file passes P7-01 to P7-10 with the 9 fixes from QA r1.' },
+      { title: '51 / 51 interaction checks', body: 'Re-run on the merged Phase 7 using this canvas runtime. All 92 in-file links resolve.' },
+      { title: 'No layout regressions', body: '218 of 248 frames are pixel-identical to their backups at the original width. The others differ only by 1 px icon rounding, the live rest timer in P6-06a and the 5 intended Phase 7 fixes. Column layout moves frames, not their contents.' },
+      { title: 'No source content lost', body: 'Undoing the migration edits in each changed file gives back the ZIP source exactly. The merged Phase 7 differs from QA r1 only in its header tag and the layout rule.' }
+    ];
+    const C = (name, what) => ({ name, href: name, what, status: 'Changed', changed: true, same: false, bg: 'rgba(200,255,46,0.12)', fg: '#C8FF2E' });
+    const S = (name) => ({ name, href: name, what: 'Byte-identical to the ZIP source', status: 'Preserved', changed: false, same: true, bg: '#202023', fg: '#C9C9CE' });
+    const files = [
+      C('RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html', 'QA r1 merged: fixes D1–D9 and 57 cross-file links. Header tag now reads "QA r1 merged". Column layout rule for the canvas frame.'),
+      C('RepCoach-AI-Flow.dc.html', '6 screen-file references renamed. Routing fix: step changes no longer throw when the runtime omits the previous state, so auto-advance runs.'),
+      C('RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html', '14 cross-file links · 2-column layout rule (board 4,800 px)'),
+      C('RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html', '95 cross-file links · 3-column layout rule (board 7,200 px)'),
+      C('RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html', '83 cross-file links · 3-column layout rule (board 7,200 px)'),
+      C('RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html', '91 cross-file links · 3-column layout rule (board 7,200 px)'),
+      C('RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html', '59 cross-file links · 3-column layout rule (board 7,200 px)'),
+      C('RepCoach-AI-Design-System.dc.html', '2-column layout rule (board 2,600 px); no links to repair'),
+      S('RepCoach-AI-v2-Home-Exercises.dc.html'), S('RepCoach-AI-Onboarding.dc.html'), S('RepCoach-AI-Home.dc.html'),
+      S('RepCoach-AI-Camera.dc.html'), S('RepCoach-AI-HUD.dc.html'), S('RepCoach-AI-Results.dc.html'),
+      S('RepCoach-AI-History-Settings.dc.html'), S('RepCoach-AI-App-Icon.dc.html'), S('RepCoach-AI-App-Store-Screenshots-EN.dc.html')
+    ];
+    const rows = [
+      { id: 'P7-01', name: 'Friends overview', href: P7 + 'P7-01a', covered: 'Overview, first time, loading, offline, error', ...fail('D1 request count · D8 "push-ups" line break') },
+      { id: 'P7-02', name: 'Find friends', href: P7 + 'P7-02a', covered: 'Username and code search, private, pending, blocked = not found, invite sheet', ...fail('D2 search status ignored request state') },
+      { id: 'P7-03', name: 'Friend profile', href: P7 + 'P7-03a', covered: 'Friend, private, blocked, limited + pending', ...pass('None') },
+      { id: 'P7-04', name: 'Friend requests', href: P7 + 'P7-04a', covered: 'Accept, decline, cancel outgoing, empty, already handled, error', ...pass('None') },
+      { id: 'P7-05', name: 'Weekly leaderboard', href: P7 + 'P7-05a', covered: '2 weeks × 4 metrics, ties =2/=4, manual not ranked, min 3, opt-out, offline, week results', ...fail('D3 offline snapshot missing 2 people') },
+      { id: 'P7-06', name: 'Challenge a friend', href: P7 + 'P7-06a', covered: 'Builder, send + undo, accept, decline + undo, declined, expired', ...fail('D4 Workouts rule missing win condition') },
+      { id: 'P7-07', name: 'Head-to-head', href: P7 + 'P7-07a', covered: 'Camera, manual, offline, back online, waiting, not counted, sync conflict', ...fail('D5 offline total shown as confirmed') },
+      { id: 'P7-08', name: 'Results', href: P7 + 'P7-08a', covered: 'Win, loss, tie, ended early, pending', ...pass('None') },
+      { id: 'P7-09', name: 'Share achievement', href: P7 + 'P7-09a', covered: 'Badge / record / challenge, username + level, story / square, share + cancel', ...fail('D8 "PUSH-" / "UPS" break') },
+      { id: 'P7-10', name: 'Privacy + safety', href: P7 + 'P7-10a', covered: 'Privacy toggles, block / remove + undo, report, social off', ...fail('D6 privacy vs leaderboard · D7 report button · D9 report target') }
+    ];
+    const defects = [
+      { id: 'D1', where: 'P7-01a', kind: 'Sample data', problem: '"1 friend request" while Requests lists 2.', fix: 'Count and avatars bound to the live request list.' },
+      { id: 'D2', where: 'P7-02a', kind: 'Interaction', problem: 'Search ignored accepted and cancelled requests.', fix: 'Search status reads the shared request state.' },
+      { id: 'D3', where: 'P7-05d', kind: 'Sample data', problem: 'Offline snapshot listed 3 of 5 people.', fix: 'Jordan and Bao added at =4.' },
+      { id: 'D4', where: 'P7-06a', kind: 'Copy', problem: 'Workouts rule did not say who wins.', fix: 'Added "First to the target wins".' },
+      { id: 'D5', where: 'P7-07a', kind: 'Rule', problem: 'Offline showed the unsynced total as confirmed.', fix: 'Confirmed total stays; "+35 on this phone · not confirmed yet" shown with icon.' },
+      { id: 'D6', where: 'P7-10a', kind: 'Sample data', problem: 'Privacy said off while You is ranked.', fix: 'Sample user has weekly count and leaderboards on.' },
+      { id: 'D7', where: 'P7-10c', kind: 'Interaction · a11y', problem: 'Send report looked enabled with no reason.', fix: 'Disabled until a reason is picked; radio semantics.' },
+      { id: 'D8', where: 'P7-09a · P7-01a', kind: 'Layout', problem: '"push-ups" broke at the hyphen.', fix: 'Word joiner after the hyphen.' },
+      { id: 'D9', where: 'P7-10c', kind: 'UX', problem: 'Report did not name the account.', fix: '"Reporting Linh Tran · @linh.t".' }
+    ];
+    const open = [
+      { id: 'O1', title: 'Friends has no back control', body: 'The Profile tab links to P7-01a as a stand-in until the Profile root exists (Auth / Account / Profile step).' },
+      { id: 'O2', title: 'Tab bar on some pushed screens only', body: 'Set one rule at final integration.' },
+      { id: 'O3', title: 'Segmented controls are 40 pt tall', body: 'Documented Phase 3 exception with a 48 pt hit area. Kept.' },
+      { id: 'O4', title: 'Accepting an invitation has no Undo', body: 'Treated as intended.' },
+      { id: 'O5', title: 'Social needs accounts', body: 'Sign-in and account screens come in the Auth / Account / Profile step.' }
+    ];
+    return { stats, checks, files, rows, defects, open };
+  }
+}
+</script>
+</body>
+</html>

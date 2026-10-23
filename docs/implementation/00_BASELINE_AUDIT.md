@@ -7,7 +7,7 @@
 | `main` HEAD audited | `5a61ab8ba46264d2049ede43b4941302f45b23cf` ("fix(ios): synchronize App Store release version") |
 | Design package baseline | Final C handoff, audited against `3594d8a` (one commit behind; the delta is the Settings version string + `tool/check_app_store_readiness.py`) |
 | Handoff archive | `RepCoach-AI-Final-C-Handoff.zip`, SHA-256 `91beb84f36a5c7523c03627bc73fd39e8bf26bf8e2ba872a6762e1f11b4461ae` |
-| Manifest check | `handoff/ASSET_MANIFEST.json`: **23/23 document files match SHA-256**; 21 `evidence/*.png` listed but not shipped in this archive (owner confirmed they are not needed for code) |
+| Manifest check | `handoff/ASSET_MANIFEST.json`: **23/23 document files match SHA-256**; 21 `evidence/*.png` listed but not shipped in the first archive; delivered later in `RepCoach-AI-Final-C-DesignSource-Evidence.zip` together with `design-source/project/*.dc.html` + `canvas.json` — **21/21 evidence files match SHA-256**; design-source checksums recorded in `docs/design/v2-final-c/DESIGN_SOURCE_SHA256.txt` (not in the manifest) |
 | Copied to | `docs/design/v2-final-c/` (unmodified; brief at `docs/design/v2-final-c/REPCOACH_AI_CLAUDE_IMPLEMENTATION_MASTER.md`) |
 
 Labels: **VERIFIED** = read from code or produced by a command in this audit · **UNVERIFIED** = not checked, with the reason stated.

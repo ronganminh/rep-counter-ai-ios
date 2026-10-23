@@ -1,0 +1,827 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-22T05:30:00Z"
+ },
+ "title": "RepCoach AI",
+ "launch": {
+  "view": "canvas",
+  "page": "finalc"
+ },
+ "pages": [
+  {
+   "id": "ds",
+   "name": "Design System"
+  },
+  {
+   "id": "v1",
+   "name": "v1 · Foundation"
+  },
+  {
+   "id": "v2",
+   "name": "v2 · Phases 1–10"
+  },
+  {
+   "id": "finala",
+   "name": "Final A · Missing screens"
+  },
+  {
+   "id": "finalb",
+   "name": "Final B · Integration"
+  },
+  {
+   "id": "finalc",
+   "name": "Final C · Design QA & Developer Handoff"
+  },
+  {
+   "id": "backup",
+   "name": "Backups · Oct 22, 2026"
+  },
+  {
+   "id": "qa",
+   "name": "QA & Documentation"
+  }
+ ],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 4540,
+   "title": "Migration + Phase 7 QA report",
+   "page": "qa",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Home-Exercises.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 2400,
+   "h": 6480,
+   "title": "v2 · Home + Exercises",
+   "page": "v2",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html": {
+   "x": 2480,
+   "y": 0,
+   "w": 4800,
+   "h": 6648,
+   "title": "v2 · Phase 2 · Workout Plans",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html": {
+   "x": 7360,
+   "y": 0,
+   "w": 7200,
+   "h": 5668,
+   "title": "v2 · Phase 3 · Dashboard + Analytics",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html": {
+   "x": 14640,
+   "y": 0,
+   "w": 7200,
+   "h": 7145,
+   "title": "v2 · Phase 4 · Personalized AI Coach",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html": {
+   "x": 21920,
+   "y": 0,
+   "w": 7200,
+   "h": 5486,
+   "title": "v2 · Phase 5 · Gamification + Challenges",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html": {
+   "x": 29200,
+   "y": 0,
+   "w": 7200,
+   "h": 6992,
+   "title": "v2 · Phase 6 · Real-time Voice Coach",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html": {
+   "x": 36480,
+   "y": 0,
+   "w": 7200,
+   "h": 5477,
+   "title": "v2 · Phase 7 · Social + Competition (QA r1 merged)",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Design-System.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 2600,
+   "h": 4762,
+   "title": "Design System",
+   "page": "ds",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Flow.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1600,
+   "h": 1719,
+   "title": "Flow",
+   "page": "v1",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Onboarding.dc.html": {
+   "x": 1680,
+   "y": 0,
+   "w": 1600,
+   "h": 2275,
+   "title": "Onboarding",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Home.dc.html": {
+   "x": 3360,
+   "y": 0,
+   "w": 1600,
+   "h": 3399,
+   "title": "Home",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Camera.dc.html": {
+   "x": 5040,
+   "y": 0,
+   "w": 1600,
+   "h": 2373,
+   "title": "Camera",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-HUD.dc.html": {
+   "x": 6720,
+   "y": 0,
+   "w": 1600,
+   "h": 6544,
+   "title": "HUD",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Results.dc.html": {
+   "x": 8400,
+   "y": 0,
+   "w": 1600,
+   "h": 4078,
+   "title": "Results",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-History-Settings.dc.html": {
+   "x": 10080,
+   "y": 0,
+   "w": 1600,
+   "h": 5694,
+   "title": "History - Settings",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-App-Icon.dc.html": {
+   "x": 11760,
+   "y": 0,
+   "w": 1600,
+   "h": 2659,
+   "title": "App Icon",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-App-Store-Screenshots-EN.dc.html": {
+   "x": 13440,
+   "y": 0,
+   "w": 7050,
+   "h": 3275,
+   "title": "App Store Screenshots EN",
+   "page": "v1",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Home-Exercises.orig-2026-10-22.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 2400,
+   "h": 6480,
+   "title": "Backup · v2 · Home + Exercises",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Phase-2-Workout-Plans.orig-2026-10-22.dc.html": {
+   "x": 2480,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup · v2 · Phase 2 · Workout Plans",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-3-Dashboard-Analytics.orig-2026-10-22.dc.html": {
+   "x": 4960,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup · v2 · Phase 3 · Dashboard + Analytics",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.orig-2026-10-22.dc.html": {
+   "x": 7440,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup · v2 · Phase 4 · Personalized AI Coach",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-5-Gamification-Challenges.orig-2026-10-22.dc.html": {
+   "x": 9920,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup · v2 · Phase 5 · Gamification + Challenges",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.orig-2026-10-22.dc.html": {
+   "x": 12400,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup · v2 · Phase 6 · Real-time Voice Coach",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.orig-2026-10-22.dc.html": {
+   "x": 14880,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup · v2 · Phase 7 (pre-merge original)",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Design-System.orig-2026-10-22.dc.html": {
+   "x": 17360,
+   "y": 0,
+   "w": 1600,
+   "h": 8000,
+   "title": "Backup · Design System",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Flow.orig-2026-10-22.dc.html": {
+   "x": 19040,
+   "y": 0,
+   "w": 1600,
+   "h": 1719,
+   "title": "Backup · Flow",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Onboarding.orig-2026-10-22.dc.html": {
+   "x": 20720,
+   "y": 0,
+   "w": 1600,
+   "h": 2275,
+   "title": "Backup · Onboarding",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Home.orig-2026-10-22.dc.html": {
+   "x": 22400,
+   "y": 0,
+   "w": 1600,
+   "h": 3399,
+   "title": "Backup · Home",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Camera.orig-2026-10-22.dc.html": {
+   "x": 24080,
+   "y": 0,
+   "w": 1600,
+   "h": 2373,
+   "title": "Backup · Camera",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-HUD.orig-2026-10-22.dc.html": {
+   "x": 25760,
+   "y": 0,
+   "w": 1600,
+   "h": 6544,
+   "title": "Backup · HUD",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Results.orig-2026-10-22.dc.html": {
+   "x": 27440,
+   "y": 0,
+   "w": 1600,
+   "h": 4078,
+   "title": "Backup · Results",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-History-Settings.orig-2026-10-22.dc.html": {
+   "x": 29120,
+   "y": 0,
+   "w": 1600,
+   "h": 5694,
+   "title": "Backup · History - Settings",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-App-Icon.orig-2026-10-22.dc.html": {
+   "x": 30800,
+   "y": 0,
+   "w": 1600,
+   "h": 2659,
+   "title": "Backup · App Icon",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-App-Store-Screenshots-EN.orig-2026-10-22.dc.html": {
+   "x": 32480,
+   "y": 0,
+   "w": 7050,
+   "h": 3275,
+   "title": "Backup · App Store Screenshots EN",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.QA-r1.dc.html": {
+   "x": 39610,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup · Phase 7 QA working copy r1",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html": {
+   "x": 43760,
+   "y": 0,
+   "w": 8000,
+   "h": 7120,
+   "title": "v2 · Phase 8 · Premium + Monetization",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-8-Handoff.dc.html": {
+   "x": 51840,
+   "y": 0,
+   "w": 2400,
+   "h": 2700,
+   "title": "v2 · Phase 8 · Components + handoff",
+   "page": "v2",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Phase-9-Auth.dc.html": {
+   "x": 54320,
+   "y": 0,
+   "w": 8000,
+   "h": 5100,
+   "title": "v2 · Phase 9 · Auth",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html": {
+   "x": 62400,
+   "y": 0,
+   "w": 8000,
+   "h": 4910,
+   "title": "v2 · Phase 9 · Account + Profile",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-9-Handoff.dc.html": {
+   "x": 70480,
+   "y": 0,
+   "w": 2400,
+   "h": 4060,
+   "title": "v2 · Phase 9 · Components + handoff",
+   "page": "v2",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Phase-10-Notifications.dc.html": {
+   "x": 72960,
+   "y": 0,
+   "w": 8000,
+   "h": 5050,
+   "title": "v2 · Phase 10 · Notifications",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html": {
+   "x": 81040,
+   "y": 0,
+   "w": 8000,
+   "h": 4840,
+   "title": "v2 · Phase 10 · Settings + recovery",
+   "page": "v2",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-10-Handoff.dc.html": {
+   "x": 89120,
+   "y": 0,
+   "w": 3200,
+   "h": 3760,
+   "title": "v2 · Phase 10 · Components + handoff",
+   "page": "v2",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Final-A-Missing-Screens.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 6000,
+   "h": 4420,
+   "title": "Final A · Missing screens · workout flow (FA-01–06)",
+   "page": "finala",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html": {
+   "x": 6080,
+   "y": 0,
+   "w": 6000,
+   "h": 4890,
+   "title": "Final A · Missing screens · data + support (FA-07–12)",
+   "page": "finala",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Final-A-Components-and-Handoff.dc.html": {
+   "x": 12160,
+   "y": 0,
+   "w": 3200,
+   "h": 3260,
+   "title": "Final A · Gap inventory, components + handoff",
+   "page": "finala",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Final-B-Integrated-Prototype.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 2200,
+   "h": 1700,
+   "title": "Final B + C · Integrated prototype (shared state · 22 journeys + 12 negative paths · EN/VI)",
+   "page": "finalb",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Final-B-Integration-Docs.dc.html": {
+   "x": 1520,
+   "y": 0,
+   "w": 6000,
+   "h": 3560,
+   "title": "Final A cleanup + Final B integration · map, data, components, QA",
+   "page": "qa",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Home-Exercises.preFB-2026-10-22.dc.html": {
+   "x": 42090,
+   "y": 0,
+   "w": 2400,
+   "h": 6480,
+   "title": "Backup pre-Final-B · v2 · Home + Exercises",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Phase-3-Dashboard-Analytics.preFB-2026-10-22.dc.html": {
+   "x": 44570,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 3",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.preFB-2026-10-22.dc.html": {
+   "x": 47050,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 4",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-5-Gamification-Challenges.preFB-2026-10-22.dc.html": {
+   "x": 49530,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 5",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.preFB-2026-10-22.dc.html": {
+   "x": 52010,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 6",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.preFB-2026-10-22.dc.html": {
+   "x": 54490,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 7",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-8-Premium-and-Monetization.preFB-2026-10-22.dc.html": {
+   "x": 56970,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 8",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-9-Account-and-Profile.preFB-2026-10-22.dc.html": {
+   "x": 59450,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 9 Account",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-v2-Phase-10-Notifications.preFB-2026-10-22.dc.html": {
+   "x": 61930,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · v2 · Phase 10 Notifications",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Final-A-Missing-Screens.preFB-2026-10-22.dc.html": {
+   "x": 64410,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · Final A · workout flow",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.preFB-2026-10-22.dc.html": {
+   "x": 66890,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · Final A · data + support",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  },
+  "RepCoach-AI-Final-A-Components-and-Handoff.preFB-2026-10-22.dc.html": {
+   "x": 69370,
+   "y": 0,
+   "w": 2400,
+   "h": 8000,
+   "title": "Backup pre-Final-B · Final A · handoff",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-History-Settings.preFB-2026-10-22.dc.html": {
+   "x": 71850,
+   "y": 0,
+   "w": 1600,
+   "h": 5694,
+   "title": "Backup pre-Final-B · v1 · History - Settings",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Final-C-Handoff.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 6000,
+   "h": 3340,
+   "title": "Final C · Design QA, localization + developer handoff (READY for no-backend tracks · PARTIAL overall)",
+   "page": "finalc",
+   "expand": "fill"
+  },
+  "RepCoach-AI-v2-Home-Exercises.preFC-2026-10-22.dc.html": {
+   "x": 73530,
+   "y": 0,
+   "w": 2400,
+   "h": 6480,
+   "title": "Backup pre-Final-C · v2 · Home + Exercises",
+   "page": "backup",
+   "expand": "fill"
+  },
+  "RepCoach-AI-Final-B-Integrated-Prototype.preFC-2026-10-22.dc.html": {
+   "x": 76010,
+   "y": 0,
+   "w": 2200,
+   "h": 1700,
+   "title": "Backup pre-Final-C · Final B · Integrated prototype",
+   "page": "backup",
+   "expand": "fill",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "RepCoach-AI-v2-Home-Exercises.dc.html",
+  "RepCoach-AI-v2-Phase-2-Workout-Plans.dc.html",
+  "RepCoach-AI-v2-Phase-3-Dashboard-Analytics.dc.html",
+  "RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.dc.html",
+  "RepCoach-AI-v2-Phase-5-Gamification-Challenges.dc.html",
+  "RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.dc.html",
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.dc.html",
+  "RepCoach-AI-v2-Phase-8-Premium-and-Monetization.dc.html",
+  "RepCoach-AI-v2-Phase-8-Handoff.dc.html",
+  "RepCoach-AI-v2-Phase-9-Auth.dc.html",
+  "RepCoach-AI-v2-Phase-9-Account-and-Profile.dc.html",
+  "RepCoach-AI-v2-Phase-9-Handoff.dc.html",
+  "RepCoach-AI-v2-Phase-10-Notifications.dc.html",
+  "RepCoach-AI-v2-Phase-10-Notifications-Settings-and-Recovery.dc.html",
+  "RepCoach-AI-v2-Phase-10-Handoff.dc.html",
+  "RepCoach-AI-Final-A-Missing-Screens.dc.html",
+  "RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html",
+  "RepCoach-AI-Final-A-Components-and-Handoff.dc.html",
+  "RepCoach-AI-Final-B-Integrated-Prototype.dc.html",
+  "RepCoach-AI-Final-B-Integration-Docs.dc.html",
+  "RepCoach-AI-Final-C-Handoff.dc.html",
+  "RepCoach-AI-Design-System.dc.html",
+  "RepCoach-AI-Flow.dc.html",
+  "RepCoach-AI-Onboarding.dc.html",
+  "RepCoach-AI-Home.dc.html",
+  "RepCoach-AI-Camera.dc.html",
+  "RepCoach-AI-HUD.dc.html",
+  "RepCoach-AI-Results.dc.html",
+  "RepCoach-AI-History-Settings.dc.html",
+  "RepCoach-AI-App-Icon.dc.html",
+  "RepCoach-AI-App-Store-Screenshots-EN.dc.html",
+  "RepCoach-AI-v2-Home-Exercises.orig-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-2-Workout-Plans.orig-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-3-Dashboard-Analytics.orig-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.orig-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-5-Gamification-Challenges.orig-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.orig-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.orig-2026-10-22.dc.html",
+  "RepCoach-AI-Design-System.orig-2026-10-22.dc.html",
+  "RepCoach-AI-Flow.orig-2026-10-22.dc.html",
+  "RepCoach-AI-Onboarding.orig-2026-10-22.dc.html",
+  "RepCoach-AI-Home.orig-2026-10-22.dc.html",
+  "RepCoach-AI-Camera.orig-2026-10-22.dc.html",
+  "RepCoach-AI-HUD.orig-2026-10-22.dc.html",
+  "RepCoach-AI-Results.orig-2026-10-22.dc.html",
+  "RepCoach-AI-History-Settings.orig-2026-10-22.dc.html",
+  "RepCoach-AI-App-Icon.orig-2026-10-22.dc.html",
+  "RepCoach-AI-App-Store-Screenshots-EN.orig-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.QA-r1.dc.html",
+  "RepCoach-AI-v2-Home-Exercises.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-3-Dashboard-Analytics.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-4-Personalized-AI-Coach.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-5-Gamification-Challenges.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-6-Real-time-Voice-Coach.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-7-Social-and-Competition.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-8-Premium-and-Monetization.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-9-Account-and-Profile.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Phase-10-Notifications.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-Final-A-Missing-Screens.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-Final-A-Components-and-Handoff.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-History-Settings.preFB-2026-10-22.dc.html",
+  "RepCoach-AI-v2-Home-Exercises.preFC-2026-10-22.dc.html",
+  "RepCoach-AI-Final-B-Integrated-Prototype.preFC-2026-10-22.dc.html"
+ ],
+ "notes": {
+  "tqa": {
+   "x": 0,
+   "y": -320,
+   "text": "Migration + Phase 7 QA · Oct 22, 2026",
+   "kind": "title1",
+   "maxW": 1440,
+   "page": "qa"
+  },
+  "tv2": {
+   "x": 0,
+   "y": -320,
+   "text": "RepCoach AI v2 · Phases 1–10",
+   "kind": "title1",
+   "maxW": 92320,
+   "page": "v2"
+  },
+  "tv1": {
+   "x": 0,
+   "y": -320,
+   "text": "RepCoach AI v1 · foundation",
+   "kind": "title1",
+   "maxW": 20490,
+   "page": "v1"
+  },
+  "tbk": {
+   "x": 0,
+   "y": -320,
+   "text": "Backups · untouched copies, Oct 22, 2026",
+   "kind": "title1",
+   "maxW": 78210,
+   "page": "backup"
+  },
+  "tfa": {
+   "x": 0,
+   "y": -320,
+   "text": "Final A · Missing screens + UX completion",
+   "kind": "title1",
+   "maxW": 15360,
+   "page": "finala"
+  },
+  "tds": {
+   "x": 0,
+   "y": -320,
+   "text": "RepCoach AI · Design System",
+   "kind": "title1",
+   "maxW": 2600,
+   "page": "ds"
+  },
+  "tfb": {
+   "x": 0,
+   "y": -320,
+   "text": "Final B · Integrated prototype",
+   "kind": "title1",
+   "maxW": 2200,
+   "page": "finalb"
+  },
+  "tqa2": {
+   "x": 1520,
+   "y": -320,
+   "text": "Final A cleanup + Final B · docs and QA · Oct 22, 2026",
+   "kind": "title1",
+   "maxW": 6000,
+   "page": "qa"
+  },
+  "tbk2": {
+   "x": 42090,
+   "y": -320,
+   "text": "Pre-Final-B copies (approved Phase 3–10, Final A, Home, v1 History-Settings) · Oct 22, 2026",
+   "kind": "title1",
+   "maxW": 31360,
+   "page": "backup"
+  },
+  "tfc": {
+   "x": 0,
+   "y": -320,
+   "text": "Final C · Design QA & developer handoff · Oct 22, 2026",
+   "kind": "title1",
+   "maxW": 6000,
+   "page": "finalc"
+  },
+  "tbk3": {
+   "x": 73530,
+   "y": -320,
+   "text": "Pre-Final-C copies · Oct 22, 2026",
+   "kind": "title1",
+   "maxW": 4680,
+   "page": "backup"
+  }
+ },
+ "designSystems": []
+}
