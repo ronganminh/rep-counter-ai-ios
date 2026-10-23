@@ -90,6 +90,8 @@ store_listing/assets/screenshots/rieng-tu-khong-dung/
 # Icon launcher Android: sinh từ assets/branding bằng flutter_launcher_icons,
 # nhưng phải có sẵn trong repo thì máy mới clone về là build được ngay.
 !rep_counter_app/android/app/src/main/res/**/*.png
+# Widget golden images (synthetic UI renders, no camera content).
+!rep_counter_app/test/**/goldens/*.png
 # Native iOS assets referenced by the Xcode asset catalogs.
 !rep_counter_app/ios/Runner/Assets.xcassets/**/*.png
 

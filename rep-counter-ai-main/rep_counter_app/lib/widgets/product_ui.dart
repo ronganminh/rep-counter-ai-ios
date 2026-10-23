@@ -3,6 +3,7 @@ import '../core/i18n/app_strings.dart';
 import '../core/i18n/locale_controller.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_typography.dart';
+import 'tap_target.dart';
 
 extension ProductCopy on BuildContext {
   String tr(String vi, String en) => language == AppLanguage.vi ? vi : en;
@@ -121,7 +122,10 @@ class SegmentChip extends StatelessWidget {
       button: true,
       selected: selected,
       label: label,
-      child: Material(
+      // 36 px visual pill, 48 dp hit area (D-24).
+      child: TapTarget(
+        onTap: onTap,
+        child: Material(
         color: Colors.transparent,
         child: InkWell(
           borderRadius: BorderRadius.circular(999),
@@ -150,6 +154,7 @@ class SegmentChip extends StatelessWidget {
             ),
           ),
         ),
+      ),
       ),
     );
   }
