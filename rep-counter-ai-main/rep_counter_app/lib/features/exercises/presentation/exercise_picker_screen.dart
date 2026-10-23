@@ -4,11 +4,11 @@ import '../../../core/i18n/locale_controller.dart';
 import '../../../exercise.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
-import '../../../widgets/product_ui.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../widgets/app_feedback.dart';
 import 'exercise_detail_page.dart';
 import '../../workout/presentation/exercise_icon.dart';
+import '../../../core/i18n/l10n.dart';
 
 class ExercisePickerScreen extends StatefulWidget {
   const ExercisePickerScreen({super.key});
@@ -31,14 +31,14 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
       for (final profile in allExercises)
         (profile.id, profile.localizedName(context.s)),
       ('squat', 'Squat'),
-      ('situp', context.tr('Gập bụng', 'Sit-up')),
+      ('situp', context.l10n.legacyExercisePickerSitUp),
       ('jumping_jack', 'Jumping jack'),
-      ('lunge', context.tr('Chùng chân', 'Lunge')),
+      ('lunge', context.l10n.legacyExercisePickerLunge),
     ].where((item) => matchesExerciseQuery(item.$2, _query)).toList();
     final l = AppLocalizations.of(context);
     return Scaffold(
         appBar: AppBar(
-            title: Text(context.tr('CHỌN BÀI TẬP', 'CHOOSE EXERCISE'),
+            title: Text(context.l10n.legacyExercisePickerChooseExercise,
                 style: AppTypography.display40.copyWith(fontSize: 28))),
         body: LayoutBuilder(builder: (context, box) {
           final large = MediaQuery.textScalerOf(context).scale(14) > 20;
@@ -81,9 +81,7 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
                                     ExerciseDetailPage(profile: profile)));
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                                content: Text(context.tr(
-                                    'Bài tập này sắp ra mắt.',
-                                    'This exercise is coming soon.'))));
+                                content: Text(context.l10n.legacyExercisePickerExerciseComingSoon)));
                           }
                         },
                         child: Padding(
@@ -93,9 +91,8 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
                                 children: [
                                   Text(
                                       available.contains(item.$1)
-                                          ? context.tr('CÓ SẴN', 'AVAILABLE')
-                                          : context.tr(
-                                              'SẮP RA MẮT', 'COMING SOON'),
+                                          ? context.l10n.legacyExercisePickerAvailable
+                                          : context.l10n.legacyExercisePickerComingSoon,
                                       style: TextStyle(
                                           fontSize: 10,
                                           fontWeight: FontWeight.w700,
@@ -122,8 +119,7 @@ class _ExercisePickerScreenState extends State<ExercisePickerScreen> {
                                               .firstWhere(
                                                   (p) => p.id == item.$1)
                                               .localizedHint(context.s)
-                                          : context.tr('Đang phát triển',
-                                              'In development'),
+                                          : context.l10n.legacyExercisePickerDevelopment,
                                       style: const TextStyle(
                                           fontSize: 12,
                                           color: AppColors.text2)),

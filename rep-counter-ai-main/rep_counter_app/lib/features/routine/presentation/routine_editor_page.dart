@@ -6,9 +6,9 @@ import '../../../core/i18n/locale_controller.dart';
 import '../../../exercise.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
-import '../../../widgets/product_ui.dart';
 import '../data/routine_store.dart';
 import '../domain/routine_preset.dart';
+import '../../../core/i18n/l10n.dart';
 
 class RoutineEditorPage extends StatefulWidget {
   const RoutineEditorPage({
@@ -94,10 +94,7 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(context.tr(
-            'Không thể lưu routine. Hãy thử lại.',
-            'Could not save the routine. Please retry.',
-          )),
+          content: Text(context.l10n.legacyRoutineEditorCouldNotSaveRoutine),
         ));
       }
     } finally {
@@ -117,31 +114,28 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
               style: TextButton.styleFrom(alignment: Alignment.centerLeft),
               onPressed: () => Navigator.of(context).pop(),
               icon: const Icon(Icons.chevron_left),
-              label: Text(context.tr('Bài tập đã lưu', 'Saved routines')),
+              label: Text(context.l10n.legacyRoutineListSavedRoutines),
             ),
             const SizedBox(height: 12),
             Text(
               widget.preset == null
-                  ? context.tr('TẠO ROUTINE', 'CREATE ROUTINE')
-                  : context.tr('SỬA ROUTINE', 'EDIT ROUTINE'),
+                  ? context.l10n.legacyRoutineEditorCreateRoutine
+                  : context.l10n.legacyRoutineEditorEditRoutine,
               style: AppTypography.display40,
             ),
             const SizedBox(height: 28),
-            _FieldLabel(context.tr('Tên routine', 'Routine name')),
+            _FieldLabel(context.l10n.legacyRoutineEditorRoutineName),
             TextField(
               key: const Key('routine-name'),
               controller: _name,
               textInputAction: TextInputAction.next,
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
-                hintText: context.tr(
-                  'Hít đất buổi sáng',
-                  'Morning push-ups',
-                ),
+                hintText: context.l10n.legacyRoutineEditorMorningPushUps,
               ),
             ),
             const SizedBox(height: 20),
-            _FieldLabel(context.tr('Bài tập', 'Exercise')),
+            _FieldLabel(context.l10n.legacyRoutineEditorExercise),
             DropdownButtonFormField<String>(
               key: const Key('routine-exercise'),
               initialValue: _exerciseId,
@@ -157,7 +151,7 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
               },
             ),
             const SizedBox(height: 20),
-            _FieldLabel(context.tr('Rep mỗi set', 'Reps per set')),
+            _FieldLabel(context.l10n.legacyRoutineEditorRepsPerSet),
             TextField(
               key: const Key('routine-reps'),
               controller: _reps,
@@ -170,7 +164,7 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
               decoration: const InputDecoration(suffixText: 'rep'),
             ),
             const SizedBox(height: 20),
-            _FieldLabel(context.tr('Số set', 'Number of sets')),
+            _FieldLabel(context.l10n.legacyRoutineEditorNumberSets),
             TextField(
               key: const Key('routine-sets'),
               controller: _sets,
@@ -182,7 +176,7 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 20),
-            _FieldLabel(context.tr('Thời gian nghỉ', 'Rest duration')),
+            _FieldLabel(context.l10n.legacyRoutineEditorRestDuration),
             TextField(
               key: const Key('routine-rest'),
               controller: _rest,
@@ -193,7 +187,7 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
               ],
               onChanged: (_) => setState(() {}),
               decoration: InputDecoration(
-                suffixText: context.tr('giây', 'sec'),
+                suffixText: context.l10n.secondsShort,
               ),
             ),
             const SizedBox(height: 28),
@@ -210,10 +204,7 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
                 onChanged: (value) => setState(() => _voice = value),
                 title: const Text('Voice Coach'),
                 subtitle: Text(
-                  context.tr(
-                    'Dùng cài đặt giọng đọc hiện có của app',
-                    'Uses the app’s existing voice coach',
-                  ),
+                  context.l10n.legacyRoutineEditorUsesAppSExisting,
                   style: TextStyle(color: p.text2),
                 ),
               ),
@@ -224,8 +215,8 @@ class _RoutineEditorPageState extends State<RoutineEditorPage> {
               onPressed: _valid && !_saving ? _save : null,
               child: Text(
                 _saving
-                    ? context.tr('Đang lưu…', 'Saving…')
-                    : context.tr('Lưu routine', 'Save routine'),
+                    ? context.l10n.legacyRoutineEditorSaving
+                    : context.l10n.legacyRoutineEditorSaveRoutine,
               ),
             ),
           ],

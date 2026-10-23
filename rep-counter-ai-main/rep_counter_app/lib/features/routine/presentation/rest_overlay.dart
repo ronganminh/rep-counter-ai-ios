@@ -4,6 +4,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../../workout/application/workout_ui_state.dart';
+import '../../../core/i18n/l10n.dart';
 
 class RoutineRestOverlay extends StatelessWidget {
   const RoutineRestOverlay({
@@ -75,7 +76,7 @@ class RoutineRestOverlay extends StatelessWidget {
                 child: Column(
                   children: [
                     Text(
-                      context.tr('SET TIẾP THEO SAU', 'NEXT SET IN'),
+                      context.l10n.legacyRestOverlayNextSet,
                       style:
                           AppTypography.caption12.copyWith(color: p.text2),
                     ),
@@ -102,19 +103,13 @@ class RoutineRestOverlay extends StatelessWidget {
             FilledButton(
               key: const Key('routine-skip-rest'),
               onPressed: onSkip,
-              child: Text(context.tr(
-                'Bỏ qua thời gian nghỉ',
-                'Skip rest',
-              )),
+              child: Text(context.l10n.legacyRestOverlaySkipRest),
             ),
             const SizedBox(height: 14),
             OutlinedButton(
               key: const Key('routine-end-workout'),
               onPressed: onEnd,
-              child: Text(context.tr(
-                'Kết thúc buổi tập',
-                'End workout',
-              )),
+              child: Text(context.l10n.legacyRestOverlayEndWorkout),
             ),
           ],
         ),

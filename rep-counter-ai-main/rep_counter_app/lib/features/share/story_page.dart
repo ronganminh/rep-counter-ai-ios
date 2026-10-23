@@ -7,11 +7,11 @@ import 'package:share_plus/share_plus.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/i18n/locale_controller.dart';
 import '../../exercise.dart';
-import '../../widgets/product_ui.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
 import '../workout/data/workout_record.dart';
 import '../workout/presentation/widgets/workout_hud.dart';
+import '../../core/i18n/l10n.dart';
 
 class StoryExporter {
   Future<ShareResultStatus> share(Uint8List bytes, Rect origin) async =>
@@ -70,7 +70,7 @@ class _StoryPageState extends State<StoryPage> {
         await _exporter.save(bytes);
         if (mounted) {
           _notice(
-              context.tr('Đã lưu ảnh vào thư viện.', 'Image saved to Photos.'));
+              context.l10n.legacyStoryPageImageSavedPhotos);
         }
       } else {
         // Even "success" only means an action was selected. An unavailable
@@ -80,16 +80,12 @@ class _StoryPageState extends State<StoryPage> {
     } on GalException catch (error) {
       if (mounted) {
         _notice(error.type == GalExceptionType.accessDenied
-            ? context.tr(
-                'Chưa có quyền thêm ảnh. Hãy cho phép trong Cài đặt của thiết bị rồi thử lại.',
-                'Photo access was denied. Allow adding photos in device Settings and retry.')
-            : context.tr('Chưa lưu được ảnh. Kiểm tra dung lượng rồi thử lại.',
-                'Could not save the image. Check available storage and retry.'));
+            ? context.l10n.legacyStoryPagePhotoAccessWasDenied
+            : context.l10n.legacyStoryPageCouldNotSaveImage);
       }
     } catch (_) {
       if (mounted) {
-        _notice(context.tr('Chưa xuất được ảnh. Hãy thử lại.',
-            'Could not export the image. Please retry.'));
+        _notice(context.l10n.legacyStoryPageCouldNotExportImage);
       }
     } finally {
       if (mounted) setState(() => _busy = false);
@@ -101,7 +97,7 @@ class _StoryPageState extends State<StoryPage> {
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-            title: Text(context.tr('Chia sẻ buổi tập', 'Share workout'))),
+            title: Text(context.l10n.legacyStoryPageShareWorkout)),
         body: ListView(padding: const EdgeInsets.all(20), children: [
           Center(
               child: ConstrainedBox(
@@ -122,9 +118,7 @@ class _StoryPageState extends State<StoryPage> {
                                           record: widget.record)))))))),
           const SizedBox(height: 16),
           Text(
-              context.tr(
-                  'Ảnh 1080 × 1920 · chỉ số liệu buổi tập, không có ảnh camera. Nội dung nhận xét dài được rút gọn trên ảnh.',
-                  '1080 × 1920 image · workout statistics only, no camera image. Long feedback is shortened on the image.'),
+              context.l10n.legacyStoryPageImageWorkoutStatisticsOnly,
               style: const TextStyle(color: AppColors.text2, fontSize: 12)),
         ]),
         bottomNavigationBar: SafeArea(
@@ -138,14 +132,14 @@ class _StoryPageState extends State<StoryPage> {
                           onPressed:
                               _busy ? null : () => _export(false, origin),
                           icon: const Icon(LucideIcons.share2),
-                          label: Text(context.tr('Chia sẻ', 'Share')))),
+                          label: Text(context.l10n.commonShare))),
                   const SizedBox(height: 8),
                   Builder(
                       builder: (origin) => OutlinedButton.icon(
                           key: const Key('save-story'),
                           onPressed: _busy ? null : () => _export(true, origin),
                           icon: const Icon(LucideIcons.download),
-                          label: Text(context.tr('Lưu ảnh', 'Save image')))),
+                          label: Text(context.l10n.legacyStoryPageSaveImage))),
                   if (_busy)
                     const Padding(
                         padding: EdgeInsets.only(top: 8),
@@ -203,7 +197,7 @@ class StoryCard extends StatelessWidget {
                             r.quality?.hasEnoughData == true
                                 ? '${r.quality!.qualityScore}/100'
                                 : '—',
-                            context.tr('Điểm form', 'Form score'))),
+                            context.l10n.legacyStoryPageFormScore)),
                     Expanded(
                         child: _Metric(
                             goal == null
@@ -214,14 +208,12 @@ class StoryCard extends StatelessWidget {
                                         ? '+${r.reps - goal}'
                                         : '${(r.reps / goal * 100).round()}%',
                             goal == null
-                                ? context.tr('Tập tự do', 'Free workout')
+                                ? context.l10n.legacyStoryPageFreeWorkout
                                 : r.reps == goal
-                                    ? context.tr('Đạt mục tiêu', 'Goal reached')
+                                    ? context.l10n.legacyStoryPageGoalReached
                                     : r.reps > goal
-                                        ? context.tr(
-                                            'Vượt mục tiêu', 'Above goal')
-                                        : context.tr(
-                                            'Mục tiêu', 'Goal progress'))),
+                                        ? context.l10n.legacyStoryPageAboveGoal
+                                        : context.l10n.legacyStoryPageGoalProgress)),
                   ]),
                   const SizedBox(height: 14),
                   if (r.aiFeedback?.trim().isNotEmpty == true)
@@ -240,7 +232,7 @@ class StoryCard extends StatelessWidget {
                       textAlign: TextAlign.center,
                       style: AppTypography.display40.copyWith(fontSize: 24)),
                   const SizedBox(height: 8),
-                  Text(context.tr('Mỗi rep đều có giá trị', 'Every rep counts'),
+                  Text(context.l10n.legacyStoryPageEveryRepCounts,
                       textAlign: TextAlign.center,
                       style: const TextStyle(
                           fontSize: 12, color: AppColors.text3)),

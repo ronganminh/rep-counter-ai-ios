@@ -15,6 +15,16 @@ const _migrated = {
   'lib/features/legal/voice_cadence_page.dart': 0,
   'lib/features/legal/legal_page.dart': 0,
   'lib/features/history/export/export_data_sheet.dart': 1,
+  'lib/features/home/presentation/home_screen.dart': 2,
+  'lib/features/workout/presentation/history_page.dart': 11,
+  'lib/features/routine/presentation/routine_editor_page.dart': 0,
+  'lib/features/routine/presentation/routine_list_page.dart': 0,
+  'lib/features/routine/presentation/rest_overlay.dart': 3,
+  'lib/features/achievements/presentation/achievement_earned_card.dart': 1,
+  'lib/features/share/story_page.dart': 0,
+  'lib/features/exercises/presentation/exercise_picker_screen.dart': 0,
+  'lib/features/workout/presentation/goal_setup_page.dart': 7,
+  'lib/features/ai/presentation/ai_consent.dart': 4,
 };
 
 void main() {
