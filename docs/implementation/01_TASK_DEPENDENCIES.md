@@ -8,7 +8,7 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 |---|---|---|---|---|
 | F-1 | gen-l10n infrastructure | — | — | ELIGIBLE |
 | F-2 | Build metadata + config placeholders | F-1 | D-14 values stay unresolved (defaults = shipping values) | ELIGIBLE |
-| F-3 | Local DB for workouts + migration | F-1 | **D-16** (local DB) | DECISION NEEDED (user-data migration) |
+| F-3 | Local DB for workouts + migration | F-1 | D-16 approved 2026-10-23 (L-D16) | IN PROGRESS |
 | F-4 | Workout draft persistence | F-3 | D-06 (12 h, proposed) | WAITS F-3 |
 | DS-1 | Theme tokens to Final C | — | D-25, D-26 | ELIGIBLE |
 | DS-2 | Shared widgets | DS-1, F-1 | D-24 | ELIGIBLE after DS-1, F-1 |
