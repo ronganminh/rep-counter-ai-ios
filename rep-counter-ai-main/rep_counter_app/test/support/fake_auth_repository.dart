@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:rep_counter_app/features/auth/domain/auth_repository.dart';
 
 /// In-memory [AuthRepository] for tests (A-1). Accounts live in [accounts];
@@ -80,6 +82,35 @@ class FakeAuthRepository implements AuthRepository {
   Future<AuthSession> reload() => _call('reload', () {
         final user = _current!.user;
         return _session(user.email!, user.provider);
+      });
+
+  final resetRequests = <String>[];
+  String? newPassword;
+  int deletions = 0;
+
+  /// Push events as a deep link or token refresh would.
+  final eventController = StreamController<AuthEvent>.broadcast();
+  @override
+  Stream<AuthEvent> get events => eventController.stream;
+
+  @override
+  Future<void> requestPasswordReset(String email) =>
+      _call('requestPasswordReset', () => resetRequests.add(email));
+
+  @override
+  Future<void> updatePassword(String password) =>
+      _call('updatePassword', () {
+        newPassword = password;
+        final email = _current?.user.email;
+        if (email != null) accounts[email] = password;
+      });
+
+  @override
+  Future<void> deleteAccount() => _call('deleteAccount', () {
+        deletions++;
+        final email = _current?.user.email;
+        if (email != null) accounts.remove(email);
+        _current = null;
       });
 
   @override

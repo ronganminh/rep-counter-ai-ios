@@ -14,7 +14,8 @@ import 'app/app_shell.dart';
 import 'app/route_observer.dart';
 import 'features/auth/application/auth_controller.dart';
 import 'features/auth/application/auth_scope.dart';
-import 'features/auth/domain/auth_repository.dart';
+import 'features/auth/data/auth_bootstrap.dart';
+import 'features/auth/presentation/password_reset_pages.dart';
 import 'features/legal/onboarding_page.dart';
 import 'camera_page.dart';
 import 'exercise.dart';
@@ -35,16 +36,24 @@ class _RepCounterAppState extends State<RepCounterApp> {
   // Vietnamese (decision log L-D15).
   final _locale = LocaleController(AppLanguage.en);
 
-  /// Accounts (A-1) exist only behind `ENABLE_ACCOUNTS`; no backend is
-  /// configured yet, so even then sign-in reports "not available".
-  final _auth = FeatureFlags.enableAccounts
-      ? (AuthController(const UnconfiguredAuthRepository())..restore())
-      : null;
+  /// Accounts (A-1, D-12 Supabase) exist only behind `ENABLE_ACCOUNTS`.
+  /// Without Supabase configuration sign-in reports "not available"; the app
+  /// never waits for this before showing training.
+  AuthController? _auth;
 
   @override
   void initState() {
     super.initState();
     _load();
+    if (FeatureFlags.enableAccounts && _ciVideoAsset.isEmpty) _initAuth();
+  }
+
+  Future<void> _initAuth() async {
+    final repository = await createAuthRepository();
+    if (repository == null || !mounted) return;
+    final auth = AuthController(repository);
+    setState(() => _auth = auth);
+    await auth.restore();
   }
 
   Future<void> _load() async {
@@ -99,7 +108,10 @@ class _RepCounterAppState extends State<RepCounterApp> {
                 : _onboarded!
                     ? (_auth == null
                         ? const AppShell()
-                        : AuthScope(controller: _auth, child: const AppShell()))
+                        : AuthScope(
+                            controller: _auth!,
+                            child: const AuthRecoveryListener(
+                                child: AppShell())))
                     : OnboardingPage(
                         onDone: () => setState(() => _onboarded = true)),
           ),

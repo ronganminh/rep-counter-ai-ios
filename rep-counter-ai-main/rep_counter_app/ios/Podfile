@@ -29,6 +29,11 @@ flutter_ios_podfile_setup
 target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
 
+  # google_sign_in (D-12) pulls the Swift pod AppCheckCore, which imports these
+  # two Objective-C pods; with static libraries they need module maps.
+  pod 'GoogleUtilities', :modular_headers => true
+  pod 'RecaptchaInterop', :modular_headers => true
+
   target 'RunnerTests' do
     inherit! :search_paths
   end

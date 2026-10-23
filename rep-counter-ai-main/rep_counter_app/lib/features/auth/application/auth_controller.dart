@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 
 import '../domain/auth_repository.dart';
@@ -27,9 +29,40 @@ class AuthExpired extends AuthState {
 }
 
 class AuthController extends ChangeNotifier {
-  AuthController(this.repository);
+  AuthController(this.repository) {
+    _events = repository.events.listen(_onEvent);
+  }
 
   final AuthRepository repository;
+  late final StreamSubscription<AuthEvent> _events;
+
+  bool _recoveryPending = false;
+
+  /// A password-reset link was opened: the app should ask for a new password.
+  bool get recoveryPending => _recoveryPending;
+
+  void _onEvent(AuthEvent e) {
+    switch (e.kind) {
+      case AuthEventKind.signedIn:
+        if (e.session != null) _set(_fromSession(e.session!));
+      case AuthEventKind.expired:
+        markExpired();
+      case AuthEventKind.passwordRecovery:
+        _recoveryPending = true;
+        if (e.session != null) {
+          _set(_fromSession(e.session!));
+        } else {
+          notifyListeners();
+        }
+    }
+  }
+
+  @override
+  void dispose() {
+    _events.cancel();
+    super.dispose();
+  }
+
   AuthState _state = const AuthGuest();
   AuthState get state => _state;
 
@@ -86,6 +119,29 @@ class AuthController extends ChangeNotifier {
 
   /// Re-reads the session, e.g. after the verification link was opened.
   Future<void> reload() => _signIn(repository.reload);
+
+  /// Throws [AuthFailure]. Succeeds for unknown addresses too.
+  Future<void> requestPasswordReset(String email) =>
+      _run(() => repository.requestPasswordReset(email.trim()));
+
+  /// Sets the new password after a reset link; clears [recoveryPending].
+  Future<void> updatePassword(String newPassword) => _run(() async {
+        await repository.updatePassword(newPassword);
+        _recoveryPending = false;
+      });
+
+  /// The user left the new-password screen without saving.
+  void dismissRecovery() {
+    if (!_recoveryPending) return;
+    _recoveryPending = false;
+    notifyListeners();
+  }
+
+  /// Throws [AuthFailure] and stays signed in when the server refuses.
+  Future<void> deleteAccount() => _run(() async {
+        await repository.deleteAccount();
+        _set(const AuthGuest());
+      });
 
   /// Called when the repository rejects the session mid-use.
   void markExpired() {

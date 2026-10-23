@@ -1,9 +1,10 @@
 import 'package:flutter/foundation.dart';
 
-/// Account client contract (roadmap A-1, decision D-12: Apple, Google and
-/// email + password). The backend is not chosen yet
-/// (docs/implementation/04_AUTH_BACKEND_OPTIONS.md), so the app ships with
-/// [UnconfiguredAuthRepository] and the account UI behind
+/// Account client contract (roadmap A-1, decision D-12: Supabase Auth with
+/// Apple, Google and email + password). The implementation is
+/// `SupabaseAuthRepository` when Supabase is configured
+/// (docs/implementation/05_SUPABASE_SETUP.md), otherwise
+/// [UnconfiguredAuthRepository]; the account UI stays behind
 /// `FeatureFlags.enableAccounts` (off by default).
 ///
 /// Implementations own the session (secure storage, token refresh). They
@@ -31,7 +32,31 @@ abstract interface class AuthRepository {
   /// Fresh state of the current session (e.g. after the verify link).
   Future<AuthSession> reload();
 
+  /// Sends a reset link. Succeeds whether or not the address has an account,
+  /// so the response never reveals which emails are registered.
+  Future<void> requestPasswordReset(String email);
+
+  /// Sets a new password for the signed-in or recovering user.
+  Future<void> updatePassword(String newPassword);
+
+  /// Asks the server to delete the account and its server data, then ends
+  /// the session. Workouts stored on this phone are not touched.
+  Future<void> deleteAccount();
+
   Future<void> signOut();
+
+  /// Session changes the app did not ask for: a deep link completed sign-in
+  /// or a password reset, or the session expired.
+  Stream<AuthEvent> get events;
+}
+
+enum AuthEventKind { signedIn, expired, passwordRecovery }
+
+@immutable
+class AuthEvent {
+  const AuthEvent(this.kind, [this.session]);
+  final AuthEventKind kind;
+  final AuthSession? session;
 }
 
 enum AuthProvider { email, apple, google }
@@ -75,6 +100,12 @@ enum AuthFailureKind {
   /// The email already signs in another way (password vs provider).
   accountExists,
   weakPassword,
+
+  /// Signed up but the verification link was not opened yet.
+  emailNotConfirmed,
+
+  /// The reset link expired or was already used.
+  recoveryLinkInvalid,
 }
 
 class AuthFailure implements Exception {
@@ -113,5 +144,13 @@ class UnconfiguredAuthRepository implements AuthRepository {
   @override
   Future<AuthSession> reload() async => _fail();
   @override
+  Future<void> requestPasswordReset(String email) async => _fail();
+  @override
+  Future<void> updatePassword(String newPassword) async => _fail();
+  @override
+  Future<void> deleteAccount() async => _fail();
+  @override
   Future<void> signOut() async {}
+  @override
+  Stream<AuthEvent> get events => const Stream.empty();
 }
