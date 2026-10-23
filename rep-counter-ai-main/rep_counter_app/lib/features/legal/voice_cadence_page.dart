@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/services/training_preferences.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
-import '../../widgets/product_ui.dart';
+import '../../core/i18n/l10n.dart';
 
 class VoiceCadencePage extends StatefulWidget {
   const VoiceCadencePage({super.key});
@@ -43,10 +43,7 @@ class _VoiceCadencePageState extends State<VoiceCadencePage> {
     } catch (_) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(context.tr(
-            'Chưa lưu được tần suất đọc số rep.',
-            'Could not save rep speech cadence.',
-          )),
+          content: Text(context.l10n.legacyVoiceCadenceCouldNotSaveRep),
         ));
       }
     } finally {
@@ -70,19 +67,16 @@ class _VoiceCadencePageState extends State<VoiceCadencePage> {
                         TextButton.styleFrom(alignment: Alignment.centerLeft),
                     onPressed: () => Navigator.of(context).pop(),
                     icon: const Icon(Icons.chevron_left),
-                    label: Text(context.tr('Cài đặt', 'Settings')),
+                    label: Text(context.l10n.commonSettings),
                   ),
                   const SizedBox(height: 12),
                   Text(
-                    context.tr('ĐỌC SỐ REP', 'REP SPEECH'),
+                    context.l10n.legacyVoiceCadenceRepSpeech,
                     style: AppTypography.display40,
                   ),
                   const SizedBox(height: 14),
                   Text(
-                    context.tr(
-                      'Chọn tần suất Voice Coach đọc số rep trong lúc tập.',
-                      'Choose how often Voice Coach speaks rep counts during a workout.',
-                    ),
+                    context.l10n.legacyVoiceCadenceChooseHowOftenVoice,
                     style: AppTypography.body16.copyWith(color: p.text2),
                   ),
                   const SizedBox(height: 34),
@@ -90,11 +84,8 @@ class _VoiceCadencePageState extends State<VoiceCadencePage> {
                     key: const Key('cadence-every-rep'),
                     selected:
                         preferences.repSpeechCadence == RepSpeechCadence.everyRep,
-                    title: context.tr('Mỗi rep', 'Every rep'),
-                    subtitle: context.tr(
-                      'Đọc sau mỗi rep đã tính',
-                      'Speak after every counted rep',
-                    ),
+                    title: context.l10n.legacyVoiceCadenceEveryRep,
+                    subtitle: context.l10n.legacyVoiceCadenceSpeakAfterEveryCounted,
                     onTap: _busy
                         ? null
                         : () => _select(RepSpeechCadence.everyRep),
@@ -104,11 +95,8 @@ class _VoiceCadencePageState extends State<VoiceCadencePage> {
                     key: const Key('cadence-every-5'),
                     selected: preferences.repSpeechCadence ==
                         RepSpeechCadence.every5Reps,
-                    title: context.tr('Mỗi 5 rep', 'Every 5 reps'),
-                    subtitle: context.tr(
-                      'Đọc ở 5, 10, 15…',
-                      'Speak at 5, 10, 15…',
-                    ),
+                    title: context.l10n.legacyVoiceCadenceEveryReps,
+                    subtitle: context.l10n.legacyVoiceCadenceSpeak,
                     onTap: _busy
                         ? null
                         : () => _select(RepSpeechCadence.every5Reps),
@@ -118,14 +106,8 @@ class _VoiceCadencePageState extends State<VoiceCadencePage> {
                     key: const Key('cadence-milestones'),
                     selected: preferences.repSpeechCadence ==
                         RepSpeechCadence.milestonesOnly,
-                    title: context.tr(
-                      'Chỉ các mốc quan trọng',
-                      'Milestones only',
-                    ),
-                    subtitle: context.tr(
-                      'Mục tiêu, set và kết thúc',
-                      'Goals, sets and challenge milestones',
-                    ),
+                    title: context.l10n.legacyVoiceCadenceMilestonesOnly,
+                    subtitle: context.l10n.legacyVoiceCadenceGoalsSetsChallengeMilestones,
                     onTap: _busy
                         ? null
                         : () => _select(RepSpeechCadence.milestonesOnly),
@@ -134,7 +116,7 @@ class _VoiceCadencePageState extends State<VoiceCadencePage> {
                   Divider(color: p.border),
                   const SizedBox(height: 14),
                   Text(
-                    context.tr('CÀI ĐẶT LIÊN QUAN', 'RELATED SETTINGS'),
+                    context.l10n.legacyVoiceCadenceRelatedSettings,
                     style: AppTypography.caption12.copyWith(color: p.text2),
                   ),
                   const SizedBox(height: 18),
@@ -153,15 +135,15 @@ class _VoiceCadencePageState extends State<VoiceCadencePage> {
                           value: preferences.voice,
                         ),
                         _RelatedRow(
-                          label: context.tr('Nhắc tư thế', 'Posture reminders'),
+                          label: context.l10n.legacyVoiceCadencePostureReminders,
                           value: preferences.cues,
                         ),
                         _RelatedRow(
-                          label: context.tr('Âm thanh set', 'Set sounds'),
+                          label: context.l10n.legacyVoiceCadenceSetSounds,
                           value: preferences.sound,
                         ),
                         _RelatedRow(
-                          label: context.tr('Rung', 'Haptics'),
+                          label: context.l10n.legacyVoiceCadenceHaptics,
                           value: preferences.haptics,
                         ),
                       ],
@@ -304,8 +286,8 @@ class _RelatedRow extends StatelessWidget {
           const SizedBox(width: 12),
           Text(
             value
-                ? context.tr('Bật', 'On')
-                : context.tr('Tắt', 'Off'),
+                ? context.l10n.legacyVoiceCadenceText
+                : context.l10n.legacyVoiceCadenceOff,
             style: AppTypography.body14.copyWith(
               color: value ? p.accent : p.text3,
             ),
