@@ -14,7 +14,7 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 | DS-2 | Shared widgets | DS-1, F-1 | D-24 | ELIGIBLE after DS-1, F-1 |
 | N-1 | 5-tab shell | DS-2 | D-15 (router) | ELIGIBLE (without go_router, see §4) |
 | N-2 | Deep links + `returnTo` | N-1 | D-15; universal-link domain | PARTIAL (custom scheme only); defer |
-| A-1 | Auth + guest state machine | N-2 | **D-12**, backend auth | BLOCKED |
+| A-1 | Auth + guest state machine | N-2 | **D-12** (decided: Apple + Google + email), backend auth | Client PRs open behind `ENABLE_ACCOUNTS` (off); real sign-in BLOCKED on backend choice (04_AUTH_BACKEND_OPTIONS) |
 | A-2 | Guest → account merge | A-1, F-3 | backend sync API | BLOCKED |
 | E-1 | Exercises tab | N-1 | D-28 | ELIGIBLE after N-1 |
 | W-1 | HUD restyle (no engine change) | DS-2 | replay CI mandatory | ELIGIBLE after DS-2 |

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'core/config/feature_flags.dart';
 import 'core/i18n/app_strings.dart';
 import 'core/i18n/locale_controller.dart';
 import 'core/legal/legal_config.dart';
@@ -11,6 +12,9 @@ import 'l10n/app_localizations.dart';
 import 'theme/app_theme.dart';
 import 'app/app_shell.dart';
 import 'app/route_observer.dart';
+import 'features/auth/application/auth_controller.dart';
+import 'features/auth/application/auth_scope.dart';
+import 'features/auth/domain/auth_repository.dart';
 import 'features/legal/onboarding_page.dart';
 import 'camera_page.dart';
 import 'exercise.dart';
@@ -30,6 +34,12 @@ class _RepCounterAppState extends State<RepCounterApp> {
   // English until the saved choice loads, so a fresh install never flashes
   // Vietnamese (decision log L-D15).
   final _locale = LocaleController(AppLanguage.en);
+
+  /// Accounts (A-1) exist only behind `ENABLE_ACCOUNTS`; no backend is
+  /// configured yet, so even then sign-in reports "not available".
+  final _auth = FeatureFlags.enableAccounts
+      ? (AuthController(const UnconfiguredAuthRepository())..restore())
+      : null;
 
   @override
   void initState() {
@@ -51,6 +61,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
   @override
   void dispose() {
     _locale.dispose();
+    _auth?.dispose();
     super.dispose();
   }
 
@@ -86,7 +97,9 @@ class _RepCounterAppState extends State<RepCounterApp> {
                 ? const Scaffold(
                     body: Center(child: CircularProgressIndicator()))
                 : _onboarded!
-                    ? const AppShell()
+                    ? (_auth == null
+                        ? const AppShell()
+                        : AuthScope(controller: _auth, child: const AppShell()))
                     : OnboardingPage(
                         onDone: () => setState(() => _onboarded = true)),
           ),
