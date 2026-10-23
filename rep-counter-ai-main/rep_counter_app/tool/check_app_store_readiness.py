@@ -29,12 +29,20 @@ def main():
     picker = read("lib/features/exercises/presentation/exercise_picker_screen.dart")
     ensure("FeatureFlags.visibleExerciseIds.contains" in picker, "Exercise picker must respect release gate")
     settings = read("lib/features/legal/settings_page.dart")
+    # The About row reads the version from build metadata (roadmap F-2), so
+    # it cannot drift from pubspec.yaml; a hard-coded literal is a regression.
     ensure(
-        f"{release_version} ({release_build})" in settings,
-        "Settings release version mismatched",
+        "AppVersionText(" in settings
+        and not re.search(r"'\d+\.\d+\.\d+ \(\d+\)'", settings),
+        "Settings release version must come from build metadata",
     )
     ensure("AppLinks.hasAppStoreListing" in settings, "iOS review link needs listing gate")
     info = plistlib.loads((ROOT / "ios/Runner/Info.plist").read_bytes())
+    ensure(
+        info.get("CFBundleShortVersionString") == "$(FLUTTER_BUILD_NAME)"
+        and info.get("CFBundleVersion") == "$(FLUTTER_BUILD_NUMBER)",
+        "iOS version must come from pubspec.yaml build metadata",
+    )
     for key in ("NSCameraUsageDescription", "NSPhotoLibraryAddUsageDescription"):
         ensure(bool(info.get(key)), f"Missing {key}")
     ensure(info.get("ITSAppUsesNonExemptEncryption") is False,
