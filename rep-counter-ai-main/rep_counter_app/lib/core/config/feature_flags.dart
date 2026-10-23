@@ -21,6 +21,12 @@ class FeatureFlags {
   static const bool enableAiFeedback =
       bool.fromEnvironment('ENABLE_AI_FEEDBACK', defaultValue: false);
 
+  /// Account UI (A-1, D-12). Off in production until an auth backend is
+  /// chosen and configured (docs/implementation/04_AUTH_BACKEND_OPTIONS.md).
+  /// Even when on, training never waits for an account.
+  static const bool enableAccounts =
+      bool.fromEnvironment('ENABLE_ACCOUNTS', defaultValue: false);
+
   /// Bài duy nhất được hỗ trợ ở MVP.
   static const String mvpExerciseId = 'push_up';
 
