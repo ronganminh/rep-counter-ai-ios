@@ -21,6 +21,7 @@ import 'package:rep_counter_app/features/workout/presentation/widgets/rep_pace_c
 import 'package:rep_counter_app/theme/app_theme.dart';
 import 'features/workout/workout_controller_test.dart' show calibration;
 import 'new_ui_test.dart' show fixture;
+import 'support/l10n.dart';
 
 WorkoutRecord detail({bool legacyFlags = false, String id = 'phase8'}) {
   final json = fixture().toJson();
@@ -259,6 +260,9 @@ void main() {
         child: MaterialApp(
             navigatorObservers: [appRouteObserver],
             theme: RepCoachTheme.dark(),
+            locale: language.locale,
+            localizationsDelegates: testLocalizationsDelegates,
+        supportedLocales: testSupportedLocales,
             builder: (context, child) => MediaQuery(
                 data: MediaQuery.of(context)
                     .copyWith(textScaler: TextScaler.linear(scale)),
@@ -437,7 +441,7 @@ void main() {
       await store.save(r);
       await pump(tester, const AppShell(), scale: scale);
       expect(tester.takeException(), isNull, reason: 'Home at $scale text');
-      await tester.tap(find.text('Lịch sử').last);
+      await tester.tap(find.text('Tiến bộ').last);
       await tester.pumpAndSettle();
       await tester.scrollUntilVisible(find.byType(ListTile), 250,
           scrollable: find.byType(Scrollable).first);

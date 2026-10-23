@@ -12,6 +12,7 @@ import 'package:rep_counter_app/features/workout/data/workout_record.dart';
 import 'package:rep_counter_app/features/workout/domain/quality_thresholds.dart';
 import 'package:rep_counter_app/features/workout/presentation/history_page.dart';
 import 'package:rep_counter_app/theme/app_theme.dart';
+import 'support/l10n.dart';
 
 WorkoutRecord record(String id, DateTime date, {int reps = 12}) =>
     WorkoutRecord(
@@ -37,6 +38,9 @@ Future<void> pump(WidgetTester tester, Widget page, {double scale = 1}) async {
       controller: locale,
       child: MaterialApp(
         theme: RepCoachTheme.dark(),
+        locale: const Locale('vi'),
+        localizationsDelegates: testLocalizationsDelegates,
+        supportedLocales: testSupportedLocales,
         home: page,
         builder: (_, child) => MediaQuery(
             data: MediaQueryData(
@@ -178,14 +182,14 @@ void main() {
   testWidgets('tabs reload saved history and show actual home summary',
       (tester) async {
     await pump(tester, const AppShell());
-    await tester.tap(find.text('Lịch sử').last);
+    await tester.tap(find.text('Tiến bộ').last);
     await tester.pumpAndSettle();
     expect(find.text('Chưa có buổi tập nào'), findsOneWidget);
     await WorkoutHistoryStore().save(record('new', DateTime.now(), reps: 27));
-    await tester.tap(find.text('Tập').last);
+    await tester.tap(find.text('Trang chủ').last);
     await tester.pumpAndSettle();
     expect(find.text('27 rep'), findsOneWidget);
-    await tester.tap(find.text('Lịch sử').last);
+    await tester.tap(find.text('Tiến bộ').last);
     await tester.pumpAndSettle();
     expect(find.text('27 rep'), findsOneWidget);
     expect(tester.takeException(), isNull);

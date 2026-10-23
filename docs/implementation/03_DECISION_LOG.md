@@ -4,7 +4,7 @@ Decisions taken while the owner is away. Each one is the safest reversible optio
 
 | ID | Open item | Decision taken (interim) | Why | Reverse by | Owner sign-off needed |
 |---|---|---|---|---|---|
-| L-D01 | D-15 router (`go_router`) | Not introduced in N-1. 5-tab shell uses Navigator 1.0 with one nested `Navigator` per tab | Smallest change; keeps camera → results imperative flow untouched | Swap the shell's nested navigators for `StatefulShellRoute` in N-2 | Mobile tech lead |
+| L-D01 | D-15 router (`go_router`) | Not introduced in N-1. The 5-tab shell keeps Navigator 1.0 with a **single root navigator**: tab roots are swapped in place and every push is full screen over the shell, exactly as today. Per-tab back stacks are deferred | Smallest change; the tab bar can never appear over camera/results (D-02) and the camera → results imperative flow is untouched | Introduce `StatefulShellRoute` (per-tab stacks) in N-2 | Mobile tech lead |
 | L-D02 | D-16 local DB | Not started. F-3/F-4/W-4/W-5 held | It migrates every user's history; owner asked not to run migrations unattended | Approve D-16 + package choice (drift or sqflite) | Mobile tech lead |
 | L-D03 | D-12 auth provider | None chosen; A-1/A-2 BLOCKED | No provider, endpoint or app ID exists | Owner chooses provider and provides backend | Product + Legal |
 | L-D04 | D-14 support email / Terms / Privacy URLs | Keep the values already shipping (`LegalConfig`) as defaults, overridable with `--dart-define`; mark "owner to confirm" | Replacing them with placeholders would break live links; inventing new ones is forbidden | Pass different `--dart-define` values or edit `AppConfig` | Product + Legal |
@@ -15,6 +15,7 @@ Decisions taken while the owner is away. Each one is the safest reversible optio
 | L-D09 | D-23 confirm word | `DELETE` (EN) and `XÓA` (VI), case-insensitive, both accepted in either language | Superset is safe; v1 already used XÓA | Restrict accepted words | Product |
 | L-D10 | D-06 recovery window | Not implemented yet (needs F-3/F-4) | — | — | Product + Mobile |
 | L-D11 | Screen side padding 20 (design) vs 24 (repo) | New v2 widgets use 20; existing screens keep 24 until restyled | Avoids visual churn in untouched screens | Change `AppSpacing.screenPadding` | Design |
+| L-D13 | Profile tab root before accounts exist | Guest-only Profile: "On this phone only" status, the existing Settings (pushed, with Back) and contact support. No sign-in entry | Showing sign-in without a provider would be a dead end | Replace with the Phase 9 Profile when A-1 lands | Product |
 | L-D12 | ARB import scope | F-1 imports the full Final C ARB (4,286 keys) unchanged so keys stay stable; only reviewed keys are used in UI | Keeps the handoff the single source; unused keys have no runtime effect | Prune keys later | Product |
 
 ## PR log

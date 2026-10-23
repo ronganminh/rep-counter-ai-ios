@@ -99,7 +99,7 @@ Live status per PR is kept in `03_DECISION_LOG.md` (§ PR log).
 ## 4 · Deviations from the roadmap and the brief
 
 1. **DS-1 before F-1.** Both have no prerequisites; the owner asked for design foundations first. Order of the two does not change any dependency.
-2. **N-1 without `go_router`.** D-15 is only PROPOSED. The 5-tab shell is built with the existing Navigator 1.0 (one nested `Navigator` per tab inside an `IndexedStack`), which is reversible and keeps `CameraPage → ResultPage` on the root navigator. The router decision moves to N-2, where deep links actually need it.
+2. **N-1 without `go_router`.** D-15 is only PROPOSED. The 5-tab shell keeps Navigator 1.0 with a single root navigator (tab roots swapped in place, pushes full screen), which is reversible and keeps `CameraPage → ResultPage` on the root navigator. Per-tab stacks and the router decision move to N-2, where deep links actually need them.
 3. **F-2 does not replace shipping legal values with placeholders.** The repo already ships a support email and privacy URL; replacing them with `[SUPPORT_EMAIL]` would break the live feedback/legal links. They become overridable `--dart-define` defaults and stay listed as "owner to confirm" (D-14). Product IDs default to empty (billing off).
 4. **F-3, F-4, W-4, W-5 are held** for an explicit D-16 decision: moving every user's workout history to a new store is a data migration, which the owner asked not to run unattended. Everything that does not need it proceeds.
 5. **L-1 is split** into several PRs by feature folder (394/395 call sites is too large for one reviewable PR).
