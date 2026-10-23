@@ -31,6 +31,7 @@ class WorkoutPersonalRecordStore {
     int? best;
     for (final record in records) {
       if (record.id == excludeRecordId ||
+          record.manual ||
           record.exerciseId != exerciseId ||
           record.mode != WorkoutMode.timed ||
           record.challengeSeconds != challengeSeconds ||

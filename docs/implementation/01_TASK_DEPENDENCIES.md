@@ -20,7 +20,7 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 | W-1 | HUD restyle (no engine change) | DS-2 | replay CI mandatory | ELIGIBLE after DS-2 |
 | W-2 | Hold-to-finish, Back sheet, idempotent finish | W-1 | — | ELIGIBLE after W-1 |
 | W-3 | Results v2 + AI card states + share toggles | W-1 | — | ELIGIBLE after W-1 |
-| W-4 | Manual tracking + guided timer | W-1, F-3 | D-18 | WAITS F-3 |
+| W-4 | Manual tracking + guided timer | W-1, F-3 | D-18 | PR open (manual entry; guided timer deferred, L-D18) |
 | W-5 | Recovery screen | F-4 | D-06 | PR open (Save partial / Discard; Resume BLOCKED, L-D17) |
 | PL-1 | Multi-day plan | N-1 | — | ELIGIBLE after N-1 |
 | PL-2 | Reschedule missed session | PL-1 | — | ELIGIBLE after PL-1 |
