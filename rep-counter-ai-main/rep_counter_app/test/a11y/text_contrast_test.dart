@@ -141,11 +141,9 @@ void main() {
             '${withHistory ? '' : ' · empty'}', (tester) async {
           final handle = tester.ensureSemantics();
           if (withHistory) {
-            await tester.runAsync(() async {
-              final store = WorkoutHistoryStore();
-              await store.save(_record('a'));
-              await store.save(_record('b', reps: 31, daysAgo: 1));
-            });
+            final store = WorkoutHistoryStore();
+            await store.save(_record('a'));
+            await store.save(_record('b', reps: 31, daysAgo: 1));
           }
           await _pump(tester, entry.value(), language: language);
           await _checkWholeScroll(tester);

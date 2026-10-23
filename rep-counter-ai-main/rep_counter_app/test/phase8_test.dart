@@ -10,6 +10,7 @@ import 'package:rep_counter_app/app/app_shell.dart';
 import 'package:rep_counter_app/app/route_observer.dart';
 import 'package:rep_counter_app/core/i18n/app_strings.dart';
 import 'package:rep_counter_app/core/i18n/locale_controller.dart';
+import 'package:rep_counter_app/features/workout/data/workout_database.dart';
 import 'package:rep_counter_app/features/workout/data/workout_history_store.dart';
 import 'package:rep_counter_app/features/workout/data/workout_record.dart';
 import 'package:rep_counter_app/features/workout/domain/rep_metric.dart';
@@ -216,19 +217,24 @@ void main() {
     await store.restore(deleted);
     await store.saveFeedback('phase8', 'Newer');
     await store.restore(deleted); // Does not overwrite a newer record.
-    final prefs = await SharedPreferences.getInstance();
-    final values = prefs.getStringList('workout_history_v1')!;
-    expect(values, contains('broken-json'));
-    final restored = values
-        .where((s) => s != 'broken-json')
-        .map((s) => jsonDecode(s) as Map)
-        .singleWhere((r) => r['id'] == 'phase8');
+    // F-3: records live in the SQLite store; unreadable legacy entries are
+    // kept verbatim there instead of in the SharedPreferences list.
+    final db = (await WorkoutDatabase.instance()).db;
+    expect(
+        (await db.query('unreadable_workouts')).map((r) => r['raw']),
+        ['broken-json']);
+    final restored = jsonDecode(
+            (await WorkoutDatabase.rawFor(db, 'phase8'))!)
+        as Map<String, dynamic>;
     expect(restored['future_field'], {'keep': true});
     expect(restored['ai_feedback'], 'Newer');
     expect(restored['rep_details'], raw['rep_details']);
+    // The legacy rollback copy still holds the unreadable entry untouched.
+    final prefs = await SharedPreferences.getInstance();
+    expect(prefs.getStringList('workout_history_v1'), contains('broken-json'));
   });
 
-  test('100 newest sessions retained when an older record is saved', () async {
+  test('history is no longer capped at 100 sessions (F-3)', () async {
     final raws = [
       for (var i = 0; i < 100; i++)
         jsonEncode({
@@ -242,9 +248,9 @@ void main() {
         {...detail(id: 'old').toJson(), 'started_at': '2020-01-01T00:00:00Z'});
     await WorkoutHistoryStore().save(older);
     final loaded = await WorkoutHistoryStore().load();
-    expect(loaded.length, 100);
+    expect(loaded.length, 101);
     expect(loaded.first.id, '99');
-    expect(loaded.any((r) => r.id == 'old'), isFalse);
+    expect(loaded.last.id, 'old');
   });
 
   final capture = GlobalKey();
