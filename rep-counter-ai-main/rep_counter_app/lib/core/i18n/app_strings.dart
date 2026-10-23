@@ -6,7 +6,13 @@
 ///
 /// Cũng không cần `flutter gen-l10n` (sinh code) — dự án chỉ có hai ngôn ngữ, và
 /// bước sinh code thêm một chỗ có thể hỏng mà máy dựng code không chạy được.
+///
+/// v2 (roadmap F-1) thêm gen-l10n từ ARB của gói Final C (`lib/l10n`). Lớp này
+/// vẫn là nguồn cho các màn cũ cho tới khi L-1 chuyển dần sang ARB; test
+/// `test/l10n/arb_parity_test.dart` giữ cho hai file ARB luôn đủ khoá.
 library;
+
+import 'dart:ui' show Locale;
 
 import '../legal/legal_config.dart';
 import 'exercise_help.dart';
@@ -18,6 +24,9 @@ enum AppLanguage {
   const AppLanguage(this.code, this.label);
   final String code;
   final String label;
+
+  /// Locale for `MaterialApp.locale` and gen-l10n lookups.
+  Locale get locale => Locale(code);
 
   static AppLanguage fromCode(String? code) =>
       values.where((l) => l.code == code).firstOrNull ?? AppLanguage.vi;

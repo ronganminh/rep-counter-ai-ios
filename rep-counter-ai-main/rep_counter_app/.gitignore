@@ -49,3 +49,7 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# gen-l10n output; regenerated from lib/l10n/*.arb by `flutter pub get`
+# (pubspec `generate: true`).
+/lib/l10n/app_localizations*.dart

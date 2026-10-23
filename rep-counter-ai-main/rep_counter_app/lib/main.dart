@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'core/i18n/app_strings.dart';
 import 'core/i18n/locale_controller.dart';
 import 'core/legal/legal_config.dart';
+import 'l10n/app_localizations.dart';
 import 'theme/app_theme.dart';
 import 'app/app_shell.dart';
 import 'app/route_observer.dart';
@@ -55,8 +57,18 @@ class _RepCounterAppState extends State<RepCounterApp> {
         controller: _locale,
         child: ValueListenableBuilder<AppLanguage>(
           valueListenable: _locale,
-          builder: (context, _, __) => MaterialApp(
+          builder: (context, language, __) => MaterialApp(
             title: LegalConfig.appName,
+            // The persisted LocaleController stays the single source of the
+            // language; gen-l10n and Material/Cupertino strings follow it.
+            locale: language.locale,
+            supportedLocales: AppLocalizations.supportedLocales,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
             debugShowCheckedModeBanner: false,
             theme: RepCoachTheme.light(),
             darkTheme: RepCoachTheme.dark(),
