@@ -1,0 +1,686 @@
+[
+ {
+  "i": 3,
+  "text": "Tomás Ruiz",
+  "dir": "vi->en",
+  "file": "v2-Phase-7-Social-and-Competition",
+  "ctx": "P7-04a",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 16,
+  "text": "JKL",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 17,
+  "text": "TUV",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 18,
+  "text": "GHI",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 19,
+  "text": "MNO",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 20,
+  "text": "ABC",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 21,
+  "text": "PQRS",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 22,
+  "text": "WXYZ",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 23,
+  "text": "DEF",
+  "dir": "en->vi",
+  "file": "Home",
+  "ctx": "B2",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 25,
+  "text": "54–116 · Header",
+  "dir": "en->vi",
+  "file": "Camera",
+  "ctx": "C0",
+  "kind": "static",
+  "reason": "non-UI"
+ },
+ {
+  "i": 40,
+  "text": "[APP_VERSION] ([BUILD_NUMBER])",
+  "dir": "en->vi",
+  "file": "History-Settings",
+  "ctx": "S1",
+  "kind": "static",
+  "reason": "unchanged"
+ },
+ {
+  "i": 45,
+  "text": "Kiểm tra tràn chữ · overflow check",
+  "dir": "vi->en",
+  "file": "v2-Phase-9-Account-and-Profile",
+  "ctx": "P9-09c",
+  "kind": "static",
+  "reason": "non-UI"
+ },
+ {
+  "i": 47,
+  "text": "Văn bản tiếng Việt dài hơn ~25–35%: tiêu đề xuống 2 dòng, nút và thẻ co giãn, số không bị cắt.",
+  "dir": "vi->en",
+  "file": "v2-Phase-9-Account-and-Profile",
+  "ctx": "P9-09c",
+  "kind": "static",
+  "reason": "non-UI"
+ },
+ {
+  "i": 56,
+  "text": "t happen, and that",
+  "dir": "en->vi",
+  "file": "v2-Phase-2-Workout-Plans",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 87,
+  "text": "d suggest Full body B with 1 set of lunges instead of 2.",
+  "dir": "en->vi",
+  "file": "v2-Phase-4-Personalized-AI-Coach",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 89,
+  "text": "s workout. You review them before anything changes.",
+  "dir": "en->vi",
+  "file": "v2-Phase-4-Personalized-AI-Coach",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 93,
+  "text": " to go",
+  "dir": "en->vi",
+  "file": "v2-Phase-5-Gamification-Challenges",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 104,
+  "text": "ll remind you if you fall behind.\" : ",
+  "dir": "en->vi",
+  "file": "v2-Phase-5-Gamification-Challenges",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 112,
+  "text": "Jordan Lee",
+  "dir": "en->vi",
+  "file": "v2-Phase-7-Social-and-Competition",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "unchanged"
+ },
+ {
+  "i": 136,
+  "text": "Barlow Condensed",
+  "dir": "en->vi",
+  "file": "Design-System",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 137,
+  "text": "pp-pulse 240ms cubic-bezier(.34,1.56,.64,1)",
+  "dir": "en->vi",
+  "file": "Design-System",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 144,
+  "text": "re offline\", ",
+  "dir": "en->vi",
+  "file": "v2-Phase-8-Premium-and-Monetization",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 148,
+  "text": "t go through\", ",
+  "dir": "en->vi",
+  "file": "v2-Phase-8-Premium-and-Monetization",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 151,
+  "text": "t confirm Pro right now\", ",
+  "dir": "en->vi",
+  "file": "v2-Phase-8-Premium-and-Monetization",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 155,
+  "text": "t respond. Nothing changed. Try again.\", ",
+  "dir": "en->vi",
+  "file": "v2-Phase-8-Premium-and-Monetization",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 156,
+  "text": ", false], server: [\"Found a purchase, but we can",
+  "dir": "en->vi",
+  "file": "v2-Phase-8-Premium-and-Monetization",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 158,
+  "text": "t available for this account\", ",
+  "dir": "en->vi",
+  "file": "v2-Phase-9-Auth",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 164,
+  "text": " : s.resends ? `New link sent ({x}).` : ",
+  "dir": "en->vi",
+  "file": "v2-Phase-9-Auth",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 165,
+  "text": "s you. Our server verified the token (simulated).",
+  "dir": "en->vi",
+  "file": "v2-Phase-9-Auth",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 170,
+  "text": ", Math.round(s.up / total * 100)],\n      conflict: [`{x} of {x} uploaded · 1 conflict to review`, ",
+  "dir": "en->vi",
+  "file": "v2-Phase-9-Auth",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 171,
+  "text": ", 100],\n      failed: [`Paused at {x} of {x}`, ",
+  "dir": "en->vi",
+  "file": "v2-Phase-9-Auth",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 179,
+  "text": "re safe on this phone. We'll keep trying automatically.",
+  "dir": "en->vi",
+  "file": "v2-Phase-9-Account-and-Profile",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 183,
+  "text": "re signed out. 2 unsynced workouts stay on this phone and upload next time you sign in to this account.",
+  "dir": "en->vi",
+  "file": "v2-Phase-9-Account-and-Profile",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 184,
+  "text": ",\n    // permission\n    perm: ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 185,
+  "text": ",\n    // reminders\n    rmOn: true, rmDays: [true, true, true, false, true, false, false], rmMin: 1050, h24: false, saved: null, rmNote: ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 186,
+  "text": ",\n    // smart\n    tone: ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 187,
+  "text": ",\n    // ai\n    ai: ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 188,
+  "text": "s camera-counted sets. Records come from your workout history, so opening this again never adds anything.",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 190,
+  "text": "s workout · 11 days left",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 192,
+  "text": "s session didn't happen. Move it or skip it, both are fine.",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 195,
+  "text": "t you, secure your account",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 206,
+  "text": " ? \"RepCoach works the same. Reminders and updates stay in the in-app inbox. You can turn notifications on later in system settings.\"\n        : ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 207,
+  "text": ",\n    // quiet hours\n    qOn: true, qs: 1320, qe: 420, qDays: [true, true, true, true, true, true, true], exSec: true, qSaved: null, qNote: ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 208,
+  "text": ",\n    // deep link\n    src: ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 209,
+  "text": ",\n    // recovery\n    rec: ",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 227,
+  "text": "t be the same time",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "truncated fragment"
+ },
+ {
+  "i": 231,
+  "text": "Planned workout · Full body B (P2-06)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 233,
+  "text": "Workout feedback (P4-02a)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 235,
+  "text": "Friend requests (P7-04a)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 236,
+  "text": "Manage subscription (P8-08e)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 237,
+  "text": "Safe fallback · invitation expired (P10-11h)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 239,
+  "text": "Account mismatch notice (P10-12k)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 240,
+  "text": "App was closed: launches, shows splash, reads the notification payload (route + ids only)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 241,
+  "text": "App already open: in-app banner tapped",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 242,
+  "text": "Row tapped in the in-app inbox",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 243,
+  "text": "{x} tap: system brings RepCoach to the front",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 244,
+  "text": "Payload recipient ≠ signed-in account → content is not shown",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 245,
+  "text": "Signed out → Auth gateway (P9-01e). Destination saved as returnTo",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 246,
+  "text": "Session expired → Sign in again (P9-12a). Destination saved as returnTo",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 247,
+  "text": "Signed in (simulated) → resuming saved destination",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 248,
+  "text": "Offline: cached data is used where it exists",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 249,
+  "text": "Session valid (restored from secure storage)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 250,
+  "text": "Server says the invite expired → safe fallback, no Accept button",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 251,
+  "text": "Offline fallback (P10-12c)",
+  "dir": "en->vi",
+  "file": "v2-Phase-10-Notifications-Settings-and-Recovery",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 252,
+  "text": "No saved session, onboarding not finished",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 256,
+  "text": "Session found in secure storage (simulated)",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 263,
+  "text": "Session kept (offline sign-in state)",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 264,
+  "text": "Open Home with an offline banner",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 265,
+  "text": "re offline\", s: ",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 267,
+  "text": "Stop: show startup problem",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 269,
+  "text": "t save yet\", ",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 292,
+  "text": "t save to Photos\", ",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 294,
+  "text": ", calSheet: false,\n    // FA-10 HUD\n    hud: ",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens-Data-and-Support",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 295,
+  "text": ",\n    // FA-10 recover\n    rec: ",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens-Data-and-Support",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 296,
+  "text": ",\n    // FA-12 help\n    faq: -1, topic: ",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens-Data-and-Support",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ },
+ {
+  "i": 297,
+  "text": ", cS: cur ? `{x}, Oct {x} · {x}. Removes {x} reps from your totals{x} from October 500` : ",
+  "dir": "en->vi",
+  "file": "Final-A-Missing-Screens-Data-and-Support",
+  "ctx": "logic",
+  "kind": "dynamic",
+  "reason": "non-UI"
+ }
+]
