@@ -14,19 +14,31 @@ class LocaleController extends ValueNotifier<AppLanguage> {
 
   static const _key = 'app_language';
 
-  /// Đọc ngôn ngữ đã lưu. Chưa từng chọn -> theo ngôn ngữ hệ thống nếu là tiếng
-  /// Anh, còn lại mặc định tiếng Việt.
+  /// Onboarding flag written by `main.dart`; marks an install that already
+  /// ran a version from before the English default.
+  static const _onboardedKey = 'onboarding_v1';
+
+  /// Đọc ngôn ngữ đã lưu. Chưa từng chọn:
+  /// - cài mới -> tiếng Anh (quyết định chủ dự án, decision log L-D15); người
+  ///   dùng đổi sang tiếng Việt trong Cài đặt;
+  /// - bản cũ đã qua onboarding nhưng chưa từng chọn -> giữ cách cũ (theo hệ
+  ///   thống: en -> EN, còn lại VI) để giao diện người đang dùng không tự đổi.
   Future<void> load(String systemLocale) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final saved = prefs.getString(_key);
-      value = saved != null
-          ? AppLanguage.fromCode(saved)
-          : (systemLocale.startsWith('en') ? AppLanguage.en : AppLanguage.vi);
+      if (saved != null) {
+        value = AppLanguage.fromCode(saved);
+      } else if (prefs.getBool(_onboardedKey) ?? false) {
+        value =
+            systemLocale.startsWith('en') ? AppLanguage.en : AppLanguage.vi;
+      } else {
+        value = AppLanguage.en;
+      }
     } catch (_) {
       // Không đọc được thì vẫn chạy với mặc định — ngôn ngữ không đáng để làm
       // app không mở lên được.
-      value = AppLanguage.vi;
+      value = AppLanguage.en;
     }
   }
 

@@ -17,6 +17,8 @@ Decisions taken while the owner is away. Each one is the safest reversible optio
 | L-D11 | Screen side padding 20 (design) vs 24 (repo) | New v2 widgets use 20; existing screens keep 24 until restyled | Avoids visual churn in untouched screens | Change `AppSpacing.screenPadding` | Design |
 | L-D13 | Profile tab root before accounts exist | Guest-only Profile: "On this phone only" status, the existing Settings (pushed, with Back) and contact support. No sign-in entry | Showing sign-in without a provider would be a dead end | Replace with the Phase 9 Profile when A-1 lands | Product |
 | L-D12 | ARB import scope | F-1 imports the full Final C ARB (4,286 keys) unchanged so keys stay stable; only reviewed keys are used in UI | Keeps the handoff the single source; unused keys have no runtime effect | Prune keys later | Product |
+| L-D14 | L-2 native Vietnamese review | **Owner decision (2026-10-23): deferred.** The current machine-assisted VI strings ship as they are; L-2 stays open as "review later" and is not a blocker | Owner chose to keep the existing translation for now | Run L-2 with a native reviewer, then update `app_vi.arb` | Product (owner) |
+| L-D15 | Default app language | **Owner decision (2026-10-23): English.** A fresh install opens in EN regardless of the system language; the user switches to VI in Settings › Language (Phase 9) and the choice is saved. Installs that already finished onboarding with no saved choice keep their previous language (system EN → EN, otherwise VI) so existing users' UI does not change on update | Owner decision; keeping existing users avoids a surprise language switch | Change the fallback in `LocaleController.load` | Product (owner) |
 
 ## PR log
 

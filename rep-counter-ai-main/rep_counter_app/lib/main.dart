@@ -27,7 +27,9 @@ class RepCounterApp extends StatefulWidget {
 
 class _RepCounterAppState extends State<RepCounterApp> {
   bool? _onboarded;
-  final _locale = LocaleController();
+  // English until the saved choice loads, so a fresh install never flashes
+  // Vietnamese (decision log L-D15).
+  final _locale = LocaleController(AppLanguage.en);
 
   @override
   void initState() {
@@ -36,8 +38,8 @@ class _RepCounterAppState extends State<RepCounterApp> {
   }
 
   Future<void> _load() async {
-    // Ngôn ngữ hệ thống chỉ dùng làm mặc định LẦN ĐẦU; sau đó tôn trọng lựa
-    // chọn đã lưu của người dùng.
+    // Cài mới mặc định tiếng Anh; lựa chọn đã lưu luôn được tôn trọng (xem
+    // LocaleController.load).
     await _locale
         .load(WidgetsBinding.instance.platformDispatcher.locale.languageCode);
     final prefs = await SharedPreferences.getInstance();
