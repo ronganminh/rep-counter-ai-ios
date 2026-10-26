@@ -34,6 +34,7 @@ Status: **CONFIRMED** = approved in an earlier phase brief or verified in shippi
 | D-26 | Bundle Barlow Condensed 600 and 700 in addition to 800 (designs use all three) or restrict designs to 800 | PROPOSED | repo pubspec bundles 800 only | Design + Mobile |
 | D-27 | October 500 and other challenge names are product names (not translated) | PROPOSED | glossary | Product |
 | D-28 | Squat, sit-up and other exercises remain "coming soon" until engine profiles exist | CONFIRMED (repo) | `ExercisePickerScreen` placeholders | Product |
+| PL-1 | Multi-day workout plans. (1) Default beginner plan: 3 workouts a week, Mon/Wed/Fri, Full Body A/B/C. (2) 2–6 planned sessions a week; user picks weekdays, exercises, sets, rep targets, duration targets and supported tracking modes. (3) Missed sessions are never moved automatically: marked missed, user-controlled rescheduling offered. (4) Recovery days are first-class calendar states; workout reminders skip them. (5) Progressive overload optional and OFF by default; suggestions need user confirmation and never change prescriptions automatically. (6) Guests create, follow and save basic plans locally without registration | **DECIDED (owner, 2026-10-26)** — supersedes the Phase 2 prototype defaults (4 days, 2–5 sessions) | Owner PL-1 specification; implementation notes in `docs/implementation/03_DECISION_LOG.md` L-D19 | Product |
 
 ## Legal / store-policy questions (not verified in this session — web access was unavailable)
 
