@@ -1,135 +1,20 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rep_counter_app/features/auth/application/auth_controller.dart';
 import 'package:rep_counter_app/features/auth/data/auth_bootstrap.dart';
 import 'package:rep_counter_app/features/auth/data/auth_config.dart';
-import 'package:rep_counter_app/features/auth/data/native_id_tokens.dart';
 import 'package:rep_counter_app/features/auth/data/secure_session_storage.dart';
 import 'package:rep_counter_app/features/auth/data/supabase_auth_api.dart';
 import 'package:rep_counter_app/features/auth/data/supabase_auth_repository.dart';
 import 'package:rep_counter_app/features/auth/domain/auth_repository.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
+import '../../support/fake_supabase_api.dart';
+
 /// A-1c: SupabaseAuthRepository over a simulated Supabase Auth API.
 
 const _redirect = 'com.ronganminh.repcoach://login-callback';
-
-ApiUser _user(String email,
-        {bool confirmed = true, String provider = 'email', bool ids = true}) =>
-    ApiUser(
-        id: 'id-$email',
-        email: email,
-        emailConfirmed: confirmed,
-        provider: provider,
-        hasIdentities: ids);
-
-class FakeApi implements SupabaseAuthApi {
-  ApiSession? session;
-  final calls = <String>[];
-  Object? nextError;
-  Object? refreshError;
-  ApiSignUpResult? signUpResult;
-  ApiUser? serverUser;
-  final events$ = StreamController<ApiAuthEvent>.broadcast();
-
-  Future<T> _call<T>(String name, T Function() body) async {
-    calls.add(name);
-    final e = nextError;
-    if (e != null) {
-      nextError = null;
-      throw e;
-    }
-    return body();
-  }
-
-  @override
-  ApiSession? get currentSession => session;
-  @override
-  Stream<ApiAuthEvent> get events => events$.stream;
-
-  @override
-  Future<ApiSignUpResult> signUp(String email, String password,
-          {required String redirectTo}) =>
-      _call('signUp $email $redirectTo', () {
-        final r = signUpResult ??
-            ApiSignUpResult(_user(email, confirmed: false), null);
-        session = r.session;
-        return r;
-      });
-
-  @override
-  Future<ApiSession> signInWithPassword(String email, String password) => _call(
-      'signInWithPassword $email', () => session = ApiSession(_user(email)));
-
-  @override
-  Future<ApiSession> signInWithIdToken(sb.OAuthProvider provider,
-          {required String idToken, String? nonce}) =>
-      _call(
-          'signInWithIdToken ${provider.name} $idToken ${nonce ?? '-'}',
-          () => session = ApiSession(
-              _user('x@${provider.name}.example', provider: provider.name)));
-
-  @override
-  Future<void> resendSignup(String email, {required String redirectTo}) =>
-      _call('resendSignup $email $redirectTo', () {});
-
-  @override
-  Future<void> resetPasswordForEmail(String email,
-          {required String redirectTo}) =>
-      _call('resetPasswordForEmail $email $redirectTo', () {});
-
-  @override
-  Future<ApiSession> refreshSession() => _call('refreshSession', () {
-        final e = refreshError;
-        if (e != null) throw e;
-        return session = ApiSession(session!.user);
-      });
-
-  @override
-  Future<ApiUser> getUser() =>
-      _call('getUser', () => serverUser ?? session!.user);
-
-  @override
-  Future<void> updatePassword(String password) => _call('updatePassword', () {
-        if (session == null) throw sb.AuthSessionMissingException();
-      });
-
-  @override
-  Future<void> deleteAccount() => _call('deleteAccount', () {});
-
-  @override
-  Future<void> signOut() => _call('signOut', () => session = null);
-}
-
-class FakeTokens implements NativeIdTokens {
-  AuthFailure? fail;
-  int calls = 0;
-  @override
-  Future<NativeIdToken> apple() async {
-    calls++;
-    if (fail != null) throw fail!;
-    return const NativeIdToken('apple-id-token', rawNonce: 'raw-nonce');
-  }
-
-  @override
-  Future<NativeIdToken> google() async {
-    calls++;
-    if (fail != null) throw fail!;
-    return const NativeIdToken('google-id-token');
-  }
-}
-
-class MemorySecrets implements SecretStore {
-  final values = <String, String>{};
-  @override
-  Future<void> delete(String key) async => values.remove(key);
-  @override
-  Future<String?> read(String key) async => values[key];
-  @override
-  Future<void> write(String key, String value) async => values[key] = value;
-}
 
 Matcher _fails(AuthFailureKind kind) =>
     throwsA(isA<AuthFailure>().having((f) => f.kind, 'kind', kind));
@@ -211,7 +96,7 @@ void main() {
 
     test('an already-registered address looks the same as a new one', () async {
       api.signUpResult = ApiSignUpResult(
-          _user('taken@example.com', confirmed: false, ids: false), null);
+          apiUser('taken@example.com', confirmed: false, ids: false), null);
       final s = await repo().signUpWithEmail('taken@example.com', 'pw-1234567');
       expect(s.user.emailVerified, isFalse);
       expect(s.user.email, 'taken@example.com');
@@ -219,8 +104,8 @@ void main() {
 
     test('reload with a session refreshes and reads the verified user',
         () async {
-      api.session = ApiSession(_user('a@example.com', confirmed: false));
-      api.serverUser = _user('a@example.com');
+      api.session = ApiSession(apiUser('a@example.com', confirmed: false));
+      api.serverUser = apiUser('a@example.com');
       final s = await repo().reload();
       expect(s.user.emailVerified, isTrue);
       expect(api.calls, ['refreshSession', 'getUser']);
@@ -237,7 +122,7 @@ void main() {
         () async {
       await expectLater(repo().updatePassword('new-password-1'),
           _fails(AuthFailureKind.recoveryLinkInvalid));
-      api.session = ApiSession(_user('a@example.com'));
+      api.session = ApiSession(apiUser('a@example.com'));
       await repo().updatePassword('new-password-1');
       expect(api.calls.last, 'updatePassword');
     });
@@ -246,20 +131,20 @@ void main() {
   group('session restore', () {
     test('no session → guest; valid → signed in', () async {
       expect(await repo().restore(), isNull);
-      api.session = ApiSession(_user('a@example.com'));
+      api.session = ApiSession(apiUser('a@example.com'));
       expect((await repo().restore())!.expired, isFalse);
       expect(api.calls, isEmpty, reason: 'valid session needs no refresh');
     });
 
     test('expired access token is refreshed', () async {
-      api.session = ApiSession(_user('a@example.com'), isExpired: true);
+      api.session = ApiSession(apiUser('a@example.com'), isExpired: true);
       final s = await repo().restore();
       expect(s!.expired, isFalse);
       expect(api.calls, ['refreshSession']);
     });
 
     test('rejected refresh → expired; offline → stays signed in', () async {
-      api.session = ApiSession(_user('a@example.com'), isExpired: true);
+      api.session = ApiSession(apiUser('a@example.com'), isExpired: true);
       api.refreshError =
           const sb.AuthApiException('x', code: 'refresh_token_not_found');
       expect((await repo().restore())!.expired, isTrue);
@@ -271,7 +156,7 @@ void main() {
 
   group('events drive the state machine', () {
     test('session expiry and password recovery reach the controller', () async {
-      api.session = ApiSession(_user('a@example.com'));
+      api.session = ApiSession(apiUser('a@example.com'));
       final c = AuthController(repo());
       addTearDown(c.dispose);
       await c.restore();
@@ -286,7 +171,7 @@ void main() {
       expect(c.state, isA<AuthExpired>());
 
       api.events$.add(ApiAuthEvent(ApiAuthEventKind.passwordRecovery,
-          ApiSession(_user('a@example.com'))));
+          ApiSession(apiUser('a@example.com'))));
       await pumpEventQueue();
       expect(c.recoveryPending, isTrue);
       expect(c.state, isA<AuthSignedIn>());
@@ -296,7 +181,7 @@ void main() {
       final c = AuthController(repo());
       addTearDown(c.dispose);
       api.events$.add(ApiAuthEvent(
-          ApiAuthEventKind.signedIn, ApiSession(_user('new@example.com'))));
+          ApiAuthEventKind.signedIn, ApiSession(apiUser('new@example.com'))));
       await pumpEventQueue();
       expect((c.state as AuthSignedIn).user.emailVerified, isTrue);
     });
@@ -348,7 +233,7 @@ void main() {
 
   group('account deletion', () {
     test('calls the server function, then ends the session', () async {
-      api.session = ApiSession(_user('a@example.com'));
+      api.session = ApiSession(apiUser('a@example.com'));
       final c = AuthController(repo());
       addTearDown(c.dispose);
       await c.restore();
@@ -358,7 +243,7 @@ void main() {
     });
 
     test('server refusal keeps the user signed in', () async {
-      api.session = ApiSession(_user('a@example.com'));
+      api.session = ApiSession(apiUser('a@example.com'));
       final c = AuthController(repo());
       addTearDown(c.dispose);
       await c.restore();
