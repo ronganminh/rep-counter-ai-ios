@@ -14,6 +14,7 @@ import '../domain/plan_schedule.dart';
 import '../domain/workout_plan.dart';
 import 'plan_calendar.dart';
 import 'plan_copy.dart';
+import 'overload_page.dart';
 import 'plan_setup_page.dart';
 import 'reschedule_sheet.dart';
 import 'session_detail_page.dart';
@@ -98,6 +99,9 @@ class _PlanOverviewPageState extends State<PlanOverviewPage> {
                 PlanSetupPage(repository: _repo, editing: view.plan)));
       case 'workouts':
         await _editTemplates(view.plan);
+      case 'overload':
+        await Navigator.of(context).push(
+            MaterialPageRoute(builder: (_) => OverloadPage(repository: _repo)));
       case 'pause':
         await _repo.setStatus(PlanStatus.paused);
       case 'resume':
@@ -175,6 +179,10 @@ class _PlanOverviewPageState extends State<PlanOverviewPage> {
                 PopupMenuItem(
                     value: 'workouts',
                     child: Text(c.tr('Sửa bài tập', 'Edit workouts'))),
+                PopupMenuItem(
+                    value: 'overload',
+                    child: Text(
+                        c.tr('Gợi ý tăng dần', 'Progression suggestions'))),
                 if (view.plan.status == PlanStatus.active)
                   PopupMenuItem(
                       value: 'pause',
