@@ -28,7 +28,10 @@ jobs:
   android-replay:
     name: Android replay (${{ matrix.fixture_key }})
     runs-on: ubuntu-latest
-    timeout-minutes: 180
+    # The rest fixture replays in ~2 h 10 m on a typical runner but has
+    # taken over 2 h 38 m on a slow one; the replay script waits up to
+    # 210 min (REPLAY_WAIT_SECONDS) and the job keeps headroom for setup.
+    timeout-minutes: 240
     strategy:
       fail-fast: false
       matrix:
