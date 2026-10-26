@@ -188,6 +188,9 @@ void main() {
     await WorkoutHistoryStore().save(record('new', DateTime.now(), reps: 27));
     await tester.tap(find.text('Trang chủ').last);
     await tester.pumpAndSettle();
+    // The plan card (PL-1) sits above the summary in the lazy home list.
+    await tester.scrollUntilVisible(find.text('27 rep'), 200,
+        scrollable: find.byType(Scrollable).first);
     expect(find.text('27 rep'), findsOneWidget);
     await tester.tap(find.text('Tiến bộ').last);
     await tester.pumpAndSettle();
