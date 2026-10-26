@@ -10,9 +10,13 @@ import 'workout_ui_state.dart';
 /// saved or discarded.
 class WorkoutDraftRecorder {
   WorkoutDraftRecorder(this._controller,
-      {WorkoutDraftStore? store, DateTime Function()? now})
+      {WorkoutDraftStore? store, DateTime Function()? now, DateTime? startedAt})
       : _store = store ?? WorkoutDraftStore(),
-        _now = now ?? DateTime.now {
+        _now = now ?? DateTime.now,
+        // A resumed workout keeps its draft's start, so its draft (and the
+        // partial record it can become) keeps the same id after a second
+        // crash.
+        _startedAt = startedAt {
     _controller.addListener(_changed);
   }
 
@@ -55,6 +59,7 @@ class WorkoutDraftRecorder {
       mode: s.mode,
       targetReps: s.goal,
       challengeSeconds: s.challengeSeconds,
+      routine: s.routine != null,
     );
     writes++;
     _enqueue(() => _store.save(draft));
