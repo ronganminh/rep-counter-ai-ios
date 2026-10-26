@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -6,6 +8,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../application/plan_repository.dart';
+import '../application/reminder_service.dart';
 import '../domain/workout_plan.dart';
 import 'plan_copy.dart';
 import 'plan_overview_page.dart';
@@ -14,9 +17,10 @@ import 'plan_setup_page.dart';
 /// Home entry to the plan (`/home/plan`): today's session, a recovery day,
 /// missed sessions waiting for the user's choice, or "No plan yet".
 class PlanHomeCard extends StatefulWidget {
-  const PlanHomeCard({super.key, this.repository});
+  const PlanHomeCard({super.key, this.repository, this.reminders});
 
   final PlanRepository? repository;
+  final ReminderService? reminders;
 
   @override
   State<PlanHomeCard> createState() => _PlanHomeCardState();
@@ -24,11 +28,19 @@ class PlanHomeCard extends StatefulWidget {
 
 class _PlanHomeCardState extends State<PlanHomeCard> {
   late final _repo = widget.repository ?? PlanRepository();
+  late final _reminders = widget.reminders ?? ReminderService();
   late Future<PlanView?> _view = _safeLoad();
 
+  /// Home reloads after every workout and tab change: re-syncing reminders
+  /// here cancels the one for a session that was just completed.
   Future<PlanView?> _safeLoad() async {
     try {
-      return await _repo.load();
+      final view = await _repo.load();
+      if (mounted) {
+        unawaited(
+            _reminders.sync(view, locale: Localizations.localeOf(context)));
+      }
+      return view;
     } catch (_) {
       return null;
     }
