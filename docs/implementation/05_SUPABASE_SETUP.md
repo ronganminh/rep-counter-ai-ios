@@ -106,42 +106,22 @@ Done at developer.apple.com, in Certificates, Identifiers & Profiles.
 - Google needs the SHA-1 values from §3.
 - Apple on Android is **not offered** (no native sheet). It could be added later with the web flow and the Services ID.
 
-## 7. Account deletion (server side; proposed, not deployed)
+## 7. Account deletion (server side)
 
-App Store guideline 5.1.1(v) requires in-app account deletion. The app calls the Edge Function **`delete-account`** with the user's JWT, then signs out. Workouts saved on the phone stay as guest data.
+**Owner decision (2026-10-26): approved for staging.** It is implemented in `supabase/functions/delete-account/`; see `supabase/README.md`.
 
-The function must be written and deployed with the owner's approval:
+App Store guideline 5.1.1(v) requires in-app account deletion. The app (Profile › Delete account, typed confirmation) calls the Edge Function with the user's JWT.
+- **Apple accounts:** the app first asks the Apple sheet for a fresh **authorization code** and sends it along. If the user cancels the sheet, nothing is deleted.
+- **What the function does:**
+  1. verifies the JWT;
+  2. for Apple accounts, exchanges the code at Apple and revokes the token. Apple secrets live only in the Edge Function secrets. A failed revoke does not block deletion, but it is reported in the response and the logs;
+  3. deletes the user's rows (`USER_TABLES`);
+  4. calls `auth.admin.deleteUser`. Every user-owned table has `user_id … references auth.users on delete cascade` (`supabase/migrations/`).
+- **Local data:** workouts on the phone are kept as guest data.
 
-```ts
-// supabase/functions/delete-account/index.ts  (proposal — not in this repo yet)
-import { createClient } from "jsr:@supabase/supabase-js@2";
+**Deploy:** the agent has no Supabase access token, so it has not deployed anything. The exact `supabase link` / `secrets set` / `db push` / `functions deploy` commands for the owner are in `supabase/README.md`. Production waits for a production project and a separate approval.
 
-Deno.serve(async (req) => {
-  const jwt = req.headers.get("Authorization")?.replace("Bearer ", "");
-  if (!jwt) return new Response("unauthorized", { status: 401 });
-  const admin = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, // secret, set by Supabase
-  );
-  const { data: { user }, error } = await admin.auth.getUser(jwt);
-  if (error || !user) return new Response("unauthorized", { status: 401 });
-
-  // 1. Delete the user's server rows (tables should use ON DELETE CASCADE on user_id).
-  // 2. Apple users: revoke the Apple token (POST https://appleid.apple.com/auth/revoke)
-  //    using a client_secret built from the .p8 key (Edge Function secret).
-  //    Needs an Apple authorization code or refresh token. Follow-up: the app
-  //    can request a fresh authorization code just before deletion.
-  // 3. Delete the auth user.
-  const { error: delError } = await admin.auth.admin.deleteUser(user.id);
-  if (delError) return new Response("failed", { status: 500 });
-  return new Response(null, { status: 204 });
-});
-```
-
-Still open:
-- **Apple token revocation:** the app does not send an Apple authorization code yet. This is a small follow-up PR once the function exists.
-- **A web page for deletion requests:** Google Play requires one. Its URL depends on D-14.
-- **Grace period wording:** the copy mentions "the grace period set in the Privacy Policy (if any)". This is a D-14 decision.
+Still open: a **web page for deletion requests** (Google Play) and the grace-period wording. Both depend on D-14.
 
 ## 8. Row-level security
 
@@ -218,7 +198,7 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 | 9 | Apple Team ID / Services ID / Key ID | ✅ `NW22NWLTK4` / `com.ronganminh.repcoach.signin` / `ANA4NT26KP` |
 | 10 | Sign in with Apple on the App ID, Apple provider ON | ✅ entitlement in `Runner.entitlements` |
 | 10b | Apple **Secret Key (for OAuth)** | ⏳ **open:** generate with `tool/apple_oauth_secret.py` (below) and paste into Supabase; renew every ≤ 6 months |
-| 11 | `delete-account` Edge Function | ⏳ approved 2026-10-26; implementation and deploy commands in a separate PR |
+| 11 | `delete-account` Edge Function | ✅ approved + implemented (`supabase/`); ⏳ **open:** owner runs the deploy commands in `supabase/README.md` (no token available to the agent) |
 | — | Apple `.p8`, Google client secret, service-role key | **secret**: dashboard / Edge Function secrets / password manager only |
 
 Supabase settings to know: "Automatically expose new tables" OFF and "Enable automatic RLS" ON. Every new table therefore needs explicit grants and policies.

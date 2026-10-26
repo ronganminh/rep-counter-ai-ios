@@ -253,6 +253,42 @@ void main() {
       expect(api.calls, ['deleteAccount']);
     });
 
+    test('Apple account: a fresh authorization code goes to the server',
+        () async {
+      api.session =
+          ApiSession(apiUser('a@privaterelay.example', provider: 'apple'));
+      final r = repo(providers: {AuthProvider.email, AuthProvider.apple});
+      await r.deleteAccount();
+      expect(api.deletedWithAppleCode, 'apple-auth-code');
+      expect(api.calls, ['deleteAccount', 'signOut']);
+    });
+
+    test('Apple account: cancelling the Apple sheet deletes nothing', () async {
+      api.session =
+          ApiSession(apiUser('a@privaterelay.example', provider: 'apple'));
+      tokens.fail =
+          const AuthFailure(AuthFailureKind.cancelled, AuthProvider.apple);
+      await expectLater(
+          repo(providers: {AuthProvider.email, AuthProvider.apple})
+              .deleteAccount(),
+          _fails(AuthFailureKind.cancelled));
+      expect(api.calls, isEmpty);
+    });
+
+    test('email and Google accounts send no Apple code', () async {
+      for (final provider in ['email', 'google']) {
+        api = FakeApi()
+          ..session = ApiSession(apiUser('a@example.com', provider: provider));
+        await repo(providers: {
+          AuthProvider.email,
+          AuthProvider.apple,
+          AuthProvider.google
+        }).deleteAccount();
+        expect(api.deletedWithAppleCode, isNull, reason: provider);
+        expect(tokens.calls, 0);
+      }
+    });
+
     test('without a session there is nothing to delete', () async {
       await expectLater(
           repo().deleteAccount(), _fails(AuthFailureKind.unavailable));
