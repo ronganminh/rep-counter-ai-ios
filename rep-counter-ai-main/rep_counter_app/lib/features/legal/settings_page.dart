@@ -320,8 +320,15 @@ class _SettingsPageState extends State<SettingsPage> {
         ]),
         SettingsGroup(title: context.l10n.legacySettingsPageAbout, children: [
           SettingsRow(
+              key: const Key('settings-help-support'),
+              icon: LucideIcons.lifeBuoy,
+              title: context.l10n.fbHelpSupport,
+              subtitle: LegalConfig.supportUrl,
+              onTap: () => AppLinks.open(LegalConfig.supportUrl)),
+          SettingsRow(
               icon: LucideIcons.messageCircle,
               title: context.l10n.legacySettingsPageSendFeedback,
+              subtitle: LegalConfig.contactEmail,
               onTap: _contact),
           if (!Platform.isIOS || AppLinks.hasAppStoreListing)
             SettingsRow(
@@ -332,6 +339,13 @@ class _SettingsPageState extends State<SettingsPage> {
               icon: LucideIcons.info,
               title: s.versionLabel,
               trailing: AppVersionText(style: TextStyle(color: p.text2))),
+          SettingsRow(
+              key: const Key('settings-website'),
+              icon: LucideIcons.globe,
+              // A URL needs no translation (settings stay on ARB strings).
+              title: Uri.parse(LegalConfig.websiteUrl).host,
+              subtitle: LegalConfig.websiteUrl,
+              onTap: () => AppLinks.open(LegalConfig.websiteUrl)),
           SettingsRow(
               icon: LucideIcons.fileText,
               title: s.termsOfUse,

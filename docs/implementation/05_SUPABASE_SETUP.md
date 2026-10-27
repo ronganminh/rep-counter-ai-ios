@@ -50,8 +50,8 @@ The client code is in place behind `ENABLE_ACCOUNTS` (default **off**), in PRs A
 **Google Cloud Console** (console.cloud.google.com):
 1. Create or choose a project, and configure the **OAuth consent screen**:
    - app name "RepCoach AI";
-   - support email;
-   - links to the Privacy Policy and Terms (D-14 is still open);
+   - support email `ronganminh221@gmail.com`;
+   - Privacy Policy `https://repcoach-ai.duckdns.org/privacy-policy.html` and Terms `https://repcoach-ai.duckdns.org/terms.html`; home page `https://repcoach-ai.duckdns.org/` (D-14, decided 2026-10-27);
    - scopes `email`, `profile`, `openid`.
 2. Under **Credentials › Create OAuth client ID**, create three clients:
    - **Web application.** This is the client Supabase uses. Keep its **Client ID** and **Client secret**. No redirect URI is needed for the native ID-token flow.
@@ -121,7 +121,9 @@ App Store guideline 5.1.1(v) requires in-app account deletion. The app (Profile 
 
 **Deploy:** the agent has no Supabase access token, so it has not deployed anything. The exact `supabase link` / `secrets set` / `db push` / `functions deploy` commands for the owner are in `supabase/README.md`. Production waits for a production project and a separate approval.
 
-Still open: a **web page for deletion requests** (Google Play) and the grace-period wording. Both depend on D-14.
+Still open:
+- **A web page for deletion requests:** Google Play requires one. D-14 gives the site (`https://repcoach-ai.duckdns.org/`) and support page (`https://repcoach-ai.duckdns.org/support.html`); the deletion-request page itself is still to be published there by the owner.
+- **Grace period wording:** the copy mentions "the grace period set in the Privacy Policy (if any)"; the Privacy Policy at `https://repcoach-ai.duckdns.org/privacy-policy.html` must state it (owner / Legal).
 
 ## 8. Row-level security
 
@@ -180,7 +182,7 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
       EOF
   ```
 
-## 10. Values to send back (status 2026-10-26, staging)
+## 10. Values to send back (status 2026-10-27, staging)
 
 | # | Value | Status |
 |---|---|---|
@@ -199,6 +201,7 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 | 10 | Sign in with Apple on the App ID, Apple provider ON | ✅ entitlement in `Runner.entitlements` |
 | 10b | Apple **Secret Key (for OAuth)** | ⏳ **open:** generate with `tool/apple_oauth_secret.py` (below) and paste into Supabase; renew every ≤ 6 months |
 | 11 | `delete-account` Edge Function | ✅ approved + implemented (`supabase/`); ⏳ **open:** owner runs the deploy commands in `supabase/README.md` (no token available to the agent) |
+| 12 | Support / legal URLs for consent screens and stores (D-14) | ✅ decided 2026-10-27: support `ronganminh221@gmail.com`, `https://repcoach-ai.duckdns.org/support.html`; privacy `https://repcoach-ai.duckdns.org/privacy-policy.html`; terms `https://repcoach-ai.duckdns.org/terms.html`; home `https://repcoach-ai.duckdns.org/`. ⏳ **open:** account-deletion request page on that site (Google Play) |
 | — | Apple `.p8`, Google client secret, service-role key | **secret**: dashboard / Edge Function secrets / password manager only |
 
 Supabase settings to know: "Automatically expose new tables" OFF and "Enable automatic RLS" ON. Every new table therefore needs explicit grants and policies.

@@ -28,8 +28,7 @@ These values must come from their owners:
 
 - `[Annual price]`, `[Monthly price]`: from the store SDK at runtime
 - `[PRODUCT_ID_*]`
-- `[SUPPORT_EMAIL]`, `[SUPPORT_URL]`
-- `[TERMS_URL]`, `[PRIVACY_URL]`: the backend already serves `/terms.html` and `/privacy-policy.html`; the owner must confirm these are canonical
+- Support email, support URL, Terms and Privacy URLs: **decided (D-14, 2026-10-27)** — `ronganminh221@gmail.com`, `https://repcoach-ai.duckdns.org/support.html`, `https://repcoach-ai.duckdns.org/terms.html`, `https://repcoach-ai.duckdns.org/privacy-policy.html`; website `https://repcoach-ai.duckdns.org/`
 - `[APP_VERSION] ([BUILD_NUMBER])`: from build metadata
 - `[TICKET_REFERENCE]`
 
