@@ -33,7 +33,7 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 | S-2 | Races, leaderboards | S-1 | backend | BLOCKED |
 | P-1 | StoreKit / Play Billing + server verification | A-1 | **D-13, D-14**, backend verify | BLOCKED |
 | P-2 | Membership / restore / rewarded ads | P-1 | ad SDK + policy | BLOCKED |
-| NT-1 | Local reminders + permission flow | PL-1 | D-19 | ELIGIBLE after PL-1 |
+| NT-1 | Local reminders + permission flow | PL-1 | D-19 | PR open (stacked on PL-1b) |
 | NT-2 | Push + inbox + deep links | NT-1, N-2 | backend push, APNs/FCM config | BLOCKED |
 | L-1 | Migrate inline strings to ARB keys | F-1 | — | ELIGIBLE after F-1 (split into several PRs) |
 | L-2 | Native VI review + parameterise sample strings | L-1 | native reviewer | DEFERRED by owner (decision log L-D14) |
