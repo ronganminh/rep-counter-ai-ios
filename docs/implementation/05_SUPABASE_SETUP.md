@@ -162,19 +162,43 @@ Still open:
 | `GOOGLE_IOS_CLIENT_ID` | public | iOS client ID |
 | `APPLE_SIGN_IN_ENABLED` | flag | `true` after §4–5 |
 
-Keep the values in a local file, for example `rep_counter_app/dart_defines.staging.json`. The file name is git-ignored.
+### Building the staging app
 
-```json
-{ "ENABLE_ACCOUNTS": "true", "SUPABASE_URL": "https://…supabase.co", "SUPABASE_ANON_KEY": "…" }
+The template `rep_counter_app/dart_defines.staging.example.json` holds the staging values. They are all public identifiers, and the publishable key is a placeholder.
+
+1. Copy it to `dart_defines.staging.json`. That name is git-ignored, so it is never committed.
+2. Paste the **staging publishable key** from Supabase › Project Settings › API.
+3. Build:
+
+```
+cd rep-counter-ai-main/rep_counter_app
+cp dart_defines.staging.example.json dart_defines.staging.json   # then paste the key
+flutter run   --flavor store --dart-define-from-file=dart_defines.staging.json            # Android device
+flutter run   --dart-define-from-file=dart_defines.staging.json                           # iPhone (signed, see §5)
+flutter build apk --flavor store --release --dart-define-from-file=dart_defines.staging.json
+flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 ```
 
-Build with:
+| Value (staging) | |
+|---|---|
+| Project | `rvysencgtomkzwgdjaqh` (Asia-Pacific / Tokyo, Free plan) |
+| `SUPABASE_URL` | `https://rvysencgtomkzwgdjaqh.supabase.co` |
+| `SUPABASE_REDIRECT_URL` | `com.ronganminh.repcoach://login-callback` (allow-listed) |
+| `GOOGLE_WEB_CLIENT_ID` | `354784213486-h6v9h1jt98ul1v701sr5b1acevqmj06b.apps.googleusercontent.com` |
+| `GOOGLE_IOS_CLIENT_ID` | `354784213486-8bpqbeqn6kggtkub48t1v14soak77sv2.apps.googleusercontent.com` (reversed form in `Info.plist`) |
+| `APPLE_SIGN_IN_ENABLED` | `true` (iOS; entitlement in `Runner.entitlements`) |
 
-```
-flutter run --dart-define-from-file=dart_defines.staging.json
-```
+**Notes**
+- **Android Google sign-in** needs the build's signing certificate SHA-1 to be registered. Upload-key and Play App Signing SHA-1 are registered. The **debug keystore is not**, so Google sign-in fails on `flutter run` debug builds until a debug Android client is added.
+- **Google consent screen** is in *Testing*. Only the listed test users (`thanhyt2024@gmail.com`) can sign in with Google until it is published.
+- **CI:** no workflow builds the app with accounts yet. If a staging build job is added, store each value as a GitHub Actions secret, write the file in the job, then build with `--dart-define-from-file`. Never put the values in the workflow file:
 
-For CI, use GitHub Actions secrets.
+  ```yaml
+  - run: |
+      cat > dart_defines.staging.json <<EOF
+      {"ENABLE_ACCOUNTS":"true","SUPABASE_URL":"${{ secrets.STAGING_SUPABASE_URL }}","SUPABASE_ANON_KEY":"${{ secrets.STAGING_SUPABASE_ANON_KEY }}", ...}
+      EOF
+  ```
 
 ## 10. Values to send back
 

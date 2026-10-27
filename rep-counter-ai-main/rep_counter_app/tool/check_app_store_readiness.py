@@ -81,6 +81,16 @@ def main():
     ensure("PrivacyInfo.xcprivacy in Resources" in project and "InfoPlist.strings in Resources" in project,
            "iOS privacy and localization resources are not bundled")
     ensure("com.ronganminh.repCounterApp" in project, "Bundle ID changed")
+    # D-12: Sign in with Apple capability and the auth / Google callback schemes.
+    entitlements = plistlib.loads((ROOT / "ios/Runner/Runner.entitlements").read_bytes())
+    ensure(entitlements.get("com.apple.developer.applesignin") == ["Default"],
+           "Sign in with Apple entitlement missing")
+    ensure(project.count("CODE_SIGN_ENTITLEMENTS = Runner/Runner.entitlements;") == 3,
+           "Runner entitlements must apply to Debug, Profile and Release")
+    schemes = {s for t in info.get("CFBundleURLTypes", []) for s in t.get("CFBundleURLSchemes", [])}
+    ensure("com.ronganminh.repcoach" in schemes, "Auth callback URL scheme missing")
+    ensure(any(s.startswith("com.googleusercontent.apps.") for s in schemes),
+           "Google Sign-In reversed client ID URL scheme missing")
     ensure("NSPrivacyCollectedDataTypeFitness" in str(manifest), "Workout statistics privacy declaration missing")
     print(
         f"PASS: App Store static release gates for "
