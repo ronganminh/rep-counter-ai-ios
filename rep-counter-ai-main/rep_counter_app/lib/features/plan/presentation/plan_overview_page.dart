@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
@@ -9,6 +11,7 @@ import '../../../widgets/app_feedback.dart';
 import '../../../widgets/product_ui.dart';
 import '../../../widgets/status_badges.dart';
 import '../application/plan_repository.dart';
+import '../application/reminder_service.dart';
 import '../domain/local_date.dart';
 import '../domain/plan_schedule.dart';
 import '../domain/workout_plan.dart';
@@ -16,6 +19,7 @@ import 'plan_calendar.dart';
 import 'plan_copy.dart';
 import 'overload_page.dart';
 import 'plan_setup_page.dart';
+import 'reminder_settings_page.dart';
 import 'reschedule_sheet.dart';
 import 'session_detail_page.dart';
 import 'targets_editor_page.dart';
@@ -24,9 +28,16 @@ import 'targets_editor_page.dart';
 /// never moved for the user), and the next four weeks.
 class PlanOverviewPage extends StatefulWidget {
   const PlanOverviewPage(
-      {super.key, this.repository, this.start = startPlanTarget});
+      {super.key,
+      this.repository,
+      this.reminders,
+      this.start = startPlanTarget});
 
   final PlanRepository? repository;
+
+  /// NT-1: re-synced with every load, so moved, done or skipped sessions
+  /// update their reminders.
+  final ReminderService? reminders;
   final StartTarget start;
 
   @override
@@ -35,6 +46,7 @@ class PlanOverviewPage extends StatefulWidget {
 
 class _PlanOverviewPageState extends State<PlanOverviewPage> {
   late final _repo = widget.repository ?? PlanRepository();
+  late final _reminders = widget.reminders ?? ReminderService();
   PlanView? _view;
   bool _loading = true;
   bool _failed = false;
@@ -54,6 +66,7 @@ class _PlanOverviewPageState extends State<PlanOverviewPage> {
         _loading = false;
         _failed = false;
       });
+      unawaited(_reminders.sync(view, locale: Localizations.localeOf(context)));
     } catch (_) {
       if (mounted) {
         setState(() {
@@ -102,6 +115,10 @@ class _PlanOverviewPageState extends State<PlanOverviewPage> {
       case 'overload':
         await Navigator.of(context).push(
             MaterialPageRoute(builder: (_) => OverloadPage(repository: _repo)));
+      case 'reminders':
+        await Navigator.of(context).push(MaterialPageRoute(
+            builder: (_) =>
+                ReminderSettingsPage(view: view, service: _reminders)));
       case 'pause':
         await _repo.setStatus(PlanStatus.paused);
       case 'resume':
@@ -183,6 +200,9 @@ class _PlanOverviewPageState extends State<PlanOverviewPage> {
                     value: 'overload',
                     child: Text(
                         c.tr('Gợi ý tăng dần', 'Progression suggestions'))),
+                PopupMenuItem(
+                    value: 'reminders',
+                    child: Text(c.tr('Lời nhắc tập', 'Workout reminders'))),
                 if (view.plan.status == PlanStatus.active)
                   PopupMenuItem(
                       value: 'pause',

@@ -22,8 +22,9 @@ abstract interface class SupabaseAuthApi {
   Future<ApiUser> getUser();
   Future<void> updatePassword(String password);
 
-  /// Calls the `delete-account` Edge Function with the user's JWT.
-  Future<void> deleteAccount();
+  /// Calls the `delete-account` Edge Function with the user's JWT, plus a
+  /// fresh Apple authorization code for Apple accounts (token revocation).
+  Future<void> deleteAccount({String? appleAuthorizationCode});
   Future<void> signOut();
 }
 
@@ -164,8 +165,11 @@ class GoTrueSupabaseAuthApi implements SupabaseAuthApi {
       _auth.updateUser(sb.UserAttributes(password: password));
 
   @override
-  Future<void> deleteAccount() async {
-    final r = await _client.functions.invoke('delete-account');
+  Future<void> deleteAccount({String? appleAuthorizationCode}) async {
+    final r = await _client.functions.invoke('delete-account', body: {
+      if (appleAuthorizationCode != null)
+        'apple_authorization_code': appleAuthorizationCode,
+    });
     if (r.status < 200 || r.status >= 300) {
       throw sb.AuthException('delete-account failed',
           statusCode: '${r.status}');

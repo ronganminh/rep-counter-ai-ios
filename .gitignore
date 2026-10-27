@@ -1,3 +1,6 @@
 # Archive used only as the local migration source.
 rep-counter-ai-main.zip
 
+
+# Apple / signing keys must never be committed (D-12).
+*.p8

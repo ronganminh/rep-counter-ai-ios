@@ -1,34 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 
+import '../../../camera_page.dart';
 import '../../../core/i18n/l10n.dart';
+import '../../../core/i18n/locale_controller.dart';
+import '../../../exercise.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/app_button.dart';
+import '../application/workout_controller.dart';
 import '../data/workout_draft_store.dart';
 import '../data/workout_history_store.dart';
 import 'widgets/discard_confirm.dart';
 import 'widgets/workout_hud.dart' show workoutTime;
 
-enum RecoveryOutcome { savedPartial, discarded }
+enum RecoveryOutcome { savedPartial, discarded, resumed }
 
 /// W-5 / FA-10e: an unfinished workout was found at launch. The user must
-/// choose: save it as one partial record, or discard it after a second
-/// confirmation. Nothing is ever discarded silently, also after the
-/// recovery window (D-06, decision log L-D17). Resume needs an engine change
-/// and is not offered (L-D17).
+/// choose: resume it, save it as one partial record, or discard it after a
+/// second confirmation. Nothing is ever discarded silently, also after the
+/// recovery window (D-06, decision log L-D17). Resume (decision B) continues
+/// the count from the saved reps inside the recovery window, for free and
+/// target-reps workouts; the draft stays until the resumed workout is saved
+/// or discarded.
 class RecoveryPage extends StatefulWidget {
   const RecoveryPage(
       {super.key,
       required this.draft,
       this.store,
       this.history,
-      this.now = DateTime.now});
+      this.now = DateTime.now,
+      this.resumeBuilder = _cameraPage});
 
   final WorkoutDraft draft;
   final WorkoutDraftStore? store;
   final WorkoutHistoryStore? history;
   final DateTime Function() now;
+
+  /// Opens the workout screen for a resumed draft (tests replace it).
+  final Widget Function(
+          ExerciseProfile profile, WorkoutDraft draft, WorkoutResumeSeed seed)
+      resumeBuilder;
+
+  static Widget _cameraPage(ExerciseProfile profile, WorkoutDraft draft,
+          WorkoutResumeSeed seed) =>
+      CameraPage(profile: profile, targetReps: draft.targetReps, resume: seed);
 
   /// Shows [RecoveryPage] for the pending draft, if any. Returns the outcome,
   /// or null when there was nothing to recover.
@@ -71,6 +87,31 @@ class _RecoveryPageState extends State<RecoveryPage> {
     }
   }
 
+  ExerciseProfile? get _resumeProfile {
+    final d = widget.draft;
+    if (!d.canResume || d.isExpired(widget.now())) return null;
+    for (final p in allExercises) {
+      if (p.id == d.exerciseId) return p;
+    }
+    return null;
+  }
+
+  void _resume(ExerciseProfile profile) {
+    if (_busy) return;
+    final d = widget.draft;
+    final seed = WorkoutResumeSeed(
+      recordId: d.recordId,
+      startedAt: d.startedAt,
+      reps: d.reps,
+      sets: d.sets,
+      elapsed: Duration(seconds: d.durationSeconds),
+    );
+    Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+            builder: (_) => widget.resumeBuilder(profile, d, seed)),
+        result: RecoveryOutcome.resumed);
+  }
+
   Future<void> _discard() async {
     if (_busy || !await confirmDiscardWorkout(context) || !mounted) return;
     setState(() => _busy = true);
@@ -82,6 +123,7 @@ class _RecoveryPageState extends State<RecoveryPage> {
   Widget build(BuildContext context) {
     final l = context.l10n, d = widget.draft;
     final expired = d.isExpired(widget.now());
+    final resumeProfile = _resumeProfile;
     return PopScope(
       // A choice is required: leaving would let the next workout overwrite
       // the draft, which would be a silent discard.
@@ -136,10 +178,21 @@ class _RecoveryPageState extends State<RecoveryPage> {
                     ),
                   ],
                   const SizedBox(height: 28),
+                  if (resumeProfile != null) ...[
+                    AppButton(
+                        key: const Key('recovery-resume'),
+                        label: context.s.finishContinue,
+                        icon: LucideIcons.play,
+                        onPressed: _busy ? null : () => _resume(resumeProfile)),
+                    const SizedBox(height: 12),
+                  ],
                   AppButton(
                       key: const Key('recovery-save-partial'),
                       label: l.recoverySavePartial,
                       icon: LucideIcons.save,
+                      variant: resumeProfile == null
+                          ? AppButtonVariant.primary
+                          : AppButtonVariant.secondary,
                       loading: _busy,
                       onPressed: _busy ? null : _savePartial),
                   const SizedBox(height: 12),
