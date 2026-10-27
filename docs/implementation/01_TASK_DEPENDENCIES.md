@@ -22,7 +22,7 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 | W-3 | Results v2 + AI card states + share toggles | W-1 | — | ELIGIBLE after W-1 |
 | W-4 | Manual tracking + guided timer | W-1, F-3 | D-18 | PR open (manual entry; guided timer deferred, L-D18) |
 | W-5 | Recovery screen | F-4 | D-06 | Merged (Save partial / Discard); Resume PR open (L-D17) |
-| PL-1 | Multi-day plan | N-1 | — | ELIGIBLE after N-1 |
+| PL-1 | Multi-day plan | N-1 | PL-1 decided (owner 2026-10-26) | PL-1a model + rules PR open; UI, reminders (NT-1), overload follow as stacked PRs |
 | PL-2 | Reschedule missed session | PL-1 | — | ELIGIBLE after PL-1 |
 | H-1 | Progress tab split from History | N-1 | D-05 | ELIGIBLE after N-1 |
 | H-2 | Delete scopes + tombstones | H-1, F-3, A-1 | account scope needs backend | BLOCKED (account scope) |
