@@ -56,3 +56,5 @@ app.*.map.json
 
 # Local --dart-define-from-file values (Supabase / OAuth ids). Never commit.
 dart_defines*.json
+# Templates with placeholders only are committed.
+!dart_defines*.example.json

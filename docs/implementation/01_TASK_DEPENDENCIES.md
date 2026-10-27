@@ -9,7 +9,7 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 | F-1 | gen-l10n infrastructure | — | — | ELIGIBLE |
 | F-2 | Build metadata + config placeholders | F-1 | D-14 values stay unresolved (defaults = shipping values) | ELIGIBLE |
 | F-3 | Local DB for workouts + migration | F-1 | D-16 approved 2026-10-23 (L-D16) | PR open |
-| F-4 | Workout draft persistence | F-3 | D-06 (12 h, proposed) | PR open; Resume BLOCKED on engine owner (L-D17) |
+| F-4 | Workout draft persistence | F-3 | D-06 (12 h, proposed) | Merged; Resume approved (decision B, L-D17), PR open |
 | DS-1 | Theme tokens to Final C | — | D-25, D-26 | ELIGIBLE |
 | DS-2 | Shared widgets | DS-1, F-1 | D-24 | ELIGIBLE after DS-1, F-1 |
 | N-1 | 5-tab shell | DS-2 | D-15 (router) | ELIGIBLE (without go_router, see §4) |
@@ -21,7 +21,7 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 | W-2 | Hold-to-finish, Back sheet, idempotent finish | W-1 | — | ELIGIBLE after W-1 |
 | W-3 | Results v2 + AI card states + share toggles | W-1 | — | ELIGIBLE after W-1 |
 | W-4 | Manual tracking + guided timer | W-1, F-3 | D-18 | PR open (manual entry; guided timer deferred, L-D18) |
-| W-5 | Recovery screen | F-4 | D-06 | PR open (Save partial / Discard; Resume BLOCKED, L-D17) |
+| W-5 | Recovery screen | F-4 | D-06 | Merged (Save partial / Discard); Resume PR open (L-D17) |
 | PL-1 | Multi-day plan | N-1 | PL-1 decided (owner 2026-10-26) | PL-1a model + rules PR open; UI, reminders (NT-1), overload follow as stacked PRs |
 | PL-2 | Reschedule missed session | PL-1 | — | ELIGIBLE after PL-1 |
 | H-1 | Progress tab split from History | N-1 | D-05 | ELIGIBLE after N-1 |
