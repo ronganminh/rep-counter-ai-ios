@@ -37,6 +37,29 @@ class StopwatchWorkoutClock implements WorkoutClock {
   void stop() => _watch.stop();
 }
 
+/// What a resumed workout already counted before the app closed (W-5,
+/// decision B). The engine is not seeded: [SessionTracker] and the rep
+/// counters start fresh, and the controller adds these offsets to what they
+/// report, so the total only ever grows from [reps].
+@immutable
+class WorkoutResumeSeed {
+  const WorkoutResumeSeed({
+    required this.recordId,
+    required this.startedAt,
+    required this.reps,
+    required this.sets,
+    required this.elapsed,
+  })  : assert(reps > 0),
+        assert(sets > 0);
+
+  /// The saved record keeps this id, so resuming and finishing writes the
+  /// same record that "Save as partial" would have: never a second one.
+  final String recordId;
+  final DateTime startedAt;
+  final int reps, sets;
+  final Duration elapsed;
+}
+
 /// Owns session orchestration; consumes reps already accepted by the old engine.
 /// Camera lifecycle, conversion, placement gating, smoothing and calibration
 /// formulas remain in CameraPage/the original domain classes during Phase 4.
@@ -53,7 +76,10 @@ class WorkoutController extends ChangeNotifier {
     WorkoutClock? clock,
     DateTime Function()? now,
     Future<void> Function(WorkoutRecord)? saveRecord,
-  })  : assert(timedChallenge == null ||
+    this.resume,
+  })  : assert(resume == null || (timedChallenge == null && routine == null),
+            'resume is offered for free and target-reps workouts only'),
+        assert(timedChallenge == null ||
             mode == null ||
             mode == WorkoutMode.timed),
         assert(timedChallenge == null || targetReps == null),
@@ -75,6 +101,10 @@ class WorkoutController extends ChangeNotifier {
         _aggregator = const WorkoutAggregator(
             setGap: Duration(seconds: 6), minRepsPerSet: 1) {
     _startedAt = _now();
+    final seed = resume;
+    if (seed != null && targetReps != null && seed.reps >= targetReps!) {
+      _goalReachedOnce = true;
+    }
   }
 
   final ExerciseProfile profile;
@@ -82,6 +112,7 @@ class WorkoutController extends ChangeNotifier {
   final WorkoutMode mode;
   final TimedChallengeConfig? timedChallenge;
   final RoutineSnapshot? routine;
+  final WorkoutResumeSeed? resume;
   final bool requireCountdown;
   final Duration feedbackDuration;
   final WorkoutClock _trackingClock;
@@ -128,7 +159,10 @@ class WorkoutController extends ChangeNotifier {
 
   /// Pose/placement time must advance while the workout timer is still stopped.
   Duration get frameTime => _trackingClock.elapsed;
-  Duration get elapsed => _clock.elapsed;
+  Duration get elapsed => (resume?.elapsed ?? Duration.zero) + _clock.elapsed;
+
+  /// Accepted reps including a resumed workout's earlier ones.
+  int get _totalReps => (resume?.reps ?? 0) + _session.totalReps;
   Set<RepQualityFlag>? get lastAcceptedRepFlags =>
       _reps.isEmpty ? null : Set<RepQualityFlag>.unmodifiable(_reps.last.flags);
   Duration? get challengeRemaining {
@@ -174,14 +208,14 @@ class WorkoutController extends ChangeNotifier {
                                 ? WorkoutUiPhase.positioning
                                 : _armed && requireCountdown
                                     ? WorkoutUiPhase.active
-                                    : _session.totalReps == 0
+                                    : _totalReps == 0
                                         ? WorkoutUiPhase.ready
                                         : WorkoutUiPhase.active),
         exerciseId: profile.id,
         exerciseName: profile.name,
-        reps: _session.totalReps,
+        reps: _totalReps,
         repsInCurrentSet: _session.repsInCurrentSet,
-        completedSets: _session.sets.length,
+        completedSets: (resume?.sets ?? 0) + _session.sets.length,
         sessionState: _session.state,
         goal: targetReps,
         elapsed: elapsed,
@@ -290,9 +324,9 @@ class WorkoutController extends ChangeNotifier {
     ));
     _session.onRep(at);
     _replaceRepFeedback(
-        feedbackForCompletedRep(_session.totalReps, flags));
+        feedbackForCompletedRep(_totalReps, flags));
     final reached = targetReps != null &&
-        _session.totalReps >= targetReps! &&
+        _totalReps >= targetReps! &&
         !_goalReachedOnce;
     if (reached) _goalReachedOnce = true;
 
@@ -527,7 +561,7 @@ class WorkoutController extends ChangeNotifier {
               ? timedChallenge!.durationSeconds
               : elapsed.inSeconds.clamp(0, 86400))
           : elapsed.inSeconds.clamp(1, 86400);
-      final record = WorkoutRecord.fromSummary(
+      final counted = WorkoutRecord.fromSummary(
         summary: summary,
         exerciseName: profile.name,
         durationSeconds: durationSeconds,
@@ -539,6 +573,7 @@ class WorkoutController extends ChangeNotifier {
         readyFrames: _readyFrames,
         lostFrames: _lostFrames,
       );
+      final record = resume == null ? counted : _resumed(counted, resume!);
       _terminalPhase = WorkoutUiPhase.saving;
       _emit();
       await _saveRecord(record);
@@ -554,6 +589,27 @@ class WorkoutController extends ChangeNotifier {
       completer.completeError(error, stack);
     }
   }
+
+  /// The resumed workout as one record: earlier reps and sets added to the
+  /// ones counted now, under the draft's id and start time. Form data covers
+  /// only the reps counted after resuming; the earlier ones have none.
+  static WorkoutRecord _resumed(WorkoutRecord r, WorkoutResumeSeed seed) =>
+      WorkoutRecord(
+        id: seed.recordId,
+        exerciseId: r.exerciseId,
+        exerciseName: r.exerciseName,
+        startedAt: seed.startedAt,
+        durationSeconds: r.durationSeconds,
+        reps: seed.reps + r.reps,
+        sets: seed.sets + r.sets,
+        targetReps: r.targetReps,
+        poseFrames: r.poseFrames,
+        readyFrames: r.readyFrames,
+        lostFrames: r.lostFrames,
+        mode: r.mode,
+        quality: r.quality,
+        repDetails: r.repDetails,
+      );
 
   void abort() {
     if (_disposed || _terminalPhase != null) return;
