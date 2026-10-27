@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/i18n/l10n.dart';
+import '../../../core/legal/legal_config.dart';
+import '../../../widgets/product_ui.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_feedback.dart';
@@ -312,6 +314,13 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
                 tone: AppBannerTone.err),
             const SizedBox(height: 16),
           ],
+          Text(
+              key: const Key('delete-help'),
+              context.tr(
+                  'Cần trợ giúp? ${LegalConfig.contactEmail} · ${LegalConfig.supportUrl}',
+                  'Need help? ${LegalConfig.contactEmail} · ${LegalConfig.supportUrl}'),
+              style: AppTypography.body14),
+          const SizedBox(height: 16),
           TypeToConfirmField(
               onChanged: (ok) => setState(() => _confirmed = ok)),
           const SizedBox(height: 20),

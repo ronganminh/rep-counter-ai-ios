@@ -379,7 +379,7 @@
   },
   "aiConsentBody": "We send workout numbers (reps, timing, form scores) to our AI provider. Video never leaves this phone. You can turn this off in Settings.",
   "@aiConsentBody": {
-    "description": "Must match the privacy policy wording [PRIVACY_URL] [source: final-c-core; status: new-canonical]"
+    "description": "Must match the privacy policy wording https://repcoach-ai.duckdns.org/privacy-policy.html [source: final-c-core; status: new-canonical]"
   },
   "aiCoachMessageNotSent": "Message didn’t send",
   "@aiCoachMessageNotSent": {
@@ -739,7 +739,7 @@
   },
   "supportByEmail": "By email · {email}",
   "@supportByEmail": {
-    "description": "email = [SUPPORT_EMAIL] config value [source: final-c-core; status: new-canonical]",
+    "description": "email = ronganminh221@gmail.com config value [source: final-c-core; status: new-canonical]",
     "placeholders": {
       "email": {
         "type": "String"
@@ -3821,7 +3821,7 @@
   "@fbNoXpAchievementsEarned": {
     "description": "Final B integrated prototype [source: Final B prototype; status: existing]"
   },
-  "fbEmailSupportEmail": "By email · [SUPPORT_EMAIL]",
+  "fbEmailSupportEmail": "By email · ronganminh221@gmail.com",
   "@fbEmailSupportEmail": {
     "description": "Final B integrated prototype [source: Final B prototype; status: existing]"
   },
@@ -3881,7 +3881,7 @@
   "@fbMessageSentSimulated": {
     "description": "Final B integrated prototype [source: Final B prototype; status: existing]"
   },
-  "fbWeReplyEmailSupport": "We reply by email from [SUPPORT_EMAIL]. Reference: [TICKET_REFERENCE].",
+  "fbWeReplyEmailSupport": "We reply by email from ronganminh221@gmail.com. Reference: [TICKET_REFERENCE].",
   "@fbWeReplyEmailSupport": {
     "description": "Final B integrated prototype [source: Final B prototype; status: existing]"
   },
@@ -12728,11 +12728,11 @@
   "@accountCloudCopiesPhoneKeeps": {
     "description": "Screens: P9-09d [source: design v2-Phase-9-Account-and-Profile; status: machine-assisted-vi-needs-review]"
   },
-  "accountGuidesCameraSetupCounting": "Guides for camera setup, counting, plans · [SUPPORT_URL]",
+  "accountGuidesCameraSetupCounting": "Guides for camera setup, counting, plans · https://repcoach-ai.duckdns.org/support.html",
   "@accountGuidesCameraSetupCounting": {
     "description": "Screens: P9-09e [source: design v2-Phase-9-Account-and-Profile; status: machine-assisted-vi-needs-review]"
   },
-  "accountWeReplyEmailSupport": "We reply by email · [SUPPORT_EMAIL]",
+  "accountWeReplyEmailSupport": "We reply by email · ronganminh221@gmail.com",
   "@accountWeReplyEmailSupport": {
     "description": "Screens: P9-09e [source: design v2-Phase-9-Account-and-Profile; status: machine-assisted-vi-needs-review]"
   },
@@ -16168,7 +16168,7 @@
   "@faAppVersionDeviceModel": {
     "description": "Screens: FA-12c [source: design Final-A-Missing-Screens-Data-and-Support; status: machine-assisted-vi-needs-review]"
   },
-  "faReplyGoesThanhN": "Reply goes to thanh.n@example.com. Support address: [SUPPORT_EMAIL] · help center [SUPPORT_URL]. No reply-time promise until support is staffed.",
+  "faReplyGoesThanhN": "Reply goes to thanh.n@example.com. Support address: ronganminh221@gmail.com · help center https://repcoach-ai.duckdns.org/support.html. No reply-time promise until support is staffed.",
   "@faReplyGoesThanhN": {
     "description": "Screens: FA-12c [source: design Final-A-Missing-Screens-Data-and-Support; status: machine-assisted-vi-needs-review]"
   },
@@ -16212,7 +16212,7 @@
   "@faNotDefaultCameraFootage": {
     "description": "Screens: FA-12d [source: design Final-A-Missing-Screens-Data-and-Support; status: machine-assisted-vi-needs-review]"
   },
-  "faSensitiveAttachmentsNeedExplicit": "Sensitive attachments need explicit opt-in. Reports go to [SUPPORT_EMAIL].",
+  "faSensitiveAttachmentsNeedExplicit": "Sensitive attachments need explicit opt-in. Reports go to ronganminh221@gmail.com.",
   "@faSensitiveAttachmentsNeedExplicit": {
     "description": "Screens: FA-12d [source: design Final-A-Missing-Screens-Data-and-Support; status: machine-assisted-vi-needs-review]"
   },

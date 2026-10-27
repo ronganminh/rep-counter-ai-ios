@@ -50,8 +50,8 @@ The client code is in place behind `ENABLE_ACCOUNTS` (default **off**), in PRs A
 **Google Cloud Console** (console.cloud.google.com):
 1. Create or choose a project, and configure the **OAuth consent screen**:
    - app name "RepCoach AI";
-   - support email;
-   - links to the Privacy Policy and Terms (D-14 is still open);
+   - support email `ronganminh221@gmail.com`;
+   - Privacy Policy `https://repcoach-ai.duckdns.org/privacy-policy.html` and Terms `https://repcoach-ai.duckdns.org/terms.html`; home page `https://repcoach-ai.duckdns.org/` (D-14, decided 2026-10-27);
    - scopes `email`, `profile`, `openid`.
 2. Under **Credentials › Create OAuth client ID**, create three clients:
    - **Web application.** This is the client Supabase uses. Keep its **Client ID** and **Client secret**. No redirect URI is needed for the native ID-token flow.
@@ -140,8 +140,8 @@ Deno.serve(async (req) => {
 
 Still open:
 - **Apple token revocation:** the app does not send an Apple authorization code yet. This is a small follow-up PR once the function exists.
-- **A web page for deletion requests:** Google Play requires one. Its URL depends on D-14.
-- **Grace period wording:** the copy mentions "the grace period set in the Privacy Policy (if any)". This is a D-14 decision.
+- **A web page for deletion requests:** Google Play requires one. D-14 gives the site (`https://repcoach-ai.duckdns.org/`) and support page (`https://repcoach-ai.duckdns.org/support.html`); the deletion-request page itself is still to be published there by the owner.
+- **Grace period wording:** the copy mentions "the grace period set in the Privacy Policy (if any)"; the Privacy Policy at `https://repcoach-ai.duckdns.org/privacy-policy.html` must state it (owner / Legal).
 
 ## 8. Row-level security
 

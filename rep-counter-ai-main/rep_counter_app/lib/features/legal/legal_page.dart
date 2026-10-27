@@ -6,6 +6,7 @@ import '../../core/i18n/app_strings.dart';
 import '../../core/i18n/locale_controller.dart';
 import '../../core/legal/legal_config.dart';
 import '../../core/i18n/l10n.dart';
+import '../../core/services/app_links.dart';
 
 enum LegalKind { privacy, terms }
 
@@ -21,7 +22,10 @@ class LegalPage extends StatelessWidget {
       appBar: AppBar(title: Text(privacy ? s.privacyPolicy : s.termsOfUse)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
-        children: privacy ? _privacy(context, s) : _terms(context, s),
+        children: [
+          ...privacy ? _privacy(context, s) : _terms(context, s),
+          _webLink(context, privacy),
+        ],
       ),
     );
   }
@@ -32,9 +36,7 @@ class LegalPage extends StatelessWidget {
         _section(context, s.privCameraTitle, s.privCameraBody),
         _section(context, s.privWorkoutTitle, s.privWorkoutBody),
         _section(context, s.privAiTitle, s.privAiBody),
-        _section(
-            context,
-            context.l10n.legacyLegalPageAutomaticAiSharedImages,
+        _section(context, context.l10n.legacyLegalPageAutomaticAiSharedImages,
             context.l10n.legacyLegalPageAutomaticAiOffDefault),
         _section(context, s.privRetentionTitle, s.privRetentionBody),
         _section(context, s.privSecurityTitle, s.privSecurityBody),
@@ -57,6 +59,19 @@ class LegalPage extends StatelessWidget {
         _section(context, s.termsContactTitle,
             '${s.termsContactBody}\n${LegalConfig.contactEmail}'),
       ];
+
+  /// D-14: the canonical online version, also linked from the stores.
+  Widget _webLink(BuildContext context, bool privacy) {
+    final url = privacy ? LegalConfig.privacyPolicyUrl : LegalConfig.termsUrl;
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: TextButton(
+        key: Key(privacy ? 'legal-privacy-url' : 'legal-terms-url'),
+        onPressed: () => AppLinks.open(url),
+        child: Text(url),
+      ),
+    );
+  }
 
   Widget _intro(String overline, String body) => Padding(
         padding: const EdgeInsets.only(bottom: 18),

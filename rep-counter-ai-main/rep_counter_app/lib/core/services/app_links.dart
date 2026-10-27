@@ -18,6 +18,10 @@ class AppLinks {
           {'id': 'com.ronganminh.repcoach'});
   static Future<bool> feedback() =>
       launchUrl(email, mode: LaunchMode.externalApplication);
+
+  /// Opens one of the D-14 web pages (support, privacy, terms, website).
+  static Future<bool> open(String url) =>
+      launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   static Future<bool> review() async {
     final url = reviewUrl(ios: Platform.isIOS);
     return url != null &&
