@@ -89,8 +89,11 @@ class FakeApi implements SupabaseAuthApi {
         if (session == null) throw sb.AuthSessionMissingException();
       });
 
+  String? deletedWithAppleCode;
+
   @override
-  Future<void> deleteAccount() => _call('deleteAccount', () {});
+  Future<void> deleteAccount({String? appleAuthorizationCode}) => _call(
+      'deleteAccount', () => deletedWithAppleCode = appleAuthorizationCode);
 
   @override
   Future<void> signOut() => _call('signOut', () => session = null);
@@ -111,6 +114,13 @@ class FakeTokens implements NativeIdTokens {
     calls++;
     if (fail != null) throw fail!;
     return const NativeIdToken('google-id-token');
+  }
+
+  @override
+  Future<String> appleAuthorizationCode() async {
+    calls++;
+    if (fail != null) throw fail!;
+    return 'apple-auth-code';
   }
 }
 
