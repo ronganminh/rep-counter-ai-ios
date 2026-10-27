@@ -106,40 +106,22 @@ Done at developer.apple.com, in Certificates, Identifiers & Profiles.
 - Google needs the SHA-1 values from §3.
 - Apple on Android is **not offered** (no native sheet). It could be added later with the web flow and the Services ID.
 
-## 7. Account deletion (server side; proposed, not deployed)
+## 7. Account deletion (server side)
 
-App Store guideline 5.1.1(v) requires in-app account deletion. The app calls the Edge Function **`delete-account`** with the user's JWT, then signs out. Workouts saved on the phone stay as guest data.
+**Owner decision (2026-10-26): approved for staging.** It is implemented in `supabase/functions/delete-account/`; see `supabase/README.md`.
 
-The function must be written and deployed with the owner's approval:
+App Store guideline 5.1.1(v) requires in-app account deletion. The app (Profile › Delete account, typed confirmation) calls the Edge Function with the user's JWT.
+- **Apple accounts:** the app first asks the Apple sheet for a fresh **authorization code** and sends it along. If the user cancels the sheet, nothing is deleted.
+- **What the function does:**
+  1. verifies the JWT;
+  2. for Apple accounts, exchanges the code at Apple and revokes the token. Apple secrets live only in the Edge Function secrets. A failed revoke does not block deletion, but it is reported in the response and the logs;
+  3. deletes the user's rows (`USER_TABLES`);
+  4. calls `auth.admin.deleteUser`. Every user-owned table has `user_id … references auth.users on delete cascade` (`supabase/migrations/`).
+- **Local data:** workouts on the phone are kept as guest data.
 
-```ts
-// supabase/functions/delete-account/index.ts  (proposal — not in this repo yet)
-import { createClient } from "jsr:@supabase/supabase-js@2";
-
-Deno.serve(async (req) => {
-  const jwt = req.headers.get("Authorization")?.replace("Bearer ", "");
-  if (!jwt) return new Response("unauthorized", { status: 401 });
-  const admin = createClient(
-    Deno.env.get("SUPABASE_URL")!,
-    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, // secret, set by Supabase
-  );
-  const { data: { user }, error } = await admin.auth.getUser(jwt);
-  if (error || !user) return new Response("unauthorized", { status: 401 });
-
-  // 1. Delete the user's server rows (tables should use ON DELETE CASCADE on user_id).
-  // 2. Apple users: revoke the Apple token (POST https://appleid.apple.com/auth/revoke)
-  //    using a client_secret built from the .p8 key (Edge Function secret).
-  //    Needs an Apple authorization code or refresh token. Follow-up: the app
-  //    can request a fresh authorization code just before deletion.
-  // 3. Delete the auth user.
-  const { error: delError } = await admin.auth.admin.deleteUser(user.id);
-  if (delError) return new Response("failed", { status: 500 });
-  return new Response(null, { status: 204 });
-});
-```
+**Deploy:** the agent has no Supabase access token, so it has not deployed anything. The exact `supabase link` / `secrets set` / `db push` / `functions deploy` commands for the owner are in `supabase/README.md`. Production waits for a production project and a separate approval.
 
 Still open:
-- **Apple token revocation:** the app does not send an Apple authorization code yet. This is a small follow-up PR once the function exists.
 - **A web page for deletion requests:** Google Play requires one. D-14 gives the site (`https://repcoach-ai.duckdns.org/`) and support page (`https://repcoach-ai.duckdns.org/support.html`); the deletion-request page itself is still to be published there by the owner.
 - **Grace period wording:** the copy mentions "the grace period set in the Privacy Policy (if any)"; the Privacy Policy at `https://repcoach-ai.duckdns.org/privacy-policy.html` must state it (owner / Legal).
 
@@ -162,43 +144,100 @@ Still open:
 | `GOOGLE_IOS_CLIENT_ID` | public | iOS client ID |
 | `APPLE_SIGN_IN_ENABLED` | flag | `true` after §4–5 |
 
-Keep the values in a local file, for example `rep_counter_app/dart_defines.staging.json`. The file name is git-ignored.
+### Building the staging app
 
-```json
-{ "ENABLE_ACCOUNTS": "true", "SUPABASE_URL": "https://…supabase.co", "SUPABASE_ANON_KEY": "…" }
+The template `rep_counter_app/dart_defines.staging.example.json` holds the staging values. They are all public identifiers, and the publishable key is a placeholder.
+
+1. Copy it to `dart_defines.staging.json`. That name is git-ignored, so it is never committed.
+2. Paste the **staging publishable key** from Supabase › Project Settings › API.
+3. Build:
+
+```
+cd rep-counter-ai-main/rep_counter_app
+cp dart_defines.staging.example.json dart_defines.staging.json   # then paste the key
+flutter run   --flavor store --dart-define-from-file=dart_defines.staging.json            # Android device
+flutter run   --dart-define-from-file=dart_defines.staging.json                           # iPhone (signed, see §5)
+flutter build apk --flavor store --release --dart-define-from-file=dart_defines.staging.json
+flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 ```
 
-Build with:
+| Value (staging) | |
+|---|---|
+| Project | `rvysencgtomkzwgdjaqh` (Asia-Pacific / Tokyo, Free plan) |
+| `SUPABASE_URL` | `https://rvysencgtomkzwgdjaqh.supabase.co` |
+| `SUPABASE_REDIRECT_URL` | `com.ronganminh.repcoach://login-callback` (allow-listed) |
+| `GOOGLE_WEB_CLIENT_ID` | `354784213486-h6v9h1jt98ul1v701sr5b1acevqmj06b.apps.googleusercontent.com` |
+| `GOOGLE_IOS_CLIENT_ID` | `354784213486-8bpqbeqn6kggtkub48t1v14soak77sv2.apps.googleusercontent.com` (reversed form in `Info.plist`) |
+| `APPLE_SIGN_IN_ENABLED` | `true` (iOS; entitlement in `Runner.entitlements`) |
+
+**Notes**
+- **Android Google sign-in** needs the build's signing certificate SHA-1 to be registered. Upload-key and Play App Signing SHA-1 are registered. The **debug keystore is not**, so Google sign-in fails on `flutter run` debug builds until a debug Android client is added.
+- **Google consent screen** is in *Testing*. Only the listed test users (`thanhyt2024@gmail.com`) can sign in with Google until it is published.
+- **CI:** no workflow builds the app with accounts yet. If a staging build job is added, store each value as a GitHub Actions secret, write the file in the job, then build with `--dart-define-from-file`. Never put the values in the workflow file:
+
+  ```yaml
+  - run: |
+      cat > dart_defines.staging.json <<EOF
+      {"ENABLE_ACCOUNTS":"true","SUPABASE_URL":"${{ secrets.STAGING_SUPABASE_URL }}","SUPABASE_ANON_KEY":"${{ secrets.STAGING_SUPABASE_ANON_KEY }}", ...}
+      EOF
+  ```
+
+## 10. Values to send back (status 2026-10-27, staging)
+
+| # | Value | Status |
+|---|---|---|
+| 1 | Staging **Project URL** | ✅ `https://rvysencgtomkzwgdjaqh.supabase.co` (Tokyo, Free plan) |
+| 2 | Staging **publishable key** | ✅ received; kept out of git (local `dart_defines.staging.json`, future CI secret) |
+| 3 | Production URL + key | ⏳ **open:** no production project yet |
+| 4a | Redirect allow-listed, Confirm email ON, Secure password change ON, min length 10 | ✅ |
+| 4b | Leaked-password protection | ⏳ **open:** needs the Pro plan |
+| 4c | Custom SMTP | ⏳ **open:** staging uses Supabase's default sender (rate-limited) |
+| 5 | Google **Web client ID** | ✅ `354784213486-h6v9…` (§9) |
+| 6 | Google **iOS client ID** + reversed ID | ✅ reversed ID registered in `Info.plist` |
+| 7 | Google Android clients | ✅ Play App Signing + upload key SHA-1. ⏳ **open:** debug keystore client (needed only to test Google on debug builds) |
+| 8 | Google provider ON, Skip nonce check ON | ✅ |
+| 8b | Google consent screen | ⏳ **open:** still *Testing* (test user only); publish before external testers |
+| 9 | Apple Team ID / Services ID / Key ID | ✅ `NW22NWLTK4` / `com.ronganminh.repcoach.signin` / `ANA4NT26KP` |
+| 10 | Sign in with Apple on the App ID, Apple provider ON | ✅ entitlement in `Runner.entitlements` |
+| 10b | Apple **Secret Key (for OAuth)** | ⏳ **open:** generate with `tool/apple_oauth_secret.py` (below) and paste into Supabase; renew every ≤ 6 months |
+| 11 | `delete-account` Edge Function | ✅ approved + implemented (`supabase/`); ⏳ **open:** owner runs the deploy commands in `supabase/README.md` (no token available to the agent) |
+| 12 | Support / legal URLs for consent screens and stores (D-14) | ✅ decided 2026-10-27: support `ronganminh221@gmail.com`, `https://repcoach-ai.duckdns.org/support.html`; privacy `https://repcoach-ai.duckdns.org/privacy-policy.html`; terms `https://repcoach-ai.duckdns.org/terms.html`; home `https://repcoach-ai.duckdns.org/`. ⏳ **open:** account-deletion request page on that site (Google Play) |
+| — | Apple `.p8`, Google client secret, service-role key | **secret**: dashboard / Edge Function secrets / password manager only |
+
+Supabase settings to know: "Automatically expose new tables" OFF and "Enable automatic RLS" ON. Every new table therefore needs explicit grants and policies.
+
+**Apple OAuth secret** (owner, locally; the `.p8` never enters the repo):
 
 ```
-flutter run --dart-define-from-file=dart_defines.staging.json
+python3 tool/apple_oauth_secret.py --p8 ~/secure/AuthKey_ANA4NT26KP.p8 \
+  --team-id NW22NWLTK4 --key-id ANA4NT26KP --client-id com.ronganminh.repcoach.signin
 ```
 
-For CI, use GitHub Actions secrets.
+Paste the printed JWT into Supabase › Authentication › Providers › Apple › Secret Key (for OAuth). The script prints the expiry date; set a reminder.
 
-## 10. Values to send back
+## 11. Staging test checklist
 
-| # | Value | Public? | How to send |
+**Automated (no device), passing:** `test/features/auth/staging_config_test.dart`, `supabase_auth_repository_test.dart`, `auth_screens_test.dart`, `auth_reset_delete_test.dart`. They run with the staging values against a simulated Supabase API, without the network. They cover:
+- native config: redirect scheme, Google scheme, Apple entitlement;
+- providers per platform;
+- with the flag off, nothing is created;
+- the session is stored in Keychain/Keystore;
+- sign-up → link → confirmed; wrong password; reset → new password; Google/Apple token exchange and cancel; expiry; delete;
+- the screens;
+- training stays available as a guest.
+
+**On a real device: UNVERIFIED.** The owner runs these on a staging build (§9). Report ✅/❌ per line.
+
+| # | Device | Steps | Expected |
 |---|---|---|---|
-| 1 | Staging Supabase **Project URL** | public | chat / issue |
-| 2 | Staging **anon / publishable key** | public | chat, or as a GitHub Actions secret |
-| 3 | Production URL + anon key | public | when ready to release (GitHub secret) |
-| 4 | Confirmation: redirect URL allow-listed, Confirm email ON, min length 10, leaked-password protection ON, custom SMTP set | — | chat |
-| 5 | Google **Web client ID** | public | chat |
-| 6 | Google **iOS client ID** and **reversed client ID** | public | chat |
-| 7 | Confirmation: Google Android client created with debug, upload **and** Play signing SHA-1 | — | chat |
-| 8 | Confirmation: Google provider ON in Supabase with "Skip nonce check" | — | chat |
-| 9 | Apple **Team ID**, **Services ID**, **Key ID** | public identifiers | chat |
-| 10 | Confirmation: Sign in with Apple enabled on App ID `com.ronganminh.repCounterApp`, Apple provider ON in Supabase | — | chat |
-| 11 | Approval to write and deploy the `delete-account` Edge Function (§7) | — | chat |
-| — | Apple `.p8`, Google client secret, service-role key | **secret** | **do not send**; they stay in the Supabase dashboard / Edge Function secrets |
-
-## 11. Staging test checklist (after the values arrive)
-
-- Sign up, open the email link on the phone, confirm "Email confirmed".
-- Sign in with a wrong password and see "Email or password is incorrect"; then sign in correctly.
-- Request a password reset, open the link, set a new password, and confirm "Password updated".
-- Use Google sign-in on iOS and Android, and Apple sign-in on iOS; cancel each once.
-- Force the session to expire (revoke it in the dashboard) and check that the "session expired" banner appears and training still works.
-- Delete the account and check the server: user gone, rows gone, Apple token revoked.
-- Turn off networking: training, history and counting still work as a guest.
+| D1 | iPhone + Android | Profile › Sign in › Create account with a new email (password ≥ 10 characters, tick Terms) | "Confirm your email" with your address |
+| D2 | same phone | Open the email link (sender: Supabase) | The app opens, then "Email confirmed"; Profile shows the account |
+| D3 | any | Sign out; sign in with a wrong password, then the right one | "Email or password is incorrect", then signed in |
+| D4 | any | Sign in › Forgot password? › send; open the link on the phone; set a new password | "Choose a new password", then "Password updated" |
+| D5 | iPhone | Continue with Google (account `thanhyt2024@gmail.com`); repeat and cancel the sheet | Signed in; cancel shows "Sign-in cancelled" and changes nothing |
+| D6 | Android **release/Play** build | Continue with Google | Signed in (debug builds fail until a debug client exists) |
+| D7 | iPhone | Continue with Apple (also try "Hide My Email"); repeat and cancel | Signed in; cancel changes nothing |
+| D8 | any | Supabase › Authentication › Users › sign the user out / revoke sessions; reopen the app after the access token expires (≤ 1 h) | "Your session expired · sign in again" banner; training still works |
+| D9 | any | Profile › Delete account › type DELETE | **Needs the `delete-account` function deployed**; then the user is gone in the dashboard |
+| D10 | any | Airplane mode | Training, history and counting work as a guest; sign-in shows "Can't connect" |
+| D11 | any | Fresh install **without** `ENABLE_ACCOUNTS` | No account UI at all |

@@ -23,6 +23,16 @@
 				<string>com.ronganminh.repcoach</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>com.ronganminh.repcoach.google</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>com.googleusercontent.apps.354784213486-8bpqbeqn6kggtkub48t1v14soak77sv2</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleDisplayName</key>
 	<string>RepCoach AI</string>

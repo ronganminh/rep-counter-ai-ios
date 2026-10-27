@@ -82,6 +82,7 @@ class CameraPage extends StatefulWidget {
     this.timedChallenge,
     this.challengeBestReps,
     this.routine,
+    this.resume,
     this.ciVideoPath,
   });
 
@@ -90,6 +91,9 @@ class CameraPage extends StatefulWidget {
   final TimedChallengeConfig? timedChallenge;
   final int? challengeBestReps;
   final RoutineSnapshot? routine;
+
+  /// Continues an unfinished workout from its saved count (W-5 recovery).
+  final WorkoutResumeSeed? resume;
 
   /// CI-only camera substitute. When set, the production workout screen and
   /// production rep pipeline stay intact; only the camera image source is
@@ -243,13 +247,15 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       targetReps: widget.targetReps,
       timedChallenge: widget.timedChallenge,
       routine: widget.routine,
+      resume: widget.resume,
       trackingClock: widget.ciVideoPath == null ? null : _ciTrackingClock,
       clock: widget.ciVideoPath == null ? null : _ciSessionClock,
     )..addListener(_workoutChanged);
     // F-4: keep a recovery draft from the read-only UI state. Off for the CI
     // video replay so replay runs write nothing extra.
     if (widget.ciVideoPath == null) {
-      _draftRecorder = WorkoutDraftRecorder(_workout);
+      _draftRecorder = WorkoutDraftRecorder(_workout,
+          startedAt: widget.resume?.startedAt);
     }
     // Ban store tra ve false ngay, nen nut ghi khong bao gio hien o ban do.
     DiagRecorder.instance.available.then((ok) {
@@ -1539,7 +1545,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           onAction:
               _cameraState == _CameraState.denied ? openAppSettings : _start,
           onRetry: _cameraState == _CameraState.denied ? _start : null,
-          onManual: _openManualLog,
+          // A resumed workout already has counted reps to finish or save.
+          onManual: widget.resume == null ? _openManualLog : null,
           onExit: _confirmExit,
         ),
       );

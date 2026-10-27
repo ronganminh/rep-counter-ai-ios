@@ -23,6 +23,7 @@ class WorkoutDraft {
     required this.mode,
     this.targetReps,
     this.challengeSeconds,
+    this.routine = false,
   });
 
   final DateTime startedAt, updatedAt;
@@ -31,16 +32,30 @@ class WorkoutDraft {
   final WorkoutMode mode;
   final int? targetReps, challengeSeconds;
 
+  /// Part of a routine (whose sets and rests are not in the draft).
+  final bool routine;
+
   /// D-06 (PROPOSED, decision log L-D17): 12 h, configurable.
   static const recoveryWindow = Duration(hours: 12);
 
   bool isExpired(DateTime now, {Duration window = recoveryWindow}) =>
       now.difference(updatedAt) > window;
 
-  /// The single partial record "Save as partial" writes. Same id every time,
-  /// so saving twice still leaves one record.
+  /// The id of the one record this workout becomes: saved as partial, or
+  /// resumed and finished. Same id every time, so it is never saved twice.
+  String get recordId => 'draft-${startedAt.toUtc().microsecondsSinceEpoch}';
+
+  /// Resume (decision B) continues free and target-reps workouts. Timed
+  /// challenges and routines have their own clocks and are saved or
+  /// discarded only.
+  bool get canResume =>
+      reps > 0 &&
+      !routine &&
+      (mode == WorkoutMode.free || mode == WorkoutMode.targetReps);
+
+  /// The single partial record "Save as partial" writes.
   WorkoutRecord toPartialRecord() => WorkoutRecord(
-        id: 'draft-${startedAt.toUtc().microsecondsSinceEpoch}',
+        id: recordId,
         exerciseId: exerciseId,
         exerciseName: exerciseName,
         startedAt: startedAt,
@@ -67,6 +82,7 @@ class WorkoutDraft {
         'mode': mode.name,
         if (targetReps != null) 'target_reps': targetReps,
         if (challengeSeconds != null) 'challenge_seconds': challengeSeconds,
+        if (routine) 'routine': true,
       };
 
   static WorkoutDraft? fromJson(Map<String, dynamic> j) {
@@ -83,6 +99,7 @@ class WorkoutDraft {
             orElse: () => WorkoutMode.free),
         targetReps: (j['target_reps'] as num?)?.toInt(),
         challengeSeconds: (j['challenge_seconds'] as num?)?.toInt(),
+        routine: j['routine'] == true,
       );
     } catch (_) {
       return null;
@@ -122,7 +139,7 @@ class WorkoutDraftStore {
     if (draft == null) return null;
     final saved = await (history ?? WorkoutHistoryStore()).load();
     final alreadySaved = saved.any((r) =>
-        r.id == draft.toPartialRecord().id ||
+        r.id == draft.recordId ||
         (r.exerciseId == draft.exerciseId &&
             r.reps >= draft.reps &&
             r.startedAt.difference(draft.startedAt).abs() <
