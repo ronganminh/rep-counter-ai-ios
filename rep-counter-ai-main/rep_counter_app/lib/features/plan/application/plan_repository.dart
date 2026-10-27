@@ -205,6 +205,14 @@ class PlanRepository {
       _change((plan, sessions, today, now) =>
           PlanSchedule.applyEdit(plan, edited, sessions, today, now, _newId));
 
+  /// Progressive-overload suggestions on or off (off by default). Turning
+  /// it on changes no target: suggestions still need the user's choice.
+  Future<PlanView?> setProgressiveOverload(bool enabled) =>
+      _change((plan, sessions, _, now) => (
+            plan.copyWith(progressiveOverload: enabled, updatedAt: now),
+            sessions
+          ));
+
   Future<PlanView?> setStatus(PlanStatus status) =>
       _change((plan, sessions, today, now) =>
           PlanSchedule.setStatus(plan, sessions, status, today, now));
