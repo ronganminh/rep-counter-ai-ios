@@ -21,6 +21,10 @@ abstract interface class NativeIdTokens {
   /// Throws [AuthFailure] (cancelled / providerFailed).
   Future<NativeIdToken> apple();
   Future<NativeIdToken> google();
+
+  /// A fresh Apple authorization code, sent with account deletion so the
+  /// server can revoke the Sign in with Apple token.
+  Future<String> appleAuthorizationCode();
 }
 
 class PlatformNativeIdTokens implements NativeIdTokens {
@@ -56,6 +60,24 @@ class PlatformNativeIdTokens implements NativeIdTokens {
             AuthFailureKind.providerFailed, AuthProvider.apple);
       }
       return NativeIdToken(token, rawNonce: rawNonce);
+    } on SignInWithAppleAuthorizationException catch (e) {
+      throw AuthFailure(
+          e.code == AuthorizationErrorCode.canceled
+              ? AuthFailureKind.cancelled
+              : AuthFailureKind.providerFailed,
+          AuthProvider.apple);
+    } on SignInWithAppleException {
+      throw const AuthFailure(
+          AuthFailureKind.providerFailed, AuthProvider.apple);
+    }
+  }
+
+  @override
+  Future<String> appleAuthorizationCode() async {
+    try {
+      final credential =
+          await SignInWithApple.getAppleIDCredential(scopes: const []);
+      return credential.authorizationCode;
     } on SignInWithAppleAuthorizationException catch (e) {
       throw AuthFailure(
           e.code == AuthorizationErrorCode.canceled

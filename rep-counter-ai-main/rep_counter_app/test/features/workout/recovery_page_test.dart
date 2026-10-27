@@ -6,6 +6,8 @@ import 'package:rep_counter_app/app/app_shell.dart';
 import 'package:rep_counter_app/app/route_observer.dart';
 import 'package:rep_counter_app/core/i18n/app_strings.dart';
 import 'package:rep_counter_app/core/i18n/locale_controller.dart';
+import 'package:rep_counter_app/exercise.dart';
+import 'package:rep_counter_app/features/workout/application/workout_controller.dart';
 import 'package:rep_counter_app/features/home/presentation/home_screen.dart';
 import 'package:rep_counter_app/features/workout/data/workout_draft_store.dart';
 import 'package:rep_counter_app/features/workout/data/workout_history_store.dart';
@@ -71,8 +73,69 @@ void main() {
         find.text('RepCoach đóng khi bạn đang tập ở 14 rep. '
             'Mọi thứ đến lúc đó đã được giữ trên máy.'),
         findsOneWidget);
-    // Resume is not offered (needs an engine change, L-D17).
-    expect(find.text(S.vi.finishContinue), findsNothing);
+    // Decision B: resume is offered inside the recovery window.
+    expect(find.byKey(const Key('recovery-resume')), findsOneWidget);
+    expect(find.text(S.vi.finishContinue), findsOneWidget);
+  });
+
+  testWidgets('resume opens the workout seeded from the draft; draft kept',
+      (tester) async {
+    final d = _draft();
+    SharedPreferences.setMockInitialValues(
+        {WorkoutDraftStore.key: jsonEncode(d.toJson())});
+    final locale = LocaleController(AppLanguage.vi);
+    addTearDown(locale.dispose);
+    ExerciseProfile? openedProfile;
+    WorkoutResumeSeed? openedSeed;
+    await tester.pumpWidget(LocaleScope(
+      controller: locale,
+      child: MaterialApp(
+        theme: RepCoachTheme.dark(),
+        locale: AppLanguage.vi.locale,
+        supportedLocales: testSupportedLocales,
+        localizationsDelegates: testLocalizationsDelegates,
+        home: RecoveryPage(
+          draft: d,
+          resumeBuilder: (profile, draft, seed) {
+            openedProfile = profile;
+            openedSeed = seed;
+            return const Scaffold(body: Text('workout'));
+          },
+        ),
+      ),
+    ));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const Key('recovery-resume')));
+    await tester.pumpAndSettle();
+    expect(find.text('workout'), findsOneWidget);
+    expect(find.byType(RecoveryPage), findsNothing);
+    expect(openedProfile, pushUp);
+    expect(openedSeed!.reps, 14);
+    expect(openedSeed!.sets, 2);
+    expect(openedSeed!.elapsed, const Duration(seconds: 168));
+    expect(openedSeed!.recordId, d.recordId);
+    expect(openedSeed!.startedAt, d.startedAt);
+    // Kept until the resumed workout is saved or discarded.
+    expect(await WorkoutDraftStore().load(), isNotNull);
+    expect(await WorkoutHistoryStore().load(), isEmpty);
+  });
+
+  testWidgets('timed challenges are not offered resume', (tester) async {
+    await _pump(tester,
+        draft: WorkoutDraft(
+          startedAt: DateTime.now().subtract(const Duration(minutes: 5)),
+          updatedAt: DateTime.now().subtract(const Duration(minutes: 4)),
+          exerciseId: 'push_up',
+          exerciseName: 'Hít đất',
+          reps: 9,
+          sets: 1,
+          durationSeconds: 40,
+          mode: WorkoutMode.timed,
+          challengeSeconds: 60,
+        ));
+    expect(find.byType(RecoveryPage), findsOneWidget);
+    expect(find.byKey(const Key('recovery-resume')), findsNothing);
+    expect(find.byKey(const Key('recovery-save-partial')), findsOneWidget);
   });
 
   testWidgets('save as partial writes one record and returns to the app',
@@ -129,6 +192,8 @@ void main() {
         findsOneWidget);
     expect(find.byKey(const Key('recovery-save-partial')), findsOneWidget);
     expect(find.byKey(const Key('recovery-discard')), findsOneWidget);
+    expect(find.byKey(const Key('recovery-resume')), findsNothing,
+        reason: 'resume only inside the recovery window');
   });
 
   testWidgets('the saved partial workout is labelled in history',

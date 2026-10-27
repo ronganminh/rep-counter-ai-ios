@@ -223,10 +223,19 @@ class SupabaseAuthRepository implements AuthRepository {
 
   @override
   Future<void> deleteAccount() => _guard(() async {
-        if (api.currentSession == null) {
+        final session = api.currentSession;
+        if (session == null) {
           throw const AuthFailure(AuthFailureKind.unavailable);
         }
-        await api.deleteAccount();
+        // Apple accounts: a fresh authorization code lets the server revoke
+        // the Sign in with Apple token (App Store 5.1.1(v)). Cancelling the
+        // sheet cancels the deletion; nothing is deleted.
+        String? appleCode;
+        if (session.user.provider == 'apple' &&
+            providers.contains(AuthProvider.apple)) {
+          appleCode = await _tokens.appleAuthorizationCode();
+        }
+        await api.deleteAccount(appleAuthorizationCode: appleCode);
         try {
           await api.signOut();
         } catch (_) {

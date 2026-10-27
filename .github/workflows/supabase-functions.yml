@@ -1,0 +1,29 @@
+name: Supabase Edge Functions
+
+on:
+  pull_request:
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-functions.yml"
+  push:
+    branches: [main]
+    paths:
+      - "supabase/**"
+      - ".github/workflows/supabase-functions.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  deno:
+    name: Deno fmt, lint, test (delete-account)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - run: deno fmt --check supabase/
+      - run: deno lint supabase/
+      - run: deno test --no-remote supabase/functions/delete-account/
