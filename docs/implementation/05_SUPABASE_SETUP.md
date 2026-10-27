@@ -200,29 +200,61 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
       EOF
   ```
 
-## 10. Values to send back
+## 10. Values to send back (status 2026-10-26, staging)
 
-| # | Value | Public? | How to send |
+| # | Value | Status |
+|---|---|---|
+| 1 | Staging **Project URL** | ✅ `https://rvysencgtomkzwgdjaqh.supabase.co` (Tokyo, Free plan) |
+| 2 | Staging **publishable key** | ✅ received; kept out of git (local `dart_defines.staging.json`, future CI secret) |
+| 3 | Production URL + key | ⏳ **open:** no production project yet |
+| 4a | Redirect allow-listed, Confirm email ON, Secure password change ON, min length 10 | ✅ |
+| 4b | Leaked-password protection | ⏳ **open:** needs the Pro plan |
+| 4c | Custom SMTP | ⏳ **open:** staging uses Supabase's default sender (rate-limited) |
+| 5 | Google **Web client ID** | ✅ `354784213486-h6v9…` (§9) |
+| 6 | Google **iOS client ID** + reversed ID | ✅ reversed ID registered in `Info.plist` |
+| 7 | Google Android clients | ✅ Play App Signing + upload key SHA-1. ⏳ **open:** debug keystore client (needed only to test Google on debug builds) |
+| 8 | Google provider ON, Skip nonce check ON | ✅ |
+| 8b | Google consent screen | ⏳ **open:** still *Testing* (test user only); publish before external testers |
+| 9 | Apple Team ID / Services ID / Key ID | ✅ `NW22NWLTK4` / `com.ronganminh.repcoach.signin` / `ANA4NT26KP` |
+| 10 | Sign in with Apple on the App ID, Apple provider ON | ✅ entitlement in `Runner.entitlements` |
+| 10b | Apple **Secret Key (for OAuth)** | ⏳ **open:** generate with `tool/apple_oauth_secret.py` (below) and paste into Supabase; renew every ≤ 6 months |
+| 11 | `delete-account` Edge Function | ⏳ approved 2026-10-26; implementation and deploy commands in a separate PR |
+| — | Apple `.p8`, Google client secret, service-role key | **secret**: dashboard / Edge Function secrets / password manager only |
+
+Supabase settings to know: "Automatically expose new tables" OFF and "Enable automatic RLS" ON. Every new table therefore needs explicit grants and policies.
+
+**Apple OAuth secret** (owner, locally; the `.p8` never enters the repo):
+
+```
+python3 tool/apple_oauth_secret.py --p8 ~/secure/AuthKey_ANA4NT26KP.p8 \
+  --team-id NW22NWLTK4 --key-id ANA4NT26KP --client-id com.ronganminh.repcoach.signin
+```
+
+Paste the printed JWT into Supabase › Authentication › Providers › Apple › Secret Key (for OAuth). The script prints the expiry date; set a reminder.
+
+## 11. Staging test checklist
+
+**Automated (no device), passing:** `test/features/auth/staging_config_test.dart`, `supabase_auth_repository_test.dart`, `auth_screens_test.dart`, `auth_reset_delete_test.dart`. They run with the staging values against a simulated Supabase API, without the network. They cover:
+- native config: redirect scheme, Google scheme, Apple entitlement;
+- providers per platform;
+- with the flag off, nothing is created;
+- the session is stored in Keychain/Keystore;
+- sign-up → link → confirmed; wrong password; reset → new password; Google/Apple token exchange and cancel; expiry; delete;
+- the screens;
+- training stays available as a guest.
+
+**On a real device: UNVERIFIED.** The owner runs these on a staging build (§9). Report ✅/❌ per line.
+
+| # | Device | Steps | Expected |
 |---|---|---|---|
-| 1 | Staging Supabase **Project URL** | public | chat / issue |
-| 2 | Staging **anon / publishable key** | public | chat, or as a GitHub Actions secret |
-| 3 | Production URL + anon key | public | when ready to release (GitHub secret) |
-| 4 | Confirmation: redirect URL allow-listed, Confirm email ON, min length 10, leaked-password protection ON, custom SMTP set | — | chat |
-| 5 | Google **Web client ID** | public | chat |
-| 6 | Google **iOS client ID** and **reversed client ID** | public | chat |
-| 7 | Confirmation: Google Android client created with debug, upload **and** Play signing SHA-1 | — | chat |
-| 8 | Confirmation: Google provider ON in Supabase with "Skip nonce check" | — | chat |
-| 9 | Apple **Team ID**, **Services ID**, **Key ID** | public identifiers | chat |
-| 10 | Confirmation: Sign in with Apple enabled on App ID `com.ronganminh.repCounterApp`, Apple provider ON in Supabase | — | chat |
-| 11 | Approval to write and deploy the `delete-account` Edge Function (§7) | — | chat |
-| — | Apple `.p8`, Google client secret, service-role key | **secret** | **do not send**; they stay in the Supabase dashboard / Edge Function secrets |
-
-## 11. Staging test checklist (after the values arrive)
-
-- Sign up, open the email link on the phone, confirm "Email confirmed".
-- Sign in with a wrong password and see "Email or password is incorrect"; then sign in correctly.
-- Request a password reset, open the link, set a new password, and confirm "Password updated".
-- Use Google sign-in on iOS and Android, and Apple sign-in on iOS; cancel each once.
-- Force the session to expire (revoke it in the dashboard) and check that the "session expired" banner appears and training still works.
-- Delete the account and check the server: user gone, rows gone, Apple token revoked.
-- Turn off networking: training, history and counting still work as a guest.
+| D1 | iPhone + Android | Profile › Sign in › Create account with a new email (password ≥ 10 characters, tick Terms) | "Confirm your email" with your address |
+| D2 | same phone | Open the email link (sender: Supabase) | The app opens, then "Email confirmed"; Profile shows the account |
+| D3 | any | Sign out; sign in with a wrong password, then the right one | "Email or password is incorrect", then signed in |
+| D4 | any | Sign in › Forgot password? › send; open the link on the phone; set a new password | "Choose a new password", then "Password updated" |
+| D5 | iPhone | Continue with Google (account `thanhyt2024@gmail.com`); repeat and cancel the sheet | Signed in; cancel shows "Sign-in cancelled" and changes nothing |
+| D6 | Android **release/Play** build | Continue with Google | Signed in (debug builds fail until a debug client exists) |
+| D7 | iPhone | Continue with Apple (also try "Hide My Email"); repeat and cancel | Signed in; cancel changes nothing |
+| D8 | any | Supabase › Authentication › Users › sign the user out / revoke sessions; reopen the app after the access token expires (≤ 1 h) | "Your session expired · sign in again" banner; training still works |
+| D9 | any | Profile › Delete account › type DELETE | **Needs the `delete-account` function deployed**; then the user is gone in the dashboard |
+| D10 | any | Airplane mode | Training, history and counting work as a guest; sign-in shows "Can't connect" |
+| D11 | any | Fresh install **without** `ENABLE_ACCOUNTS` | No account UI at all |
