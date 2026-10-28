@@ -521,7 +521,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   /// Đã cấp quyền camera rồi thì vào thẳng, đừng hỏi lại.
   ///
   /// `_cameraState` trước đây luôn bắt đầu ở `awaitingConsent`, nên mỗi lần vào
-  /// buổi tập là phải bấm "Cho phép và mở camera" một lần nữa, dù đã cấp quyền
+  /// buổi tập là phải bấm "Tiếp tục" một lần nữa, dù đã cấp quyền
   /// từ lâu. Người dùng đọc câu "Cần quyền camera" thì tưởng quyền bị mất.
   ///
   /// Việc này KHÔNG phá yêu cầu của Google Play là phải giải thích trước khi
@@ -1527,10 +1527,16 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     );
   }
 
+  /// Before the system prompt (5.1.1(iv), L-D24) the gate has no way out: no
+  /// close, no "Not now", no manual logging, and back does nothing, so
+  /// "Continue" always reaches the system camera prompt. Exits and manual
+  /// logging come back once the prompt has been answered.
+  bool get _beforePrompt => _cameraState == _CameraState.awaitingConsent;
+
   Widget _cameraGate() => PopScope(
         canPop: _allowPop,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) _confirmExit();
+          if (!didPop && !_beforePrompt) _confirmExit();
         },
         child: CameraPermissionView(
           title: _cameraTitle,
@@ -1540,14 +1546,15 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           actionLabel: _cameraState == _CameraState.denied
               ? context.s.openSettings
               : _cameraState == _CameraState.awaitingConsent
-                  ? context.s.cameraAllowAndOpen
+                  ? context.s.cameraContinue
                   : context.s.retry,
           onAction:
               _cameraState == _CameraState.denied ? openAppSettings : _start,
           onRetry: _cameraState == _CameraState.denied ? _start : null,
           // A resumed workout already has counted reps to finish or save.
-          onManual: widget.resume == null ? _openManualLog : null,
-          onExit: _confirmExit,
+          onManual:
+              widget.resume == null && !_beforePrompt ? _openManualLog : null,
+          onExit: _beforePrompt ? null : _confirmExit,
         ),
       );
 

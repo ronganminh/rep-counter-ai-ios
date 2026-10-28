@@ -6,6 +6,12 @@ import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_typography.dart';
 import '../../../../widgets/product_ui.dart';
 
+/// Camera gate shown before and after the system permission prompt.
+///
+/// App Store Guideline 5.1.1(iv) (L-D24): before the prompt the only action
+/// is [actionLabel] ("Continue"), which always leads to the system prompt.
+/// Pass `onExit: null` and no [onManual] for that state: no close, no "Not
+/// now", no other way out. Exits and manual logging come after the prompt.
 class CameraPermissionView extends StatelessWidget {
   const CameraPermissionView(
       {super.key,
@@ -20,18 +26,21 @@ class CameraPermissionView extends StatelessWidget {
       this.onManual});
   final String title, body, actionLabel;
   final bool denied, loading;
-  final VoidCallback onAction, onExit;
-  final VoidCallback? onRetry;
+  final VoidCallback onAction;
+  final VoidCallback? onExit, onRetry;
 
   /// W-4: log reps by hand instead of using the camera.
   final VoidCallback? onManual;
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
-            leading: IconButton(
-                onPressed: onExit,
-                tooltip: context.tr('Đóng', 'Close'),
-                icon: const Icon(LucideIcons.x))),
+            automaticallyImplyLeading: false,
+            leading: onExit == null
+                ? null
+                : IconButton(
+                    onPressed: onExit,
+                    tooltip: context.tr('Đóng', 'Close'),
+                    icon: const Icon(LucideIcons.x))),
         body: SafeArea(
             child: LayoutBuilder(
                 builder: (context, box) => SingleChildScrollView(
@@ -126,12 +135,13 @@ class CameraPermissionView extends StatelessWidget {
                                               onPressed: onManual,
                                               child: Text(context
                                                   .l10n.cameraTrackManually)),
-                                        TextButton(
-                                            onPressed: onExit,
-                                            child: Text(
-                                                context.tr('Để sau', 'Not now'),
-                                                style: const TextStyle(
-                                                    color: AppColors.text2))),
+                                        if (onExit != null)
+                                          TextButton(
+                                              onPressed: onExit,
+                                              child: Text(
+                                                  context.tr('Đóng', 'Close'),
+                                                  style: const TextStyle(
+                                                      color: AppColors.text2))),
                                       ])),
                             ]))))),
       );

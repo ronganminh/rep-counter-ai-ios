@@ -71,7 +71,7 @@ any ─abort (confirmed discard)─▶ aborted          app background ─▶ pa
 **Auth (PROPOSED, Phase 9):** `guest → authenticating → authenticated ⇄ tokenRefreshing → sessionExpired → reauth`; `authenticated → signingOut → guest (local kept)`; `deletingAccount → guest`.
 **Entitlement (PROPOSED):** `free → purchasing → pending | verifying → pro | failed(free)`; `pro → grace | billingRetry | expired | revoked → free`.
 **Merge (PROPOSED):** `preview → (conflict → resolved) → working → done | failed(rollback to guest namespace)`.
-**Notification permission:** `notAsked → prePrompt → (osPrompt) → granted | denied`; "Not now" keeps `notAsked`.
+**Notification permission:** `notAsked → prePrompt → osPrompt → granted | denied`; the pre-prompt's only action is "Continue", which always shows the OS prompt (no "Not now", App Store 5.1.1(iv), L-D24); `denied` offers Open Settings.
 
 ## 8 · UI components
 

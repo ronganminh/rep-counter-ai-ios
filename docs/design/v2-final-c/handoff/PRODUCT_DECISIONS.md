@@ -7,7 +7,7 @@ Status: **CONFIRMED** = approved in an earlier phase brief or verified in shippi
 | ID | Decision | Status | Evidence / source | Owner to approve |
 |---|---|---|---|---|
 | D-01 | Five tabs `Home \| Exercises \| Train \| Progress \| Profile`; Train is the centre action; no further tabs | CONFIRMED | Final B brief B-01; prototype | Product |
-| D-02 | Tab bar hidden on onboarding, auth, camera/HUD, results, payment, destructive and permission flows; nothing overlays the HUD | CONFIRMED | Final B B-02 | Product / Design |
+| D-02 | Tab bar hidden on onboarding, auth, camera/HUD, results, payment, destructive and permission flows; nothing overlays the HUD. Permission flows: a pre-permission screen has one action, "Continue" / "Tiếp tục", that always leads to the OS prompt; no "Allow" wording, no "Not now" or close before the prompt; after a denial, Open Settings (+ fallback). App Store 5.1.1(iv), rule changed 2026-10-28 (L-D24) | CONFIRMED | Final B B-02; App Review 2026-10-27 | Product / Design |
 | D-03 | Dark theme only for v2; light palette exists in code but is not designed | CONFIRMED (dark) · light = out of scope | repo `AppPalette.light`, `main.dart` forces `ThemeMode.dark` | Design |
 | D-04 | English + Tiếng Việt at launch; Vietnamese uses shipping-app terms (rep, set, streak, huy hiệu, Tiến bộ, Xóa) | PROPOSED (glossary) | `l10n/LOCALIZATION_GLOSSARY.md`; repo `S.vi` | Product + native VI reviewer |
 | D-05 | Deleting a workout does **not** revoke earned XP or achievements; totals/records/streak/charts recalculate; server may correct invalid, fraudulent or duplicate rewards; verified competition results stay server-authoritative | PROPOSED (A-04) | Final A cleanup | Product + Backend |

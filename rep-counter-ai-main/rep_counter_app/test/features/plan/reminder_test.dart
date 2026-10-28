@@ -12,6 +12,7 @@ import 'package:rep_counter_app/features/plan/domain/workout_plan.dart';
 import 'package:rep_counter_app/features/plan/presentation/reminder_settings_page.dart';
 import 'package:rep_counter_app/features/workout/data/workout_record.dart';
 import 'package:rep_counter_app/theme/app_theme.dart';
+import 'package:rep_counter_app/widgets/app_button.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../support/l10n.dart';
@@ -280,17 +281,81 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Get reminders for planned sessions'), findsOneWidget);
     expect(platform.log, isEmpty, reason: 'no prompt before the user asks');
+    // 5.1.1(iv): the explanation only continues to the OS prompt.
+    expect(find.widgetWithText(AppButton, 'Continue'), findsOneWidget);
+    expect(find.byKey(const Key('reminder-not-now')), findsNothing);
+    expect(find.text('Not now'), findsNothing);
+    expect(find.byType(BackButton), findsNothing);
+    for (final t in tester.widgetList<Text>(find.byType(Text))) {
+      expect((t.data ?? '').toLowerCase(), isNot(contains('allow')));
+    }
     await tester.tap(find.byKey(const Key('reminder-enable')));
     await tester
         .runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('reminder-denied')), findsOneWidget);
+    expect(find.byKey(const Key('reminder-open-settings')), findsOneWidget);
     expect(find.byKey(const Key('reminder-toggle')), findsOneWidget);
     expect(find.byKey(Key('reminder-${monday.addDays(2).toIso()}')),
         findsOneWidget);
     expect(
         find.byKey(Key('reminder-${monday.addDays(1).toIso()}')), findsNothing,
         reason: 'Tuesday is a recovery day');
+  });
+
+  Future<void> openRoute(WidgetTester tester, PlanView view) async {
+    final locale = LocaleController(AppLanguage.en);
+    addTearDown(locale.dispose);
+    tester.view.physicalSize = const Size(393, 852);
+    tester.view.devicePixelRatio = 1;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(LocaleScope(
+        controller: locale,
+        child: MaterialApp(
+            theme: RepCoachTheme.dark(),
+            supportedLocales: testSupportedLocales,
+            localizationsDelegates: testLocalizationsDelegates,
+            home: Builder(
+                builder: (context) => TextButton(
+                    onPressed: () => Navigator.of(context).push(
+                        MaterialPageRoute<void>(
+                            builder: (_) => ReminderSettingsPage(
+                                view: view, service: service))),
+                    child: const Text('open'))))));
+    await tester.tap(find.text('open'));
+    await tester.pumpAndSettle();
+  }
+
+  testWidgets('5.1.1(iv): no back before the prompt, back after it',
+      (tester) async {
+    await tester
+        .runAsync(() => ReminderPrefsStore().save(const ReminderPrefs()));
+    platform.granted = ReminderPermission.unknown;
+    final view = (await tester.runAsync(repo.load))!;
+    await openRoute(tester, view);
+    expect(find.byType(BackButton), findsNothing);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(ReminderSettingsPage), findsOneWidget,
+        reason: 'system back does not skip the prompt');
+    platform.granted = ReminderPermission.granted;
+    await tester.tap(find.byKey(const Key('reminder-enable')));
+    await tester
+        .runAsync(() => Future<void>.delayed(const Duration(milliseconds: 50)));
+    await tester.pumpAndSettle();
+    expect(find.byKey(const Key('reminder-toggle')), findsOneWidget);
+    expect(find.byType(BackButton), findsOneWidget);
+  });
+
+  testWidgets('reminders off with notifications granted: no explanation again',
+      (tester) async {
+    await tester
+        .runAsync(() => ReminderPrefsStore().save(const ReminderPrefs()));
+    final view = (await tester.runAsync(repo.load))!;
+    await openRoute(tester, view);
+    expect(find.byKey(const Key('reminder-enable')), findsNothing);
+    expect(find.byKey(const Key('reminder-toggle')), findsOneWidget);
+    expect(find.byType(BackButton), findsOneWidget);
   });
 }
 

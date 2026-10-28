@@ -333,7 +333,7 @@ void main() {
               body: denied ? S.vi.cameraDeniedBody : S.vi.cameraPermissionBody,
               denied: denied,
               loading: false,
-              actionLabel: S.vi.cameraAllowAndOpen,
+              actionLabel: S.vi.cameraContinue,
               onAction: () {},
               onExit: () {}));
       expect(tester.takeException(), isNull);
