@@ -1423,10 +1423,15 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     );
   }
 
+  /// Before the system prompt (5.1.1(iv)) the gate has no way out: no close,
+  /// no "Not now", and back does nothing, so "Continue" always reaches the
+  /// system camera prompt. Exits come back once the prompt has been answered.
+  bool get _beforePrompt => _cameraState == _CameraState.awaitingConsent;
+
   Widget _cameraGate() => PopScope(
         canPop: _allowPop,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop) _confirmExit();
+          if (!didPop && !_beforePrompt) _confirmExit();
         },
         child: CameraPermissionView(
           title: _cameraTitle,
@@ -1436,12 +1441,12 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           actionLabel: _cameraState == _CameraState.denied
               ? context.s.openSettings
               : _cameraState == _CameraState.awaitingConsent
-                  ? context.s.cameraAllowAndOpen
+                  ? context.s.cameraContinue
                   : context.s.retry,
           onAction:
               _cameraState == _CameraState.denied ? openAppSettings : _start,
           onRetry: _cameraState == _CameraState.denied ? _start : null,
-          onExit: _confirmExit,
+          onExit: _beforePrompt ? null : _confirmExit,
         ),
       );
 
