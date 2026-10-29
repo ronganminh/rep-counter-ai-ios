@@ -5,16 +5,28 @@ Staging project: `rvysencgtomkzwgdjaqh` (Tokyo). No production project yet.
 | Path                        | What                                                                                                                                                                                                                                                            |
 | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `functions/delete-account/` | Account deletion (App Store 5.1.1(v)): verify JWT → revoke Sign in with Apple (if the app sent an authorization code) → delete the user's rows → `auth.admin.deleteUser`. `handler.ts` holds the logic, `apple.ts` the Apple revocation, `index.ts` the wiring. |
-| `migrations/`               | User-owned tables: `user_id … references auth.users on delete cascade`, RLS on, explicit grants (the project does not auto-expose tables).                                                                                                                      |
+| `migrations/`               | User-owned tables: `user_id … references auth.users on delete cascade`, RLS on, explicit grants (the project does not auto-expose tables). Schema agreed in `docs/implementation/06_SUPABASE_SCHEMA_PROPOSAL.md` (owner decision L-D30).                        |
+| `contracts/`                | Request/response shapes of the SQL functions and Edge Functions the app calls. Checked by the SQL tests against the database and by the Flutter tests against the client adapters.                                                                              |
+| `tests/`                    | `run.sh` applies every migration to a fresh plain Postgres with `supabase_stub.sql` (roles, `auth.users`, `auth.uid()`) and runs `*.test.sql` (RLS, grants, idempotency, contracts).                                                                            |
+
+### Migrations
+
+| File                                     | Group         | What                                                                                                                                                                                                                |
+| ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261026000000_user_owned_tables.sql`   | D-12          | `profiles`                                                                                                                                                                                                          |
+| `20261029000100_sync_workouts_plans.sql` | A-2 sync, H-2 | `workouts`, `plans` (tombstones, `server_seq`); RPCs `sync_push_workouts`, `sync_pull_workouts`, `sync_workout_client_ids`, `sync_push_plans`, `sync_pull_plans`; `purge_sync_tombstones()` (service role, 90 days) |
 
 ## Tests
 
 ```
-deno test --no-remote supabase/functions/delete-account/
+deno test --no-remote supabase/functions/
+PGHOST=… PGUSER=postgres supabase/tests/run.sh     # any Postgres 16 you can create databases on
 ```
 
-CI runs this in `.github/workflows/supabase-functions.yml`. The tests use
-generated keys and a mocked `fetch`; there are no network calls and no secrets.
+CI runs both in `.github/workflows/supabase-functions.yml` (the SQL tests
+against a `postgres:16` service). The function tests use generated keys and a
+mocked `fetch`; the SQL tests use a stub of the Supabase roles and `auth`
+schema. No network calls, no Supabase project, no secrets.
 
 ## Deploy to staging (owner, on your machine)
 
@@ -46,6 +58,30 @@ supabase functions deploy delete-account --project-ref rvysencgtomkzwgdjaqh
 supabase functions list --project-ref rvysencgtomkzwgdjaqh
 supabase secrets list   --project-ref rvysencgtomkzwgdjaqh   # names only, values are hidden
 ```
+
+### Backend groups (06, applied in order)
+
+Each group adds a migration (and Edge Functions where it has them). After
+pulling a new group, review the SQL, then:
+
+```bash
+supabase db push --linked --dry-run   # lists the migrations that would run
+supabase db push --linked             # applies them to staging
+```
+
+**A-2 sync** (`20261029000100_sync_workouts_plans.sql`, no Edge Function):
+nothing to set. Schedule the 90-day tombstone purge (Q3) once, in the SQL
+editor, after enabling the `pg_cron` extension (Database › Extensions):
+
+```sql
+select cron.schedule('purge-sync-tombstones', '17 3 * * *',
+  $$select public.purge_sync_tombstones()$$);
+```
+
+Check: `select public.sync_pull_workouts(0, 10);` in the SQL editor fails with
+`not_authenticated` (no user), which is expected; the app calls it with the
+user's JWT. The client stays off until a build sets
+`--dart-define=ENABLE_ACCOUNTS=true --dart-define=ENABLE_CLOUD_SYNC=true`.
 
 **Smoke test on staging, without deleting a real user.** Expect
 `401 {"error":"unauthorized"}`:
