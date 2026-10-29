@@ -6,12 +6,14 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 
 import '../../../core/i18n/l10n.dart';
 import '../../../core/i18n/locale_controller.dart';
+import '../../../core/services/training_preferences.dart';
 import '../../../exercise.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_feedback.dart';
 import '../../../widgets/product_ui.dart';
+import '../application/guided_timer_cues.dart';
 import '../data/workout_history_store.dart';
 import '../data/workout_record.dart';
 import '../domain/workout_mode.dart';
@@ -23,6 +25,8 @@ enum GuidedTimerPhase { work, rest, done }
 /// it is a timer the user controls: +10 s, pause, done early. The record
 /// is manual with the time actually held (never the target), no reps and
 /// no form data, so it never counts toward timed bests or challenges.
+/// X-2: spoken cues and keep-screen-on follow Settings (both on by
+/// default), see [GuidedTimerCues].
 class GuidedTimerPage extends StatefulWidget {
   const GuidedTimerPage({
     super.key,
@@ -32,12 +36,16 @@ class GuidedTimerPage extends StatefulWidget {
     this.restSeconds = 30,
     this.history,
     this.now = DateTime.now,
+    this.cues,
+    this.loadPreferences = TrainingPreferences.load,
   });
 
   final ExerciseProfile profile;
   final int sets, seconds, restSeconds;
   final WorkoutHistoryStore? history;
   final DateTime Function() now;
+  final GuidedTimerCues? cues;
+  final Future<TrainingPreferences> Function() loadPreferences;
 
   @override
   State<GuidedTimerPage> createState() => _GuidedTimerPageState();
@@ -54,17 +62,37 @@ class _GuidedTimerPageState extends State<GuidedTimerPage> {
   bool _paused = false, _saving = false, _saved = false;
   String? _error;
 
+  late final GuidedTimerCues _cues = widget.cues ?? GuidedTimerCues();
+
   int get _totalHeld => _held.fold(0, (a, b) => a + b);
 
   @override
   void initState() {
     super.initState();
     _ticker = Timer.periodic(const Duration(seconds: 1), (_) => _tick());
+    _loadCues();
+  }
+
+  Future<void> _loadCues() async {
+    TrainingPreferences prefs;
+    try {
+      prefs = await widget.loadPreferences();
+    } catch (_) {
+      prefs = const TrainingPreferences();
+    }
+    if (!mounted) return;
+    _cues.configure(prefs, context.language);
+    if (_phase == GuidedTimerPhase.done) return;
+    _cues.counting(!_paused);
+    if (_phase == GuidedTimerPhase.work) {
+      _cues.setStarted(_set + 1, widget.sets);
+    }
   }
 
   @override
   void dispose() {
     _ticker?.cancel();
+    _cues.dispose();
     super.dispose();
   }
 
@@ -73,12 +101,18 @@ class _GuidedTimerPageState extends State<GuidedTimerPage> {
     setState(() {
       if (_phase == GuidedTimerPhase.rest) {
         _rest--;
-        if (_rest <= 0) _phase = GuidedTimerPhase.work;
+        _cues.countdown(_rest);
+        if (_rest <= 0) _startSet();
         return;
       }
       _held[_set]++;
       final target = _targets[_set];
-      if (_held[_set] * 2 == target) HapticFeedback.lightImpact();
+      if (_held[_set] * 2 == target) {
+        HapticFeedback.lightImpact();
+        // Short sets go straight to the final countdown.
+        if (target - _held[_set] > 3) _cues.halfway();
+      }
+      _cues.countdown(target - _held[_set]);
       if (_held[_set] >= target) {
         HapticFeedback.mediumImpact();
         _endSet();
@@ -93,15 +127,27 @@ class _GuidedTimerPageState extends State<GuidedTimerPage> {
     } else {
       _set++;
       _rest = widget.restSeconds;
-      _phase = widget.restSeconds > 0
-          ? GuidedTimerPhase.rest
-          : GuidedTimerPhase.work;
+      if (widget.restSeconds > 0) {
+        _phase = GuidedTimerPhase.rest;
+        _cues.rest(widget.restSeconds);
+      } else {
+        _startSet();
+      }
     }
+  }
+
+  void _startSet() {
+    _rest = 0;
+    _phase = GuidedTimerPhase.work;
+    _cues.setStarted(_set + 1, widget.sets);
   }
 
   void _finish() {
     _phase = GuidedTimerPhase.done;
     _ticker?.cancel();
+    _cues
+      ..counting(false)
+      ..finished();
     if (_totalHeld > 0) _save();
   }
 
@@ -260,10 +306,7 @@ class _GuidedTimerPageState extends State<GuidedTimerPage> {
                       key: const Key('timer-skip-rest'),
                       label: context.tr('Bỏ qua nghỉ', 'Skip rest'),
                       variant: AppButtonVariant.secondary,
-                      onPressed: () => setState(() {
-                            _rest = 0;
-                            _phase = GuidedTimerPhase.work;
-                          })),
+                      onPressed: () => setState(_startSet)),
                 const SizedBox(height: 12),
                 AppButton(
                     key: const Key('timer-pause'),
@@ -271,7 +314,10 @@ class _GuidedTimerPageState extends State<GuidedTimerPage> {
                         ? context.tr('Tiếp tục', 'Resume')
                         : context.tr('Tạm dừng', 'Pause'),
                     icon: _paused ? LucideIcons.play : LucideIcons.pause,
-                    onPressed: () => setState(() => _paused = !_paused)),
+                    onPressed: () => setState(() {
+                          _paused = !_paused;
+                          _cues.counting(!_paused);
+                        })),
                 const SizedBox(height: 12),
                 AppButton(
                     key: const Key('timer-done-early'),
