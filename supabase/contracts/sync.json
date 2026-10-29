@@ -1,0 +1,30 @@
+{
+  "description": "A-2 sync RPCs (PostgREST /rest/v1/rpc/<name>). Checked by supabase/tests/sync.test.sql against the database and by the Flutter client test test/features/sync/supabase_cloud_sync_api_test.dart against the client.",
+  "functions": {
+    "sync_pull_workouts": {
+      "params": ["p_after", "p_limit"],
+      "returns": { "rows": "array", "cursor": "number", "has_more": "boolean" }
+    },
+    "sync_push_workouts": {
+      "params": ["p_rows"],
+      "returns": "array"
+    },
+    "sync_workout_client_ids": {
+      "params": [],
+      "returns": "array"
+    }
+  },
+  "push_row": ["client_id", "raw", "client_updated_at", "deleted_at"],
+  "workout_row": [
+    "client_id",
+    "raw",
+    "client_updated_at",
+    "deleted_at",
+    "server_seq"
+  ],
+  "errors": {
+    "28000": "not signed in",
+    "22023": "invalid argument or row",
+    "54000": "more than 500 rows in one push"
+  }
+}
