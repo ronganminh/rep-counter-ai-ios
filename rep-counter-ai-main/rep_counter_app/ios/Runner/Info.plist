@@ -25,6 +25,16 @@
 		</dict>
 		<dict>
 			<key>CFBundleTypeRole</key>
+			<string>Viewer</string>
+			<key>CFBundleURLName</key>
+			<string>com.ronganminh.repcoach.links</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>repcoach</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
 			<string>Editor</string>
 			<key>CFBundleURLName</key>
 			<string>com.ronganminh.repcoach.google</string>
