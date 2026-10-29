@@ -6,9 +6,10 @@ import '../features/workout/data/workout_record.dart';
 import 'app_tab_bar.dart';
 
 /// N-2a: in-app destinations of `repcoach://` links (APP_NAVIGATION_MAP §5)
-/// and of reminder taps. Only the in-app part: the OS does not hand
-/// `repcoach://` URLs to the app yet, and universal links need the domain
-/// files (BLOCKED, 01_TASK_DEPENDENCIES §5).
+/// and of reminder taps. The OS hands `repcoach://` URLs to the app through
+/// the URL type (iOS) and intent filter (Android) registered in X-1
+/// (`os_links.dart`); universal links still need the domain files (BLOCKED,
+/// 01_TASK_DEPENDENCIES §5).
 enum AppLinkKind {
   planSession,
   workoutFeedback,
