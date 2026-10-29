@@ -39,6 +39,8 @@ dependencies:
   # X-1: repcoach:// links from the OS. Already resolved through
   # supabase_flutter; the same version, now used directly.
   app_links: ^7.2.2
+  # X-2: keeps the screen on while the guided timer counts.
+  wakelock_plus: ^1.8.0
 
 dev_dependencies:
   flutter_test:
