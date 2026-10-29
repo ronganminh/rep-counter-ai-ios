@@ -4,41 +4,41 @@ Source of truth for task IDs and acceptance criteria: `docs/design/v2-final-c/ha
 
 ## 1 · The 33 tasks
 
-| ID | Title (short) | Depends on (roadmap) | Extra gate | Eligibility now |
+| ID | Title (short) | Depends on (roadmap) | Extra gate | Status (2026-10-29, main `1b417ce`) |
 |---|---|---|---|---|
-| F-1 | gen-l10n infrastructure | — | — | ELIGIBLE |
-| F-2 | Build metadata + config placeholders | F-1 | D-14 values stay unresolved (defaults = shipping values) | ELIGIBLE |
-| F-3 | Local DB for workouts + migration | F-1 | D-16 approved 2026-10-23 (L-D16) | PR open |
-| F-4 | Workout draft persistence | F-3 | D-06 (12 h, proposed) | Merged; Resume approved (decision B, L-D17), PR open |
-| DS-1 | Theme tokens to Final C | — | D-25, D-26 | ELIGIBLE |
-| DS-2 | Shared widgets | DS-1, F-1 | D-24 | ELIGIBLE after DS-1, F-1 |
-| N-1 | 5-tab shell | DS-2 | D-15 (router) | ELIGIBLE (without go_router, see §4) |
-| N-2 | Deep links + `returnTo` | N-1 | D-15; universal-link domain | PARTIAL (custom scheme only); defer |
-| A-1 | Auth + guest state machine | N-2 | **D-12** decided: Supabase Auth, Apple + Google + email | Client + Supabase repository in PRs behind `ENABLE_ACCOUNTS` (off); go-live BLOCKED on owner setup (05_SUPABASE_SETUP) |
-| A-2 | Guest → account merge | A-1, F-3 | backend sync API | BLOCKED |
-| E-1 | Exercises tab | N-1 | D-28 | ELIGIBLE after N-1 |
-| W-1 | HUD restyle (no engine change) | DS-2 | replay CI mandatory | ELIGIBLE after DS-2 |
-| W-2 | Hold-to-finish, Back sheet, idempotent finish | W-1 | — | ELIGIBLE after W-1 |
-| W-3 | Results v2 + AI card states + share toggles | W-1 | — | ELIGIBLE after W-1 |
-| W-4 | Manual tracking + guided timer | W-1, F-3 | D-18 | PR open (manual entry; guided timer deferred, L-D18) |
-| W-5 | Recovery screen | F-4 | D-06 | Merged (Save partial / Discard); Resume PR open (L-D17) |
-| PL-1 | Multi-day plan | N-1 | PL-1 decided (owner 2026-10-26) | PL-1a model + rules PR open; UI, reminders (NT-1), overload follow as stacked PRs |
-| PL-2 | Reschedule missed session | PL-1 | — | ELIGIBLE after PL-1 |
-| H-1 | Progress tab split from History | N-1 | D-05 | ELIGIBLE after N-1 |
-| H-2 | Delete scopes + tombstones | H-1, F-3, A-1 | account scope needs backend | BLOCKED (account scope) |
-| AI-1 | Credits ledger client | A-1 | backend credits API, D-08 | BLOCKED |
-| AI-2 | Coach chat + contextual paywall | AI-1, P-1 | backend | BLOCKED |
-| G-1 | Server XP / achievements sync / challenges | A-1 | backend XP | BLOCKED |
-| S-1 | Friends, requests, block/report | A-1 | backend social | BLOCKED |
-| S-2 | Races, leaderboards | S-1 | backend | BLOCKED |
-| P-1 | StoreKit / Play Billing + server verification | A-1 | **D-13, D-14**, backend verify | BLOCKED |
-| P-2 | Membership / restore / rewarded ads | P-1 | ad SDK + policy | BLOCKED |
-| NT-1 | Local reminders + permission flow | PL-1 | D-19 | PR open (stacked on PL-1b) |
-| NT-2 | Push + inbox + deep links | NT-1, N-2 | backend push, APNs/FCM config | BLOCKED |
-| L-1 | Migrate inline strings to ARB keys | F-1 | — | ELIGIBLE after F-1 (split into several PRs) |
-| L-2 | Native VI review + parameterise sample strings | L-1 | native reviewer | DEFERRED by owner (decision log L-D14) |
-| Q-1 | Accessibility pass | DS-2 | device VoiceOver/TalkBack | PARTIAL (code fixes yes; device checks UNVERIFIED) |
-| Q-2 | Release readiness gate | all | owner authorisation | NOT IN SCOPE while owner is away (no release) |
+| F-1 | gen-l10n infrastructure | — | — | DONE (merged) |
+| F-2 | Build metadata + config placeholders | F-1 | D-14 values stay unresolved (defaults = shipping values) | DONE (merged) |
+| F-3 | Local DB for workouts + migration | F-1 | D-16 approved 2026-10-23 (L-D16) | DONE (merged) |
+| F-4 | Workout draft persistence | F-3 | D-06 (12 h, proposed) | DONE (merged, Resume merged) |
+| DS-1 | Theme tokens to Final C | — | D-25, D-26 | DONE (merged) |
+| DS-2 | Shared widgets | DS-1, F-1 | D-24 | DONE (merged) |
+| N-1 | 5-tab shell | DS-2 | D-15 (router) | DONE (merged, no go_router) |
+| N-2 | Deep links + `returnTo` | N-1 | D-15; universal-link domain | NEXT (no backend): in-app link router for `repcoach://` destinations + reminder-notification tap → session, with the §5 fallbacks. Universal links BLOCKED (needs `apple-app-site-association` / `assetlinks.json` hosted on the D-14 domain and an owner decision on the scheme) |
+| A-1 | Auth + guest state machine | N-2 | **D-12** decided: Supabase Auth, Apple + Google + email | Client + Supabase repository + delete-account merged, behind `ENABLE_ACCOUNTS` (off). Go-live BLOCKED on owner device checks D1–D11 and deploying `delete-account` |
+| A-2 | Guest → account merge | A-1, F-3 | backend sync API | BLOCKED (sync backend). Will add interface + fake behind a flag; schema in 06 |
+| E-1 | Exercises tab | N-1 | D-28 | DONE (merged) |
+| W-1 | HUD restyle (no engine change) | DS-2 | replay CI mandatory | DONE (merged) |
+| W-2 | Hold-to-finish, Back sheet, idempotent finish | W-1 | — | DONE (merged) |
+| W-3 | Results v2 + AI card states + share toggles | W-1 | — | DONE (merged) |
+| W-4 | Manual tracking + guided timer | W-1, F-3 | D-18 | Manual entry DONE (merged). **Guided timer NEXT** (no backend, L-D18 deferred it) |
+| W-5 | Recovery screen | F-4 | D-06 | DONE (merged) |
+| PL-1 | Multi-day plan | N-1 | PL-1 decided (owner 2026-10-26) | DONE (PL-1a/b/c merged) |
+| PL-2 | Reschedule missed session | PL-1 | — | DONE inside PL-1b (reschedule sheet, history unchanged, reminder follows: `plan_schedule_test`, `plan_repository_test`, `reminder_test`). **Train sheet shows today's planned session: NEXT** |
+| H-1 | Progress tab split from History | N-1 | D-05 | DONE (merged) |
+| H-2 | Delete scopes + tombstones | H-1, F-3, A-1 | account scope needs backend | Phone scope exists (Settings › clear history on this phone). Account / both scopes BLOCKED (sync backend); tombstones designed in 06 |
+| AI-1 | Credits ledger client | A-1 | backend credits API, D-08 | BLOCKED (credits backend, D-08). Interface + fake behind a flag; schema in 06 |
+| AI-2 | Coach chat + contextual paywall | AI-1, P-1 | backend | BLOCKED (AI-1, P-1) |
+| G-1 | Server XP / achievements sync / challenges | A-1 | backend XP | BLOCKED (XP backend). Interface + fake; schema in 06 |
+| S-1 | Friends, requests, block/report | A-1 | backend social | BLOCKED (social backend). Interface + fake; schema in 06 |
+| S-2 | Races, leaderboards | S-1 | backend | BLOCKED (S-1) |
+| P-1 | StoreKit / Play Billing + server verification | A-1 | **D-13, D-14**, backend verify | BLOCKED (D-13 prices/product IDs, store accounts, server verification). Interface + fake behind `billingEnabled` (off) |
+| P-2 | Membership / restore / rewarded ads | P-1 | ad SDK + policy | BLOCKED (P-1, ad SDK + policy) |
+| NT-1 | Local reminders + permission flow | PL-1 | D-19 | DONE (merged; 5.1.1(iv) rules L-D24 merged) |
+| NT-2 | Push + inbox + deep links | NT-1, N-2 | backend push, APNs/FCM config | BLOCKED (push backend, APNs/FCM). Interface + fake |
+| L-1 | Migrate inline strings to ARB keys | F-1 | — | PARTIAL: 267 `context.tr` calls left in 30 files; more slices possible (no backend) |
+| L-2 | Native VI review + parameterise sample strings | L-1 | native reviewer | DEFERRED by owner (L-D14) |
+| Q-1 | Accessibility pass | DS-2 | device VoiceOver/TalkBack | PARTIAL: code-level pass on new screens NEXT; device VoiceOver/TalkBack UNVERIFIED |
+| Q-2 | Release readiness gate | all | owner authorisation | Prepare the gate only (readiness script + checklist for v2); **no release** |
 
 ## 2 · Dependency graph
 
@@ -106,3 +106,18 @@ Live status per PR is kept in `03_DECISION_LOG.md` (§ PR log).
 6. **Q-1** delivers code-level fixes (hit areas, contrast tokens, semantics) only; VoiceOver/TalkBack/Dynamic Type on devices stay UNVERIFIED.
 7. **Brief wave W2 "auth guards"** cannot ship before A-1; they are not built.
 8. **W-1 (HUD restyle) was held for design source**, because the first archive had no HUD frames. The owner then supplied `design-source/project/*.dc.html` and `handoff/evidence/*.png` (copied unmodified to `docs/design/v2-final-c/`). W-1 and the visual part of W-3 are therefore unblocked, view layer only. **W-2 went first** because its acceptance criteria are behavioural (quick-tap hint, 1 s hold, Back sheet, discard confirm, single finish) and do not depend on the restyle; W-1/W-3 are stacked on top of it.
+
+## 5 · Work order after the merge train (2026-10-29)
+
+No backend needed, one small PR each, in dependency order:
+
+1. **PL-2b** Train sheet: today's planned session first (start it with the plan targets), then free workout and manual. Recovery days and a done session say so.
+2. **N-2a** In-app link router: `repcoach://plan/session/{id}`, `workouts/{id}/feedback`, `inbox`, `membership`, `friends/requests`, `races/{id}`, `invites/{id}`, `challenges/{id}` → destination or the §5 fallback; reminder notification tap opens the session (never over a live workout). No OS-level URL registration yet.
+3. **W-4b** Guided timer (camera off): timed sets with rest, saved as a manual timed record.
+4. **Q-1b** Accessibility pass on the v2 screens added since Q-1 (plans, reminders, auth, recovery, manual): semantics labels, 48 dp targets, text scale 2.0.
+5. **Q-2a** Release gate preparation for v2: readiness checks (5.1.1(iv) copy, version row, no `[PLACEHOLDER]`), RELEASE_CHECKLIST statuses. No release.
+6. **06** `docs/implementation/06_SUPABASE_SCHEMA_PROPOSAL.md`: Postgres + RLS + Edge Functions for sync, tombstones, credits, XP, social, entitlements, push tokens. Proposal only; no tables are created.
+7. **Backend seams** (behind flags, off, with in-memory fakes and tests): sync (A-2), credits (AI-1), XP (G-1), social (S-1), entitlements (P-1), push registration (NT-2).
+
+BLOCKED until the owner decides or provides something: universal links (domain files), A-1 go-live (device checks + `delete-account` deploy), sync / credits / XP / social / push backends (approve 06 first), billing (D-13 prices, product IDs, store setup), ads (SDK + policy), L-2 (native review).
+
