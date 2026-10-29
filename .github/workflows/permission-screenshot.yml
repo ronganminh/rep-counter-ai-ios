@@ -1,0 +1,42 @@
+name: Permission Screenshot
+
+# Renders the real CameraPermissionView (build 1.0.0 (7) code) to PNGs on CI so
+# the App Store 5.1.1(iv) fix can be verified visually from GitHub artifacts:
+# the pre-permission screen shows a single "Continue"/"Tiếp tục" button and no
+# "Allow", "Not now" or close/back.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "rep-counter-ai-main/rep_counter_app/test/screenshot/**"
+      - ".github/workflows/permission-screenshot.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  screenshot:
+    name: Render camera permission screens
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: "3.47.5"
+          channel: stable
+          cache: true
+      - run: flutter pub get
+      - name: Render permission screens to PNG
+        run: flutter test --update-goldens test/screenshot/camera_permission_screenshot_test.dart
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: camera-permission-screenshots
+          path: rep-counter-ai-main/rep_counter_app/test/screenshot/goldens/*.png
+          if-no-files-found: warn
+          retention-days: 30
