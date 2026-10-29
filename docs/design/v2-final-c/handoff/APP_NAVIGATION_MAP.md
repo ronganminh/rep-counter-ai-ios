@@ -79,7 +79,7 @@ Guest + account-only target → auth gate with `returnTo`. During a live workout
 
 - Sheets (Train sheet, reschedule, plan select, share sheet, discard confirm) are dismissible by drag/scrim unless destructive-confirm is in progress.
 - Paywalls, rewarded ads and upgrade prompts **never** appear during an active workout or over results-saving; contextual paywall only after an explicit user action (e.g. asking AI Coach with 0 credits).
-- OS permission prompts are always preceded by a pre-permission screen; "Not now" never triggers the OS prompt.
+- OS permission prompts may be preceded by a pre-permission screen. That screen's only action is **"Continue" / "Tiếp tục"**, and it always leads to the OS prompt: no "Allow" wording, no "Not now", no close, and Back does nothing until the prompt has been answered (App Store Guideline 5.1.1(iv); App Review rejected iOS 1.0.0 (6) for an "Allow" button and a "Not now" exit, see L-D24). After a denial: a "permission off" state with **Open Settings** and any fallback (manual tracking, retry).
 - Destructive flows (delete history scopes, delete account) are full-screen, no tab bar, typed confirmation.
 
 ## 8 · Workout navigation exceptions

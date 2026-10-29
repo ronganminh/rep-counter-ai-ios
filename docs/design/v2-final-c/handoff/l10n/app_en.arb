@@ -1184,7 +1184,7 @@
   "@finishWorkoutTooltip": {
     "description": "Existing shipping string S.finishWorkoutTooltip [source: repo lib/core/i18n/app_strings.dart; status: existing]"
   },
-  "cameraAllowAndOpen": "Allow and open the camera",
+  "cameraAllowAndOpen": "Continue",
   "@cameraAllowAndOpen": {
     "description": "Existing shipping string S.cameraAllowAndOpen [source: repo lib/core/i18n/app_strings.dart; status: existing]"
   },

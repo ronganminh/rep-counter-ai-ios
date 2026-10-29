@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/i18n/l10n.dart';
 import '../../../l10n/app_localizations.dart';
@@ -15,7 +16,12 @@ import 'plan_copy.dart';
 
 /// P10-02 / P10-03 workout reminders: an in-app explanation before the OS
 /// prompt, the denied state (planning keeps working), reminder time, quiet
-/// hours and the next reminders. Reminders follow planned sessions only:
+/// hours and the next reminders.
+///
+/// App Store 5.1.1(iv) (L-D24): the explanation's only action is "Continue",
+/// which always shows the OS prompt; no "Not now" and no back before it. Once
+/// asked, the settings are shown (toggle off if the user declined) with a way
+/// to open the system settings. Reminders follow planned sessions only:
 /// never recovery days, never a session already done, missed or skipped.
 class ReminderSettingsPage extends StatefulWidget {
   const ReminderSettingsPage(
@@ -82,19 +88,31 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
   String _time(int minute) =>
       TimeOfDay(hour: minute ~/ 60, minute: minute % 60).format(context);
 
+  /// The pre-permission explanation: reminders are off and the OS has not
+  /// granted notifications yet.
+  bool get _beforePrompt =>
+      _prefs != null &&
+      !_prefs!.enabled &&
+      _permission != ReminderPermission.granted;
+
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
     final prefs = _prefs;
-    return Scaffold(
-      appBar:
-          AppBar(title: Text(context.tr('Lời nhắc tập', 'Workout reminders'))),
-      body: SafeArea(
-        child: prefs == null
-            ? const Center(child: CircularProgressIndicator())
-            : ListView(
-                padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
-                children: prefs.enabled ? _settings(prefs) : _intro(l)),
+    final intro = _beforePrompt;
+    return PopScope(
+      canPop: !intro,
+      child: Scaffold(
+        appBar: AppBar(
+            automaticallyImplyLeading: !intro,
+            title: Text(context.tr('Lời nhắc tập', 'Workout reminders'))),
+        body: SafeArea(
+          child: prefs == null
+              ? const Center(child: CircularProgressIndicator())
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+                  children: intro ? _intro(l) : _settings(prefs)),
+        ),
       ),
     );
   }
@@ -116,16 +134,9 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
         const SizedBox(height: 24),
         AppButton(
             key: const Key('reminder-enable'),
-            label: l.notifTurnReminders,
-            icon: LucideIcons.bell,
+            label: l.commonContinue,
             loading: _busy,
             onPressed: _enable),
-        const SizedBox(height: 8),
-        AppButton(
-            key: const Key('reminder-not-now'),
-            label: context.tr('Để sau', 'Not now'),
-            variant: AppButtonVariant.ghost,
-            onPressed: () => Navigator.of(context).pop()),
       ];
 
   List<Widget> _settings(ReminderPrefs prefs) {
@@ -139,6 +150,13 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
             body: context.tr(
                 'Bạn có thể bật trong cài đặt hệ thống. Kế hoạch và buổi tập vẫn hoạt động bình thường.',
                 'You can turn them on in system settings. Your plan and workouts work as usual.')),
+        const SizedBox(height: 8),
+        AppButton(
+            key: const Key('reminder-open-settings'),
+            label: l.cameraOpenSettings,
+            icon: LucideIcons.settings,
+            variant: AppButtonVariant.secondary,
+            onPressed: openAppSettings),
         const SizedBox(height: 12),
       ],
       SwitchListTile(
