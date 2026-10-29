@@ -2,19 +2,22 @@
 
 Staging project: `rvysencgtomkzwgdjaqh` (Tokyo). No production project yet.
 
-| Path                        | What                                                                                                                                                                                                                                                            |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `functions/delete-account/` | Account deletion (App Store 5.1.1(v)): verify JWT → revoke Sign in with Apple (if the app sent an authorization code) → delete the user's rows → `auth.admin.deleteUser`. `handler.ts` holds the logic, `apple.ts` the Apple revocation, `index.ts` the wiring. |
-| `migrations/`               | User-owned tables: `user_id … references auth.users on delete cascade`, RLS on, explicit grants (the project does not auto-expose tables). Schema agreed in `docs/implementation/06_SUPABASE_SCHEMA_PROPOSAL.md` (owner decision L-D30).                        |
-| `contracts/`                | Request/response shapes of the SQL functions and Edge Functions the app calls. Checked by the SQL tests against the database and by the Flutter tests against the client adapters.                                                                              |
-| `tests/`                    | `run.sh` applies every migration to a fresh plain Postgres with `supabase_stub.sql` (roles, `auth.users`, `auth.uid()`) and runs `*.test.sql` (RLS, grants, idempotency, contracts).                                                                            |
+| Path                        | What                                                                                                                                                                                                                                                                                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `functions/ai-request/`     | Credited AI (coach chat, advanced analysis, progress review): verify JWT → charge one credit per `request_id` → GroqCloud → refund on provider failure. Stores and logs no conversation (D-21). Free post-workout feedback stays on the existing backend (D-07).                                                                                        |
+| `functions/delete-account/` | Account deletion (App Store 5.1.1(v)): verify JWT → revoke Sign in with Apple (if the app sent an authorization code) → delete the user's rows → `auth.admin.deleteUser`. `handler.ts` holds the logic, `apple.ts` the Apple revocation, `index.ts` the wiring.                                                                                         |
+| `migrations/`               | User-owned tables: `user_id … references auth.users on delete cascade`, RLS on, explicit grants (the project does not auto-expose tables). Schema agreed in `docs/implementation/06_SUPABASE_SCHEMA_PROPOSAL.md` (owner decision L-D30).                                                                                                                |
+| `contracts/`                | Request/response shapes of the SQL functions and Edge Functions the app calls. Checked by the SQL tests against the database and by the Flutter tests against the client adapters.                                                                                                                                                                      |
+| `tests/`                    | `run.sh` applies every migration to a fresh plain Postgres with `supabase_stub.sql` (roles, `auth.users`, `auth.uid()`) and runs `*.test.sql` (RLS, grants, idempotency, contracts; `user_tables.test.sql` checks that every table holding user rows has RLS, cascades, is in `delete-account`'s `USER_TABLES` and can be deleted by the service role). |
 
 ### Migrations
 
-| File                                     | Group         | What                                                                                                                                                                                                                |
-| ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20261026000000_user_owned_tables.sql`   | D-12          | `profiles`                                                                                                                                                                                                          |
-| `20261029000100_sync_workouts_plans.sql` | A-2 sync, H-2 | `workouts`, `plans` (tombstones, `server_seq`); RPCs `sync_push_workouts`, `sync_pull_workouts`, `sync_workout_client_ids`, `sync_push_plans`, `sync_pull_plans`; `purge_sync_tombstones()` (service role, 90 days) |
+| File                                     | Group         | What                                                                                                                                                                                                                                                                                  |
+| ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20261026000000_user_owned_tables.sql`   | D-12          | `profiles`                                                                                                                                                                                                                                                                            |
+| `20261029000100_sync_workouts_plans.sql` | A-2 sync, H-2 | `workouts`, `plans` (tombstones, `server_seq`); RPCs `sync_push_workouts`, `sync_pull_workouts`, `sync_workout_client_ids`, `sync_push_plans`, `sync_pull_plans`; `purge_sync_tombstones()` (service role, 90 days)                                                                   |
+| `20261029000150_service_role_grants.sql` | D-12 fix      | explicit `service_role` grants on `profiles`, so `delete-account` can delete it whatever the project's default grants                                                                                                                                                                 |
+| `20261029000200_ai_credits.sql`          | AI-1 credits  | `ai_credit_ledger` (append-only), view `ai_credit_balance`; `ai_credit_balance()` for the app; `ai_credit_consume` / `ai_credit_refund` for `ai-request` only (service role). Weekly top-up to 10 Free / 60 Pro (Q5 placeholders), Pro read from `ai_credit_is_pro` (false until P-1) |
 
 ## Tests
 
@@ -82,6 +85,25 @@ Check: `select public.sync_pull_workouts(0, 10);` in the SQL editor fails with
 `not_authenticated` (no user), which is expected; the app calls it with the
 user's JWT. The client stays off until a build sets
 `--dart-define=ENABLE_ACCOUNTS=true --dart-define=ENABLE_CLOUD_SYNC=true`.
+
+**AI-1 credits** (`20261029000200_ai_credits.sql` + `functions/ai-request`). The
+Groq key is the same kind of key the feedback backend uses; set it only here,
+never in the app:
+
+```bash
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh GROQ_API_KEY=<your Groq key>
+# optional, default openai/gpt-oss-20b (as backend/ai_provider.py)
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh GROQ_MODEL=openai/gpt-oss-20b
+supabase functions deploy ai-request --project-ref rvysencgtomkzwgdjaqh   # JWT verification ON
+```
+
+Without `GROQ_API_KEY` the function answers `503 not_configured` and charges
+nothing. Smoke test (expect `401 {"error":"unauthorized"}`):
+
+```bash
+curl -i -X POST https://rvysencgtomkzwgdjaqh.supabase.co/functions/v1/ai-request \
+  -H "Authorization: Bearer invalid"
+```
 
 **Smoke test on staging, without deleting a real user.** Expect
 `401 {"error":"unauthorized"}`:

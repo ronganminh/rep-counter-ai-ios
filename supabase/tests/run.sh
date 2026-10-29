@@ -16,7 +16,7 @@ psql_admin=(psql -X -q -v ON_ERROR_STOP=1 -d postgres)
 
 run() {
   echo "-- $1"
-  CONTRACTS_DIR="$root/contracts" psql -X -q -v ON_ERROR_STOP=1 -d "$db" -f "$1"
+  CONTRACTS_DIR="$root/contracts" FUNCTIONS_DIR="$root/functions" psql -X -q -v ON_ERROR_STOP=1 -d "$db" -f "$1"
 }
 
 run "$here/supabase_stub.sql"
