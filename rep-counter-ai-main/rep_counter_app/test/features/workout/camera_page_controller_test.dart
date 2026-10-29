@@ -166,7 +166,7 @@ void main() {
     await open(tester);
     expect(find.text(S.vi.cameraPermissionTitle), findsOneWidget);
     expect(camera.requests, 0);
-    await tester.tap(find.text(S.vi.cameraAllowAndOpen));
+    await tester.tap(find.text(S.vi.cameraContinue));
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('native-preview')), findsOneWidget);
     expect(find.byKey(const Key('start-countdown')), findsOneWidget);
@@ -220,15 +220,35 @@ void main() {
     await close(tester);
   });
 
+  testWidgets('5.1.1(iv): no way out before the prompt; Continue always asks',
+      (tester) async {
+    await open(tester);
+    expect(find.text(S.vi.cameraPermissionTitle), findsOneWidget);
+    expect(find.text('Để sau'), findsNothing);
+    expect(find.byTooltip('Đóng'), findsNothing);
+    // System back does not leave or open the exit dialog either.
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text(S.vi.cameraPermissionTitle), findsOneWidget);
+    expect(find.text(S.vi.finishTitle), findsNothing);
+    expect(camera.requests, 0);
+    await tester.tap(find.text(S.vi.cameraContinue));
+    await tester.pumpAndSettle();
+    expect(camera.requests, 1, reason: 'Continue goes to the system prompt');
+    await close(tester);
+  });
+
   testWidgets('denied camera preserves settings and retry actions',
       (tester) async {
     camera.deny = true;
     await open(tester);
-    await tester.tap(find.text(S.vi.cameraAllowAndOpen));
+    await tester.tap(find.text(S.vi.cameraContinue));
     await tester.pumpAndSettle();
     expect(find.text(S.vi.cameraDenied), findsOneWidget);
     expect(find.text(S.vi.openSettings), findsOneWidget);
     expect(find.text(S.vi.cameraGrantedRetry), findsOneWidget);
+    // After the prompt the user can leave again.
+    expect(find.byTooltip('Đóng'), findsOneWidget);
     await close(tester);
   });
 
@@ -236,7 +256,7 @@ void main() {
       (tester) async {
     camera.noCamera = true;
     await open(tester);
-    await tester.tap(find.text(S.vi.cameraAllowAndOpen));
+    await tester.tap(find.text(S.vi.cameraContinue));
     await tester.pumpAndSettle();
     expect(find.text(S.vi.cameraUnavailable), findsOneWidget);
     await tester.tap(find.text(S.vi.retry));
@@ -256,7 +276,7 @@ void main() {
       (tester) async {
     camera.initializeGate = Completer<void>();
     await open(tester);
-    await tester.tap(find.text(S.vi.cameraAllowAndOpen));
+    await tester.tap(find.text(S.vi.cameraContinue));
     await tester.pump();
     await tester.pump();
     expect(camera.created, 1);

@@ -141,7 +141,7 @@ class S {
     required this.finishDiscard,
     required this.finishSave,
     required this.finishWorkoutTooltip,
-    required this.cameraAllowAndOpen,
+    required this.cameraContinue,
     required this.cameraGrantedRetry,
     required this.cameraOnDeviceNote,
     required this.cameraOpening,
@@ -379,7 +379,7 @@ class S {
   final String finishDiscard;
   final String finishSave;
   final String finishWorkoutTooltip;
-  final String cameraAllowAndOpen;
+  final String cameraContinue;
   final String cameraGrantedRetry;
   final String cameraOnDeviceNote;
   final String cameraOpening;
@@ -614,7 +614,7 @@ class S {
     finishDiscard: 'Thoát không lưu',
     finishSave: 'Lưu & kết thúc',
     finishWorkoutTooltip: 'Kết thúc buổi tập',
-    cameraAllowAndOpen: 'Cho phép và mở camera',
+    cameraContinue: 'Tiếp tục',
     cameraGrantedRetry: 'Tôi đã cấp quyền • Thử lại',
     cameraOnDeviceNote:
         'Khung hình được xử lý trực tiếp trên thiết bị và không được tải lên máy chủ.',
@@ -858,7 +858,7 @@ class S {
     finishDiscard: 'Leave without saving',
     finishSave: 'Save & finish',
     finishWorkoutTooltip: 'Finish workout',
-    cameraAllowAndOpen: 'Allow and open the camera',
+    cameraContinue: 'Continue',
     cameraGrantedRetry: 'I granted permission • Retry',
     cameraOnDeviceNote:
         'Frames are processed directly on your device and are never uploaded to a server.',
