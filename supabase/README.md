@@ -24,6 +24,7 @@ Staging project: `rvysencgtomkzwgdjaqh` (Tokyo). No production project yet.
 | `20261029000300_xp.sql`                  | G-1 XP           | `xp_events` (one per user + source, D-09), `user_progress`, `achievements_unlocked`; a trigger on `workouts` awards XP from the synced row (manual = half, Q4; tombstones nothing; no revoke on delete, D-05) instead of a separate `award-xp` function; `xp_progress()` for the app; `xp_correct()` (service role, negative only)   |
 | `20261029000400_social.sql`              | S-1 social       | `friendships`, `blocks`, `reports` (service role only, kept with ids nulled on account deletion, Q7), `invites` (7 days, 20 open per user); `social_*` functions for invite / respond / state / block / report / friends; `social_leaderboard` (me + friends, camera workouts only, D-18). No search by name (Q6). Races (S-2) later |
 | `20261029000500_entitlements.sql`        | P-1 entitlements | `entitlements` (one per store purchase, first account keeps it), `store_events` (raw notifications, service role only); `entitlement_current()` for the app; `entitlement_record` / `entitlement_update_from_store` for the functions; `ai_credit_is_pro` now reads entitlements (Pro → 60 credits)                                  |
+| `20261029000600_push_inbox.sql`          | NT-2 push/inbox  | `push_tokens` (a token follows the signed-in account), `inbox_items` (`repcoach://` links only); `push_register_token` / `push_unregister_token` / `inbox_list` / `inbox_mark_read` for the app; `inbox_create` / `push_drop_token` for `send-push`                                                                                  |
 
 ## Tests
 
@@ -150,6 +151,32 @@ App Store Connect › App › App Information › App Store Server Notifications
 (Version 2, sandbox and production), and a Pub/Sub push subscription on the Play
 RTDN topic. The app must set `appAccountToken` (StoreKit) /
 `obfuscatedExternalAccountId` (Play Billing) to the user's id at purchase.
+
+**NT-2 push and inbox** (`20261029000600_push_inbox.sql` +
+`functions/send-push`). The inbox works with the migration alone; pushes need
+the APNs key and the Firebase project (06 §7, still open):
+
+```bash
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh \
+  PUSH_SEND_SECRET="$(openssl rand -hex 24)"
+# Apple Developer › Keys: a key with Apple Push Notifications service (.p8).
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh \
+  APNS_TEAM_ID=NW22NWLTK4 APNS_KEY_ID=<key id> \
+  APNS_PRIVATE_KEY="$(cat ~/secure/AuthKey_<key id>.p8)" APNS_ENV=sandbox
+#   APNS_ENV=production for TestFlight / App Store builds.
+# Firebase console › Project settings › Service accounts › Generate key.
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh \
+  FCM_SERVICE_ACCOUNT_JSON="$(cat ~/secure/firebase-service-account.json)"
+supabase functions deploy send-push --no-verify-jwt --project-ref rvysencgtomkzwgdjaqh
+```
+
+Test (writes one inbox item for that user):
+
+```bash
+curl -X POST https://rvysencgtomkzwgdjaqh.supabase.co/functions/v1/send-push \
+  -H "x-push-secret: <PUSH_SEND_SECRET>" -H "content-type: application/json" \
+  -d '{"user_id":"<user uuid>","kind":"system","link":"repcoach://inbox","title":"Hello"}'
+```
 
 **Smoke test on staging, without deleting a real user.** Expect
 `401 {"error":"unauthorized"}`:

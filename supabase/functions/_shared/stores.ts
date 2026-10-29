@@ -139,13 +139,14 @@ export async function appStoreState(
 }
 
 export async function googleAccessToken(
-  cfg: PlayConfig,
+  cfg: { clientEmail: string; privateKeyPem: string },
   fetchFn: typeof fetch = fetch,
   nowSeconds = Math.floor(Date.now() / 1000),
+  scope = "https://www.googleapis.com/auth/androidpublisher",
 ): Promise<string> {
   const assertion = await signRs256({
     iss: cfg.clientEmail,
-    scope: "https://www.googleapis.com/auth/androidpublisher",
+    scope,
     aud: "https://oauth2.googleapis.com/token",
     iat: nowSeconds,
     exp: nowSeconds + 600,
