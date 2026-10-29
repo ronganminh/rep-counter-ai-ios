@@ -12,6 +12,9 @@ export const USER_TABLES = [
   "workouts",
   "plans",
   "ai_credit_ledger",
+  "xp_events",
+  "user_progress",
+  "achievements_unlocked",
 ] as const;
 
 const admin = createClient(
