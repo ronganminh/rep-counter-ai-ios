@@ -1,6 +1,6 @@
 # 06 · Supabase schema proposal: sync, credits, XP, social, billing, push
 
-Status: **PROPOSAL for owner review (2026-10-29). Nothing here exists.** No table, function, policy or secret has been created; the only live migration is `supabase/migrations/20261026000000_user_owned_tables.sql` (`profiles`). Every SQL block below is a sketch to agree on before a migration is written. Once approved, each section becomes its own migration + Edge Function PR with tests, applied by the owner (`supabase db push --linked`), staging first.
+Status: **ACCEPTED by the owner on 2026-10-29: all §10 answers (Q1–Q8) as proposed** (PRODUCT_DECISIONS BE-1, decision log L-D30). Work order set by the owner: sync → credits → XP → social → entitlements → push/inbox, which replaces the order in §9. Each section becomes its own migration + Edge Function PR with tests, applied to staging (`rvysencgtomkzwgdjaqh`) by the owner (`supabase db push --linked`); the SQL blocks below are the agreed starting point, and the migrations in `supabase/migrations/` are the source of truth once merged. The only live migration so far is `20261026000000_user_owned_tables.sql` (`profiles`).
 
 Scope: the backend parts of the roadmap that are BLOCKED today (01_TASK_DEPENDENCIES §1): A-2 sync and guest merge, H-2 account-scope deletes, AI-1/AI-2 credits, G-1 XP and achievements, S-1/S-2 social, P-1/P-2 entitlements, NT-2 push and inbox.
 
@@ -238,7 +238,7 @@ create table public.inbox_items (
 
 `delete-account` already removes the auth user (cascade) after revoking Sign in with Apple. Each table above is added to `USER_TABLES` in the same PR that creates it. `reports.reporter/reported` use `on delete set null` so a report survives the account for moderation (owner/legal to confirm). `store_events` keep only platform payloads, which may contain transaction ids; retention to be set with legal.
 
-## 9 · Order of work once approved
+## 9 · Order of work once approved (superseded by the owner's order in the status line)
 
 1. Shared helpers + `workouts` + `plans` + sync function, behind `ENABLE_ACCOUNTS` (A-2, H-2).
 2. `user_progress` / `xp_events` / `achievements_unlocked` + `award-xp` (G-1).
@@ -249,7 +249,7 @@ create table public.inbox_items (
 
 Each step: migration with RLS tests (pgTAP or the Supabase CLI test runner), Deno tests for the function, client repository behind its flag, and the existing in-memory fakes kept for widget tests.
 
-## 10 · Decisions needed from the owner
+## 10 · Decisions (all accepted by the owner, 2026-10-29)
 
 | # | Question | Proposal |
 |---|---|---|
