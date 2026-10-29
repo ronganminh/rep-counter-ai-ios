@@ -12,13 +12,14 @@ Staging project: `rvysencgtomkzwgdjaqh` (Tokyo). No production project yet.
 
 ### Migrations
 
-| File                                     | Group         | What                                                                                                                                                                                                                                                                                                                               |
-| ---------------------------------------- | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `20261026000000_user_owned_tables.sql`   | D-12          | `profiles`                                                                                                                                                                                                                                                                                                                         |
-| `20261029000100_sync_workouts_plans.sql` | A-2 sync, H-2 | `workouts`, `plans` (tombstones, `server_seq`); RPCs `sync_push_workouts`, `sync_pull_workouts`, `sync_workout_client_ids`, `sync_push_plans`, `sync_pull_plans`; `purge_sync_tombstones()` (service role, 90 days)                                                                                                                |
-| `20261029000150_service_role_grants.sql` | D-12 fix      | explicit `service_role` grants on `profiles`, so `delete-account` can delete it whatever the project's default grants                                                                                                                                                                                                              |
-| `20261029000200_ai_credits.sql`          | AI-1 credits  | `ai_credit_ledger` (append-only), view `ai_credit_balance`; `ai_credit_balance()` for the app; `ai_credit_consume` / `ai_credit_refund` for `ai-request` only (service role). Weekly top-up to 10 Free / 60 Pro (Q5 placeholders), Pro read from `ai_credit_is_pro` (false until P-1)                                              |
-| `20261029000300_xp.sql`                  | G-1 XP        | `xp_events` (one per user + source, D-09), `user_progress`, `achievements_unlocked`; a trigger on `workouts` awards XP from the synced row (manual = half, Q4; tombstones nothing; no revoke on delete, D-05) instead of a separate `award-xp` function; `xp_progress()` for the app; `xp_correct()` (service role, negative only) |
+| File                                     | Group         | What                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `20261026000000_user_owned_tables.sql`   | D-12          | `profiles`                                                                                                                                                                                                                                                                                                                           |
+| `20261029000100_sync_workouts_plans.sql` | A-2 sync, H-2 | `workouts`, `plans` (tombstones, `server_seq`); RPCs `sync_push_workouts`, `sync_pull_workouts`, `sync_workout_client_ids`, `sync_push_plans`, `sync_pull_plans`; `purge_sync_tombstones()` (service role, 90 days)                                                                                                                  |
+| `20261029000150_service_role_grants.sql` | D-12 fix      | explicit `service_role` grants on `profiles`, so `delete-account` can delete it whatever the project's default grants                                                                                                                                                                                                                |
+| `20261029000200_ai_credits.sql`          | AI-1 credits  | `ai_credit_ledger` (append-only), view `ai_credit_balance`; `ai_credit_balance()` for the app; `ai_credit_consume` / `ai_credit_refund` for `ai-request` only (service role). Weekly top-up to 10 Free / 60 Pro (Q5 placeholders), Pro read from `ai_credit_is_pro` (false until P-1)                                                |
+| `20261029000300_xp.sql`                  | G-1 XP        | `xp_events` (one per user + source, D-09), `user_progress`, `achievements_unlocked`; a trigger on `workouts` awards XP from the synced row (manual = half, Q4; tombstones nothing; no revoke on delete, D-05) instead of a separate `award-xp` function; `xp_progress()` for the app; `xp_correct()` (service role, negative only)   |
+| `20261029000400_social.sql`              | S-1 social    | `friendships`, `blocks`, `reports` (service role only, kept with ids nulled on account deletion, Q7), `invites` (7 days, 20 open per user); `social_*` functions for invite / respond / state / block / report / friends; `social_leaderboard` (me + friends, camera workouts only, D-18). No search by name (Q6). Races (S-2) later |
 
 ## Tests
 
@@ -110,6 +111,11 @@ curl -i -X POST https://rvysencgtomkzwgdjaqh.supabase.co/functions/v1/ai-request
 awarded inside the database when a workout syncs. To correct a bad award from
 the SQL editor:
 `select public.xp_correct('<user uuid>', '<workout client_id>', 30, 'duplicate');`
+
+**S-1 social** (`20261029000400_social.sql`, no Edge Function): nothing to set.
+The leaderboard is a SQL function (`security definer`), so no `leaderboard` Edge
+Function is needed. Reports are read only from the dashboard (service role):
+`select * from public.reports order by created_at desc;`
 
 **Smoke test on staging, without deleting a real user.** Expect
 `401 {"error":"unauthorized"}`:

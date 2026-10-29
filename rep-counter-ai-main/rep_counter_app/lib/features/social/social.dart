@@ -27,8 +27,18 @@ class LeaderboardRow {
 class SocialError implements Exception {
   const SocialError(this.code);
 
-  /// `invite_expired`, `invite_used`, `blocked`, `self`, `not_found`.
+  /// `invite_expired`, `invite_used`, `blocked`, `self`, `not_found`,
+  /// `too_many_invites`, `too_many_reports`.
   final String code;
+}
+
+/// Someone I am connected with (friend or request); never anyone else.
+@immutable
+class FriendSummary {
+  const FriendSummary(this.userId, this.displayName, this.state);
+  final String userId;
+  final String displayName;
+  final FriendState state;
 }
 
 /// The account side. Every call is on behalf of the signed-in user.
@@ -39,6 +49,11 @@ abstract interface class SocialApi {
   Future<FriendState> state(String userId);
   Future<void> block(String userId);
   Future<void> report(String userId, String reason);
+
+  /// Friends and requests, without people who blocked me.
+  Future<List<FriendSummary>> friends();
+
+  /// Me and my friends, camera workouts only (D-18), best first.
   Future<List<LeaderboardRow>> leaderboard(String exerciseId);
 }
 
@@ -133,6 +148,19 @@ class _As implements SocialApi {
   Future<void> report(String userId, String reason) async {
     s.reports
         .add((me, userId, reason.substring(0, reason.length.clamp(0, 500))));
+  }
+
+  @override
+  Future<List<FriendSummary>> friends() async {
+    final others = {
+      for (final k in s._friendships.keys)
+        if (k.$1 == me) k.$2 else if (k.$2 == me) k.$1,
+    };
+    return [
+      for (final u in others)
+        if (await state(u) != FriendState.none)
+          FriendSummary(u, s.names[u] ?? '', await state(u)),
+    ];
   }
 
   @override
