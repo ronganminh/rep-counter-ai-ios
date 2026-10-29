@@ -95,3 +95,49 @@ end $$;
 grant usage on schema test to anon, authenticated, service_role;
 grant execute on all functions in schema test
   to anon, authenticated, service_role;
+
+-- Checks the functions listed under [p_section] of a contract file: each
+-- exists with exactly those parameter names, [p_role] may execute it, and
+-- the roles in [p_denied] may not.
+create or replace function test.check_contract(
+  p_contract jsonb, p_section text, p_role text,
+  p_denied text[] default array['anon'])
+returns void language plpgsql as $$
+declare
+  f record;
+  v_oid oid;
+  v_args text[];
+  v_sig text;
+  v_denied text;
+begin
+  for f in select key, value from jsonb_each(p_contract -> p_section) loop
+    select p.oid, coalesce(p.proargnames, '{}') into v_oid, v_args
+      from pg_proc p
+      where p.proname = f.key and p.pronamespace = 'public'::regnamespace;
+    if v_oid is null then
+      raise exception 'contract: missing function %', f.key;
+    end if;
+    if v_args <> array(select jsonb_array_elements_text(f.value -> 'params')) then
+      raise exception 'contract: % has params %', f.key, v_args;
+    end if;
+    v_sig := v_oid::regprocedure::text;
+    if not has_function_privilege(p_role, v_sig, 'execute') then
+      raise exception 'contract: % cannot execute %', p_role, v_sig;
+    end if;
+    foreach v_denied in array p_denied loop
+      if has_function_privilege(v_denied, v_sig, 'execute') then
+        raise exception 'contract: % can execute %', v_denied, v_sig;
+      end if;
+    end loop;
+  end loop;
+end $$;
+
+-- True when [p_obj] has exactly the keys of the contract object [p_shape].
+create or replace function test.has_shape(p_obj jsonb, p_shape jsonb)
+returns boolean language sql immutable as $$
+  select array(select jsonb_object_keys(p_obj) order by 1)
+       = array(select jsonb_object_keys(p_shape) order by 1)
+$$;
+
+grant execute on all functions in schema test
+  to anon, authenticated, service_role;

@@ -1,0 +1,51 @@
+{
+  "description": "AI-1 credits. The app calls ai_credit_balance (PostgREST RPC) and the ai-request Edge Function; ai-request calls ai_credit_consume / ai_credit_refund with the service role. Checked by supabase/tests/credits.test.sql, supabase/functions/ai-request/handler_test.ts and the Flutter test test/features/credits/supabase_ai_credits_api_test.dart.",
+  "functions": {
+    "ai_credit_balance": {
+      "params": [],
+      "returns": {
+        "balance": "number",
+        "weekly_allowance": "number",
+        "week_start": "string",
+        "pro": "boolean"
+      }
+    }
+  },
+  "service_functions": {
+    "ai_credit_consume": {
+      "params": ["p_user", "p_request_id", "p_kind"],
+      "returns": {
+        "balance": "number",
+        "weekly_allowance": "number",
+        "week_start": "string",
+        "pro": "boolean",
+        "status": "string"
+      }
+    },
+    "ai_credit_refund": {
+      "params": ["p_user", "p_request_id"],
+      "returns": {
+        "balance": "number",
+        "weekly_allowance": "number",
+        "week_start": "string",
+        "pro": "boolean",
+        "refunded": "boolean"
+      }
+    }
+  },
+  "edge_functions": {
+    "ai-request": {
+      "request": ["request_id", "kind", "locale", "messages", "context"],
+      "kinds": ["coach_chat", "advanced_analysis", "progress_review"],
+      "response": ["request_id", "text", "balance"],
+      "errors": {
+        "400": "invalid_body",
+        "401": "unauthorized",
+        "402": "insufficient_credits",
+        "409": "duplicate_request",
+        "502": "provider_error",
+        "503": "not_configured"
+      }
+    }
+  }
+}

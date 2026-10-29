@@ -12,7 +12,8 @@ class AiCredits {
   static const bool enabled = FeatureFlags.enableAccounts &&
       bool.fromEnvironment('ENABLE_AI_CREDITS', defaultValue: false);
 
-  /// D-08 weekly allowance. PROPOSED values, not production.
+  /// D-08 weekly allowance: placeholder values accepted for staging (06 Q5,
+  /// L-D30). On the backend `ai_credit_weekly_allowance` decides.
   static const freeWeekly = 10, proWeekly = 60;
 
   static int weeklyAllowance({required bool pro}) =>
@@ -127,4 +128,71 @@ class InMemoryAiCreditsApi implements AiCreditsApi {
     }
     return _balance;
   }
+}
+
+extension CreditedRequestWire on CreditedRequest {
+  /// The `kind` the backend uses (`supabase/contracts/credits.json`).
+  String get wireName => switch (this) {
+        CreditedRequest.coachChat => 'coach_chat',
+        CreditedRequest.advancedAnalysis => 'advanced_analysis',
+        CreditedRequest.progressReview => 'progress_review',
+      };
+}
+
+@immutable
+class CreditBalance {
+  const CreditBalance(
+      {required this.balance,
+      required this.weeklyAllowance,
+      required this.weekStart,
+      required this.pro});
+  final int balance, weeklyAllowance;
+  final DateTime weekStart;
+  final bool pro;
+}
+
+@immutable
+class CoachMessage {
+  const CoachMessage.user(this.content) : fromUser = true;
+  const CoachMessage.assistant(this.content) : fromUser = false;
+  final String content;
+  final bool fromUser;
+}
+
+@immutable
+class CreditedAnswer {
+  const CreditedAnswer(
+      {required this.requestId, required this.text, required this.balance});
+  final String requestId, text;
+  final int balance;
+}
+
+/// This request id was already charged; the app asks again with a new id
+/// (the server never charges twice and keeps no copy of the answer, D-21).
+class DuplicateAiRequest implements Exception {
+  const DuplicateAiRequest(this.balance);
+  final int balance;
+}
+
+/// The provider failed; the credit was given back.
+class AiProviderFailed implements Exception {
+  const AiProviderFailed(this.balance);
+  final int balance;
+}
+
+/// What the app calls for credited AI. On the backend one request does
+/// charge → provider → refund-on-failure (`ai-request`), so the client never
+/// charges or refunds itself; [CreditedAiRunner] and [AiCreditsApi] above
+/// are the same rules for the in-memory ledger.
+abstract interface class CreditedAiApi {
+  Future<CreditBalance> balance();
+
+  /// Throws [InsufficientCredits], [DuplicateAiRequest] or [AiProviderFailed].
+  Future<CreditedAnswer> ask({
+    required String requestId,
+    required CreditedRequest kind,
+    required String locale,
+    List<CoachMessage> messages = const [],
+    Map<String, Object?>? context,
+  });
 }

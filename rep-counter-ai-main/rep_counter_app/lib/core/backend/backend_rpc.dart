@@ -22,10 +22,14 @@ abstract interface class BackendRpc {
 /// `error` field of an Edge Function's JSON body; [status] is the HTTP
 /// status for Edge Functions. Never carries tokens or user data.
 class BackendException implements Exception {
-  const BackendException(this.code, {this.status});
+  const BackendException(this.code, {this.status, this.body});
 
   final String code;
   final int? status;
+
+  /// An Edge Function's JSON error body (e.g. the balance with
+  /// `insufficient_credits`); null for SQL functions.
+  final Map<String, Object?>? body;
 
   bool get notSignedIn => code == '28000' || status == 401;
 
@@ -56,10 +60,11 @@ class SupabaseBackendRpc implements BackendRpc {
       return response.data;
     } on sb.FunctionException catch (e) {
       final details = e.details;
-      final code = details is Map && details['error'] is String
-          ? details['error'] as String
+      final body = details is Map ? details.cast<String, Object?>() : null;
+      final code = body?['error'] is String
+          ? body!['error'] as String
           : 'http_${e.status}';
-      throw BackendException(code, status: e.status);
+      throw BackendException(code, status: e.status, body: body);
     }
   }
 }

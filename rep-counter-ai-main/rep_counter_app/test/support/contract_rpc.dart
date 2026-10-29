@@ -47,6 +47,12 @@ class ContractRpc implements BackendRpc {
     final edge = (contract['edge_functions'] as Map?)?.cast<String, Object?>();
     expect(edge?[function], isNotNull,
         reason: '$function is not an Edge Function in the contract');
+    final request =
+        ((edge![function] as Map)['request'] as List?)?.cast<String>();
+    if (request != null) {
+      expect(body.keys.toSet(), request.toSet(),
+          reason: 'body of $function must match the contract');
+    }
     final wire = (jsonDecode(jsonEncode(body)) as Map).cast<String, Object?>();
     return jsonDecode(jsonEncode(invokeHandler!(function, wire)));
   }
