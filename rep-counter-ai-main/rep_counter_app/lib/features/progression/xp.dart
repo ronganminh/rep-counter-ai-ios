@@ -30,7 +30,9 @@ class XpWorkout {
   final bool manual;
 }
 
-/// PROPOSED award rules, values to be confirmed (06 §10 Q4).
+/// Award rules accepted by the owner (06 Q4, L-D30). The database applies
+/// the same rules (`xp_for_workout`); `supabase/contracts/xp.json` holds the
+/// examples both sides are tested against.
 class XpRules {
   const XpRules._();
 
