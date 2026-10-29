@@ -16,6 +16,7 @@ import '../features/workout/presentation/recovery_page.dart';
 import '../widgets/app_feedback.dart';
 import '../widgets/product_ui.dart';
 import 'app_link.dart';
+import 'os_links.dart';
 import 'app_tab_bar.dart';
 import 'route_observer.dart';
 
@@ -49,7 +50,10 @@ class _AppShellState extends State<AppShell> with RouteAware {
     super.initState();
     // W-5: offer an unfinished workout once the shell is on screen.
     WidgetsBinding.instance.addPostFrameCallback((_) => _recover());
-    _linkSub = (widget.links ?? LocalNotificationsPlatform.opened)
+    // Reminder taps and `repcoach://` links from the OS (X-1).
+    _linkSub = (widget.links ??
+            mergeLinkStreams(
+                [LocalNotificationsPlatform.opened, osRepcoachLinks()]))
         .listen((raw) => _openLink(AppLink.parse(raw)));
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {

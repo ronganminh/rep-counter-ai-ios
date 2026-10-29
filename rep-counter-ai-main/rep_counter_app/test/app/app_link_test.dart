@@ -5,6 +5,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rep_counter_app/app/app_link.dart';
 import 'package:rep_counter_app/app/app_shell.dart';
 import 'package:rep_counter_app/app/app_tab_bar.dart';
+import 'package:rep_counter_app/app/os_links.dart';
 import 'package:rep_counter_app/app/route_observer.dart';
 import 'package:rep_counter_app/core/i18n/app_strings.dart';
 import 'package:rep_counter_app/core/i18n/locale_controller.dart';
@@ -149,7 +150,7 @@ void main() {
     tearDown(() => links.close());
 
     Future<void> pumpShell(WidgetTester tester,
-        {Future<String?> Function()? initial}) async {
+        {Future<String?> Function()? initial, Stream<String>? stream}) async {
       tester.view.physicalSize = const Size(393, 852);
       tester.view.devicePixelRatio = 1;
       addTearDown(tester.view.reset);
@@ -164,7 +165,7 @@ void main() {
           localizationsDelegates: testLocalizationsDelegates,
           navigatorObservers: [appRouteObserver],
           home: AppShell(
-              links: links.stream,
+              links: stream ?? links.stream,
               initialLink: initial ?? () async => null,
               linkRouter: router),
         ),
@@ -207,6 +208,28 @@ void main() {
       await settle(tester);
       expect(
           find.text('That session is no longer in your plan.'), findsOneWidget);
+    });
+
+    testWidgets(
+        'X-1: OS links reach the router; missing entities fall back; '
+        'the auth callback is left alone', (tester) async {
+      final os = StreamController<String>.broadcast();
+      addTearDown(os.close);
+      final id = (await tester.runAsync(todayId))!;
+      await pumpShell(tester,
+          stream: mergeLinkStreams(
+              [links.stream, osRepcoachLinks(source: os.stream)]));
+      os.add('com.ronganminh.repcoach://login-callback?code=abc');
+      os.add('https://repcoach-ai.duckdns.org/plan/session/$id');
+      await settle(tester);
+      expect(find.byType(SessionDetailPage), findsNothing);
+      os.add('repcoach://plan/session/missing');
+      await settle(tester);
+      expect(
+          find.text('That session is no longer in your plan.'), findsOneWidget);
+      os.add('repcoach://plan/session/$id');
+      await settle(tester);
+      expect(find.byType(SessionDetailPage), findsOneWidget);
     });
 
     testWidgets('workout feedback opens the saved result read-only',
