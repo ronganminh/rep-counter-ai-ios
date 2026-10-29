@@ -15,6 +15,7 @@ export const USER_TABLES = [
   "xp_events",
   "user_progress",
   "achievements_unlocked",
+  "entitlements",
 ] as const;
 
 const admin = createClient(

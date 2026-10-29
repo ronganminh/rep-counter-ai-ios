@@ -2,24 +2,28 @@
 
 Staging project: `rvysencgtomkzwgdjaqh` (Tokyo). No production project yet.
 
-| Path                        | What                                                                                                                                                                                                                                                                                                                                                    |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `functions/ai-request/`     | Credited AI (coach chat, advanced analysis, progress review): verify JWT → charge one credit per `request_id` → GroqCloud → refund on provider failure. Stores and logs no conversation (D-21). Free post-workout feedback stays on the existing backend (D-07).                                                                                        |
-| `functions/delete-account/` | Account deletion (App Store 5.1.1(v)): verify JWT → revoke Sign in with Apple (if the app sent an authorization code) → delete the user's rows → `auth.admin.deleteUser`. `handler.ts` holds the logic, `apple.ts` the Apple revocation, `index.ts` the wiring.                                                                                         |
-| `migrations/`               | User-owned tables: `user_id … references auth.users on delete cascade`, RLS on, explicit grants (the project does not auto-expose tables). Schema agreed in `docs/implementation/06_SUPABASE_SCHEMA_PROPOSAL.md` (owner decision L-D30).                                                                                                                |
-| `contracts/`                | Request/response shapes of the SQL functions and Edge Functions the app calls. Checked by the SQL tests against the database and by the Flutter tests against the client adapters.                                                                                                                                                                      |
-| `tests/`                    | `run.sh` applies every migration to a fresh plain Postgres with `supabase_stub.sql` (roles, `auth.users`, `auth.uid()`) and runs `*.test.sql` (RLS, grants, idempotency, contracts; `user_tables.test.sql` checks that every table holding user rows has RLS, cascades, is in `delete-account`'s `USER_TABLES` and can be deleted by the service role). |
+| Path                         | What                                                                                                                                                                                                                                                                                                                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `functions/ai-request/`      | Credited AI (coach chat, advanced analysis, progress review): verify JWT → charge one credit per `request_id` → GroqCloud → refund on provider failure. Stores and logs no conversation (D-21). Free post-workout feedback stays on the existing backend (D-07).                                                                                        |
+| `functions/verify-purchase/` | P-1: JWT → product id allowed (`STORE_PRODUCT_IDS`) → state read from the App Store Server API / Play Developer API with our credentials → account check (appAccountToken / obfuscatedExternalAccountId = user id) → `entitlement_record` → Play acknowledge. 503 until product ids exist (D-14).                                                       |
+| `functions/store-webhook/`   | P-1: App Store Server Notifications v2 + Play RTDN (Pub/Sub push), `?secret=` required; stores the raw event, re-reads the purchase from the store, updates the known entitlement. Deployed with `--no-verify-jwt`.                                                                                                                                     |
+| `functions/_shared/`         | `jwt.ts` (ES256 / RS256), `stores.ts` (Apple / Google APIs), `store_config.ts` (secrets), `assert.ts` + `test_helpers.ts` (tests only).                                                                                                                                                                                                                 |
+| `functions/delete-account/`  | Account deletion (App Store 5.1.1(v)): verify JWT → revoke Sign in with Apple (if the app sent an authorization code) → delete the user's rows → `auth.admin.deleteUser`. `handler.ts` holds the logic, `apple.ts` the Apple revocation, `index.ts` the wiring.                                                                                         |
+| `migrations/`                | User-owned tables: `user_id … references auth.users on delete cascade`, RLS on, explicit grants (the project does not auto-expose tables). Schema agreed in `docs/implementation/06_SUPABASE_SCHEMA_PROPOSAL.md` (owner decision L-D30).                                                                                                                |
+| `contracts/`                 | Request/response shapes of the SQL functions and Edge Functions the app calls. Checked by the SQL tests against the database and by the Flutter tests against the client adapters.                                                                                                                                                                      |
+| `tests/`                     | `run.sh` applies every migration to a fresh plain Postgres with `supabase_stub.sql` (roles, `auth.users`, `auth.uid()`) and runs `*.test.sql` (RLS, grants, idempotency, contracts; `user_tables.test.sql` checks that every table holding user rows has RLS, cascades, is in `delete-account`'s `USER_TABLES` and can be deleted by the service role). |
 
 ### Migrations
 
-| File                                     | Group         | What                                                                                                                                                                                                                                                                                                                                 |
-| ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `20261026000000_user_owned_tables.sql`   | D-12          | `profiles`                                                                                                                                                                                                                                                                                                                           |
-| `20261029000100_sync_workouts_plans.sql` | A-2 sync, H-2 | `workouts`, `plans` (tombstones, `server_seq`); RPCs `sync_push_workouts`, `sync_pull_workouts`, `sync_workout_client_ids`, `sync_push_plans`, `sync_pull_plans`; `purge_sync_tombstones()` (service role, 90 days)                                                                                                                  |
-| `20261029000150_service_role_grants.sql` | D-12 fix      | explicit `service_role` grants on `profiles`, so `delete-account` can delete it whatever the project's default grants                                                                                                                                                                                                                |
-| `20261029000200_ai_credits.sql`          | AI-1 credits  | `ai_credit_ledger` (append-only), view `ai_credit_balance`; `ai_credit_balance()` for the app; `ai_credit_consume` / `ai_credit_refund` for `ai-request` only (service role). Weekly top-up to 10 Free / 60 Pro (Q5 placeholders), Pro read from `ai_credit_is_pro` (false until P-1)                                                |
-| `20261029000300_xp.sql`                  | G-1 XP        | `xp_events` (one per user + source, D-09), `user_progress`, `achievements_unlocked`; a trigger on `workouts` awards XP from the synced row (manual = half, Q4; tombstones nothing; no revoke on delete, D-05) instead of a separate `award-xp` function; `xp_progress()` for the app; `xp_correct()` (service role, negative only)   |
-| `20261029000400_social.sql`              | S-1 social    | `friendships`, `blocks`, `reports` (service role only, kept with ids nulled on account deletion, Q7), `invites` (7 days, 20 open per user); `social_*` functions for invite / respond / state / block / report / friends; `social_leaderboard` (me + friends, camera workouts only, D-18). No search by name (Q6). Races (S-2) later |
+| File                                     | Group            | What                                                                                                                                                                                                                                                                                                                                 |
+| ---------------------------------------- | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `20261026000000_user_owned_tables.sql`   | D-12             | `profiles`                                                                                                                                                                                                                                                                                                                           |
+| `20261029000100_sync_workouts_plans.sql` | A-2 sync, H-2    | `workouts`, `plans` (tombstones, `server_seq`); RPCs `sync_push_workouts`, `sync_pull_workouts`, `sync_workout_client_ids`, `sync_push_plans`, `sync_pull_plans`; `purge_sync_tombstones()` (service role, 90 days)                                                                                                                  |
+| `20261029000150_service_role_grants.sql` | D-12 fix         | explicit `service_role` grants on `profiles`, so `delete-account` can delete it whatever the project's default grants                                                                                                                                                                                                                |
+| `20261029000200_ai_credits.sql`          | AI-1 credits     | `ai_credit_ledger` (append-only), view `ai_credit_balance`; `ai_credit_balance()` for the app; `ai_credit_consume` / `ai_credit_refund` for `ai-request` only (service role). Weekly top-up to 10 Free / 60 Pro (Q5 placeholders), Pro read from `ai_credit_is_pro` (false until P-1)                                                |
+| `20261029000300_xp.sql`                  | G-1 XP           | `xp_events` (one per user + source, D-09), `user_progress`, `achievements_unlocked`; a trigger on `workouts` awards XP from the synced row (manual = half, Q4; tombstones nothing; no revoke on delete, D-05) instead of a separate `award-xp` function; `xp_progress()` for the app; `xp_correct()` (service role, negative only)   |
+| `20261029000400_social.sql`              | S-1 social       | `friendships`, `blocks`, `reports` (service role only, kept with ids nulled on account deletion, Q7), `invites` (7 days, 20 open per user); `social_*` functions for invite / respond / state / block / report / friends; `social_leaderboard` (me + friends, camera workouts only, D-18). No search by name (Q6). Races (S-2) later |
+| `20261029000500_entitlements.sql`        | P-1 entitlements | `entitlements` (one per store purchase, first account keeps it), `store_events` (raw notifications, service role only); `entitlement_current()` for the app; `entitlement_record` / `entitlement_update_from_store` for the functions; `ai_credit_is_pro` now reads entitlements (Pro → 60 credits)                                  |
 
 ## Tests
 
@@ -116,6 +120,36 @@ the SQL editor:
 The leaderboard is a SQL function (`security definer`), so no `leaderboard` Edge
 Function is needed. Reports are read only from the dashboard (service role):
 `select * from public.reports order by created_at desc;`
+
+**P-1 entitlements** (`20261029000500_entitlements.sql` +
+`functions/verify-purchase` + `functions/store-webhook`). **Billing stays off**
+until prices and product ids are decided (D-14). Applying the migration is safe
+now; the functions answer `503 not_configured` and record nothing while
+`STORE_PRODUCT_IDS` is unset. When D-14 is decided:
+
+```bash
+# App Store Connect › Users and Access › Integrations › In-App Purchase: a key (.p8), its Key ID, the Issuer ID.
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh \
+  APPSTORE_ISSUER_ID=<issuer id> APPSTORE_KEY_ID=<key id> \
+  APPSTORE_PRIVATE_KEY="$(cat ~/secure/SubscriptionKey_<key id>.p8)"
+# Google Cloud service account with access to the app in Play Console (financial data, manage orders).
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh \
+  PLAY_SERVICE_ACCOUNT_JSON="$(cat ~/secure/play-service-account.json)"
+supabase secrets set --project-ref rvysencgtomkzwgdjaqh \
+  STORE_WEBHOOK_SECRET="$(openssl rand -hex 24)" \
+  STORE_PRODUCT_IDS=<monthly id>,<annual id>
+#   APPSTORE_BUNDLE_ID (default com.ronganminh.repCounterApp) and
+#   PLAY_PACKAGE_NAME (default com.ronganminh.repcoach) only if they differ.
+supabase functions deploy verify-purchase --project-ref rvysencgtomkzwgdjaqh
+supabase functions deploy store-webhook --no-verify-jwt --project-ref rvysencgtomkzwgdjaqh
+```
+
+Then point the stores at
+`https://rvysencgtomkzwgdjaqh.supabase.co/functions/v1/store-webhook?secret=<STORE_WEBHOOK_SECRET>`:
+App Store Connect › App › App Information › App Store Server Notifications
+(Version 2, sandbox and production), and a Pub/Sub push subscription on the Play
+RTDN topic. The app must set `appAccountToken` (StoreKit) /
+`obfuscatedExternalAccountId` (Play Billing) to the user's id at purchase.
 
 **Smoke test on staging, without deleting a real user.** Expect
 `401 {"error":"unauthorized"}`:
