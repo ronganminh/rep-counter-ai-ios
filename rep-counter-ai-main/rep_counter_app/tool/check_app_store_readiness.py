@@ -26,6 +26,47 @@ def shown_copy(path):
     return tuple(texts)
 
 
+def check_permission_screens():
+    """App Store 5.1.1(iv), L-D24 (App Review rejected 1.0.0 (6)): a
+    pre-permission screen offers only "Continue", never "Allow", and has no
+    "Not now" / close before the system prompt."""
+    strings = read("lib/core/i18n/app_strings.dart")
+    ensure("cameraContinue: 'Continue'" in strings
+           and "cameraContinue: 'Tiếp tục'" in strings,
+           "Camera pre-permission button must say Continue / Tiếp tục")
+    ensure("cameraAllowAndOpen" not in strings,
+           "Camera pre-permission must not say Allow")
+    view = read("lib/features/workout/presentation/widgets/camera_permission_view.dart")
+    ensure("'Not now'" not in view and "'Để sau'" not in view,
+           "Camera pre-permission screen must not offer Not now")
+    camera = read("lib/camera_page.dart")
+    ensure("onExit: _beforePrompt ? null : _confirmExit" in camera
+           and "!didPop && !_beforePrompt" in camera,
+           "Camera gate must have no way out before the system prompt")
+    reminders = read("lib/features/plan/presentation/reminder_settings_page.dart")
+    ensure("label: l.commonContinue" in reminders
+           and "reminder-not-now" not in reminders
+           and "canPop: !intro" in reminders,
+           "Reminder explanation must only continue to the system prompt")
+    for locale, word in (("en", "allow"), ("vi", "cho phép")):
+        arb = json.loads(read(f"lib/l10n/app_{locale}.arb"))
+        for key in ("cameraAllowAndOpen", "notifPrePermTitle", "notifPrePermBody",
+                    "commonContinue"):
+            ensure(word not in str(arb.get(key, "")).lower(),
+                   f"Pre-permission copy {key} ({locale}) must not say Allow")
+
+
+def check_flag_defaults():
+    """Every ENABLE_* switch in the app defaults to off, so a build without
+    --dart-define never ships accounts, sync, credits, XP, social, billing
+    or push."""
+    for path in sorted((ROOT / "lib").rglob("*.dart")):
+        text = path.read_text(encoding="utf-8")
+        for match in re.finditer(r"fromEnvironment\(\s*'(ENABLE_\w+)'([^)]*)\)", text):
+            ensure("defaultValue: true" not in match.group(2),
+                   f"{match.group(1)} must default to false ({path.relative_to(ROOT)})")
+
+
 def main():
     spec = read("pubspec.yaml")
     version_match = re.search(
@@ -92,6 +133,8 @@ def main():
     ensure(any(s.startswith("com.googleusercontent.apps.") for s in schemes),
            "Google Sign-In reversed client ID URL scheme missing")
     ensure("NSPrivacyCollectedDataTypeFitness" in str(manifest), "Workout statistics privacy declaration missing")
+    check_permission_screens()
+    check_flag_defaults()
     print(
         f"PASS: App Store static release gates for "
         f"{release_version} ({release_build})"
