@@ -2,7 +2,7 @@
 
 **Owner decision D-12 (2026-10-23): Supabase Auth**, with three sign-in methods: Google, Apple, and email + password.
 
-The client code is in place behind `ENABLE_ACCOUNTS` (default **off**), in PRs A-1a, A-1b and A-1c. Nothing below has been created yet: no project, key, client ID or entitlement. This page lists, step by step, what the owner must set up, and which values to send back so the agent can open the follow-up PR.
+The client code is in place behind `ENABLE_ACCOUNTS` (default **off**), in PRs A-1a, A-1b and A-1c. This page lists, step by step, what the owner sets up and which values to send back. **Status 2026-10-31:** the staging project `rvysencgtomkzwgdjaqh` is configured, the backend v2 migrations are applied and `delete-account` + `ai-request` are deployed (§10); there is no production project yet.
 
 > **Secrets.** Never paste the service-role key, the Google client **secret** or the Apple `.p8` key into chat, git or the app. They go only into the Supabase dashboard or Edge Function secrets. The app needs only the values marked *public* in §9.
 
@@ -143,6 +143,17 @@ Still open:
 | `GOOGLE_WEB_CLIENT_ID` | public | `…apps.googleusercontent.com` (Web client) |
 | `GOOGLE_IOS_CLIENT_ID` | public | iOS client ID |
 | `APPLE_SIGN_IN_ENABLED` | flag | `true` after §4–5 |
+| `ENABLE_CLOUD_SYNC` | flag | backend v2, A-2 sync (needs `ENABLE_ACCOUNTS`) |
+| `ENABLE_AI_CREDITS` | flag | AI-1 credits / `ai-request` |
+| `ENABLE_XP` | flag | G-1 XP |
+| `ENABLE_SOCIAL` | flag | S-1 friends, block, report, leaderboard |
+| `ENABLE_INBOX` | flag | NT-2 in-app inbox (works without pushes) |
+| `ENABLE_PUSH` | flag | NT-2 remote pushes; **off** until APNs / Firebase exist (implies the inbox) |
+| `ENABLE_BILLING` | flag | P-1; **off** until D-14 (prices, product ids) |
+
+Every flag is off unless set, and each backend v2 flag also needs `ENABLE_ACCOUNTS`. `test/features/auth/staging_config_test.dart` fails if the staging example names a define the app does not read (a typo such as `ENABLE_SYNC` would otherwise be ignored silently).
+
+> **State of the app with the backend v2 flags on (2026-10-31).** The Supabase adapters for sync, credits, XP, social and inbox exist and are tested (`lib/features/*/supabase_*_api.dart`), but **no screen or background job calls them yet**: the local workout database has no sync bookkeeping (`client_updated_at`, `deleted_at`, cursor), and there is no credits, XP, friends or inbox UI. A staging build with these flags therefore behaves like an accounts-only build. The backend is verified with the integration test (`supabase/README.md`, "Integration test on staging"), not on the device. Wiring each feature into the app is the next step and needs its own PR.
 
 ### Building the staging app
 
@@ -170,6 +181,48 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 | `GOOGLE_IOS_CLIENT_ID` | `354784213486-8bpqbeqn6kggtkub48t1v14soak77sv2.apps.googleusercontent.com` (reversed form in `Info.plist`) |
 | `APPLE_SIGN_IN_ENABLED` | `true` (iOS; entitlement in `Runner.entitlements`) |
 
+### Staging builds for testers: TestFlight internal and Play internal testing
+
+Build from `main`, with the staging file, on the owner's Mac (iOS) or any machine with the upload key (Android). These binaries talk to **staging**: give them to internal testers only, never submit them for review, and never promote the Play release to production. The store release is a separate build without the staging file.
+
+```bash
+git checkout main && git pull
+cd rep-counter-ai-main/rep_counter_app
+cp dart_defines.staging.example.json dart_defines.staging.json   # paste the publishable key; git-ignored
+flutter test test/features/auth/staging_config_test.dart          # the file is still well-formed
+```
+
+Pick a build number higher than every build already uploaded (App Store Connect › TestFlight, Play Console › App bundle explorer). The version name stays as in `pubspec.yaml` (`2.0.0`).
+
+**iOS → TestFlight, internal testing**
+
+```bash
+# Signed IPA (automatic signing with the team NW22NWLTK4 in Xcode).
+tool/build_ios.sh --ipa --release --build-number=<N> \
+  --dart-define-from-file=dart_defines.staging.json
+# → build/ios/ipa/*.ipa
+```
+
+1. Upload with **Transporter** (or Xcode › Organizer › Distribute App › App Store Connect › Upload).
+2. App Store Connect › TestFlight: wait for processing; answer the export-compliance question (the app uses only the standard encryption of HTTPS).
+3. Add the build to an **Internal Testing** group only (App Store Connect users, no Beta App Review). Do not add it to an external group.
+4. Write "STAGING" and the build number in the "What to Test" field.
+
+**Android → Play internal testing**
+
+```bash
+# Needs android/key.properties with the upload key (never committed).
+flutter build appbundle --release --flavor store --build-number=<N> \
+  --dart-define-from-file=dart_defines.staging.json
+# → build/app/outputs/bundle/storeRelease/app-store-release.aab
+```
+
+1. Play Console › Testing › **Internal testing** › Create new release › upload the `.aab`.
+2. Release notes: "STAGING build <N>". Testers: the internal list (the Google account `thanhyt2024@gmail.com` is the one that can use Google sign-in while the consent screen is in *Testing*).
+3. Do **not** use "Promote release" to closed, open or production tracks for this build.
+
+Google sign-in works on the Play build, because Play App Signing's SHA-1 is registered (§10 row 7). Then run the checklist in §11.
+
 **Notes**
 - **Android Google sign-in** needs the build's signing certificate SHA-1 to be registered. Upload-key and Play App Signing SHA-1 are registered. The **debug keystore is not**, so Google sign-in fails on `flutter run` debug builds until a debug Android client is added.
 - **Google consent screen** is in *Testing*. Only the listed test users (`thanhyt2024@gmail.com`) can sign in with Google until it is published.
@@ -182,7 +235,7 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
       EOF
   ```
 
-## 10. Values to send back (status 2026-10-27, staging)
+## 10. Values to send back (status 2026-10-31, staging)
 
 | # | Value | Status |
 |---|---|---|
@@ -200,8 +253,14 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 | 9 | Apple Team ID / Services ID / Key ID | ✅ `NW22NWLTK4` / `com.ronganminh.repcoach.signin` / `ANA4NT26KP` |
 | 10 | Sign in with Apple on the App ID, Apple provider ON | ✅ entitlement in `Runner.entitlements` |
 | 10b | Apple **Secret Key (for OAuth)** | ⏳ **open:** generate with `tool/apple_oauth_secret.py` (below) and paste into Supabase; renew every ≤ 6 months |
-| 11 | `delete-account` Edge Function | ✅ approved + implemented (`supabase/`); ⏳ **open:** owner runs the deploy commands in `supabase/README.md` (no token available to the agent) |
+| 11 | `delete-account` Edge Function | ✅ deployed by the owner 2026-10-31: ACTIVE v1, JWT verification ON, `APPLE_*` secrets set; unauthenticated call → 401 ✅ |
 | 12 | Support / legal URLs for consent screens and stores (D-14) | ✅ decided 2026-10-27: support `ronganminh221@gmail.com`, `https://repcoach-ai.duckdns.org/support.html`; privacy `https://repcoach-ai.duckdns.org/privacy-policy.html`; terms `https://repcoach-ai.duckdns.org/terms.html`; home `https://repcoach-ai.duckdns.org/`. ⏳ **open:** account-deletion request page on that site (Google Play) |
+| 13 | Backend v2 migrations (06) | ✅ 8/8 applied 2026-10-31, Local == Remote |
+| 14 | `ai-request` Edge Function | ✅ ACTIVE v1, JWT verification ON, `GROQ_API_KEY` + `GROQ_MODEL` set; unauthenticated call → 401 ✅ |
+| 15 | Tombstone purge (`purge_sync_tombstones`, daily 03:17 UTC) | ⏳ **open:** owner runs the SQL in `supabase/README.md` (A-2 sync) |
+| 16 | `verify-purchase`, `store-webhook` | ⏸ **blocked:** D-14 prices and product ids, App Store IAP key, Play service account |
+| 17 | `send-push` | ⏸ **blocked:** APNs key, Firebase project |
+| 18 | Signed-in backend flow on staging | ⏳ **open:** owner runs `test/staging/staging_backend_test.dart` (`supabase/README.md`) |
 | — | Apple `.p8`, Google client secret, service-role key | **secret**: dashboard / Edge Function secrets / password manager only |
 
 Supabase settings to know: "Automatically expose new tables" OFF and "Enable automatic RLS" ON. Every new table therefore needs explicit grants and policies.
@@ -226,6 +285,14 @@ Paste the printed JWT into Supabase › Authentication › Providers › Apple �
 - the screens;
 - training stays available as a guest.
 
+**Automated, backend v2 (no device, no network), passing:**
+- `test/core/backend/supabase_backend_rpc_test.dart`: the real Supabase SDK against a fake server. 401 (expired JWT, gateway `UNAUTHORIZED_INVALID_JWT_FORMAT`), 404 (missing function), 5xx with an HTML page, a malformed 200 and no network all come out as one error type the features handle; nothing crashes.
+- `test/features/sync/cloud_sync_test.dart`: with 401 / 28000 / 404 / 500 / no network on pull or push, local workouts and deletions are untouched, nothing is marked pushed, the cursor does not move, and the result is "N changes pending" (signed out, offline or server). Once the server is back everything is pushed exactly once.
+- `test/features/auth/supabase_auth_repository_test.dart`: delete account without network says "Can't connect", a 5xx says "not available", and the user stays signed in.
+- The contract tests of each adapter against `supabase/contracts/*.json`.
+
+**Against staging (network, owner's machine), UNVERIFIED until run:** `test/staging/staging_backend_test.dart` (commands in `supabase/README.md`). Steps: no-session calls refused → sign up / sign in → sync push, pull, tombstone → XP awarded once → `ai-request` charges one credit, never twice → `delete-account`.
+
 **On a real device: UNVERIFIED.** The owner runs these on a staging build (§9). Report ✅/❌ per line.
 
 | # | Device | Steps | Expected |
@@ -241,3 +308,10 @@ Paste the printed JWT into Supabase › Authentication › Providers › Apple �
 | D9 | any | Profile › Delete account › type DELETE | **Needs the `delete-account` function deployed**; then the user is gone in the dashboard |
 | D10 | any | Airplane mode | Training, history and counting work as a guest; sign-in shows "Can't connect" |
 | D11 | any | Fresh install **without** `ENABLE_ACCOUNTS` | No account UI at all |
+| D12 | any | Staging build (all backend v2 flags as in the example). Signed in, record 2 workouts (camera + manual), then airplane mode, record 1 more, force-quit, reopen | Training, history and counting work; nothing lost; no crash. Sync: **no UI yet** (§9 note), so nothing to see; record ✅ for "no crash, no loss" |
+| D13 | any | Same build, then in the dashboard sign the user out / revoke sessions; keep training | "Your session expired" banner (D8); local history intact; no crash |
+| D14 | — | Sync push / pull | **Not testable in the app yet** (no caller). Covered by the integration test, steps 2 |
+| D15 | — | AI credits (`ai-request`, balance) | **Not testable in the app yet.** Integration test, step 4. Basic post-workout feedback is unchanged and stays free (D-07) |
+| D16 | — | XP / level | **Not testable in the app yet.** Integration test, steps 2–3 |
+| D17 | — | Social (invite, accept, block, report, leaderboard) and inbox | **Not testable in the app yet** (no screens). Backend covered by `supabase/tests/social.test.sql` and `push_inbox.test.sql` in CI |
+| D18 | any | Profile › Delete account on the staging build, then check the dashboard | User gone; `workouts`, `ai_credit_ledger`, `xp_events`, `inbox_items` rows for that user gone (cascade) |
