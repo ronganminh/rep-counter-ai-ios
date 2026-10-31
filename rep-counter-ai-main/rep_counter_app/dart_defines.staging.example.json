@@ -1,5 +1,12 @@
 {
   "ENABLE_ACCOUNTS": "true",
+  "ENABLE_CLOUD_SYNC": "true",
+  "ENABLE_AI_CREDITS": "true",
+  "ENABLE_XP": "true",
+  "ENABLE_SOCIAL": "true",
+  "ENABLE_INBOX": "true",
+  "ENABLE_BILLING": "false",
+  "ENABLE_PUSH": "false",
   "SUPABASE_URL": "https://rvysencgtomkzwgdjaqh.supabase.co",
   "SUPABASE_ANON_KEY": "<staging publishable key from the Supabase dashboard>",
   "SUPABASE_REDIRECT_URL": "com.ronganminh.repcoach://login-callback",

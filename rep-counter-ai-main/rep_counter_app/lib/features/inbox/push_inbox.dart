@@ -8,8 +8,16 @@ import '../../core/config/feature_flags.dart';
 class PushInbox {
   const PushInbox._();
 
+  /// Remote pushes: token registration and `send-push` (needs APNs / FCM,
+  /// still open).
   static const bool enabled = FeatureFlags.enableAccounts &&
       bool.fromEnvironment('ENABLE_PUSH', defaultValue: false);
+
+  /// The in-app inbox works on the database alone, so staging can turn it on
+  /// with pushes still off. Pushes always write the inbox, so they imply it.
+  static const bool inboxEnabled = enabled ||
+      FeatureFlags.enableAccounts &&
+          bool.fromEnvironment('ENABLE_INBOX', defaultValue: false);
 
   /// Inbox links must be in-app links (the N-2a router input).
   static bool isValidLink(String link) =>

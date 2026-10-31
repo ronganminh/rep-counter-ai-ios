@@ -18,9 +18,11 @@ class SupabaseCloudSyncApi implements CloudSyncApi {
   Future<SyncPage> pull({required int after, int limit = 500}) async {
     final res = _map(await _rpc
         .rpc('sync_pull_workouts', {'p_after': after, 'p_limit': limit}));
+    final cursor = res['cursor'];
+    if (cursor is! num) throw const BackendException('invalid_response');
     return SyncPage(
       [for (final row in _list(res['rows'])) _workout(_map(row))],
-      (res['cursor'] as num).toInt(),
+      cursor.toInt(),
       hasMore: res['has_more'] == true,
     );
   }
@@ -52,7 +54,11 @@ class SupabaseCloudSyncApi implements CloudSyncApi {
           id as String
       };
 
-  static SyncWorkout _workout(Map<String, Object?> row) => SyncWorkout(
+  /// A malformed row is the server's fault: it fails the round like any
+  /// backend error instead of crashing the caller.
+  static SyncWorkout _workout(Map<String, Object?> row) {
+    try {
+      return SyncWorkout(
         clientId: row['client_id'] as String,
         raw: _map(row['raw']),
         clientUpdatedAt: DateTime.parse(row['client_updated_at'] as String),
@@ -61,6 +67,12 @@ class SupabaseCloudSyncApi implements CloudSyncApi {
             : DateTime.parse(row['deleted_at'] as String),
         serverSeq: (row['server_seq'] as num).toInt(),
       );
+    } on TypeError {
+      throw const BackendException('invalid_response');
+    } on FormatException {
+      throw const BackendException('invalid_response');
+    }
+  }
 
   static Map<String, Object?> _map(Object? v) {
     if (v is Map) return v.cast<String, Object?>();

@@ -75,6 +75,7 @@ void main() {
             .inbox(),
         throwsA(isA<BackendException>()));
     expect(PushInbox.enabled, isFalse);
+    expect(PushInbox.inboxEnabled, isFalse);
     expect(createPushInboxApi(), isNull);
     final rpc = ContractRpc(contract, (_, __) => null);
     expect(createPushInboxApi(enabled: false, rpc: rpc), isNull);

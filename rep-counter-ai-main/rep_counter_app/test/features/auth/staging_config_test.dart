@@ -63,6 +63,13 @@ void main() {
       final d = _example();
       expect(d.keys.toSet(), {
         'ENABLE_ACCOUNTS',
+        'ENABLE_CLOUD_SYNC',
+        'ENABLE_AI_CREDITS',
+        'ENABLE_XP',
+        'ENABLE_SOCIAL',
+        'ENABLE_INBOX',
+        'ENABLE_BILLING',
+        'ENABLE_PUSH',
         'SUPABASE_URL',
         'SUPABASE_ANON_KEY',
         'SUPABASE_REDIRECT_URL',
@@ -78,6 +85,33 @@ void main() {
         expect(v, isNot(contains('sb_secret_')));
         expect(v, isNot(contains('service_role')));
       }
+    });
+
+    test('every define in the example is read by the app (no typo)', () {
+      final sources = [
+        for (final f in Directory('lib').listSync(recursive: true))
+          if (f is File && f.path.endsWith('.dart')) f.readAsStringSync()
+      ].join('\n');
+      for (final key in _example().keys) {
+        expect(sources, contains("fromEnvironment('$key'"), reason: key);
+      }
+    });
+
+    test('backend v2 on, billing and push off (D-14, APNs open)', () {
+      final d = _example();
+      for (final on in [
+        'ENABLE_ACCOUNTS',
+        'ENABLE_CLOUD_SYNC',
+        'ENABLE_AI_CREDITS',
+        'ENABLE_XP',
+        'ENABLE_SOCIAL',
+        'ENABLE_INBOX',
+        'APPLE_SIGN_IN_ENABLED',
+      ]) {
+        expect(d[on], 'true', reason: on);
+      }
+      expect(d['ENABLE_BILLING'], 'false');
+      expect(d['ENABLE_PUSH'], 'false');
     });
 
     test('the real staging file is git-ignored, the example is not', () {

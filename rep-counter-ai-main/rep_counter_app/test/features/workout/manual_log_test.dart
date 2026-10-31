@@ -158,8 +158,16 @@ void main() {
 
   testWidgets('history labels manual records', (tester) async {
     final r = _timed(id: 'manual-1', reps: 12, manual: true);
-    await WorkoutHistoryStore().save(WorkoutRecord.fromJson(
-        {...r.toJson(), 'mode': 'free', 'challenge_seconds': null}));
+    // History opens on the last 7 days, so the record must be recent.
+    await WorkoutHistoryStore().save(WorkoutRecord.fromJson({
+      ...r.toJson(),
+      'mode': 'free',
+      'challenge_seconds': null,
+      'started_at': DateTime.now()
+          .subtract(const Duration(hours: 1))
+          .toUtc()
+          .toIso8601String(),
+    }));
     await _pump(tester, const Scaffold(body: HistoryPage()));
     await tester.scrollUntilVisible(
         find.byKey(const Key('history-manual')), 250,

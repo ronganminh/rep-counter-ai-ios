@@ -38,11 +38,55 @@ against a `postgres:16` service). The function tests use generated keys and a
 mocked `fetch`; the SQL tests use a stub of the Supabase roles and `auth`
 schema. No network calls, no Supabase project, no secrets.
 
+## Staging status (deployed by the owner on 2026-10-31)
+
+The agent has no Supabase access token and deploys nothing; this is what the
+owner reported.
+
+| Part                               | State on `rvysencgtomkzwgdjaqh`                                                                                        |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| Migrations                         | ✅ 8/8 applied, `supabase migration list` Local == Remote (`20261026000000` … `20261029000600`)                        |
+| `delete-account`                   | ✅ ACTIVE v1, JWT verification ON; secrets `APPLE_TEAM_ID`, `APPLE_KEY_ID`, `APPLE_CLIENT_ID`, `APPLE_PRIVATE_KEY` set |
+| `ai-request`                       | ✅ ACTIVE v1, JWT verification ON; secrets `GROQ_API_KEY`, `GROQ_MODEL` set                                            |
+| `verify-purchase`, `store-webhook` | ⏸ not deployed: waits for prices and product ids (D-14), the App Store IAP key and the Play service account            |
+| `send-push`                        | ⏸ not deployed: waits for the APNs key and the Firebase project (06 §7)                                                |
+| Tombstone purge (cron)             | ⏳ the owner runs the SQL under **A-2 sync** below once in the SQL editor                                              |
+| Smoke test without a session       | ✅ `ai-request` → 401, `delete-account` → 401 (`UNAUTHORIZED_INVALID_JWT_FORMAT`, from the gateway)                    |
+| Signed-in flow                     | ⏳ `test/staging/staging_backend_test.dart` (below), run by the owner with a throwaway account                         |
+
+The inbox works with the migration alone (no `send-push` needed): the app reads
+`inbox_list`; items are written by `send-push` later or from the SQL editor
+(`select public.inbox_create('<user uuid>', 'system', 'repcoach://inbox',
+'Hello', null);`).
+
+### Integration test on staging (owner, on your machine)
+
+The app's own Supabase adapters against the real project: sign up → sign in →
+sync push / pull / tombstone → XP awarded from the synced workout → `ai-request`
+with the JWT (one credit, never twice for the same request id) →
+`delete-account`. It is skipped when the variables are missing, so CI and
+`flutter test` never call staging.
+
+```bash
+cd rep-counter-ai-main/rep_counter_app
+export SUPABASE_URL=https://rvysencgtomkzwgdjaqh.supabase.co
+export SUPABASE_ANON_KEY='<staging publishable key>'      # the public key, never the service role
+export STAGING_TEST_EMAIL='<you>+rcit1@gmail.com'          # must contain +rcit: the run deletes it
+export STAGING_TEST_PASSWORD='<at least 10 characters>'
+flutter test test/staging/staging_backend_test.dart --reporter expanded
+```
+
+"Confirm email" is ON, so the first run signs up and stops at step 1 with
+"Confirm the email sent to …". Open the Supabase email on any device (the link
+may try to open the app; the account is confirmed either way), then run the same
+command again: steps 2–5 run and the account is deleted at the end. Use a new
+`+rcitN` address for each later run. It costs one AI credit and one Groq call
+per run.
+
 ## Deploy to staging (owner, on your machine)
 
-The agent has no Supabase access token, so nothing has been deployed. Run these
-yourself. The token comes from `supabase login`, and is never stored in this
-repo.
+Commands for the first deploy and for later groups. The token comes from
+`supabase login`, and is never stored in this repo.
 
 ```bash
 # 0. Supabase CLI ≥ 2.x  (brew install supabase/tap/supabase  or  npm i -g supabase)
@@ -81,12 +125,37 @@ supabase db push --linked             # applies them to staging
 
 **A-2 sync** (`20261029000100_sync_workouts_plans.sql`, no Edge Function):
 nothing to set. Schedule the 90-day tombstone purge (Q3) once, in the SQL
-editor, after enabling the `pg_cron` extension (Database › Extensions):
+editor. Enable `pg_cron` first (Database › Extensions › pg_cron), or run the
+first line:
 
 ```sql
-select cron.schedule('purge-sync-tombstones', '17 3 * * *',
-  $$select public.purge_sync_tombstones()$$);
+create extension if not exists pg_cron with schema pg_catalog;
+
+-- Every day at 03:17 UTC. Scheduling the same name again replaces the job.
+select cron.schedule(
+  'purge-sync-tombstones',
+  '17 3 * * *',
+  $$select public.purge_sync_tombstones()$$
+);
+
+-- Check: the job, then its runs after 03:17 UTC.
+select jobid, jobname, schedule, command, active
+  from cron.job where jobname = 'purge-sync-tombstones';
+select status, return_message, start_time
+  from cron.job_run_details
+ where jobid = (select jobid from cron.job where jobname = 'purge-sync-tombstones')
+ order by start_time desc limit 5;
+
+-- Run once by hand (returns how many tombstones were removed; 0 on a new project).
+select public.purge_sync_tombstones();
+
+-- To stop it: select cron.unschedule('purge-sync-tombstones');
 ```
+
+`purge_sync_tombstones(p_older_than interval default '90 days')` deletes
+workouts and plans whose `deleted_at` is older than that. The app cannot call it
+(no grant to `anon` / `authenticated`); the job runs as the `postgres` user that
+scheduled it.
 
 Check: `select public.sync_pull_workouts(0, 10);` in the SQL editor fails with
 `not_authenticated` (no user), which is expected; the app calls it with the
@@ -105,7 +174,10 @@ supabase functions deploy ai-request --project-ref rvysencgtomkzwgdjaqh   # JWT 
 ```
 
 Without `GROQ_API_KEY` the function answers `503 not_configured` and charges
-nothing. Smoke test (expect `401 {"error":"unauthorized"}`):
+nothing. Smoke test: expect `401`. With JWT verification ON the gateway answers
+first (`{"code":"UNAUTHORIZED_INVALID_JWT_FORMAT",…}` for this token), so the
+function's own `{"error":"unauthorized"}` only appears for a well-formed but
+invalid JWT. Both are 401, and the app treats them the same:
 
 ```bash
 curl -i -X POST https://rvysencgtomkzwgdjaqh.supabase.co/functions/v1/ai-request \
@@ -178,16 +250,17 @@ curl -X POST https://rvysencgtomkzwgdjaqh.supabase.co/functions/v1/send-push \
   -d '{"user_id":"<user uuid>","kind":"system","link":"repcoach://inbox","title":"Hello"}'
 ```
 
-**Smoke test on staging, without deleting a real user.** Expect
-`401 {"error":"unauthorized"}`:
+**Smoke test on staging, without deleting a real user.** Expect `401`
+(`UNAUTHORIZED_INVALID_JWT_FORMAT` from the gateway, as for `ai-request`):
 
 ```bash
 curl -i -X POST https://rvysencgtomkzwgdjaqh.supabase.co/functions/v1/delete-account \
   -H "Authorization: Bearer invalid"
 ```
 
-**Full test:** run device step D9 in `docs/implementation/05_SUPABASE_SETUP.md`
-§11 with a throwaway account. Then check in the dashboard:
+**Full test:** the integration test above (step 5), or device step D9 in
+`docs/implementation/05_SUPABASE_SETUP.md` §11 with a throwaway account. Then
+check in the dashboard:
 
 - the user is gone from Authentication › Users;
 - the `profiles` row is gone;

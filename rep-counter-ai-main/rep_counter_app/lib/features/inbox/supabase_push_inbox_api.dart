@@ -43,9 +43,10 @@ class SupabasePushInboxApi implements PushInboxApi {
 }
 
 /// The push / inbox backend for this build: null unless `ENABLE_ACCOUNTS`
-/// and `ENABLE_PUSH` are both on and Supabase is initialised.
+/// and `ENABLE_INBOX` (or `ENABLE_PUSH`) are on and Supabase is initialised.
+/// Registering a push token additionally needs [PushInbox.enabled].
 PushInboxApi? createPushInboxApi(
-        {bool enabled = PushInbox.enabled, BackendRpc? rpc}) =>
+        {bool enabled = PushInbox.inboxEnabled, BackendRpc? rpc}) =>
     switch (rpc ?? supabaseBackendRpc(enabled: enabled)) {
       final BackendRpc r when enabled => SupabasePushInboxApi(r),
       _ => null,

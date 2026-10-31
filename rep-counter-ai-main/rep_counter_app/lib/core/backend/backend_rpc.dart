@@ -1,3 +1,7 @@
+import 'dart:async';
+import 'dart:io';
+
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
 /// The two ways the app talks to the account backend (D-12, Supabase):
@@ -18,9 +22,11 @@ abstract interface class BackendRpc {
 }
 
 /// A backend call failed. [code] is the Postgres SQLSTATE for SQL functions
-/// (`28000` not signed in, `22023` bad argument, `42501` not allowed) or the
-/// `error` field of an Edge Function's JSON body; [status] is the HTTP
-/// status for Edge Functions. Never carries tokens or user data.
+/// (`28000` not signed in, `22023` bad argument, `42501` not allowed), a
+/// PostgREST code (`PGRST…`), the `error` field of an Edge Function's JSON
+/// body, `network` when no answer arrived, or `session` when the session
+/// could not be refreshed; [status] is the HTTP status for Edge Functions.
+/// Never carries tokens or user data.
 class BackendException implements Exception {
   const BackendException(this.code, {this.status, this.body});
 
@@ -31,14 +37,26 @@ class BackendException implements Exception {
   /// `insufficient_credits`); null for SQL functions.
   final Map<String, Object?>? body;
 
-  bool get notSignedIn => code == '28000' || status == 401;
+  bool get notSignedIn =>
+      code == '28000' ||
+      code == 'session' ||
+      status == 401 ||
+      _jwtCodes.contains(code);
+
+  /// No answer from the server (offline, DNS, TLS, timeout): retry later.
+  bool get offline => code == 'network';
+
+  /// PostgREST's JWT errors: invalid, missing role, expired / bad claims.
+  static const _jwtCodes = {'PGRST301', 'PGRST302', 'PGRST303'};
 
   @override
   String toString() =>
       'BackendException($code${status == null ? '' : ', $status'})';
 }
 
-/// [BackendRpc] over the app's Supabase client.
+/// [BackendRpc] over the app's Supabase client. Every failure, including
+/// no network and a session that cannot be refreshed, comes out as a
+/// [BackendException], so callers handle one type and keep local data.
 class SupabaseBackendRpc implements BackendRpc {
   SupabaseBackendRpc(this._client);
 
@@ -50,6 +68,10 @@ class SupabaseBackendRpc implements BackendRpc {
       return await _client.rpc<Object?>(function, params: params);
     } on sb.PostgrestException catch (e) {
       throw BackendException(e.code ?? 'unknown');
+    } catch (e) {
+      final mapped = _transport(e);
+      if (mapped == null) rethrow;
+      throw mapped;
     }
   }
 
@@ -58,6 +80,9 @@ class SupabaseBackendRpc implements BackendRpc {
     try {
       final response = await _client.functions.invoke(function, body: body);
       return response.data;
+    } on sb.FunctionsFetchException catch (e) {
+      // Nothing was sent: the details hold the transport or session error.
+      throw _transport(e.details) ?? const BackendException('network');
     } on sb.FunctionException catch (e) {
       final details = e.details;
       final body = details is Map ? details.cast<String, Object?>() : null;
@@ -67,6 +92,18 @@ class SupabaseBackendRpc implements BackendRpc {
       throw BackendException(code, status: e.status, body: body);
     }
   }
+
+  /// Maps a failure that happened before the server answered; null for
+  /// anything else (a bug, which should surface as is).
+  static BackendException? _transport(Object? e) => switch (e) {
+        sb.AuthRetryableFetchException() => const BackendException('network'),
+        sb.AuthException() => const BackendException('session', status: 401),
+        http.ClientException() ||
+        IOException() ||
+        TimeoutException() =>
+          const BackendException('network'),
+        _ => null,
+      };
 }
 
 /// The backend for a feature whose flag is [enabled]; null when the flag is
