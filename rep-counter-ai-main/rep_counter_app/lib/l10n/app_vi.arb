@@ -4301,5 +4301,8 @@
   "coachAnalyzeLastWorkout": "Phân tích buổi tập gần nhất",
   "coachUsesOneCredit": "Dùng 1 lượt AI",
   "coachConsentTitle": "Gửi cho HLV AI?",
-  "coachConsentBody": "Tin nhắn của bạn, và với phân tích là bản tóm tắt số liệu buổi tập, được gửi tới máy chủ RepCoach rồi tới GroqCloud để viết câu trả lời. Không gửi video, ảnh hay điểm mốc cơ thể. Cuộc trò chuyện không được lưu trên máy chủ."
+  "coachConsentBody": "Tin nhắn của bạn, và với phân tích là bản tóm tắt số liệu buổi tập, được gửi tới máy chủ RepCoach rồi tới GroqCloud để viết câu trả lời. Không gửi video, ảnh hay điểm mốc cơ thể. Cuộc trò chuyện không được lưu trên máy chủ.",
+  "xpLevelTitle": "Cấp {level}",
+  "xpToLevel": "Còn {xp} XP để lên Cấp {level}",
+  "xpFromSyncedWorkouts": "XP đến từ các buổi tập đã đồng bộ vào tài khoản. Xóa buổi tập không bao giờ làm mất XP hay huy hiệu."
 }

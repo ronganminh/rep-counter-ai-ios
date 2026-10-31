@@ -10,6 +10,7 @@ import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../../exercises/presentation/exercise_picker_screen.dart';
 import '../../plan/presentation/plan_home_card.dart';
+import '../../progression/presentation/xp_widgets.dart';
 import '../../plan/presentation/plan_today_sheet.dart';
 import '../../routine/presentation/routine_list_page.dart';
 import '../../sync/presentation/sync_widgets.dart';
@@ -84,6 +85,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               style: TextStyle(color: p.text3, fontSize: 12)))
                     ]),
                     const SyncHomeStrip(),
+                    const XpLevelCard(),
                     const SizedBox(height: 24),
                     Card(
                         child: ListTile(

@@ -175,7 +175,9 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
       _again = true;
       return _running!;
     }
-    return _running = _round().whenComplete(() {
+    // Started in a microtask so [busy] is already true when the round
+    // first notifies listeners.
+    return _running = Future<void>.microtask(_round).whenComplete(() {
       _running = null;
       _notify();
       if (_again && !_disposed) {

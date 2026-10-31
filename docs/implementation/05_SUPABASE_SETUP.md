@@ -156,7 +156,8 @@ Every flag is off unless set, and each backend v2 flag also needs `ENABLE_ACCOUN
 > **State of the app with the backend v2 flags on.** Wired into the app one feature per PR (owner approval 2026-10-31):
 > - **Sync (A-2), wired:** `SyncController` (`lib/features/sync/`) runs when the app opens signed in, at sign-in, about 2 s after a workout or plan is saved or deleted, when the app returns to the foreground, on "Sync now" (Profile), and retries after 30 s / 2 min / 10 min on failure. Home and Profile show the sync badge ("N waiting to sync", offline, couldn't sync, synced). Guest workouts are offered with "Bring your workouts" (dry run first, one choice for workouts that differ, or keep them on this phone). Settings › Delete workout history asks phone / account / both (D-20).
 > - **AI credits (AI-1), wired:** Profile shows "AI credits this week" (used / allowance, resets Monday) and **AI Coach** with the balance chip. AI Coach: chat, "Analyze my last workout" (advanced analysis) and "Review progress" (90-day summary, needs 3 saved workouts); each costs 1 credit through `ai-request` with a request id (a retry reuses it, so it is charged once). Asked once for consent before the first request. At 0 credits a neutral "No AI credits left this week" with the reset day, no paywall (billing off). The free post-workout feedback is unchanged and never uses credits (D-07).
-> - XP, social and inbox: adapters only, no screen yet (next PRs).
+> - **XP (G-1), wired:** Home and Progress show "Level N" with XP into the level and "N XP to Level N+1"; Progress lists the account's achievements. Both are read from the server (`xp_progress`, `achievements_list`) at sign-in, when the screen opens and after each sync round; XP is awarded by the database when a workout syncs, and deleting a workout takes nothing away (D-05). **Needs the new migration `20261031000100_achievements.sql` applied (`supabase db push --linked`)**; until then the achievements list call fails and the level card still shows.
+> - Social and inbox: adapters only, no screen yet (next PRs).
 
 ### Building the staging app
 
@@ -325,6 +326,10 @@ Paste the printed JWT into Supabase › Authentication › Providers › Apple �
 | D15d | any | "Analyze my last workout" (needs a saved workout); "Review progress" (needs 3) | Each answers and costs 1 credit; with fewer workouts the action is disabled with the reason |
 | D15e | any | Use all credits (or set the balance to 0 in the dashboard) | "No AI credits left this week · They come back on Monday", send disabled, no red error, no Pro/paywall |
 | D15f | any | Finish a workout with AI feedback on | The free feedback card still says it doesn't use AI credits; the balance is unchanged |
-| D16 | — | XP / level | **Not testable in the app yet.** Integration test, steps 2–3 |
+| D16a | any | After `supabase db push` of `20261031000100_achievements.sql`. Signed in with sync on, record a 20-rep push-up workout; wait for "Synced" | Home: "Level 1 · LV 1 · 30 / 50 XP · 20 XP to Level 2". Progress: Achievements shows "First Workout" (and "New Personal Record" for a first free workout) |
+| D16b | any | Record a manual workout of 20 reps | +15 XP (half, Q4) |
+| D16c | any | Delete a synced workout (History) | XP, level and achievements unchanged (D-05) |
+| D16d | any | Airplane mode, open Home/Progress | The last level shown stays; nothing crashes |
+| D16e | any | As a guest / with `ENABLE_XP` off | No level card, no achievements section |
 | D17 | — | Social (invite, accept, block, report, leaderboard) and inbox | **Not testable in the app yet** (no screens). Backend covered by `supabase/tests/social.test.sql` and `push_inbox.test.sql` in CI |
 | D18 | any | Profile › Delete account on the staging build, then check the dashboard | User gone; `workouts`, `ai_credit_ledger`, `xp_events`, `inbox_items` rows for that user gone (cascade) |
