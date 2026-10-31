@@ -17797,5 +17797,30 @@
   "coachConsentBody": "Your message, and for analyses a summary of your workout numbers, go to the RepCoach server and then to GroqCloud to write the answer. No video, photos or body keypoints. The conversation is not stored on our server.",
   "@coachConsentBody": {
     "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "xpLevelTitle": "Level {level}",
+  "@xpLevelTitle": {
+    "description": "[source: G-1 XP wiring; status: new]",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "xpToLevel": "{xp} XP to Level {level}",
+  "@xpToLevel": {
+    "description": "[source: G-1 XP wiring; status: new]",
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "xpFromSyncedWorkouts": "XP comes from workouts synced to your account. Deleting a workout never takes XP or achievements away.",
+  "@xpFromSyncedWorkouts": {
+    "description": "[source: G-1 XP wiring; status: new]"
   }
 }
