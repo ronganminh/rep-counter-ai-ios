@@ -217,6 +217,16 @@ void main() {
     expect(c.mergeOffered, isTrue);
   });
 
+  test('listeners see the round as busy, then idle', () async {
+    final (auth, _) = await authFor('a@x.com');
+    final c = await controllerFor(auth);
+    final seen = <bool>[];
+    c.addListener(() => seen.add(c.busy));
+    await c.syncNow();
+    expect(seen.first, isTrue);
+    expect(seen.last, isFalse);
+  });
+
   test('plans: saved plans go up, the account plan comes down', () async {
     final (auth, _) = await authFor('a@x.com');
     final c = await controllerFor(auth, plans: true);
