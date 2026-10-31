@@ -4286,5 +4286,9 @@
   "faSentThroughShareSheet": "Đã gửi qua bảng chia sẻ (mô phỏng).",
   "faNothingWasSent": "Chưa gửi gì.",
   "faSavedPhotosSimulated": "Đã lưu vào ảnh (mô phỏng). 1080 × 1920.",
-  "faTryAgainWorkoutIsn": "Hãy thử lại. Buổi tập của bạn không bị ảnh hưởng."
+  "faTryAgainWorkoutIsn": "Hãy thử lại. Buổi tập của bạn không bị ảnh hưởng.",
+  "syncDeleteAccountBody": "Xóa buổi tập khỏi tài khoản trên mọi thiết bị. Máy này vẫn giữ bản của nó. Tài khoản không bị xóa.",
+  "syncDeleteBothBody": "Xóa buổi tập khỏi máy này và khỏi tài khoản. Tài khoản không bị xóa.",
+  "syncDeleteNeedsConnection": "Không kết nối được tài khoản nên chưa xóa gì khỏi tài khoản. Hãy thử lại khi có mạng.",
+  "syncMergeOffer": "{count} buổi tập trên máy này chưa có trong tài khoản."
 }

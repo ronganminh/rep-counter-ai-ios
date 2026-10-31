@@ -17,6 +17,7 @@ import '../../auth/presentation/password_reset_pages.dart';
 import '../../auth/presentation/sign_in_page.dart';
 import '../../auth/presentation/verify_email_page.dart';
 import '../../legal/settings_page.dart';
+import '../../sync/presentation/sync_widgets.dart';
 
 /// Profile tab root (P9-07, N-1).
 ///
@@ -54,8 +55,10 @@ class ProfilePage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
             ],
-            if (auth != null && state is AuthSignedIn)
-              _AccountCard(controller: auth, state: state)
+            if (auth != null && state is AuthSignedIn) ...[
+              const SyncAccountSection(),
+              _AccountCard(controller: auth, state: state),
+            ]
             else
             Container(
               key: const Key('profile-guest-card'),

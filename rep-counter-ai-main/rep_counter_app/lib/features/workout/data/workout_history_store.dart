@@ -1,14 +1,20 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
+import '../../../core/data/local_data_changes.dart';
 import 'workout_database.dart';
 import 'workout_record.dart';
 
 /// Carries the exact removed JSON so Undo also preserves optional/future fields.
 class DeletedWorkout {
-  const DeletedWorkout._(this.record, this._raw);
+  const DeletedWorkout._(this.record, this._raw, {this.inAccount = false});
   final WorkoutRecord record;
   final String _raw;
+
+  /// The workout belonged to the account (A-2): its deletion was queued for
+  /// sync, and Undo uploads it again.
+  final bool inAccount;
 }
 
 /// Workout history. Since F-3 the records live in [WorkoutDatabase] (SQLite,
@@ -36,6 +42,26 @@ class WorkoutHistoryStore {
   @visibleForTesting
   static void resetForTest() => _pending = null;
 
+  /// Runs [operation] in the same queue as every history change, so cloud
+  /// sync (A-2) never interleaves with a save, delete or Undo. [operation]
+  /// gets null when the database cannot be opened.
+  static Future<T> exclusive<T>(
+          Future<T> Function(WorkoutDatabase? db) operation) =>
+      _serial(() async {
+        WorkoutDatabase? db;
+        try {
+          db = await WorkoutDatabase.instance();
+        } catch (_) {}
+        return operation(db);
+      });
+
+  static void _changed() => LocalDataChanges.notify(LocalDataKind.workouts);
+
+  /// Removes workout [id] from the pre-F-3 rollback copy, so a deletion that
+  /// arrived from the account is not imported again at the next open. Safe
+  /// inside [exclusive].
+  static Future<void> forgetLegacyCopy(String id) => _LegacyHistory.delete(id);
+
   /// The database, or null when it cannot be opened (legacy fallback).
   Future<WorkoutDatabase?> _database() async {
     try {
@@ -59,10 +85,14 @@ class WorkoutHistoryStore {
         final db = await _database();
         if (db == null) return _LegacyHistory.save(record);
         await db.db.transaction((txn) async {
+          final existing = await WorkoutDatabase.clientIdFor(txn, record.id);
+          final clientId = existing ?? WorkoutDatabase.newClientId();
           await WorkoutDatabase.insert(txn, record.toJson(), record,
-              clientId: await WorkoutDatabase.clientIdFor(txn, record.id),
-              replace: true);
+              clientId: clientId, replace: true);
+          await WorkoutDatabase.markChanged(txn, clientId,
+              isNew: existing == null);
         });
+        _changed();
       });
 
   /// Deletes all history, including the legacy rollback copy, so a cleared
@@ -72,8 +102,12 @@ class WorkoutHistoryStore {
         await db?.db.transaction((txn) async {
           await txn.delete('workouts');
           await txn.delete('unreadable_workouts');
+          // This phone only (D-20): the account keeps its copies and they
+          // are not pulled back here; queued deletions still reach it.
+          await txn.rawUpdate("UPDATE sync_rows SET state = 'kept'");
         });
         await _LegacyHistory.clear();
+        _changed();
       });
 
   /// Change only feedback. Preserve metrics and unknown fields verbatim.
@@ -87,7 +121,12 @@ class WorkoutHistoryStore {
           json['ai_feedback'] = feedback;
           await txn.update('workouts', {'raw': jsonEncode(json)},
               where: 'id = ?', whereArgs: [id]);
+          final clientId = await WorkoutDatabase.clientIdFor(txn, id);
+          if (clientId != null) {
+            await WorkoutDatabase.markChanged(txn, clientId, isNew: false);
+          }
         });
+        _changed();
       });
 
   /// Deletes one workout. It is also removed from the legacy copy so the next
@@ -95,17 +134,40 @@ class WorkoutHistoryStore {
   Future<DeletedWorkout?> delete(String id) => _serial(() async {
         final db = await _database();
         if (db == null) return _LegacyHistory.delete(id);
-        final removed = await db.db.transaction((txn) async {
+        final (removed, inAccount) = await db.db.transaction((txn) async {
           final raw = await WorkoutDatabase.rawFor(txn, id);
-          if (raw != null) {
-            await txn.delete('workouts', where: 'id = ?', whereArgs: [id]);
+          if (raw == null) return (null, false);
+          final clientId = await WorkoutDatabase.clientIdFor(txn, id);
+          final state = clientId == null
+              ? null
+              : await WorkoutDatabase.syncStateOf(txn, clientId);
+          final inAccount = state == 'pending' || state == 'synced';
+          if (inAccount) {
+            // A tombstone, so the deletion reaches the account and other
+            // phones (FA-07).
+            await txn.insert(
+                'sync_deletions',
+                {
+                  'client_id': clientId,
+                  'raw': raw,
+                  'deleted_at': DateTime.now().toUtc().millisecondsSinceEpoch,
+                },
+                conflictAlgorithm: ConflictAlgorithm.replace);
           }
-          return raw;
+          if (clientId != null) {
+            await txn.delete('sync_rows',
+                where: 'client_id = ?', whereArgs: [clientId]);
+          }
+          await txn.delete('workouts', where: 'id = ?', whereArgs: [id]);
+          return (raw, inAccount);
         });
         if (removed == null) return null;
         await _LegacyHistory.delete(id);
+        _changed();
         final parsed = parseWorkoutJson(removed);
-        return parsed == null ? null : DeletedWorkout._(parsed.record, removed);
+        return parsed == null
+            ? null
+            : DeletedWorkout._(parsed.record, removed, inAccount: inAccount);
       });
 
   Future<void> restore(DeletedWorkout deleted) => _serial(() async {
@@ -113,9 +175,27 @@ class WorkoutHistoryStore {
         if (db == null) return _LegacyHistory.restore(deleted);
         final parsed = parseWorkoutJson(deleted._raw);
         if (parsed == null) return;
-        // Do not overwrite a newer copy if an ID has already been restored.
-        await WorkoutDatabase.insert(db.db, parsed.json, parsed.record,
-            clientId: parsed.json['client_id'] as String?, replace: false);
+        await db.db.transaction((txn) async {
+          // Do not overwrite a newer copy if an ID has already been restored.
+          final written = await WorkoutDatabase.insert(
+              txn, parsed.json, parsed.record,
+              clientId: parsed.json['client_id'] as String?, replace: false);
+          final clientId = await WorkoutDatabase.clientIdFor(txn, parsed.record.id);
+          if (!written || !deleted.inAccount || clientId == null) return;
+          // Undo of an account workout: drop the queued deletion, or, if it
+          // already reached the account, upload the workout again (newer).
+          await txn.delete('sync_deletions',
+              where: 'client_id = ?', whereArgs: [clientId]);
+          await txn.insert(
+              'sync_rows',
+              {
+                'client_id': clientId,
+                'state': 'pending',
+                'updated_at': DateTime.now().toUtc().millisecondsSinceEpoch,
+              },
+              conflictAlgorithm: ConflictAlgorithm.replace);
+        });
+        _changed();
       });
 }
 

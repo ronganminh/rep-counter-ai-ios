@@ -3,11 +3,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../../core/data/local_data_changes.dart';
 import '../domain/workout_plan.dart';
 
 /// Plans and their sessions as one local JSON document (PL-1). Local-first:
-/// guests and signed-in users alike; no plan endpoint exists, so nothing is
-/// sent anywhere. A few hundred sessions a year stay small.
+/// guests and signed-in users alike. With cloud sync on (A-2) each plan and
+/// its sessions are copied to the account by `PlanSyncSource`; this store
+/// stays the source of truth on the phone. A few hundred sessions a year
+/// stay small.
 @immutable
 class PlanSnapshot {
   const PlanSnapshot(
@@ -87,6 +90,7 @@ class PlanStore {
         if (!await prefs.setString(key, raw)) {
           throw StateError('Cannot write plans');
         }
+        LocalDataChanges.notify(LocalDataKind.plans);
         return next;
       });
 
