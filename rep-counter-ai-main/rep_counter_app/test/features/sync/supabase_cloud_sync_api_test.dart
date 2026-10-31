@@ -81,6 +81,10 @@ class AsyncContractRpc implements BackendRpc {
   @override
   Future<Object?> invoke(String function, Map<String, Object?> body) =>
       throw UnimplementedError();
+
+  @override
+  Future<void> upsert(String table, Map<String, Object?> row) =>
+      throw UnimplementedError();
 }
 
 class FakeLocal implements LocalSyncSource {

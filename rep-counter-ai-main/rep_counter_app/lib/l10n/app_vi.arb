@@ -4304,5 +4304,22 @@
   "coachConsentBody": "Tin nhắn của bạn, và với phân tích là bản tóm tắt số liệu buổi tập, được gửi tới máy chủ RepCoach rồi tới GroqCloud để viết câu trả lời. Không gửi video, ảnh hay điểm mốc cơ thể. Cuộc trò chuyện không được lưu trên máy chủ.",
   "xpLevelTitle": "Cấp {level}",
   "xpToLevel": "Còn {xp} XP để lên Cấp {level}",
-  "xpFromSyncedWorkouts": "XP đến từ các buổi tập đã đồng bộ vào tài khoản. Xóa buổi tập không bao giờ làm mất XP hay huy hiệu."
+  "xpFromSyncedWorkouts": "XP đến từ các buổi tập đã đồng bộ vào tài khoản. Xóa buổi tập không bao giờ làm mất XP hay huy hiệu.",
+  "socialInviteCodeLabel": "Mã mời",
+  "socialInviteOnlyBody": "Bạn bè tham gia bằng liên kết hoặc mã mời của bạn. Không ai tìm được bạn theo tên.",
+  "socialInviteValid": "Dùng được một lần, trong 7 ngày.",
+  "socialInviteExpired": "Lời mời đã hết hạn. Hãy xin lời mời mới.",
+  "socialInviteUsed": "Lời mời này đã được dùng.",
+  "socialInviteSelf": "Đây là lời mời của chính bạn.",
+  "socialInviteBlocked": "Bạn không thể thêm người này.",
+  "socialTooManyInvites": "Bạn đang có 20 lời mời chưa dùng. Hãy chờ một số được dùng hoặc hết hạn.",
+  "socialTooManyReports": "Bạn đã đạt giới hạn báo cáo hôm nay. Hãy thử lại vào ngày mai.",
+  "socialInviteOpened": "Xong. Hãy đồng ý lời mời bên dưới để trở thành bạn bè.",
+  "socialReportSent": "Đã gửi báo cáo. Cảm ơn bạn.",
+  "socialBlockTitle": "Chặn người này?",
+  "socialBlockBody": "Họ không thể gửi lời mời cho bạn hay thấy bạn trên bảng xếp hạng. Họ không được thông báo.",
+  "socialBlockAction": "Chặn",
+  "socialYou": "Bạn",
+  "socialNoName": "Bạn bè",
+  "socialLeaderboardEmpty": "Tuần này bạn và bạn bè chưa có rep nào đếm bằng camera."
 }

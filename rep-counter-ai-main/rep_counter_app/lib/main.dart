@@ -19,6 +19,8 @@ import 'features/auth/presentation/password_reset_pages.dart';
 import 'features/credits/credits_controller.dart';
 import 'features/legal/onboarding_page.dart';
 import 'features/progression/xp_controller.dart';
+import 'features/social/social.dart';
+import 'features/social/supabase_social_api.dart';
 import 'features/sync/sync_controller.dart';
 import 'features/sync/sync_scope.dart';
 import 'camera_page.dart';
@@ -54,6 +56,9 @@ class _RepCounterAppState extends State<RepCounterApp> {
   /// XP, level and server achievements (G-1) behind `ENABLE_XP`.
   XpController? _xp;
 
+  /// Friends and leaderboard (S-1) behind `ENABLE_SOCIAL`.
+  SocialApi? _social;
+
   @override
   void initState() {
     super.initState();
@@ -68,11 +73,13 @@ class _RepCounterAppState extends State<RepCounterApp> {
     final sync = createSyncController(auth)?..start();
     final credits = createCreditsController(auth);
     final xp = createXpController(auth, sync: sync);
+    final social = createSocialApi();
     setState(() {
       _auth = auth;
       _sync = sync;
       _credits = credits;
       _xp = xp;
+      _social = social;
     });
     await auth.restore();
   }
@@ -104,6 +111,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
       out = CreditsScope(controller: _credits!, child: out);
     }
     if (_xp != null) out = XpScope(controller: _xp!, child: out);
+    if (_social != null) out = SocialScope(api: _social!, child: out);
     return _sync == null ? out : SyncScope(controller: _sync!, child: out);
   }
 

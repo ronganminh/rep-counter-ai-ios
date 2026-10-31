@@ -18,6 +18,8 @@ import '../../auth/presentation/sign_in_page.dart';
 import '../../auth/presentation/verify_email_page.dart';
 import '../../credits/presentation/credits_widgets.dart';
 import '../../legal/settings_page.dart';
+import '../../social/presentation/friends_page.dart';
+import '../../social/supabase_social_api.dart';
 import '../../sync/presentation/sync_widgets.dart';
 
 /// Profile tab root (P9-07, N-1).
@@ -93,6 +95,21 @@ class ProfilePage extends StatelessWidget {
                 ],
               ),
             ),
+            if (SocialScope.maybeOf(context) != null) ...[
+              const SizedBox(height: 16),
+              Card(
+                clipBehavior: Clip.antiAlias,
+                child: SettingsRow(
+                  key: const Key('profile-friends'),
+                  icon: LucideIcons.users,
+                  title: l.socialFriends,
+                  subtitle: state is AuthSignedIn ? null : l.authGateFriends,
+                  trailing: const Icon(LucideIcons.chevronRight,
+                      size: 18, color: AppColors.text2),
+                  onTap: () => openFriends(context),
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
             Card(
               clipBehavior: Clip.antiAlias,
