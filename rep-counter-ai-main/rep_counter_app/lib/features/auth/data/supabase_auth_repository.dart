@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
 import '../domain/auth_repository.dart';
@@ -64,7 +65,10 @@ class SupabaseAuthRepository implements AuthRepository {
     if (e is SocketException ||
         e is TimeoutException ||
         e is HttpException ||
-        e is sb.AuthRetryableFetchException) {
+        e is http.ClientException ||
+        e is sb.AuthRetryableFetchException ||
+        // delete-account could not be reached (no response at all).
+        e is sb.FunctionsFetchException) {
       return AuthFailure(AuthFailureKind.network, provider);
     }
     if (e is sb.AuthWeakPasswordException) {

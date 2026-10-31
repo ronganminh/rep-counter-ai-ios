@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:http/http.dart' as http;
 import 'package:rep_counter_app/features/auth/application/auth_controller.dart';
 import 'package:rep_counter_app/features/auth/data/auth_bootstrap.dart';
 import 'package:rep_counter_app/features/auth/data/auth_config.dart';
@@ -58,6 +59,7 @@ void main() {
         sb.AuthRetryableFetchException(message: 'offline'):
             AuthFailureKind.network,
         const SocketException('no route'): AuthFailureKind.network,
+        http.ClientException('reset'): AuthFailureKind.network,
         const sb.AuthApiException('x', code: 'signup_disabled'):
             AuthFailureKind.unavailable,
         StateError('anything else'): AuthFailureKind.unavailable,
@@ -67,6 +69,30 @@ void main() {
         await expectLater(r.signInWithEmail('a@example.com', 'pw-123456789'),
             _fails(entry.value),
             reason: '${entry.key}');
+      }
+    });
+
+    test('delete account: offline vs server failure, nothing changes locally',
+        () async {
+      final r = repo();
+      await r.signInWithEmail('a@example.com', 'pw-123456789');
+      for (final (error, kind) in [
+        (
+          const sb.FunctionsFetchException(details: 'no route'),
+          AuthFailureKind.network
+        ),
+        (
+          const sb.FunctionsHttpException(status: 503, details: 'down'),
+          AuthFailureKind.unavailable
+        ),
+        (
+          const sb.FunctionsHttpException(status: 401, details: {}),
+          AuthFailureKind.unavailable
+        ),
+      ]) {
+        api.nextError = error;
+        await expectLater(r.deleteAccount(), _fails(kind), reason: '$error');
+        expect(api.session, isNotNull, reason: 'still signed in');
       }
     });
 
