@@ -210,6 +210,14 @@ void main() {
           find.text('That session is no longer in your plan.'), findsOneWidget);
     });
 
+    testWidgets('links opened inside the app (inbox) use the same router',
+        (tester) async {
+      await pumpShell(tester);
+      InAppLinks.open('repcoach://membership');
+      await settle(tester);
+      expect(find.byType(ProfilePage), findsOneWidget);
+    });
+
     testWidgets(
         'X-1: OS links reach the router; missing entities fall back; '
         'the auth callback is left alone', (tester) async {
