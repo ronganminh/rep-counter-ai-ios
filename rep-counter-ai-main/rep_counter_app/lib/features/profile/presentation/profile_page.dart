@@ -16,6 +16,7 @@ import '../../auth/presentation/auth_welcome_page.dart';
 import '../../auth/presentation/password_reset_pages.dart';
 import '../../auth/presentation/sign_in_page.dart';
 import '../../auth/presentation/verify_email_page.dart';
+import '../../credits/presentation/credits_widgets.dart';
 import '../../legal/settings_page.dart';
 import '../../sync/presentation/sync_widgets.dart';
 
@@ -57,6 +58,7 @@ class ProfilePage extends StatelessWidget {
             ],
             if (auth != null && state is AuthSignedIn) ...[
               const SyncAccountSection(),
+              const CreditsProfileSection(),
               _AccountCard(controller: auth, state: state),
             ]
             else

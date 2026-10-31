@@ -16,6 +16,7 @@ import 'features/auth/application/auth_controller.dart';
 import 'features/auth/application/auth_scope.dart';
 import 'features/auth/data/auth_bootstrap.dart';
 import 'features/auth/presentation/password_reset_pages.dart';
+import 'features/credits/credits_controller.dart';
 import 'features/legal/onboarding_page.dart';
 import 'features/sync/sync_controller.dart';
 import 'features/sync/sync_scope.dart';
@@ -46,6 +47,9 @@ class _RepCounterAppState extends State<RepCounterApp> {
   /// Cloud sync (A-2) behind `ENABLE_CLOUD_SYNC`; needs accounts.
   SyncController? _sync;
 
+  /// AI credits and the AI Coach (AI-1) behind `ENABLE_AI_CREDITS`.
+  CreditsController? _credits;
+
   @override
   void initState() {
     super.initState();
@@ -58,9 +62,11 @@ class _RepCounterAppState extends State<RepCounterApp> {
     if (repository == null || !mounted) return;
     final auth = AuthController(repository);
     final sync = createSyncController(auth)?..start();
+    final credits = createCreditsController(auth);
     setState(() {
       _auth = auth;
       _sync = sync;
+      _credits = credits;
     });
     await auth.restore();
   }
@@ -80,12 +86,18 @@ class _RepCounterAppState extends State<RepCounterApp> {
   void dispose() {
     _locale.dispose();
     _sync?.dispose();
+    _credits?.dispose();
     _auth?.dispose();
     super.dispose();
   }
 
-  Widget _withSync(Widget child) =>
-      _sync == null ? child : SyncScope(controller: _sync!, child: child);
+  Widget _withSync(Widget child) {
+    var out = child;
+    if (_credits != null) {
+      out = CreditsScope(controller: _credits!, child: out);
+    }
+    return _sync == null ? out : SyncScope(controller: _sync!, child: out);
+  }
 
   @override
   Widget build(BuildContext context) => LocaleScope(

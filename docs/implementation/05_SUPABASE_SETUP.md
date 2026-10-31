@@ -155,7 +155,8 @@ Every flag is off unless set, and each backend v2 flag also needs `ENABLE_ACCOUN
 
 > **State of the app with the backend v2 flags on.** Wired into the app one feature per PR (owner approval 2026-10-31):
 > - **Sync (A-2), wired:** `SyncController` (`lib/features/sync/`) runs when the app opens signed in, at sign-in, about 2 s after a workout or plan is saved or deleted, when the app returns to the foreground, on "Sync now" (Profile), and retries after 30 s / 2 min / 10 min on failure. Home and Profile show the sync badge ("N waiting to sync", offline, couldn't sync, synced). Guest workouts are offered with "Bring your workouts" (dry run first, one choice for workouts that differ, or keep them on this phone). Settings › Delete workout history asks phone / account / both (D-20).
-> - Credits, XP, social and inbox: adapters only, no screen yet (next PRs).
+> - **AI credits (AI-1), wired:** Profile shows "AI credits this week" (used / allowance, resets Monday) and **AI Coach** with the balance chip. AI Coach: chat, "Analyze my last workout" (advanced analysis) and "Review progress" (90-day summary, needs 3 saved workouts); each costs 1 credit through `ai-request` with a request id (a retry reuses it, so it is charged once). Asked once for consent before the first request. At 0 credits a neutral "No AI credits left this week" with the reset day, no paywall (billing off). The free post-workout feedback is unchanged and never uses credits (D-07).
+> - XP, social and inbox: adapters only, no screen yet (next PRs).
 
 ### Building the staging app
 
@@ -318,7 +319,12 @@ Paste the printed JWT into Supabase › Authentication › Providers › Apple �
 | D14d | any | Same workout edited on two phones before syncing (e.g. AI feedback on one) | The merge preview shows "1 workout differs" with "Keep the account version" / "Keep this phone's version"; the chosen one ends up on both |
 | D14e | any | Settings › Delete workout history › This phone only / My account / Both, type DELETE | Phone only: History empty here, the account (dashboard) keeps the rows and they don't come back to this phone. My account: rows become tombstones in the dashboard, this phone keeps its copy. Both: both empty. Airplane mode with My account / Both: "Couldn't reach your account, so nothing was deleted" and nothing changes. The account itself is never deleted |
 | D14f | any | Create a plan; sync; open the app on phone B | The plan is on B. Start a different plan on B: the newer one stays active on both |
-| D15 | — | AI credits (`ai-request`, balance) | **Not testable in the app yet.** Integration test, step 4. Basic post-workout feedback is unchanged and stays free (D-07) |
+| D15a | any | Signed in: Profile | "AI credits this week · 0 of 10 used" (Free) and AI Coach with "10 AI credits" |
+| D15b | any | AI Coach › ask a question (accept the consent once) | An answer appears; the chip shows 9; the meter "1 of 10 used". In the dashboard `ai_credit_ledger` has one `consume` row for that request id. Nothing of the conversation is stored there |
+| D15c | any | Airplane mode › ask | "Message didn't send" with Retry; the balance does not change. Back online › Retry: answered, charged once |
+| D15d | any | "Analyze my last workout" (needs a saved workout); "Review progress" (needs 3) | Each answers and costs 1 credit; with fewer workouts the action is disabled with the reason |
+| D15e | any | Use all credits (or set the balance to 0 in the dashboard) | "No AI credits left this week · They come back on Monday", send disabled, no red error, no Pro/paywall |
+| D15f | any | Finish a workout with AI feedback on | The free feedback card still says it doesn't use AI credits; the balance is unchanged |
 | D16 | — | XP / level | **Not testable in the app yet.** Integration test, steps 2–3 |
 | D17 | — | Social (invite, accept, block, report, leaderboard) and inbox | **Not testable in the app yet** (no screens). Backend covered by `supabase/tests/social.test.sql` and `push_inbox.test.sql` in CI |
 | D18 | any | Profile › Delete account on the staging build, then check the dashboard | User gone; `workouts`, `ai_credit_ledger`, `xp_events`, `inbox_items` rows for that user gone (cascade) |
