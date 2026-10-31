@@ -1,3 +1,5 @@
+import 'package:flutter/widgets.dart';
+
 import '../../core/backend/backend_rpc.dart';
 import 'social.dart';
 
@@ -80,6 +82,18 @@ class SupabaseSocialApi implements SocialApi {
               (r['display_name'] as String?) ?? '', _state(r['state'])),
       ];
 
+  /// Written straight to the user's own `profiles` row (RLS: the owner can
+  /// insert and update it); there is no RPC for it.
+  @override
+  Future<void> setDisplayName(String userId, String name) {
+    final trimmed = name.trim();
+    return _rpc.upsert('profiles', {
+      'user_id': userId,
+      'display_name': trimmed.length > 80 ? trimmed.substring(0, 80) : trimmed,
+      'updated_at': _now().toUtc().toIso8601String(),
+    });
+  }
+
   @override
   Future<List<LeaderboardRow>> leaderboard(String exerciseId) async => [
         for (final r in await _rows('social_leaderboard', {
@@ -87,8 +101,23 @@ class SupabaseSocialApi implements SocialApi {
           'p_since': weekStart.toIso8601String(),
         }))
           LeaderboardRow(
-              r['display_name'] as String? ?? '', (r['reps'] as num).toInt()),
+              r['display_name'] as String? ?? '', (r['reps'] as num).toInt(),
+              me: r['me'] == true),
       ];
+}
+
+/// Provides the [SocialApi] when `ENABLE_SOCIAL` is on and the backend is
+/// configured; without it the Friends entry and friend links hide or fall
+/// back.
+class SocialScope extends InheritedWidget {
+  const SocialScope({super.key, required this.api, required super.child});
+  final SocialApi api;
+
+  static SocialApi? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<SocialScope>()?.api;
+
+  @override
+  bool updateShouldNotify(SocialScope old) => old.api != api;
 }
 
 /// The social backend for this build: null unless `ENABLE_ACCOUNTS` and

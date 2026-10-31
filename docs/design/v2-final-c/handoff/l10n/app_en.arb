@@ -17822,5 +17822,73 @@
   "xpFromSyncedWorkouts": "XP comes from workouts synced to your account. Deleting a workout never takes XP or achievements away.",
   "@xpFromSyncedWorkouts": {
     "description": "[source: G-1 XP wiring; status: new]"
+  },
+  "socialInviteCodeLabel": "Invite code",
+  "@socialInviteCodeLabel": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteOnlyBody": "Friends join with your invite link or code. Nobody can find you by name.",
+  "@socialInviteOnlyBody": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteValid": "Works once, for 7 days.",
+  "@socialInviteValid": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteExpired": "This invite has expired. Ask for a new one.",
+  "@socialInviteExpired": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteUsed": "This invite was already used.",
+  "@socialInviteUsed": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteSelf": "That’s your own invite.",
+  "@socialInviteSelf": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteBlocked": "You can’t add this person.",
+  "@socialInviteBlocked": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialTooManyInvites": "You have 20 open invites. Wait until some are used or expire.",
+  "@socialTooManyInvites": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialTooManyReports": "You’ve reached today’s limit for reports. Try again tomorrow.",
+  "@socialTooManyReports": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteOpened": "Done. Accept the request below to become friends.",
+  "@socialInviteOpened": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialReportSent": "Report sent. Thank you.",
+  "@socialReportSent": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialBlockTitle": "Block this person?",
+  "@socialBlockTitle": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialBlockBody": "They can’t send you requests or see you on leaderboards. They aren’t told.",
+  "@socialBlockBody": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialBlockAction": "Block",
+  "@socialBlockAction": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialYou": "You",
+  "@socialYou": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialNoName": "Friend",
+  "@socialNoName": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialLeaderboardEmpty": "No camera-counted reps from you or your friends this week yet.",
+  "@socialLeaderboardEmpty": {
+    "description": "[source: S-1 social wiring; status: new]"
   }
 }

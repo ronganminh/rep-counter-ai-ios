@@ -81,6 +81,10 @@ class AsyncContractRpc implements BackendRpc {
     await _check.invoke(function, body);
     return server.handle(function, body);
   }
+
+  @override
+  Future<void> upsert(String table, Map<String, Object?> row) =>
+      throw UnimplementedError();
 }
 
 void main() {
