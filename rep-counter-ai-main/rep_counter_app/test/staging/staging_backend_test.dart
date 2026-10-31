@@ -4,6 +4,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rep_counter_app/core/backend/backend_rpc.dart';
 import 'package:rep_counter_app/features/credits/ai_credits.dart';
 import 'package:rep_counter_app/features/credits/supabase_ai_credits_api.dart';
+import 'package:rep_counter_app/features/inbox/push_inbox.dart';
+import 'package:rep_counter_app/features/inbox/supabase_push_inbox_api.dart';
 import 'package:rep_counter_app/features/progression/supabase_xp_api.dart';
 import 'package:rep_counter_app/features/progression/xp.dart';
 import 'package:rep_counter_app/features/sync/cloud_sync.dart';
@@ -188,6 +190,12 @@ void main() {
         }
         rethrow;
       }
+    });
+
+    test('3b. inbox_list answers for the signed-in user', () async {
+      needSession();
+      if (!signedIn) return;
+      expect(await SupabasePushInboxApi(rpc).inbox(), isA<List<InboxItem>>());
     });
 
     test('4. ai-request with the JWT charges one credit, once', () async {

@@ -24,6 +24,16 @@ Stream<String> osRepcoachLinks({Stream<String>? source}) {
       .where(isRepcoachLink);
 }
 
+/// Links opened from inside the app (an inbox item), for the same N-2a
+/// router and rules as OS links: never over a live workout.
+abstract final class InAppLinks {
+  static final _controller = StreamController<String>.broadcast();
+
+  static Stream<String> get stream => _controller.stream;
+
+  static void open(String link) => _controller.add(link);
+}
+
 /// One stream of link strings from several sources; the same link arriving
 /// twice within [window] (an OS replaying the launch link) is opened once.
 Stream<String> mergeLinkStreams(List<Stream<String>> sources,
