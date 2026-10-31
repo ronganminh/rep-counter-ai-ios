@@ -4290,5 +4290,16 @@
   "syncDeleteAccountBody": "Xóa buổi tập khỏi tài khoản trên mọi thiết bị. Máy này vẫn giữ bản của nó. Tài khoản không bị xóa.",
   "syncDeleteBothBody": "Xóa buổi tập khỏi máy này và khỏi tài khoản. Tài khoản không bị xóa.",
   "syncDeleteNeedsConnection": "Không kết nối được tài khoản nên chưa xóa gì khỏi tài khoản. Hãy thử lại khi có mạng.",
-  "syncMergeOffer": "{count} buổi tập trên máy này chưa có trong tài khoản."
+  "syncMergeOffer": "{count} buổi tập trên máy này chưa có trong tài khoản.",
+  "creditsChip": "{credits} lượt AI",
+  "creditsMeterTitle": "Lượt AI tuần này",
+  "creditsMeterValue": "Đã dùng {used}/{allowance}",
+  "creditsResetsMonday": "Làm mới vào thứ Hai",
+  "creditsNoneLeftTitle": "Đã hết lượt AI tuần này",
+  "creditsNoneLeftBody": "Lượt AI sẽ có lại vào thứ Hai. Nhận xét sau buổi tập vẫn miễn phí.",
+  "creditsUnavailable": "Chưa tải được lượt AI. Chưa có lượt nào bị trừ.",
+  "coachAnalyzeLastWorkout": "Phân tích buổi tập gần nhất",
+  "coachUsesOneCredit": "Dùng 1 lượt AI",
+  "coachConsentTitle": "Gửi cho HLV AI?",
+  "coachConsentBody": "Tin nhắn của bạn, và với phân tích là bản tóm tắt số liệu buổi tập, được gửi tới máy chủ RepCoach rồi tới GroqCloud để viết câu trả lời. Không gửi video, ảnh hay điểm mốc cơ thể. Cuộc trò chuyện không được lưu trên máy chủ."
 }
