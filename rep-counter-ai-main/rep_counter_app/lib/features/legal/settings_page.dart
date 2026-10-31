@@ -14,8 +14,12 @@ import '../../core/legal/legal_config.dart';
 import '../../core/services/training_preferences.dart';
 import '../../theme/app_colors.dart';
 import '../../theme/app_typography.dart';
+import '../../widgets/app_feedback.dart';
 import '../../widgets/product_ui.dart';
 import '../../exercise.dart';
+import '../sync/presentation/delete_history_sheet.dart';
+import '../sync/sync_controller.dart';
+import '../sync/sync_scope.dart';
 import '../workout/data/calibration_store.dart';
 import '../workout/data/workout_history_store.dart';
 import '../workout/domain/quality_thresholds.dart';
@@ -151,6 +155,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Future<int> _loadCount() async => (await WorkoutHistoryStore().load()).length;
   Future<void> _deleteData() async {
+    final sync = SyncScope.maybeOf(context);
+    if (sync != null && sync.signedIn) return _deleteWithScope(sync);
     final confirmed = await showDialog<bool>(
         context: context, builder: (_) => const _DeleteDataDialog());
     if (confirmed != true) return;
@@ -170,6 +176,38 @@ class _SettingsPageState extends State<SettingsPage> {
             content: Text(context.l10n.legacySettingsPageCouldNotDeleteData)));
       }
     }
+  }
+
+  /// D-20 with cloud sync: this phone, the account, or both. Account and
+  /// both need the server first; when it cannot be reached nothing is
+  /// deleted anywhere. Earned XP and achievements stay (D-05).
+  Future<void> _deleteWithScope(SyncController sync) async {
+    final scope = await showDeleteHistorySheet(context);
+    if (scope == null || !mounted) return;
+    final l = context.l10n;
+    try {
+      if (scope != DeleteScope.phone) await sync.deleteFromAccount();
+    } catch (_) {
+      if (mounted) {
+        AppToast.show(context, l.syncDeleteNeedsConnection,
+            icon: LucideIcons.cloudOff, iconColor: AppColors.warningText);
+      }
+      return;
+    }
+    try {
+      if (scope != DeleteScope.account) await WorkoutHistoryStore().clear();
+    } catch (_) {
+      if (mounted) {
+        AppToast.show(context, l.legacySettingsPageCouldNotDeleteData,
+            icon: LucideIcons.circleAlert, iconColor: AppColors.dangerText);
+      }
+      return;
+    }
+    if (!mounted) return;
+    setState(() {
+      _count = _loadCount();
+    });
+    AppToast.show(context, l.historyDeleted);
   }
 
   @override
@@ -302,7 +340,9 @@ class _SettingsPageState extends State<SettingsPage> {
               future: _count,
               builder: (context, snapshot) => SettingsRow(
                     icon: LucideIcons.trash2,
-                    title: s.clearHistory,
+                    title: (SyncScope.maybeOf(context)?.signedIn ?? false)
+                        ? context.l10n.historyDeleteTitle
+                        : s.clearHistory,
                     destructive: true,
                     subtitle: context.tr(
                         '${snapshot.data ?? 0} buổi tập · bao gồm hiệu chỉnh đã lưu',

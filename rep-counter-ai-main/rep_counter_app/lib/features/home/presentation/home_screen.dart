@@ -12,6 +12,7 @@ import '../../exercises/presentation/exercise_picker_screen.dart';
 import '../../plan/presentation/plan_home_card.dart';
 import '../../plan/presentation/plan_today_sheet.dart';
 import '../../routine/presentation/routine_list_page.dart';
+import '../../sync/presentation/sync_widgets.dart';
 import '../../workout/data/workout_history_store.dart';
 import '../../workout/data/workout_record.dart';
 import '../../workout/presentation/exercise_icon.dart';
@@ -82,6 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               context.l10n.legacyHomeScreenDeviceNoAccountNeeded,
                               style: TextStyle(color: p.text3, fontSize: 12)))
                     ]),
+                    const SyncHomeStrip(),
                     const SizedBox(height: 24),
                     Card(
                         child: ListTile(

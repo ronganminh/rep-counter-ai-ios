@@ -17,6 +17,8 @@ import 'features/auth/application/auth_scope.dart';
 import 'features/auth/data/auth_bootstrap.dart';
 import 'features/auth/presentation/password_reset_pages.dart';
 import 'features/legal/onboarding_page.dart';
+import 'features/sync/sync_controller.dart';
+import 'features/sync/sync_scope.dart';
 import 'camera_page.dart';
 import 'exercise.dart';
 
@@ -41,6 +43,9 @@ class _RepCounterAppState extends State<RepCounterApp> {
   /// never waits for this before showing training.
   AuthController? _auth;
 
+  /// Cloud sync (A-2) behind `ENABLE_CLOUD_SYNC`; needs accounts.
+  SyncController? _sync;
+
   @override
   void initState() {
     super.initState();
@@ -52,7 +57,11 @@ class _RepCounterAppState extends State<RepCounterApp> {
     final repository = await createAuthRepository();
     if (repository == null || !mounted) return;
     final auth = AuthController(repository);
-    setState(() => _auth = auth);
+    final sync = createSyncController(auth)?..start();
+    setState(() {
+      _auth = auth;
+      _sync = sync;
+    });
     await auth.restore();
   }
 
@@ -70,9 +79,13 @@ class _RepCounterAppState extends State<RepCounterApp> {
   @override
   void dispose() {
     _locale.dispose();
+    _sync?.dispose();
     _auth?.dispose();
     super.dispose();
   }
+
+  Widget _withSync(Widget child) =>
+      _sync == null ? child : SyncScope(controller: _sync!, child: child);
 
   @override
   Widget build(BuildContext context) => LocaleScope(
@@ -110,8 +123,8 @@ class _RepCounterAppState extends State<RepCounterApp> {
                         ? const AppShell()
                         : AuthScope(
                             controller: _auth!,
-                            child: const AuthRecoveryListener(
-                                child: AppShell())))
+                            child: _withSync(const AuthRecoveryListener(
+                                child: AppShell()))))
                     : OnboardingPage(
                         onDone: () => setState(() => _onboarded = true)),
           ),
