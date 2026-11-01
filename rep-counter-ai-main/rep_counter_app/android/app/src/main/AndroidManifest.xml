@@ -55,6 +55,14 @@
                 <data android:scheme="com.ronganminh.repcoach"
                     android:host="login-callback"/>
             </intent-filter>
+            <!-- X-1: in-app links (repcoach://plan/session/<id>, inbox, …)
+                 for the N-2a router (APP_NAVIGATION_MAP §5). -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data android:scheme="repcoach"/>
+            </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

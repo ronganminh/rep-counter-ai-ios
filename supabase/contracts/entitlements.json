@@ -1,0 +1,65 @@
+{
+  "description": "P-1 entitlements. The app calls entitlement_current (RPC) and verify-purchase (Edge Function); verify-purchase and store-webhook write with the service role. Billing is off until product ids exist (D-14). Checked by supabase/tests/entitlements.test.sql, the verify-purchase / store-webhook Deno tests and test/features/billing/supabase_entitlement_api_test.dart.",
+  "functions": {
+    "entitlement_current": {
+      "params": [],
+      "returns": {
+        "product_id": "string",
+        "status": "string",
+        "expires_at": "string|null",
+        "verified_at": "string",
+        "pro": "boolean"
+      }
+    }
+  },
+  "service_functions": {
+    "entitlement_record": {
+      "params": [
+        "p_user",
+        "p_platform",
+        "p_product_id",
+        "p_original_transaction_id",
+        "p_status",
+        "p_expires_at"
+      ]
+    },
+    "entitlement_update_from_store": {
+      "params": [
+        "p_platform",
+        "p_original_transaction_id",
+        "p_product_id",
+        "p_status",
+        "p_expires_at"
+      ]
+    }
+  },
+  "statuses": [
+    "active",
+    "grace",
+    "billing_retry",
+    "expired",
+    "revoked",
+    "pending"
+  ],
+  "edge_functions": {
+    "verify-purchase": {
+      "request": ["platform", "product_id", "token"],
+      "response": [
+        "product_id",
+        "status",
+        "expires_at",
+        "verified_at",
+        "pro"
+      ],
+      "errors": {
+        "400": "invalid_body",
+        "401": "unauthorized",
+        "403": "account_mismatch",
+        "409": "owned_by_other_account",
+        "422": "verification_failed",
+        "502": "store_unavailable",
+        "503": "not_configured"
+      }
+    }
+  }
+}

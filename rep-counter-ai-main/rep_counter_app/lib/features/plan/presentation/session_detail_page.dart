@@ -11,6 +11,7 @@ import '../../../widgets/product_ui.dart';
 import '../../../widgets/status_badges.dart';
 import '../../routine/domain/routine_preset.dart';
 import '../../workout/domain/workout_mode.dart';
+import '../../workout/presentation/guided_timer_page.dart';
 import '../../workout/presentation/manual_log_page.dart';
 import '../application/plan_repository.dart';
 import '../domain/plan_schedule.dart';
@@ -31,7 +32,10 @@ Future<void> startPlanTarget(
   final profile = allExercises.firstWhere((e) => e.id == t.exerciseId,
       orElse: () => pushUp);
   final Widget page = t.tracking == TrackingMode.manual
-      ? ManualLogPage(profile: profile)
+      ? (t.isDuration
+          // W-4b: a timed target tracked by hand runs the guided timer.
+          ? GuidedTimerPage(profile: profile, sets: t.sets, seconds: t.seconds!)
+          : ManualLogPage(profile: profile))
       : t.isDuration
           ? CameraPage(
               profile: profile,
