@@ -56,6 +56,15 @@ class ContractRpc implements BackendRpc {
     final wire = (jsonDecode(jsonEncode(body)) as Map).cast<String, Object?>();
     return jsonDecode(jsonEncode(invokeHandler!(function, wire)));
   }
+
+  /// Rows written with [upsert], by table.
+  final upserts = <String, List<Map<String, Object?>>>{};
+
+  @override
+  Future<void> upsert(String table, Map<String, Object?> row) async {
+    calls.add('upsert $table');
+    (upserts[table] ??= []).add(row);
+  }
 }
 
 /// Fails a call the way the backend does.
@@ -69,6 +78,10 @@ class FailingRpc implements BackendRpc {
 
   @override
   Future<Object?> invoke(String function, Map<String, Object?> body) =>
+      Future.error(error);
+
+  @override
+  Future<void> upsert(String table, Map<String, Object?> row) =>
       Future.error(error);
 }
 

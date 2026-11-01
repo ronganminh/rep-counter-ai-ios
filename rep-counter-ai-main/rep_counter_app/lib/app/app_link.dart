@@ -93,6 +93,13 @@ class OpenWorkout extends LinkTarget {
 }
 
 /// A tab, plus a notice when the link could not be followed.
+/// Friends (S-1), signed in or through the auth gate; [inviteCode] from a
+/// `repcoach://invites/<code>` link is offered for acceptance.
+class OpenFriends extends LinkTarget {
+  const OpenFriends({this.inviteCode});
+  final String? inviteCode;
+}
+
 class LinkFallback extends LinkTarget {
   const LinkFallback(this.tab, [this.notice]);
   final AppTab tab;
@@ -103,12 +110,17 @@ class LinkFallback extends LinkTarget {
 class AppLinkRouter {
   AppLinkRouter(
       {PlanRepository? plans,
-      Future<List<WorkoutRecord>> Function()? loadWorkouts})
+      Future<List<WorkoutRecord>> Function()? loadWorkouts,
+      bool Function()? socialEnabled})
       : _plans = plans ?? PlanRepository(),
-        _loadWorkouts = loadWorkouts ?? WorkoutHistoryStore().load;
+        _loadWorkouts = loadWorkouts ?? WorkoutHistoryStore().load,
+        _social = socialEnabled ?? (() => false);
 
   final PlanRepository _plans;
   final Future<List<WorkoutRecord>> Function() _loadWorkouts;
+
+  /// Whether Friends exists in this build (`ENABLE_SOCIAL` and accounts).
+  final bool Function() _social;
 
   Future<LinkTarget> resolve(AppLink link) async {
     switch (link.kind) {
@@ -137,6 +149,10 @@ class AppLinkRouter {
         return const LinkFallback(AppTab.home);
       case AppLinkKind.membership:
         return const LinkFallback(AppTab.profile);
+      case AppLinkKind.friendRequests when _social():
+        return const OpenFriends();
+      case AppLinkKind.invite when _social():
+        return OpenFriends(inviteCode: link.id);
       case AppLinkKind.friendRequests:
       case AppLinkKind.race:
       case AppLinkKind.invite:

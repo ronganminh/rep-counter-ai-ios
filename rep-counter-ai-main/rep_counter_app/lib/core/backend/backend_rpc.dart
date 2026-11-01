@@ -19,6 +19,10 @@ abstract interface class BackendRpc {
 
   /// Calls an Edge Function with the user's JWT; returns its decoded JSON.
   Future<Object?> invoke(String function, Map<String, Object?> body);
+
+  /// Inserts or updates the signed-in user's own row of [table] through
+  /// PostgREST (RLS decides what is allowed), e.g. `profiles`.
+  Future<void> upsert(String table, Map<String, Object?> row);
 }
 
 /// A backend call failed. [code] is the Postgres SQLSTATE for SQL functions
@@ -90,6 +94,19 @@ class SupabaseBackendRpc implements BackendRpc {
           ? body!['error'] as String
           : 'http_${e.status}';
       throw BackendException(code, status: e.status, body: body);
+    }
+  }
+
+  @override
+  Future<void> upsert(String table, Map<String, Object?> row) async {
+    try {
+      await _client.from(table).upsert(row);
+    } on sb.PostgrestException catch (e) {
+      throw BackendException(e.code ?? 'unknown');
+    } catch (e) {
+      final mapped = _transport(e);
+      if (mapped == null) rethrow;
+      throw mapped;
     }
   }
 
