@@ -1,0 +1,38 @@
+{
+  "description": "NT-2 push tokens and inbox. The app calls the RPCs; send-push (service role, x-push-secret) writes the inbox row and pushes. Checked by supabase/tests/push_inbox.test.sql, supabase/functions/send-push/handler_test.ts and test/features/inbox/supabase_push_inbox_api_test.dart.",
+  "functions": {
+    "push_register_token": {
+      "params": ["p_platform", "p_token"],
+      "returns": { "ok": "boolean" }
+    },
+    "push_unregister_token": {
+      "params": ["p_token"],
+      "returns": { "ok": "boolean" }
+    },
+    "inbox_list": { "params": ["p_limit"], "returns": "array" },
+    "inbox_mark_read": {
+      "params": ["p_id"],
+      "returns": { "ok": "boolean" }
+    }
+  },
+  "service_functions": {
+    "inbox_create": {
+      "params": ["p_user", "p_kind", "p_link", "p_title", "p_body"]
+    },
+    "push_drop_token": { "params": ["p_token"] }
+  },
+  "inbox_row": ["id", "kind", "link", "title", "body", "created_at", "read_at"],
+  "kinds": ["friend_request", "race", "invite", "billing", "system"],
+  "edge_functions": {
+    "send-push": {
+      "request": ["user_id", "kind", "link", "title", "body"],
+      "response": ["inbox_id", "sent", "dropped", "failed"],
+      "push_payload": "title and link only, never the body",
+      "errors": {
+        "400": "invalid_body",
+        "401": "unauthorized",
+        "500": "internal"
+      }
+    }
+  }
+}

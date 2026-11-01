@@ -1,0 +1,33 @@
+{
+  "description": "G-1 XP. The app reads xp_progress (PostgREST RPC); XP is awarded by the database when a workout syncs. The award rule examples are checked against the SQL function xp_for_workout (supabase/tests/xp.test.sql) and the Dart XpRules (test/features/progression/supabase_xp_api_test.dart).",
+  "functions": {
+    "xp_progress": {
+      "params": [],
+      "returns": { "xp_total": "number", "level": "number" }
+    }
+  },
+  "service_functions": {
+    "xp_correct": {
+      "params": ["p_user", "p_source_id", "p_amount", "p_reason"],
+      "returns": { "xp_total": "number", "level": "number" }
+    }
+  },
+  "award_examples": [
+    { "reps": 0, "duration_seconds": 0, "manual": false, "xp": 0 },
+    { "reps": 20, "duration_seconds": 120, "manual": false, "xp": 30 },
+    { "reps": 20, "duration_seconds": 120, "manual": true, "xp": 15 },
+    { "reps": 0, "duration_seconds": 60, "manual": true, "xp": 10 },
+    { "reps": 0, "duration_seconds": 90, "manual": false, "xp": 25 },
+    { "reps": 500, "duration_seconds": 900, "manual": false, "xp": 150 },
+    { "reps": 500, "duration_seconds": 900, "manual": true, "xp": 75 }
+  ],
+  "level_examples": [
+    { "xp": 0, "level": 1 },
+    { "xp": 49, "level": 1 },
+    { "xp": 50, "level": 2 },
+    { "xp": 199, "level": 2 },
+    { "xp": 200, "level": 3 },
+    { "xp": 450, "level": 4 },
+    { "xp": -30, "level": 1 }
+  ]
+}
