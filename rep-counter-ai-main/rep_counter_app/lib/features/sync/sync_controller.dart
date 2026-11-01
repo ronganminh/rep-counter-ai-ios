@@ -70,9 +70,13 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
   Future<void>? _running;
   bool _again = false;
 
-  int _pending = 0, _undecided = 0;
+  int _pending = 0, _undecided = 0, _dataRevision = 0;
   SyncBlocker? _blocker;
   bool _everSynced = false;
+
+  /// Changes when sync wrote account data into this phone's workouts or
+  /// plans, so Home and History reload what they show.
+  int get dataRevision => _dataRevision;
 
   /// Workouts, deletions and plans waiting for upload.
   int get pending => _pending;
@@ -195,6 +199,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
     }
     _notify();
     SyncBlocker? blocker;
+    final before = await _cursors();
     try {
       final w =
           await SyncEngine(api: workoutsApi, local: workouts).tryRun();
@@ -209,6 +214,9 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
       blocker = SyncBlocker.server;
     }
     _blocker = blocker;
+    // A cursor that moved means pulled rows were applied here (also when
+    // the push afterwards failed).
+    if (await _cursors() != before) _dataRevision++;
     if (blocker == null) {
       _everSynced = true;
       _failures = 0;
@@ -222,6 +230,14 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
       if (delay != null) schedule(delay);
     }
     await _refreshCounts();
+  }
+
+  Future<String> _cursors() async {
+    try {
+      return '${await workouts.cursor()}:${await plans?.cursor()}';
+    } catch (_) {
+      return '';
+    }
   }
 
   Future<void> _refreshCounts() async {
@@ -277,6 +293,7 @@ class SyncController extends ChangeNotifier with WidgetsBindingObserver {
           ? const {}
           : {for (final id in plan.conflicts) id: plan.remote[id]!},
     );
+    if (!keepPhone && plan.conflicts.isNotEmpty) _dataRevision++;
     await syncNow();
   }
 

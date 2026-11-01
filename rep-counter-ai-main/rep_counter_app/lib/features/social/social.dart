@@ -61,6 +61,9 @@ abstract interface class SocialApi {
 
   /// The name friends see (`profiles.display_name`, at most 80 characters).
   Future<void> setDisplayName(String userId, String name);
+
+  /// My current display name; null when none was set.
+  Future<String?> displayName(String userId);
 }
 
 /// Server rules for tests and UI work, acting as [me].
@@ -172,6 +175,9 @@ class _As implements SocialApi {
   @override
   Future<void> setDisplayName(String userId, String name) async =>
       s.names[me] = name;
+
+  @override
+  Future<String?> displayName(String userId) async => s.names[me];
 
   @override
   Future<List<LeaderboardRow>> leaderboard(String exerciseId) async {

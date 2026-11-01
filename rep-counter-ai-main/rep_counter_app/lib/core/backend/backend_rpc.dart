@@ -23,6 +23,11 @@ abstract interface class BackendRpc {
   /// Inserts or updates the signed-in user's own row of [table] through
   /// PostgREST (RLS decides what is allowed), e.g. `profiles`.
   Future<void> upsert(String table, Map<String, Object?> row);
+
+  /// Rows of [table] whose columns equal [where] (RLS limits them to the
+  /// signed-in user's own rows), e.g. my `profiles` row.
+  Future<List<Map<String, Object?>>> select(
+      String table, Map<String, Object> where);
 }
 
 /// A backend call failed. [code] is the Postgres SQLSTATE for SQL functions
@@ -101,6 +106,24 @@ class SupabaseBackendRpc implements BackendRpc {
   Future<void> upsert(String table, Map<String, Object?> row) async {
     try {
       await _client.from(table).upsert(row);
+    } on sb.PostgrestException catch (e) {
+      throw BackendException(e.code ?? 'unknown');
+    } catch (e) {
+      final mapped = _transport(e);
+      if (mapped == null) rethrow;
+      throw mapped;
+    }
+  }
+
+  @override
+  Future<List<Map<String, Object?>>> select(
+      String table, Map<String, Object> where) async {
+    try {
+      var query = _client.from(table).select();
+      for (final e in where.entries) {
+        query = query.eq(e.key, e.value);
+      }
+      return [for (final row in await query) row.cast<String, Object?>()];
     } on sb.PostgrestException catch (e) {
       throw BackendException(e.code ?? 'unknown');
     } catch (e) {

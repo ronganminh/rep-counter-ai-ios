@@ -17890,5 +17890,18 @@
   "socialLeaderboardEmpty": "No camera-counted reps from you or your friends this week yet.",
   "@socialLeaderboardEmpty": {
     "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialNameShown": "Friends see you as “{name}”.",
+  "@socialNameShown": {
+    "description": "[source: S-1 follow-up; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "socialNameNotSet": "No display name yet: friends see “Friend”.",
+  "@socialNameNotSet": {
+    "description": "[source: S-1 follow-up; status: new]"
   }
 }

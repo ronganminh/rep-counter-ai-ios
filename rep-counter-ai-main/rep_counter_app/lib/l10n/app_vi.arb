@@ -4321,5 +4321,7 @@
   "socialBlockAction": "Chặn",
   "socialYou": "Bạn",
   "socialNoName": "Bạn bè",
-  "socialLeaderboardEmpty": "Tuần này bạn và bạn bè chưa có rep nào đếm bằng camera."
+  "socialLeaderboardEmpty": "Tuần này bạn và bạn bè chưa có rep nào đếm bằng camera.",
+  "socialNameShown": "Bạn bè thấy bạn là “{name}”.",
+  "socialNameNotSet": "Chưa có tên hiển thị: bạn bè thấy “Bạn bè”."
 }

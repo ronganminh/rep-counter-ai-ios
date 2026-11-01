@@ -9,6 +9,7 @@ import '../../../widgets/product_ui.dart';
 import '../../history/progress_statistics.dart';
 import '../../plan/presentation/plan_today_sheet.dart';
 import '../../progression/presentation/xp_widgets.dart';
+import '../../sync/presentation/sync_refresh.dart';
 import '../data/workout_history_store.dart';
 import '../data/workout_record.dart';
 import '../domain/workout_mode.dart';
@@ -57,7 +58,7 @@ class HistoryPage extends StatefulWidget {
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HistoryPageState extends State<HistoryPage> with ReloadOnSync {
   late Future<List<WorkoutRecord>> _records;
   String? _filter = pushUp.id;
   ProgressRange _range = ProgressRange.days7;
@@ -75,6 +76,21 @@ class _HistoryPageState extends State<HistoryPage> {
       _records = next;
     });
     await next;
+  }
+
+  @override
+  void reloadAfterSync() async {
+    final List<WorkoutRecord> records;
+    try {
+      records = await WorkoutHistoryStore().load();
+    } catch (_) {
+      return; // keep what is shown; the next reload tries again
+    }
+    if (!mounted) return;
+    // The builder keeps showing the old list while this resolves.
+    setState(() {
+      _records = Future.value(records);
+    });
   }
 
   Future<void> _delete(WorkoutRecord record) async {
@@ -221,7 +237,8 @@ class _HistoryPageState extends State<HistoryPage> {
               FutureBuilder<List<WorkoutRecord>>(
                 future: _records,
                 builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
+                  if (snapshot.connectionState == ConnectionState.waiting &&
+                      !snapshot.hasData) {
                     return const Padding(
                       padding: EdgeInsets.only(top: 80),
                       child: Center(child: CircularProgressIndicator()),
