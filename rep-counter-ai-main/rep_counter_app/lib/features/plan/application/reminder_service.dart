@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -37,6 +38,21 @@ class LocalNotificationsPlatform implements ReminderPlatform {
   final FlutterLocalNotificationsPlugin _plugin;
   Future<void>? _ready;
 
+  static final _opened = StreamController<String>.broadcast();
+
+  /// Payloads of reminders the user tapped while the app was running
+  /// (N-2a). Every instance initialises the plugin with the same callback.
+  static Stream<String> get opened => _opened.stream;
+
+  /// The payload of the reminder that launched the app, if any.
+  Future<String?> launchPayload() async {
+    await _init();
+    final details = await _plugin.getNotificationAppLaunchDetails();
+    return details?.didNotificationLaunchApp == true
+        ? details!.notificationResponse?.payload
+        : null;
+  }
+
   static const _channel = AndroidNotificationDetails(
     'workout_reminders',
     'Workout reminders',
@@ -48,14 +64,19 @@ class LocalNotificationsPlatform implements ReminderPlatform {
   Future<void> _init() => _ready ??= () async {
         tzdata.initializeTimeZones();
         await _plugin.initialize(
-            settings: const InitializationSettings(
-          android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-          // Permission is asked from the reminder settings, never at launch.
-          iOS: DarwinInitializationSettings(
-              requestAlertPermission: false,
-              requestBadgePermission: false,
-              requestSoundPermission: false),
-        ));
+          settings: const InitializationSettings(
+            android: AndroidInitializationSettings('@mipmap/ic_launcher'),
+            // Permission is asked from the reminder settings, never at launch.
+            iOS: DarwinInitializationSettings(
+                requestAlertPermission: false,
+                requestBadgePermission: false,
+                requestSoundPermission: false),
+          ),
+          onDidReceiveNotificationResponse: (response) {
+            final payload = response.payload;
+            if (payload != null) _opened.add(payload);
+          },
+        );
       }();
 
   @override
