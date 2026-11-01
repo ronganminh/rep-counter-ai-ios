@@ -19,6 +19,7 @@ import '../../exercise.dart';
 import '../workout/data/calibration_store.dart';
 import '../workout/data/workout_history_store.dart';
 import '../workout/domain/quality_thresholds.dart';
+import '../workout/presentation/guided_timer_settings.dart';
 import 'legal_page.dart';
 import 'voice_cadence_page.dart';
 import '../../core/i18n/l10n.dart';
@@ -295,6 +296,7 @@ class _SettingsPageState extends State<SettingsPage> {
                       builder: (_) =>
                           const LegalPage(kind: LegalKind.privacy)))),
             ]),
+        const GuidedTimerSettingsGroup(),
         SettingsGroup(title: context.l10n.legacySettingsPageData, children: [
           FutureBuilder<int>(
               future: _count,

@@ -1,0 +1,55 @@
+{
+  "description": "S-1 social RPCs. Business refusals return {\"error\": code} with the codes below. Checked by supabase/tests/social.test.sql and test/features/social/supabase_social_api_test.dart.",
+  "functions": {
+    "social_create_invite": {
+      "params": [],
+      "returns": { "code": "string", "expires_at": "string" }
+    },
+    "social_accept_invite": {
+      "params": ["p_code"],
+      "returns": { "user_id": "string", "state": "string" }
+    },
+    "social_respond": {
+      "params": ["p_user", "p_accept"],
+      "returns": { "state": "string" }
+    },
+    "social_state": {
+      "params": ["p_user"],
+      "returns": { "state": "string" }
+    },
+    "social_block": {
+      "params": ["p_user"],
+      "returns": { "state": "string" }
+    },
+    "social_report": {
+      "params": ["p_user", "p_reason"],
+      "returns": { "ok": "boolean" }
+    },
+    "social_friends": {
+      "params": [],
+      "returns": "array"
+    },
+    "social_leaderboard": {
+      "params": ["p_exercise_id", "p_since"],
+      "returns": "array"
+    }
+  },
+  "friend_row": ["user_id", "display_name", "state"],
+  "leaderboard_row": ["display_name", "reps", "me"],
+  "states": [
+    "none",
+    "request_sent",
+    "request_received",
+    "friends",
+    "blocked"
+  ],
+  "errors": [
+    "not_found",
+    "self",
+    "invite_used",
+    "invite_expired",
+    "blocked",
+    "too_many_invites",
+    "too_many_reports"
+  ]
+}

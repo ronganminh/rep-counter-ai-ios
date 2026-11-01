@@ -7,7 +7,18 @@ import { type AppleConfig, revokeAppleAuthorizationCode } from "./apple.ts";
 // Public tables keyed by user_id. Each also has a foreign key to auth.users
 // with ON DELETE CASCADE (supabase/migrations), so this explicit pass is a
 // second line of defence. Add every new user-owned table here.
-export const USER_TABLES = ["profiles"] as const;
+export const USER_TABLES = [
+  "profiles",
+  "workouts",
+  "plans",
+  "ai_credit_ledger",
+  "xp_events",
+  "user_progress",
+  "achievements_unlocked",
+  "entitlements",
+  "push_tokens",
+  "inbox_items",
+] as const;
 
 const admin = createClient(
   Deno.env.get("SUPABASE_URL")!,
