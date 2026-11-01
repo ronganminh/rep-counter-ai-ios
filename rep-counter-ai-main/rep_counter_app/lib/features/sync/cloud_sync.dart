@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 
+import '../../core/backend/backend_rpc.dart';
 import '../../core/config/feature_flags.dart';
 import '../auth/domain/merge_preview.dart';
 
@@ -89,6 +90,36 @@ class SyncResult {
   final int pulled, pushed;
 }
 
+/// Why a sync round stopped. The phone's changes stay pending either way.
+enum SyncBlocker {
+  /// No session or it expired (401): sync again after signing in.
+  signedOut,
+
+  /// No answer from the server: retry when the network is back.
+  offline,
+
+  /// The server failed or answered something unexpected (404, 5xx).
+  server,
+}
+
+/// What the app shows after a sync attempt: done, or "N changes waiting".
+@immutable
+class SyncStatus {
+  const SyncStatus.synced(SyncResult this.result)
+      : pending = 0,
+        blocker = null;
+  const SyncStatus.pending(this.pending, SyncBlocker this.blocker)
+      : result = null;
+
+  final SyncResult? result;
+
+  /// Workouts and deletions on this phone that are not in the account yet.
+  final int pending;
+  final SyncBlocker? blocker;
+
+  bool get isPending => blocker != null;
+}
+
 /// One sync round: pull everything after the cursor, apply it, then push
 /// this phone's changes. Pulling first means a workout edited on two
 /// devices ends with the newer edit everywhere (the server keeps the newer
@@ -119,6 +150,22 @@ class SyncEngine {
     final stored = await api.push(pending);
     await local.markPushed(stored);
     return SyncResult(pulled: pulled, pushed: stored.length);
+  }
+
+  /// [run] for the app: never throws a backend failure. Local data is never
+  /// removed because of one: a failed pull applies nothing past the last
+  /// saved page, a failed push leaves every change pending.
+  Future<SyncStatus> tryRun() async {
+    try {
+      return SyncStatus.synced(await run());
+    } on BackendException catch (e) {
+      final blocker = e.notSignedIn
+          ? SyncBlocker.signedOut
+          : e.offline
+              ? SyncBlocker.offline
+              : SyncBlocker.server;
+      return SyncStatus.pending((await local.pending()).length, blocker);
+    }
   }
 
   /// The guest → account dry run (`/auth/merge`): nothing is uploaded.
