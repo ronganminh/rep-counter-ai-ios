@@ -16,7 +16,14 @@ import 'features/auth/application/auth_controller.dart';
 import 'features/auth/application/auth_scope.dart';
 import 'features/auth/data/auth_bootstrap.dart';
 import 'features/auth/presentation/password_reset_pages.dart';
+import 'features/credits/credits_controller.dart';
+import 'features/inbox/inbox_controller.dart';
 import 'features/legal/onboarding_page.dart';
+import 'features/progression/xp_controller.dart';
+import 'features/social/social.dart';
+import 'features/social/supabase_social_api.dart';
+import 'features/sync/sync_controller.dart';
+import 'features/sync/sync_scope.dart';
 import 'camera_page.dart';
 import 'exercise.dart';
 
@@ -41,6 +48,21 @@ class _RepCounterAppState extends State<RepCounterApp> {
   /// never waits for this before showing training.
   AuthController? _auth;
 
+  /// Cloud sync (A-2) behind `ENABLE_CLOUD_SYNC`; needs accounts.
+  SyncController? _sync;
+
+  /// AI credits and the AI Coach (AI-1) behind `ENABLE_AI_CREDITS`.
+  CreditsController? _credits;
+
+  /// XP, level and server achievements (G-1) behind `ENABLE_XP`.
+  XpController? _xp;
+
+  /// Friends and leaderboard (S-1) behind `ENABLE_SOCIAL`.
+  SocialApi? _social;
+
+  /// The in-app inbox (NT-2) behind `ENABLE_INBOX`; pushes stay off.
+  InboxController? _inbox;
+
   @override
   void initState() {
     super.initState();
@@ -52,7 +74,19 @@ class _RepCounterAppState extends State<RepCounterApp> {
     final repository = await createAuthRepository();
     if (repository == null || !mounted) return;
     final auth = AuthController(repository);
-    setState(() => _auth = auth);
+    final sync = createSyncController(auth)?..start();
+    final credits = createCreditsController(auth);
+    final xp = createXpController(auth, sync: sync);
+    final social = createSocialApi();
+    final inbox = createInboxController(auth);
+    setState(() {
+      _auth = auth;
+      _sync = sync;
+      _credits = credits;
+      _xp = xp;
+      _social = social;
+      _inbox = inbox;
+    });
     await auth.restore();
   }
 
@@ -70,8 +104,23 @@ class _RepCounterAppState extends State<RepCounterApp> {
   @override
   void dispose() {
     _locale.dispose();
+    _sync?.dispose();
+    _credits?.dispose();
+    _xp?.dispose();
+    _inbox?.dispose();
     _auth?.dispose();
     super.dispose();
+  }
+
+  Widget _withSync(Widget child) {
+    var out = child;
+    if (_credits != null) {
+      out = CreditsScope(controller: _credits!, child: out);
+    }
+    if (_xp != null) out = XpScope(controller: _xp!, child: out);
+    if (_social != null) out = SocialScope(api: _social!, child: out);
+    if (_inbox != null) out = InboxScope(controller: _inbox!, child: out);
+    return _sync == null ? out : SyncScope(controller: _sync!, child: out);
   }
 
   @override
@@ -110,8 +159,8 @@ class _RepCounterAppState extends State<RepCounterApp> {
                         ? const AppShell()
                         : AuthScope(
                             controller: _auth!,
-                            child: const AuthRecoveryListener(
-                                child: AppShell())))
+                            child: _withSync(const AuthRecoveryListener(
+                                child: AppShell()))))
                     : OnboardingPage(
                         onDone: () => setState(() => _onboarded = true)),
           ),

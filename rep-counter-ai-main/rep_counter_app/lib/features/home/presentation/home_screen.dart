@@ -9,9 +9,13 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../../exercises/presentation/exercise_picker_screen.dart';
+import '../../inbox/presentation/inbox_page.dart';
 import '../../plan/presentation/plan_home_card.dart';
+import '../../progression/presentation/xp_widgets.dart';
 import '../../plan/presentation/plan_today_sheet.dart';
 import '../../routine/presentation/routine_list_page.dart';
+import '../../sync/presentation/sync_refresh.dart';
+import '../../sync/presentation/sync_widgets.dart';
 import '../../workout/data/workout_history_store.dart';
 import '../../workout/data/workout_record.dart';
 import '../../workout/presentation/exercise_icon.dart';
@@ -25,7 +29,7 @@ class HomeScreen extends StatefulWidget {
   State<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with ReloadOnSync {
   late Future<List<WorkoutRecord>> _records;
   @override
   void initState() {
@@ -39,6 +43,21 @@ class _HomeScreenState extends State<HomeScreen> {
       _records = next;
     });
     await next;
+  }
+
+  @override
+  void reloadAfterSync() async {
+    final List<WorkoutRecord> records;
+    try {
+      records = await WorkoutHistoryStore().load();
+    } catch (_) {
+      return; // keep what is shown; the next reload tries again
+    }
+    if (!mounted) return;
+    // The builder keeps showing the old list while this resolves.
+    setState(() {
+      _records = Future.value(records);
+    });
   }
 
   @override
@@ -68,6 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: AppTypography.title20
                                             .copyWith(color: p.accentInk)),
                                   ]))),
+                      const InboxBell(),
                     ]),
                     const SizedBox(height: 32),
                     Text(
@@ -82,6 +102,8 @@ class _HomeScreenState extends State<HomeScreen> {
                               context.l10n.legacyHomeScreenDeviceNoAccountNeeded,
                               style: TextStyle(color: p.text3, fontSize: 12)))
                     ]),
+                    const SyncHomeStrip(),
+                    const XpLevelCard(),
                     const SizedBox(height: 24),
                     Card(
                         child: ListTile(
@@ -117,7 +139,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         future: _records,
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
+                                  ConnectionState.waiting &&
+                              !snapshot.hasData) {
                             return const Center(
                                 child: CircularProgressIndicator());
                           }

@@ -247,6 +247,11 @@ do $$
 begin
   assert (select v -> 0 -> 'doc' ->> 'name' from t where k = 'plan-older') = 'Full body';
   assert jsonb_array_length((select v -> 'rows' from t where k = 'plan-pull')) = 1;
+  -- Plan row keys match the contract (the app's SupabasePlanSyncApi).
+  assert (select array_agg(k order by k) from jsonb_object_keys(
+      (select v -> 'rows' -> 0 from t where k = 'plan-pull')) k) =
+    (select array_agg(x order by x) from jsonb_array_elements_text(
+      (select current_setting('t.contract')::jsonb -> 'plan_row')) x);
 end $$;
 
 -- Q3 purge: only tombstones older than the window go; signed-in users

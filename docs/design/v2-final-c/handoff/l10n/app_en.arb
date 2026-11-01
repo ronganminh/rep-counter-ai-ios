@@ -17719,5 +17719,189 @@
   "faTryAgainWorkoutIsn": "Try again. Your workout isn't affected.",
   "@faTryAgainWorkoutIsn": {
     "description": "dynamic string in Final-A-Missing-Screens (logic) [source: Final C gap pass; status: machine-assisted-needs-review]"
+  },
+  "syncDeleteAccountBody": "Removes workouts from your account on every device. This phone keeps its copy. Your account is not deleted.",
+  "@syncDeleteAccountBody": {
+    "description": "[source: A-2 sync wiring; status: new]"
+  },
+  "syncDeleteBothBody": "Removes workouts from this phone and from your account. Your account is not deleted.",
+  "@syncDeleteBothBody": {
+    "description": "[source: A-2 sync wiring; status: new]"
+  },
+  "syncDeleteNeedsConnection": "Couldn’t reach your account, so nothing was deleted from it. Try again when you’re online.",
+  "@syncDeleteNeedsConnection": {
+    "description": "[source: A-2 sync wiring; status: new]"
+  },
+  "syncMergeOffer": "{count, plural, =1{1 workout on this phone isn’t in your account yet.} other{{count} workouts on this phone aren’t in your account yet.}}",
+  "@syncMergeOffer": {
+    "description": "[source: A-2 sync wiring; status: new]",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsChip": "{credits, plural, =1{1 AI credit} other{{credits} AI credits}}",
+  "@creditsChip": {
+    "description": "[source: AI-1 credits wiring; status: new]",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsMeterTitle": "AI credits this week",
+  "@creditsMeterTitle": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsMeterValue": "{used} of {allowance} used",
+  "@creditsMeterValue": {
+    "description": "[source: AI-1 credits wiring; status: new]",
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "allowance": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsResetsMonday": "Resets Monday",
+  "@creditsResetsMonday": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsNoneLeftTitle": "No AI credits left this week",
+  "@creditsNoneLeftTitle": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsNoneLeftBody": "They come back on Monday. Feedback after workouts stays free.",
+  "@creditsNoneLeftBody": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsUnavailable": "Couldn’t load your AI credits. Nothing was used.",
+  "@creditsUnavailable": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachAnalyzeLastWorkout": "Analyze my last workout",
+  "@coachAnalyzeLastWorkout": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachUsesOneCredit": "Uses 1 AI credit",
+  "@coachUsesOneCredit": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachConsentTitle": "Send to the AI coach?",
+  "@coachConsentTitle": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachConsentBody": "Your message, and for analyses a summary of your workout numbers, go to the RepCoach server and then to GroqCloud to write the answer. No video, photos or body keypoints. The conversation is not stored on our server.",
+  "@coachConsentBody": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "xpLevelTitle": "Level {level}",
+  "@xpLevelTitle": {
+    "description": "[source: G-1 XP wiring; status: new]",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "xpToLevel": "{xp} XP to Level {level}",
+  "@xpToLevel": {
+    "description": "[source: G-1 XP wiring; status: new]",
+    "placeholders": {
+      "xp": {
+        "type": "int"
+      },
+      "level": {
+        "type": "int"
+      }
+    }
+  },
+  "xpFromSyncedWorkouts": "XP comes from workouts synced to your account. Deleting a workout never takes XP or achievements away.",
+  "@xpFromSyncedWorkouts": {
+    "description": "[source: G-1 XP wiring; status: new]"
+  },
+  "socialInviteCodeLabel": "Invite code",
+  "@socialInviteCodeLabel": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteOnlyBody": "Friends join with your invite link or code. Nobody can find you by name.",
+  "@socialInviteOnlyBody": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteValid": "Works once, for 7 days.",
+  "@socialInviteValid": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteExpired": "This invite has expired. Ask for a new one.",
+  "@socialInviteExpired": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteUsed": "This invite was already used.",
+  "@socialInviteUsed": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteSelf": "That’s your own invite.",
+  "@socialInviteSelf": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteBlocked": "You can’t add this person.",
+  "@socialInviteBlocked": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialTooManyInvites": "You have 20 open invites. Wait until some are used or expire.",
+  "@socialTooManyInvites": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialTooManyReports": "You’ve reached today’s limit for reports. Try again tomorrow.",
+  "@socialTooManyReports": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialInviteOpened": "Done. Accept the request below to become friends.",
+  "@socialInviteOpened": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialReportSent": "Report sent. Thank you.",
+  "@socialReportSent": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialBlockTitle": "Block this person?",
+  "@socialBlockTitle": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialBlockBody": "They can’t send you requests or see you on leaderboards. They aren’t told.",
+  "@socialBlockBody": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialBlockAction": "Block",
+  "@socialBlockAction": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialYou": "You",
+  "@socialYou": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialNoName": "Friend",
+  "@socialNoName": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialLeaderboardEmpty": "No camera-counted reps from you or your friends this week yet.",
+  "@socialLeaderboardEmpty": {
+    "description": "[source: S-1 social wiring; status: new]"
+  },
+  "socialNameShown": "Friends see you as “{name}”.",
+  "@socialNameShown": {
+    "description": "[source: S-1 follow-up; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "socialNameNotSet": "No display name yet: friends see “Friend”.",
+  "@socialNameNotSet": {
+    "description": "[source: S-1 follow-up; status: new]"
   }
 }

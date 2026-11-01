@@ -4,7 +4,11 @@ import 'package:flutter/material.dart';
 
 import '../features/home/presentation/home_screen.dart';
 import '../features/exercises/presentation/exercise_picker_screen.dart';
+import '../features/inbox/inbox_controller.dart';
+import '../features/inbox/presentation/inbox_page.dart';
 import '../features/profile/presentation/profile_page.dart';
+import '../features/social/presentation/friends_page.dart';
+import '../features/social/supabase_social_api.dart';
 import '../features/workout/presentation/history_page.dart';
 import '../exercise.dart';
 import '../features/plan/application/reminder_service.dart';
@@ -37,8 +41,13 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> with RouteAware {
   AppTab _tab = AppTab.home;
   int _revision = 0;
-  StreamSubscription<String>? _linkSub;
-  late final _linkRouter = widget.linkRouter ?? AppLinkRouter();
+  StreamSubscription<String>? _linkSub, _inAppSub;
+  late final _linkRouter = widget.linkRouter ??
+      AppLinkRouter(
+          socialEnabled: () =>
+              context.getInheritedWidgetOfExactType<SocialScope>() != null,
+          inboxEnabled: () =>
+              context.getInheritedWidgetOfExactType<InboxScope>() != null);
 
   /// A link that arrived while something was over the shell (a workout,
   /// results, a sheet): delivered when the shell is back on top, never over
@@ -55,6 +64,9 @@ class _AppShellState extends State<AppShell> with RouteAware {
             mergeLinkStreams(
                 [LocalNotificationsPlatform.opened, osRepcoachLinks()]))
         .listen((raw) => _openLink(AppLink.parse(raw)));
+    // Links opened inside the app (inbox items).
+    _inAppSub =
+        InAppLinks.stream.listen((raw) => _openLink(AppLink.parse(raw)));
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       try {
         final raw = await (widget.initialLink ??
@@ -87,6 +99,10 @@ class _AppShellState extends State<AppShell> with RouteAware {
       case OpenWorkout(:final record):
         await navigator.push(MaterialPageRoute<void>(
             builder: (_) => ResultPage(record: record, readOnly: true)));
+      case OpenFriends(:final inviteCode):
+        await openFriends(context, inviteCode: inviteCode);
+      case OpenInbox():
+        await openInbox(context);
       case LinkFallback(:final tab, :final notice):
         setState(() => _tab = tab);
         final text = switch (notice) {
@@ -131,6 +147,7 @@ class _AppShellState extends State<AppShell> with RouteAware {
   void dispose() {
     appRouteObserver.unsubscribe(this);
     _linkSub?.cancel();
+    _inAppSub?.cancel();
     super.dispose();
   }
 

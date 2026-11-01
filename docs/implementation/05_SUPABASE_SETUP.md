@@ -2,7 +2,7 @@
 
 **Owner decision D-12 (2026-10-23): Supabase Auth**, with three sign-in methods: Google, Apple, and email + password.
 
-The client code is in place behind `ENABLE_ACCOUNTS` (default **off**), in PRs A-1a, A-1b and A-1c. Nothing below has been created yet: no project, key, client ID or entitlement. This page lists, step by step, what the owner must set up, and which values to send back so the agent can open the follow-up PR.
+The client code is in place behind `ENABLE_ACCOUNTS` (default **off**), in PRs A-1a, A-1b and A-1c. This page lists, step by step, what the owner sets up and which values to send back. **Status 2026-10-31:** the staging project `rvysencgtomkzwgdjaqh` is configured, the backend v2 migrations are applied and `delete-account` + `ai-request` are deployed (§10); there is no production project yet.
 
 > **Secrets.** Never paste the service-role key, the Google client **secret** or the Apple `.p8` key into chat, git or the app. They go only into the Supabase dashboard or Edge Function secrets. The app needs only the values marked *public* in §9.
 
@@ -143,6 +143,22 @@ Still open:
 | `GOOGLE_WEB_CLIENT_ID` | public | `…apps.googleusercontent.com` (Web client) |
 | `GOOGLE_IOS_CLIENT_ID` | public | iOS client ID |
 | `APPLE_SIGN_IN_ENABLED` | flag | `true` after §4–5 |
+| `ENABLE_CLOUD_SYNC` | flag | backend v2, A-2 sync (needs `ENABLE_ACCOUNTS`) |
+| `ENABLE_AI_CREDITS` | flag | AI-1 credits / `ai-request` |
+| `ENABLE_XP` | flag | G-1 XP |
+| `ENABLE_SOCIAL` | flag | S-1 friends, block, report, leaderboard |
+| `ENABLE_INBOX` | flag | NT-2 in-app inbox (works without pushes) |
+| `ENABLE_PUSH` | flag | NT-2 remote pushes; **off** until APNs / Firebase exist (implies the inbox) |
+| `ENABLE_BILLING` | flag | P-1; **off** until D-14 (prices, product ids) |
+
+Every flag is off unless set, and each backend v2 flag also needs `ENABLE_ACCOUNTS`. `test/features/auth/staging_config_test.dart` fails if the staging example names a define the app does not read (a typo such as `ENABLE_SYNC` would otherwise be ignored silently).
+
+> **State of the app with the backend v2 flags on.** Wired into the app one feature per PR (owner approval 2026-10-31):
+> - **Sync (A-2), wired:** `SyncController` (`lib/features/sync/`) runs when the app opens signed in, at sign-in, about 2 s after a workout or plan is saved or deleted, when the app returns to the foreground, on "Sync now" (Profile), and retries after 30 s / 2 min / 10 min on failure. Home and Profile show the sync badge ("N waiting to sync", offline, couldn't sync, synced). Guest workouts are offered with "Bring your workouts" (dry run first, one choice for workouts that differ, or keep them on this phone). Settings › Delete workout history asks phone / account / both (D-20).
+> - **AI credits (AI-1), wired:** Profile shows "AI credits this week" (used / allowance, resets Monday) and **AI Coach** with the balance chip. AI Coach: chat, "Analyze my last workout" (advanced analysis) and "Review progress" (90-day summary, needs 3 saved workouts); each costs 1 credit through `ai-request` with a request id (a retry reuses it, so it is charged once). Asked once for consent before the first request. At 0 credits a neutral "No AI credits left this week" with the reset day, no paywall (billing off). The free post-workout feedback is unchanged and never uses credits (D-07).
+> - **XP (G-1), wired:** Home and Progress show "Level N" with XP into the level and "N XP to Level N+1"; Progress lists the account's achievements. Both are read from the server (`xp_progress`, `achievements_list`) at sign-in, when the screen opens and after each sync round; XP is awarded by the database when a workout syncs, and deleting a workout takes nothing away (D-05). Its migration `20261031000100_achievements.sql` was applied to staging on 2026-11-01.
+> - **Social (S-1), wired:** Profile › Friends (guests go through the auth gate and return to Friends). Invite with a code / `repcoach://invites/<code>` link (share sheet or copy); opening someone's invite puts their request in your Requests to accept or decline (server rule, Final C "the link opens a request to you"); block and report from a friend's menu; the display name friends see (written to your own `profiles` row); this week's leaderboard of camera-counted reps only (D-18, enforced by the server). No search by name (Q6). `repcoach://friends/requests` and `repcoach://invites/<code>` open Friends.
+> - **Inbox (NT-2), wired:** a bell on Home with the unread count opens Notifications (`inbox_list`, newest first); tapping an item marks it read and opens its `repcoach://` link through the N-2a router (never over a live workout; `repcoach://inbox` opens the inbox); "Mark all read". No real pushes (`ENABLE_PUSH` off, no token registered). Items come from `send-push` later, or from the SQL editor: `select public.inbox_create('<user uuid>', 'system', 'repcoach://membership', 'Hello', 'Test');`.
 
 ### Building the staging app
 
@@ -170,6 +186,48 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 | `GOOGLE_IOS_CLIENT_ID` | `354784213486-8bpqbeqn6kggtkub48t1v14soak77sv2.apps.googleusercontent.com` (reversed form in `Info.plist`) |
 | `APPLE_SIGN_IN_ENABLED` | `true` (iOS; entitlement in `Runner.entitlements`) |
 
+### Staging builds for testers: TestFlight internal and Play internal testing
+
+Build from `main`, with the staging file, on the owner's Mac (iOS) or any machine with the upload key (Android). These binaries talk to **staging**: give them to internal testers only, never submit them for review, and never promote the Play release to production. The store release is a separate build without the staging file.
+
+```bash
+git checkout main && git pull
+cd rep-counter-ai-main/rep_counter_app
+cp dart_defines.staging.example.json dart_defines.staging.json   # paste the publishable key; git-ignored
+flutter test test/features/auth/staging_config_test.dart          # the file is still well-formed
+```
+
+Pick a build number higher than every build already uploaded (App Store Connect › TestFlight, Play Console › App bundle explorer). The version name stays as in `pubspec.yaml` (`2.0.0`).
+
+**iOS → TestFlight, internal testing**
+
+```bash
+# Signed IPA (automatic signing with the team NW22NWLTK4 in Xcode).
+tool/build_ios.sh --ipa --release --build-number=<N> \
+  --dart-define-from-file=dart_defines.staging.json
+# → build/ios/ipa/*.ipa
+```
+
+1. Upload with **Transporter** (or Xcode › Organizer › Distribute App › App Store Connect › Upload).
+2. App Store Connect › TestFlight: wait for processing; answer the export-compliance question (the app uses only the standard encryption of HTTPS).
+3. Add the build to an **Internal Testing** group only (App Store Connect users, no Beta App Review). Do not add it to an external group.
+4. Write "STAGING" and the build number in the "What to Test" field.
+
+**Android → Play internal testing**
+
+```bash
+# Needs android/key.properties with the upload key (never committed).
+flutter build appbundle --release --flavor store --build-number=<N> \
+  --dart-define-from-file=dart_defines.staging.json
+# → build/app/outputs/bundle/storeRelease/app-store-release.aab
+```
+
+1. Play Console › Testing › **Internal testing** › Create new release › upload the `.aab`.
+2. Release notes: "STAGING build <N>". Testers: the internal list (the Google account `thanhyt2024@gmail.com` is the one that can use Google sign-in while the consent screen is in *Testing*).
+3. Do **not** use "Promote release" to closed, open or production tracks for this build.
+
+Google sign-in works on the Play build, because Play App Signing's SHA-1 is registered (§10 row 7). Then run the checklist in §11.
+
 **Notes**
 - **Android Google sign-in** needs the build's signing certificate SHA-1 to be registered. Upload-key and Play App Signing SHA-1 are registered. The **debug keystore is not**, so Google sign-in fails on `flutter run` debug builds until a debug Android client is added.
 - **Google consent screen** is in *Testing*. Only the listed test users (`thanhyt2024@gmail.com`) can sign in with Google until it is published.
@@ -182,7 +240,7 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
       EOF
   ```
 
-## 10. Values to send back (status 2026-10-27, staging)
+## 10. Values to send back (status 2026-10-31, staging)
 
 | # | Value | Status |
 |---|---|---|
@@ -200,8 +258,15 @@ flutter build ipa --release --dart-define-from-file=dart_defines.staging.json
 | 9 | Apple Team ID / Services ID / Key ID | ✅ `NW22NWLTK4` / `com.ronganminh.repcoach.signin` / `ANA4NT26KP` |
 | 10 | Sign in with Apple on the App ID, Apple provider ON | ✅ entitlement in `Runner.entitlements` |
 | 10b | Apple **Secret Key (for OAuth)** | ⏳ **open:** generate with `tool/apple_oauth_secret.py` (below) and paste into Supabase; renew every ≤ 6 months |
-| 11 | `delete-account` Edge Function | ✅ approved + implemented (`supabase/`); ⏳ **open:** owner runs the deploy commands in `supabase/README.md` (no token available to the agent) |
+| 11 | `delete-account` Edge Function | ✅ deployed by the owner 2026-10-31: ACTIVE v1, JWT verification ON, `APPLE_*` secrets set; unauthenticated call → 401 ✅ |
 | 12 | Support / legal URLs for consent screens and stores (D-14) | ✅ decided 2026-10-27: support `ronganminh221@gmail.com`, `https://repcoach-ai.duckdns.org/support.html`; privacy `https://repcoach-ai.duckdns.org/privacy-policy.html`; terms `https://repcoach-ai.duckdns.org/terms.html`; home `https://repcoach-ai.duckdns.org/`. ⏳ **open:** account-deletion request page on that site (Google Play) |
+| 13 | Backend v2 migrations (06) | ✅ 8/8 applied 2026-10-31, Local == Remote |
+| 14 | `ai-request` Edge Function | ✅ ACTIVE v1, JWT verification ON, `GROQ_API_KEY` + `GROQ_MODEL` set; unauthenticated call → 401 ✅ |
+| 15 | Tombstone purge (`purge_sync_tombstones`, daily 03:17 UTC) | ✅ scheduled by the owner (`pg_cron`, job `purge-sync-tombstones`) |
+| 15b | `20261031000100_achievements.sql` | ✅ applied 2026-11-01 (SQL editor, version recorded) |
+| 16 | `verify-purchase`, `store-webhook` | ⏸ **blocked:** D-14 prices and product ids, App Store IAP key, Play service account |
+| 17 | `send-push` | ⏸ **blocked:** APNs key, Firebase project |
+| 18 | Signed-in backend flow on staging | ⏳ **open:** owner runs `test/staging/staging_backend_test.dart` (`supabase/README.md`) |
 | — | Apple `.p8`, Google client secret, service-role key | **secret**: dashboard / Edge Function secrets / password manager only |
 
 Supabase settings to know: "Automatically expose new tables" OFF and "Enable automatic RLS" ON. Every new table therefore needs explicit grants and policies.
@@ -226,6 +291,14 @@ Paste the printed JWT into Supabase › Authentication › Providers › Apple �
 - the screens;
 - training stays available as a guest.
 
+**Automated, backend v2 (no device, no network), passing:**
+- `test/core/backend/supabase_backend_rpc_test.dart`: the real Supabase SDK against a fake server. 401 (expired JWT, gateway `UNAUTHORIZED_INVALID_JWT_FORMAT`), 404 (missing function), 5xx with an HTML page, a malformed 200 and no network all come out as one error type the features handle; nothing crashes.
+- `test/features/sync/cloud_sync_test.dart`: with 401 / 28000 / 404 / 500 / no network on pull or push, local workouts and deletions are untouched, nothing is marked pushed, the cursor does not move, and the result is "N changes pending" (signed out, offline or server). Once the server is back everything is pushed exactly once.
+- `test/features/auth/supabase_auth_repository_test.dart`: delete account without network says "Can't connect", a 5xx says "not available", and the user stays signed in.
+- The contract tests of each adapter against `supabase/contracts/*.json`.
+
+**Against staging (network, owner's machine), UNVERIFIED until run:** `test/staging/staging_backend_test.dart` (commands in `supabase/README.md`). Steps: no-session calls refused → sign up / sign in → sync push, pull, tombstone → XP awarded once → `ai-request` charges one credit, never twice → `delete-account`.
+
 **On a real device: UNVERIFIED.** The owner runs these on a staging build (§9). Report ✅/❌ per line.
 
 | # | Device | Steps | Expected |
@@ -241,3 +314,33 @@ Paste the printed JWT into Supabase › Authentication › Providers › Apple �
 | D9 | any | Profile › Delete account › type DELETE | **Needs the `delete-account` function deployed**; then the user is gone in the dashboard |
 | D10 | any | Airplane mode | Training, history and counting work as a guest; sign-in shows "Can't connect" |
 | D11 | any | Fresh install **without** `ENABLE_ACCOUNTS` | No account UI at all |
+| D12 | any | Staging build (all backend v2 flags as in the example). Signed in, record 2 workouts (camera + manual), then airplane mode, record 1 more, force-quit, reopen | Training, history and counting work; nothing lost; no crash. Home badge "Offline · 1 waiting to sync" while offline; back online it turns "Synced" within a few seconds (or tap Profile › Sync now) |
+| D13 | any | Same build, then in the dashboard sign the user out / revoke sessions; keep training | "Your session expired" banner (D8); local history intact; no crash |
+| D14a | phone A + phone B (or reinstall) | Same account on both. Record a workout on A; on B open the app (or Profile › Sync now) | B shows the workout once on Home and in History without pulling to refresh; Home badge "Synced" on both. In the dashboard, `workouts` has one row for it |
+| D14b | phone A + B | Delete that workout on A (History); sync B | Gone on B too (tombstone). Undo on A within 5 s instead: it stays on both |
+| D14c | any | As a guest record 2 workouts, then sign in to an account that already has workouts | Banner "Bring your workouts" on Home / Profile; the preview counts "already in your account" / "new"; Merge uploads only the new ones (dashboard row count goes up by exactly those). "Keep workouts on this phone only" makes the banner go away and uploads nothing |
+| D14d | any | Same workout edited on two phones before syncing (e.g. AI feedback on one) | The merge preview shows "1 workout differs" with "Keep the account version" / "Keep this phone's version"; the chosen one ends up on both |
+| D14e | any | Settings › Delete workout history › This phone only / My account / Both, type DELETE | Phone only: History empty here, the account (dashboard) keeps the rows and they don't come back to this phone. My account: rows become tombstones in the dashboard, this phone keeps its copy. Both: both empty. Airplane mode with My account / Both: "Couldn't reach your account, so nothing was deleted" and nothing changes. The account itself is never deleted |
+| D14f | any | Create a plan; sync; open the app on phone B | The plan is on B. Start a different plan on B: the newer one stays active on both |
+| D15a | any | Signed in: Profile | "AI credits this week · 0 of 10 used" (Free) and AI Coach with "10 AI credits" |
+| D15b | any | AI Coach › ask a question (accept the consent once) | An answer appears; the chip shows 9; the meter "1 of 10 used". In the dashboard `ai_credit_ledger` has one `consume` row for that request id. Nothing of the conversation is stored there |
+| D15c | any | Airplane mode › ask | "Message didn't send" with Retry; the balance does not change. Back online › Retry: answered, charged once |
+| D15d | any | "Analyze my last workout" (needs a saved workout); "Review progress" (needs 3) | Each answers and costs 1 credit; with fewer workouts the action is disabled with the reason |
+| D15e | any | Use all credits (or set the balance to 0 in the dashboard) | "No AI credits left this week · They come back on Monday", send disabled, no red error, no Pro/paywall |
+| D15f | any | Finish a workout with AI feedback on | The free feedback card still says it doesn't use AI credits; the balance is unchanged |
+| D16a | any | Signed in with sync on, record a 20-rep push-up workout; wait for "Synced" | Home: "Level 1 · LV 1 · 30 / 50 XP · 20 XP to Level 2". Progress: Achievements shows "First Workout" (and "New Personal Record" for a first free workout) |
+| D16b | any | Record a manual workout of 20 reps | +15 XP (half, Q4) |
+| D16c | any | Delete a synced workout (History) | XP, level and achievements unchanged (D-05) |
+| D16d | any | Airplane mode, open Home/Progress | The last level shown stays; nothing crashes |
+| D16e | any | As a guest / with `ENABLE_XP` off | No level card, no achievements section |
+| D17a | phones A and B, two accounts | Both: Profile › Friends › set a display name › Save; reopen Friends | "Friends see you as “…”." under the field, which is prefilled with the saved name; the dashboard `profiles` row has it |
+| D17b | A, B | A: Invite a friend › Share invite (or Copy code). B: open the link (or paste the code › Add) | B sees "Done. Accept the request below…" and A in Requests; Accept → "You and A are now friends" on B; A sees B in Friends after pull-to-refresh |
+| D17c | A, B | Both record a camera push-up workout and sync; a manual one too | Leaderboard (this week) lists both with camera reps only; the manual reps are not counted |
+| D17d | A | A: friend menu › Report (pick a reason, optionally Also block); then Block | "Report sent. Thank you."; the dashboard `reports` has the row; B disappears from A's leaderboard; B is not told |
+| D17e | any | Same code twice, an expired code (> 7 days), your own code | "already used" / "expired" / "That's your own invite"; nothing changes |
+| D17f | any | Signed out › Profile › Friends | The auth gate ("Friends need an account"); after signing in you land in Friends |
+| D17g | any | Airplane mode › Friends | "Couldn't load friends" with Retry; actions say "Nothing changed. Check your connection" |
+| D17h | any | In the SQL editor create 2 items for your user (`inbox_create`, one with link `repcoach://friends/requests`); reopen Home | The bell shows 2; Notifications lists both newest first, "2 unread" |
+| D17i | any | Tap the friend-request item | It is marked read (bell 1) and Friends opens. During a workout nothing opens until you leave it |
+| D17j | any | Mark all read; airplane mode › pull to refresh | Bell without a number; offline: "This screen couldn't load…" with Retry, the list stays |
+| D18 | any | Profile › Delete account on the staging build, then check the dashboard | User gone; `workouts`, `ai_credit_ledger`, `xp_events`, `inbox_items` rows for that user gone (cascade) |

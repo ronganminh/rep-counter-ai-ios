@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rep_counter_app/core/backend/backend_rpc.dart';
 import 'package:rep_counter_app/features/sync/cloud_sync.dart';
 
 /// A-2 seam: sync rules against the in-memory server, two phones.
@@ -57,6 +58,28 @@ class FakeLocal implements LocalSyncSource {
 
   @override
   Future<void> saveCursor(int cursor) async => savedCursor = cursor;
+}
+
+/// The in-memory server, failing a pull or a push the way staging can.
+class FlakyApi extends InMemoryCloudSyncApi {
+  BackendException? failPull, failPush;
+
+  /// Fails only the second page of a pull (the first one is applied).
+  bool failSecondPage = false;
+  int pulls = 0;
+
+  @override
+  Future<SyncPage> pull({required int after, int limit = 500}) async {
+    pulls++;
+    if (failPull != null && (!failSecondPage || pulls == 2)) throw failPull!;
+    return super.pull(after: after, limit: limit);
+  }
+
+  @override
+  Future<List<SyncWorkout>> push(List<SyncWorkout> workouts) async {
+    if (failPush != null) throw failPush!;
+    return super.push(workouts);
+  }
 }
 
 void main() {
@@ -140,4 +163,108 @@ void main() {
     expect(p.toUpload, 1);
     expect(server.rows.keys, ['shared']);
   });
+
+  group('server failures keep local data and leave changes pending', () {
+    late FlakyApi flaky;
+    late FakeLocal phone;
+    late SyncEngine engine;
+
+    setUp(() {
+      flaky = FlakyApi();
+      phone = FakeLocal()
+        ..save('w1', t0)
+        ..save('w2', t0, reps: 20)
+        ..delete('w2', t0.add(const Duration(minutes: 1)));
+      engine = SyncEngine(api: flaky, local: phone);
+    });
+
+    Future<void> expectUntouched() async {
+      expect(phone.workouts.keys, {'w1', 'w2'});
+      expect(phone.workouts['w1']!.raw['reps'], 10);
+      expect(phone.workouts['w2']!.isTombstone, isTrue);
+      expect(phone.dirty, {'w1', 'w2'});
+      expect(phone.savedCursor, 0);
+    }
+
+    for (final (name, error, blocker) in [
+      (
+        '401 session expired',
+        const BackendException('http_401', status: 401),
+        SyncBlocker.signedOut
+      ),
+      (
+        '28000 not signed in',
+        const BackendException('28000'),
+        SyncBlocker.signedOut
+      ),
+      (
+        '404 function missing',
+        const BackendException('PGRST202'),
+        SyncBlocker.server
+      ),
+      ('500 server error', const BackendException('500'), SyncBlocker.server),
+      ('no network', const BackendException('network'), SyncBlocker.offline),
+    ]) {
+      test('$name on pull', () async {
+        flaky.failPull = error;
+        final s = await engine.tryRun();
+        expect(s.isPending, isTrue);
+        expect(s.blocker, blocker);
+        expect(s.pending, 2);
+        await expectUntouched();
+        expect(flaky.rows, isEmpty);
+      });
+
+      test('$name on push', () async {
+        flaky.failPush = error;
+        final s = await engine.tryRun();
+        expect(s.blocker, blocker);
+        expect(s.pending, 2);
+        await expectUntouched();
+      });
+    }
+
+    test('a failed second page keeps the first one and its cursor', () async {
+      final other = FakeLocal();
+      for (var i = 0; i < 600; i++) {
+        other.save('s$i', t0);
+      }
+      await SyncEngine(api: flaky, local: other).run();
+      flaky
+        ..failPull = const BackendException('503')
+        ..failSecondPage = true
+        ..pulls = 0;
+      final s = await engine.tryRun();
+      expect(s.blocker, SyncBlocker.server);
+      expect(phone.savedCursor, 500);
+      expect(phone.workouts.length, 502);
+      expect(phone.dirty, {'w1', 'w2'});
+    });
+
+    test('once the server is back everything is pushed exactly once', () async {
+      flaky.failPush = const BackendException('network');
+      expect((await engine.tryRun()).isPending, isTrue);
+      expect((await engine.tryRun()).isPending, isTrue);
+      flaky.failPush = null;
+      final s = await engine.tryRun();
+      expect(s.isPending, isFalse);
+      expect(s.result!.pushed, 2);
+      expect(phone.dirty, isEmpty);
+      expect(flaky.rows.keys, {'w1', 'w2'});
+      expect(flaky.rows['w2']!.isTombstone, isTrue);
+      expect((await engine.tryRun()).result!.pushed, 0);
+    });
+
+    test('anything that is not a backend failure still surfaces', () async {
+      flaky.failPull = null;
+      final broken = SyncEngine(api: _ThrowingApi(), local: phone);
+      await expectLater(broken.tryRun(), throwsStateError);
+    });
+  });
+}
+
+class _ThrowingApi extends InMemoryCloudSyncApi {
+  @override
+  Future<SyncPage> pull({required int after, int limit = 500}) =>
+      Future.error(StateError('bug'));
 }

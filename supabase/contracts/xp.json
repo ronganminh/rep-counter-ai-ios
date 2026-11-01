@@ -1,11 +1,24 @@
 {
-  "description": "G-1 XP. The app reads xp_progress (PostgREST RPC); XP is awarded by the database when a workout syncs. The award rule examples are checked against the SQL function xp_for_workout (supabase/tests/xp.test.sql) and the Dart XpRules (test/features/progression/supabase_xp_api_test.dart).",
+  "description": "G-1 XP. The app reads xp_progress and achievements_list (PostgREST RPC); XP is awarded by the database when a workout syncs. The award rule examples are checked against the SQL function xp_for_workout (supabase/tests/xp.test.sql) and the Dart XpRules (test/features/progression/supabase_xp_api_test.dart).",
   "functions": {
     "xp_progress": {
       "params": [],
       "returns": { "xp_total": "number", "level": "number" }
+    },
+    "achievements_list": {
+      "params": [],
+      "returns": "array"
     }
   },
+  "achievement_row": ["achievement_id", "unlocked_at"],
+  "achievement_ids": [
+    "firstWorkout",
+    "totalReps100",
+    "streak7",
+    "firstTimeChallenge",
+    "newPersonalRecord",
+    "workouts10"
+  ],
   "service_functions": {
     "xp_correct": {
       "params": ["p_user", "p_source_id", "p_amount", "p_reason"],

@@ -102,20 +102,7 @@ class AchievementEarnedCard extends StatelessWidget {
     );
   }
 
-  String _title(BuildContext context) => switch (achievement) {
-        AchievementId.firstWorkout =>
-          context.l10n.legacyAchievementEarnedFirstWorkout,
-        AchievementId.totalReps100 =>
-          context.l10n.legacyAchievementEarnedTotalReps,
-        AchievementId.streak7 =>
-          context.l10n.legacyAchievementEarnedDayStreak,
-        AchievementId.firstTimeChallenge =>
-          context.l10n.legacyAchievementEarnedFirstTimeChallenge,
-        AchievementId.newPersonalRecord =>
-          context.l10n.legacyAchievementEarnedNewPersonalRecord,
-        AchievementId.workouts10 =>
-          context.l10n.legacyAchievementEarnedWorkouts,
-      };
+  String _title(BuildContext context) => achievementTitle(context, achievement);
 
   String _description(BuildContext context) => switch (achievement) {
         AchievementId.firstWorkout => context.l10n.legacyAchievementEarnedCompletedFirstWorkout,
@@ -126,3 +113,20 @@ class AchievementEarnedCard extends StatelessWidget {
         AchievementId.workouts10 => context.l10n.legacyAchievementEarnedSavedWorkoutsDevice,
       };
 }
+
+/// The localized name of [achievement] (also used for server achievements).
+String achievementTitle(BuildContext context, AchievementId achievement) =>
+    switch (achievement) {
+      AchievementId.firstWorkout =>
+          context.l10n.legacyAchievementEarnedFirstWorkout,
+      AchievementId.totalReps100 =>
+          context.l10n.legacyAchievementEarnedTotalReps,
+      AchievementId.streak7 =>
+          context.l10n.legacyAchievementEarnedDayStreak,
+      AchievementId.firstTimeChallenge =>
+          context.l10n.legacyAchievementEarnedFirstTimeChallenge,
+      AchievementId.newPersonalRecord =>
+          context.l10n.legacyAchievementEarnedNewPersonalRecord,
+      AchievementId.workouts10 =>
+          context.l10n.legacyAchievementEarnedWorkouts,
+    };

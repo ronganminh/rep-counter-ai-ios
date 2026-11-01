@@ -19,9 +19,12 @@ enum FriendState { none, requestSent, requestReceived, friends, blocked }
 
 @immutable
 class LeaderboardRow {
-  const LeaderboardRow(this.displayName, this.reps);
+  const LeaderboardRow(this.displayName, this.reps, {this.me = false});
   final String displayName;
   final int reps;
+
+  /// The signed-in user's own row.
+  final bool me;
 }
 
 class SocialError implements Exception {
@@ -55,6 +58,12 @@ abstract interface class SocialApi {
 
   /// Me and my friends, camera workouts only (D-18), best first.
   Future<List<LeaderboardRow>> leaderboard(String exerciseId);
+
+  /// The name friends see (`profiles.display_name`, at most 80 characters).
+  Future<void> setDisplayName(String userId, String name);
+
+  /// My current display name; null when none was set.
+  Future<String?> displayName(String userId);
 }
 
 /// Server rules for tests and UI work, acting as [me].
@@ -164,6 +173,13 @@ class _As implements SocialApi {
   }
 
   @override
+  Future<void> setDisplayName(String userId, String name) async =>
+      s.names[me] = name;
+
+  @override
+  Future<String?> displayName(String userId) async => s.names[me];
+
+  @override
   Future<List<LeaderboardRow>> leaderboard(String exerciseId) async {
     final friends = {
       for (final e in s._friendships.entries)
@@ -173,7 +189,8 @@ class _As implements SocialApi {
     return [
       for (final u in {me, ...friends})
         if (s.cameraReps[u]?[exerciseId] != null)
-          LeaderboardRow(s.names[u] ?? '', s.cameraReps[u]![exerciseId]!),
+          LeaderboardRow(s.names[u] ?? '', s.cameraReps[u]![exerciseId]!,
+              me: u == me),
     ]..sort((a, b) => b.reps.compareTo(a.reps));
   }
 }

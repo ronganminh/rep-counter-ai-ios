@@ -68,6 +68,18 @@ class XpProgress {
 /// workout is synced (`award-xp`), so the client has no award call.
 abstract interface class XpApi {
   Future<XpProgress> progress();
+
+  /// Achievements unlocked on the server from synced workouts, oldest
+  /// first. Never revoked (D-05).
+  Future<List<UnlockedAchievement>> achievements();
+}
+
+/// One server achievement; [id] is an `AchievementId` name (contracts/xp.json).
+@immutable
+class UnlockedAchievement {
+  const UnlockedAchievement(this.id, this.unlockedAt);
+  final String id;
+  final DateTime unlockedAt;
 }
 
 /// Server rules for tests and UI work: one award per (source type, source
@@ -96,6 +108,11 @@ class InMemoryXpServer implements XpApi {
   void correct(String id, int amount) =>
       events.add((type: 'correction', id: id, amount: -amount.abs()));
 
+  final unlocked = <UnlockedAchievement>[];
+
   @override
   Future<XpProgress> progress() async => XpProgress(math.max(_total, 0));
+
+  @override
+  Future<List<UnlockedAchievement>> achievements() async => [...unlocked];
 }
