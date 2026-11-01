@@ -65,6 +65,17 @@ class ContractRpc implements BackendRpc {
     calls.add('upsert $table');
     (upserts[table] ??= []).add(row);
   }
+
+  /// Answers [select] from the rows written with [upsert].
+  @override
+  Future<List<Map<String, Object?>>> select(
+      String table, Map<String, Object> where) async {
+    calls.add('select $table');
+    return [
+      for (final row in upserts[table] ?? const <Map<String, Object?>>[])
+        if (where.entries.every((e) => row[e.key] == e.value)) row
+    ];
+  }
 }
 
 /// Fails a call the way the backend does.
@@ -82,6 +93,11 @@ class FailingRpc implements BackendRpc {
 
   @override
   Future<void> upsert(String table, Map<String, Object?> row) =>
+      Future.error(error);
+
+  @override
+  Future<List<Map<String, Object?>>> select(
+          String table, Map<String, Object> where) =>
       Future.error(error);
 }
 

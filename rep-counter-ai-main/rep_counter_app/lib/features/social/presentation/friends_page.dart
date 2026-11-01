@@ -59,10 +59,36 @@ class _FriendsPageState extends State<FriendsPage> {
   late final _code = TextEditingController(text: widget.inviteCode ?? '');
   final _nameField = TextEditingController();
 
+  /// The name friends see now; null when none is set or not loaded.
+  String? _currentName;
+  bool _nameLoaded = false;
+
   @override
   void initState() {
     super.initState();
     _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _loadName());
+  }
+
+  String? get _userId => switch (AuthScope.maybeOf(context)?.state) {
+        AuthSignedIn(:final user) => user.id,
+        _ => null,
+      };
+
+  /// Shows (and prefills) my current display name; a failure keeps the
+  /// field empty and changes nothing.
+  Future<void> _loadName() async {
+    final id = _userId;
+    if (id == null) return;
+    try {
+      final name = await widget.api.displayName(id);
+      if (!mounted) return;
+      setState(() {
+        _currentName = name;
+        _nameLoaded = true;
+        if (_nameField.text.isEmpty && name != null) _nameField.text = name;
+      });
+    } catch (_) {}
   }
 
   @override
@@ -140,11 +166,17 @@ class _FriendsPageState extends State<FriendsPage> {
   }
 
   Future<void> _saveName() async {
-    final auth = AuthScope.maybeOf(context)?.state;
+    final id = _userId;
     final name = _nameField.text.trim();
-    if (auth is! AuthSignedIn || name.isEmpty) return;
-    await _run(() => widget.api.setDisplayName(auth.user.id, name),
-        done: context.l10n.accountDisplayName);
+    if (id == null || name.isEmpty) return;
+    if (await _run(() => widget.api.setDisplayName(id, name),
+            done: context.l10n.socialNameShown(name)) &&
+        mounted) {
+      setState(() {
+        _currentName = name.length > 80 ? name.substring(0, 80) : name;
+        _nameLoaded = true;
+      });
+    }
   }
 
   Future<void> _block(FriendSummary f) async {
@@ -263,7 +295,14 @@ class _FriendsPageState extends State<FriendsPage> {
                     controller: _nameField,
                     maxLength: 80,
                     decoration: InputDecoration(
-                        labelText: l.accountDisplayName, counterText: ''),
+                        labelText: l.accountDisplayName,
+                        counterText: '',
+                        helperText: !_nameLoaded
+                            ? null
+                            : _currentName == null
+                                ? l.socialNameNotSet
+                                : l.socialNameShown(_currentName!),
+                        helperMaxLines: 2),
                     onSubmitted: (_) => _saveName(),
                   ),
                 ),

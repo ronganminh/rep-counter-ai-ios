@@ -37,6 +37,8 @@ class _OfflineSocial implements SocialApi {
   Future<List<LeaderboardRow>> leaderboard(String exerciseId) async => _fail();
   @override
   Future<void> setDisplayName(String userId, String name) async => _fail();
+  @override
+  Future<String?> displayName(String userId) async => _fail();
 }
 
 void main() {
@@ -200,6 +202,26 @@ void main() {
       await tester.tap(find.byKey(const Key('friends-save-name')));
       await tester.pumpAndSettle();
       expect(server.names['me'], 'Thanh N');
+      expect(find.text('Friends see you as “Thanh N”.'), findsWidgets);
+    });
+
+    testWidgets('the current display name is shown and prefilled (EN/VI)',
+        (tester) async {
+      final auth =
+          (await tester.runAsync(() async => (await authFor('a@x.com')).$1))!;
+      server.names.remove('me');
+      await pump(tester, page(), auth: auth, language: AppLanguage.vi);
+      expect(find.text('Chưa có tên hiển thị: bạn bè thấy “Bạn bè”.'),
+          findsOneWidget);
+
+      server.names['me'] = 'Thanh';
+      // A fresh page (the previous one keeps its state).
+      await pump(tester, KeyedSubtree(key: UniqueKey(), child: page()),
+          auth: auth);
+      expect(find.text('Friends see you as “Thanh”.'), findsOneWidget);
+      final field = tester.widget<TextField>(
+          find.byKey(const Key('friends-display-name')));
+      expect(field.controller!.text, 'Thanh');
     });
 
         testWidgets('guests go through the auth gate (return-to)', (tester) async {
@@ -219,6 +241,15 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(FriendsPage), findsNothing);
     });
+  });
+
+  test('Supabase: my display name is read from my profiles row', () async {
+    final rpc = ContractRpc(loadContract('social'), (_, __) => null);
+    final api = SupabaseSocialApi(rpc);
+    expect(await api.displayName('u1'), isNull);
+    await api.setDisplayName('u1', 'Thanh');
+    expect(await api.displayName('u1'), 'Thanh');
+    expect(await api.displayName('u2'), isNull);
   });
 
   test('Supabase: the display name goes to my profiles row', () async {

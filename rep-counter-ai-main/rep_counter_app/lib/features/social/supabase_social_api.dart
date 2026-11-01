@@ -95,6 +95,13 @@ class SupabaseSocialApi implements SocialApi {
   }
 
   @override
+  Future<String?> displayName(String userId) async {
+    final rows = await _rpc.select('profiles', {'user_id': userId});
+    final name = rows.isEmpty ? null : rows.first['display_name'];
+    return name is String && name.trim().isNotEmpty ? name : null;
+  }
+
+  @override
   Future<List<LeaderboardRow>> leaderboard(String exerciseId) async => [
         for (final r in await _rows('social_leaderboard', {
           'p_exercise_id': exerciseId,

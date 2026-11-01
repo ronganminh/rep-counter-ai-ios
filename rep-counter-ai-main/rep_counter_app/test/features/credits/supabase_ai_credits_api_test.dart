@@ -85,6 +85,11 @@ class AsyncContractRpc implements BackendRpc {
   @override
   Future<void> upsert(String table, Map<String, Object?> row) =>
       throw UnimplementedError();
+
+  @override
+  Future<List<Map<String, Object?>>> select(
+          String table, Map<String, Object> where) =>
+      throw UnimplementedError();
 }
 
 void main() {
