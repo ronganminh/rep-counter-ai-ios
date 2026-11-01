@@ -7,6 +7,7 @@ import 'package:rep_counter_app/features/credits/supabase_ai_credits_api.dart';
 import 'package:rep_counter_app/features/progression/supabase_xp_api.dart';
 import 'package:rep_counter_app/features/progression/xp.dart';
 import 'package:rep_counter_app/features/sync/cloud_sync.dart';
+import 'package:rep_counter_app/features/sync/plan_sync.dart';
 import 'package:rep_counter_app/features/sync/supabase_cloud_sync_api.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
@@ -150,6 +151,23 @@ void main() {
       expect(await sync.clientIds(), isNot(contains(clientId)));
       // No XP revoke on delete (D-05).
       expect((await SupabaseXpApi(rpc).progress()).xpTotal, xp.xpTotal);
+    });
+
+    test('2b. plans: push one plan doc and pull it back', () async {
+      needSession();
+      if (!signedIn) return;
+      final plans = SupabasePlanSyncApi(rpc);
+      final at = DateTime.now().toUtc();
+      final stored = (await plans.push([
+        SyncWorkout(
+            clientId: 'rcit-plan-$runId',
+            raw: const {'plan': {'name': 'rcit'}, 'sessions': []},
+            clientUpdatedAt: at)
+      ]))
+          .single;
+      expect(stored.serverSeq, greaterThan(0));
+      final page = await plans.pull(after: stored.serverSeq - 1);
+      expect(page.workouts.map((p) => p.clientId), contains('rcit-plan-$runId'));
     });
 
     test('3. xp_progress', () async {

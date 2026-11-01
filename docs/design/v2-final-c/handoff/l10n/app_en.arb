@@ -17719,5 +17719,26 @@
   "faTryAgainWorkoutIsn": "Try again. Your workout isn't affected.",
   "@faTryAgainWorkoutIsn": {
     "description": "dynamic string in Final-A-Missing-Screens (logic) [source: Final C gap pass; status: machine-assisted-needs-review]"
+  },
+  "syncDeleteAccountBody": "Removes workouts from your account on every device. This phone keeps its copy. Your account is not deleted.",
+  "@syncDeleteAccountBody": {
+    "description": "[source: A-2 sync wiring; status: new]"
+  },
+  "syncDeleteBothBody": "Removes workouts from this phone and from your account. Your account is not deleted.",
+  "@syncDeleteBothBody": {
+    "description": "[source: A-2 sync wiring; status: new]"
+  },
+  "syncDeleteNeedsConnection": "Couldn’t reach your account, so nothing was deleted from it. Try again when you’re online.",
+  "@syncDeleteNeedsConnection": {
+    "description": "[source: A-2 sync wiring; status: new]"
+  },
+  "syncMergeOffer": "{count, plural, =1{1 workout on this phone isn’t in your account yet.} other{{count} workouts on this phone aren’t in your account yet.}}",
+  "@syncMergeOffer": {
+    "description": "[source: A-2 sync wiring; status: new]",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

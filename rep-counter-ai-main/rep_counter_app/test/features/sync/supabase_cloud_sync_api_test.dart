@@ -158,11 +158,14 @@ void main() {
     b = SyncEngine(api: api, local: phoneB);
   });
 
-  test('the contract lists exactly the functions the adapter calls', () {
+  test('the contract lists exactly the functions the adapters call', () {
     expect((contract['functions'] as Map).keys.toSet(), {
       'sync_pull_workouts',
       'sync_push_workouts',
       'sync_workout_client_ids',
+      // SupabasePlanSyncApi (supabase_plan_sync_api_test.dart).
+      'sync_pull_plans',
+      'sync_push_plans',
     });
   });
 

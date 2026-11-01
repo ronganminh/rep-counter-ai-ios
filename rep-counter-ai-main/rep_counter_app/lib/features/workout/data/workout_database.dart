@@ -22,7 +22,8 @@ class WorkoutDatabase {
 
   static const fileName = 'repcoach.db';
   static const legacyKey = 'workout_history_v1';
-  static const schemaVersion = 1;
+  /// 2 adds the cloud-sync bookkeeping tables (A-2), see [createSyncTables].
+  static const schemaVersion = 2;
 
   /// Meta key written once the first import has been verified.
   static const importedKey = 'legacy_import_v1';
@@ -56,6 +57,9 @@ class WorkoutDatabase {
     final db = await openDatabase(path,
         version: schemaVersion,
         onCreate: (db, _) => _create(db),
+        onUpgrade: (db, from, _) async {
+          if (from < 2) await createSyncTables(db);
+        },
         // In-memory test databases must not be shared between tests.
         singleInstance: pathOverride == null);
     final store = WorkoutDatabase._(db);
@@ -82,6 +86,79 @@ class WorkoutDatabase {
     await db.execute('CREATE TABLE unreadable_workouts (raw TEXT PRIMARY KEY)');
     await db.execute(
         'CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL)');
+    await createSyncTables(db);
+  }
+
+  /// Cloud-sync bookkeeping (A-2), beside `workouts` so that table and its
+  /// rows never change shape. Additive and idempotent: safe on every open,
+  /// on a fresh install and after an interrupted upgrade.
+  ///
+  /// * `sync_rows`: one row per workout that belongs to the account:
+  ///   `pending` (to upload), `synced`, or `kept` (no longer synced with this
+  ///   phone: kept on the phone only, or removed from the phone only). A
+  ///   workout with no row here is local and undecided: it is only uploaded
+  ///   after the guest → account merge.
+  /// * `sync_deletions`: deletions of account workouts not uploaded yet,
+  ///   with the deleted JSON (the server needs the full row for a tombstone).
+  static Future<void> createSyncTables(DatabaseExecutor db) async {
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sync_rows (
+        client_id TEXT PRIMARY KEY,
+        state TEXT NOT NULL,
+        updated_at INTEGER NOT NULL
+      )''');
+    await db.execute('''
+      CREATE TABLE IF NOT EXISTS sync_deletions (
+        client_id TEXT PRIMARY KEY,
+        raw TEXT NOT NULL,
+        deleted_at INTEGER NOT NULL
+      )''');
+  }
+
+  /// The account this phone's synced workouts belong to, if signed in.
+  static const syncUserKey = 'sync_user';
+
+  static Future<String?> metaValue(DatabaseExecutor db, String key) async {
+    final rows = await db.query('meta',
+        columns: ['value'], where: 'key = ?', whereArgs: [key], limit: 1);
+    return rows.isEmpty ? null : rows.single['value'] as String;
+  }
+
+  static Future<void> setMeta(
+          DatabaseExecutor db, String key, String? value) =>
+      value == null
+          ? db.delete('meta', where: 'key = ?', whereArgs: [key])
+          : db.insert('meta', {'key': key, 'value': value},
+              conflictAlgorithm: ConflictAlgorithm.replace);
+
+  static Future<String?> syncStateOf(
+      DatabaseExecutor db, String clientId) async {
+    final rows = await db.query('sync_rows',
+        columns: ['state'],
+        where: 'client_id = ?',
+        whereArgs: [clientId],
+        limit: 1);
+    return rows.isEmpty ? null : rows.single['state'] as String;
+  }
+
+  /// Records a local change to [clientId] for sync. A new workout belongs to
+  /// the account when one is linked; an existing one keeps its side: an
+  /// account workout becomes pending again, a local or kept one stays.
+  static Future<void> markChanged(DatabaseExecutor db, String clientId,
+      {required bool isNew}) async {
+    final state = await syncStateOf(db, clientId);
+    final linked = await metaValue(db, syncUserKey) != null;
+    final upload =
+        state == 'pending' || state == 'synced' || (isNew && linked);
+    if (!upload) return;
+    await db.insert(
+        'sync_rows',
+        {
+          'client_id': clientId,
+          'state': 'pending',
+          'updated_at': DateTime.now().toUtc().millisecondsSinceEpoch,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   /// Imports every legacy entry not already present, then verifies that each

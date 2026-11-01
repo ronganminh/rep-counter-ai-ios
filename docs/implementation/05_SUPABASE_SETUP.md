@@ -153,7 +153,9 @@ Still open:
 
 Every flag is off unless set, and each backend v2 flag also needs `ENABLE_ACCOUNTS`. `test/features/auth/staging_config_test.dart` fails if the staging example names a define the app does not read (a typo such as `ENABLE_SYNC` would otherwise be ignored silently).
 
-> **State of the app with the backend v2 flags on (2026-10-31).** The Supabase adapters for sync, credits, XP, social and inbox exist and are tested (`lib/features/*/supabase_*_api.dart`), but **no screen or background job calls them yet**: the local workout database has no sync bookkeeping (`client_updated_at`, `deleted_at`, cursor), and there is no credits, XP, friends or inbox UI. A staging build with these flags therefore behaves like an accounts-only build. The backend is verified with the integration test (`supabase/README.md`, "Integration test on staging"), not on the device. Wiring each feature into the app is the next step and needs its own PR.
+> **State of the app with the backend v2 flags on.** Wired into the app one feature per PR (owner approval 2026-10-31):
+> - **Sync (A-2), wired:** `SyncController` (`lib/features/sync/`) runs when the app opens signed in, at sign-in, about 2 s after a workout or plan is saved or deleted, when the app returns to the foreground, on "Sync now" (Profile), and retries after 30 s / 2 min / 10 min on failure. Home and Profile show the sync badge ("N waiting to sync", offline, couldn't sync, synced). Guest workouts are offered with "Bring your workouts" (dry run first, one choice for workouts that differ, or keep them on this phone). Settings › Delete workout history asks phone / account / both (D-20).
+> - Credits, XP, social and inbox: adapters only, no screen yet (next PRs).
 
 ### Building the staging app
 
@@ -308,9 +310,14 @@ Paste the printed JWT into Supabase › Authentication › Providers › Apple �
 | D9 | any | Profile › Delete account › type DELETE | **Needs the `delete-account` function deployed**; then the user is gone in the dashboard |
 | D10 | any | Airplane mode | Training, history and counting work as a guest; sign-in shows "Can't connect" |
 | D11 | any | Fresh install **without** `ENABLE_ACCOUNTS` | No account UI at all |
-| D12 | any | Staging build (all backend v2 flags as in the example). Signed in, record 2 workouts (camera + manual), then airplane mode, record 1 more, force-quit, reopen | Training, history and counting work; nothing lost; no crash. Sync: **no UI yet** (§9 note), so nothing to see; record ✅ for "no crash, no loss" |
+| D12 | any | Staging build (all backend v2 flags as in the example). Signed in, record 2 workouts (camera + manual), then airplane mode, record 1 more, force-quit, reopen | Training, history and counting work; nothing lost; no crash. Home badge "Offline · 1 waiting to sync" while offline; back online it turns "Synced" within a few seconds (or tap Profile › Sync now) |
 | D13 | any | Same build, then in the dashboard sign the user out / revoke sessions; keep training | "Your session expired" banner (D8); local history intact; no crash |
-| D14 | — | Sync push / pull | **Not testable in the app yet** (no caller). Covered by the integration test, steps 2 |
+| D14a | phone A + phone B (or reinstall) | Same account on both. Record a workout on A; on B open the app (or Profile › Sync now) | B shows the workout once in History; Home badge "Synced" on both. In the dashboard, `workouts` has one row for it |
+| D14b | phone A + B | Delete that workout on A (History); sync B | Gone on B too (tombstone). Undo on A within 5 s instead: it stays on both |
+| D14c | any | As a guest record 2 workouts, then sign in to an account that already has workouts | Banner "Bring your workouts" on Home / Profile; the preview counts "already in your account" / "new"; Merge uploads only the new ones (dashboard row count goes up by exactly those). "Keep workouts on this phone only" makes the banner go away and uploads nothing |
+| D14d | any | Same workout edited on two phones before syncing (e.g. AI feedback on one) | The merge preview shows "1 workout differs" with "Keep the account version" / "Keep this phone's version"; the chosen one ends up on both |
+| D14e | any | Settings › Delete workout history › This phone only / My account / Both, type DELETE | Phone only: History empty here, the account (dashboard) keeps the rows and they don't come back to this phone. My account: rows become tombstones in the dashboard, this phone keeps its copy. Both: both empty. Airplane mode with My account / Both: "Couldn't reach your account, so nothing was deleted" and nothing changes. The account itself is never deleted |
+| D14f | any | Create a plan; sync; open the app on phone B | The plan is on B. Start a different plan on B: the newer one stays active on both |
 | D15 | — | AI credits (`ai-request`, balance) | **Not testable in the app yet.** Integration test, step 4. Basic post-workout feedback is unchanged and stays free (D-07) |
 | D16 | — | XP / level | **Not testable in the app yet.** Integration test, steps 2–3 |
 | D17 | — | Social (invite, accept, block, report, leaderboard) and inbox | **Not testable in the app yet** (no screens). Backend covered by `supabase/tests/social.test.sql` and `push_inbox.test.sql` in CI |
