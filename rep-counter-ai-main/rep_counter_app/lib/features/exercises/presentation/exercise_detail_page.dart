@@ -112,7 +112,8 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
             AppButton(
               key: const Key('exercise-start'),
               label: l.workoutStart,
-              onPressed: () => showPlanTodaySheet(context, profile),
+              onPressed: () =>
+                  showPlanTodaySheet(context, profile, showPlan: false),
             ),
           ],
         ),
