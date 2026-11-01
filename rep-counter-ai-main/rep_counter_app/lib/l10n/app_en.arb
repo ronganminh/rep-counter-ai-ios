@@ -17740,5 +17740,62 @@
         "type": "int"
       }
     }
+  },
+  "creditsChip": "{credits, plural, =1{1 AI credit} other{{credits} AI credits}}",
+  "@creditsChip": {
+    "description": "[source: AI-1 credits wiring; status: new]",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsMeterTitle": "AI credits this week",
+  "@creditsMeterTitle": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsMeterValue": "{used} of {allowance} used",
+  "@creditsMeterValue": {
+    "description": "[source: AI-1 credits wiring; status: new]",
+    "placeholders": {
+      "used": {
+        "type": "int"
+      },
+      "allowance": {
+        "type": "int"
+      }
+    }
+  },
+  "creditsResetsMonday": "Resets Monday",
+  "@creditsResetsMonday": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsNoneLeftTitle": "No AI credits left this week",
+  "@creditsNoneLeftTitle": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsNoneLeftBody": "They come back on Monday. Feedback after workouts stays free.",
+  "@creditsNoneLeftBody": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "creditsUnavailable": "Couldn’t load your AI credits. Nothing was used.",
+  "@creditsUnavailable": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachAnalyzeLastWorkout": "Analyze my last workout",
+  "@coachAnalyzeLastWorkout": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachUsesOneCredit": "Uses 1 AI credit",
+  "@coachUsesOneCredit": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachConsentTitle": "Send to the AI coach?",
+  "@coachConsentTitle": {
+    "description": "[source: AI-1 credits wiring; status: new]"
+  },
+  "coachConsentBody": "Your message, and for analyses a summary of your workout numbers, go to the RepCoach server and then to GroqCloud to write the answer. No video, photos or body keypoints. The conversation is not stored on our server.",
+  "@coachConsentBody": {
+    "description": "[source: AI-1 credits wiring; status: new]"
   }
 }
