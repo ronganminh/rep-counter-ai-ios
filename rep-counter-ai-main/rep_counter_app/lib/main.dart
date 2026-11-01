@@ -17,6 +17,7 @@ import 'features/auth/application/auth_scope.dart';
 import 'features/auth/data/auth_bootstrap.dart';
 import 'features/auth/presentation/password_reset_pages.dart';
 import 'features/credits/credits_controller.dart';
+import 'features/inbox/inbox_controller.dart';
 import 'features/legal/onboarding_page.dart';
 import 'features/progression/xp_controller.dart';
 import 'features/social/social.dart';
@@ -59,6 +60,9 @@ class _RepCounterAppState extends State<RepCounterApp> {
   /// Friends and leaderboard (S-1) behind `ENABLE_SOCIAL`.
   SocialApi? _social;
 
+  /// The in-app inbox (NT-2) behind `ENABLE_INBOX`; pushes stay off.
+  InboxController? _inbox;
+
   @override
   void initState() {
     super.initState();
@@ -74,12 +78,14 @@ class _RepCounterAppState extends State<RepCounterApp> {
     final credits = createCreditsController(auth);
     final xp = createXpController(auth, sync: sync);
     final social = createSocialApi();
+    final inbox = createInboxController(auth);
     setState(() {
       _auth = auth;
       _sync = sync;
       _credits = credits;
       _xp = xp;
       _social = social;
+      _inbox = inbox;
     });
     await auth.restore();
   }
@@ -101,6 +107,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
     _sync?.dispose();
     _credits?.dispose();
     _xp?.dispose();
+    _inbox?.dispose();
     _auth?.dispose();
     super.dispose();
   }
@@ -112,6 +119,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
     }
     if (_xp != null) out = XpScope(controller: _xp!, child: out);
     if (_social != null) out = SocialScope(api: _social!, child: out);
+    if (_inbox != null) out = InboxScope(controller: _inbox!, child: out);
     return _sync == null ? out : SyncScope(controller: _sync!, child: out);
   }
 

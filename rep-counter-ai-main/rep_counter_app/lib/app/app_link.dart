@@ -93,6 +93,11 @@ class OpenWorkout extends LinkTarget {
 }
 
 /// A tab, plus a notice when the link could not be followed.
+/// The in-app inbox (NT-2).
+class OpenInbox extends LinkTarget {
+  const OpenInbox();
+}
+
 /// Friends (S-1), signed in or through the auth gate; [inviteCode] from a
 /// `repcoach://invites/<code>` link is offered for acceptance.
 class OpenFriends extends LinkTarget {
@@ -111,16 +116,21 @@ class AppLinkRouter {
   AppLinkRouter(
       {PlanRepository? plans,
       Future<List<WorkoutRecord>> Function()? loadWorkouts,
-      bool Function()? socialEnabled})
+      bool Function()? socialEnabled,
+      bool Function()? inboxEnabled})
       : _plans = plans ?? PlanRepository(),
         _loadWorkouts = loadWorkouts ?? WorkoutHistoryStore().load,
-        _social = socialEnabled ?? (() => false);
+        _social = socialEnabled ?? (() => false),
+        _inbox = inboxEnabled ?? (() => false);
 
   final PlanRepository _plans;
   final Future<List<WorkoutRecord>> Function() _loadWorkouts;
 
   /// Whether Friends exists in this build (`ENABLE_SOCIAL` and accounts).
   final bool Function() _social;
+
+  /// Whether the inbox exists in this build (`ENABLE_INBOX` and accounts).
+  final bool Function() _inbox;
 
   Future<LinkTarget> resolve(AppLink link) async {
     switch (link.kind) {
@@ -145,6 +155,8 @@ class AppLinkRouter {
           if (r.id == link.id) return OpenWorkout(r);
         }
         return const LinkFallback(AppTab.progress, LinkNotice.workoutGone);
+      case AppLinkKind.inbox when _inbox():
+        return const OpenInbox();
       case AppLinkKind.inbox:
         return const LinkFallback(AppTab.home);
       case AppLinkKind.membership:

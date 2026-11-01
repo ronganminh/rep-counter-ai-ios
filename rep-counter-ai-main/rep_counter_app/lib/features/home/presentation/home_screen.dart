@@ -9,6 +9,7 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../../exercises/presentation/exercise_picker_screen.dart';
+import '../../inbox/presentation/inbox_page.dart';
 import '../../plan/presentation/plan_home_card.dart';
 import '../../progression/presentation/xp_widgets.dart';
 import '../../plan/presentation/plan_today_sheet.dart';
@@ -70,6 +71,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                         style: AppTypography.title20
                                             .copyWith(color: p.accentInk)),
                                   ]))),
+                      const InboxBell(),
                     ]),
                     const SizedBox(height: 32),
                     Text(
