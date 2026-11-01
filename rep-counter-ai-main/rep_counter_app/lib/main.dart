@@ -18,6 +18,7 @@ import 'features/auth/data/auth_bootstrap.dart';
 import 'features/auth/presentation/password_reset_pages.dart';
 import 'features/credits/credits_controller.dart';
 import 'features/legal/onboarding_page.dart';
+import 'features/progression/xp_controller.dart';
 import 'features/sync/sync_controller.dart';
 import 'features/sync/sync_scope.dart';
 import 'camera_page.dart';
@@ -50,6 +51,9 @@ class _RepCounterAppState extends State<RepCounterApp> {
   /// AI credits and the AI Coach (AI-1) behind `ENABLE_AI_CREDITS`.
   CreditsController? _credits;
 
+  /// XP, level and server achievements (G-1) behind `ENABLE_XP`.
+  XpController? _xp;
+
   @override
   void initState() {
     super.initState();
@@ -63,10 +67,12 @@ class _RepCounterAppState extends State<RepCounterApp> {
     final auth = AuthController(repository);
     final sync = createSyncController(auth)?..start();
     final credits = createCreditsController(auth);
+    final xp = createXpController(auth, sync: sync);
     setState(() {
       _auth = auth;
       _sync = sync;
       _credits = credits;
+      _xp = xp;
     });
     await auth.restore();
   }
@@ -87,6 +93,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
     _locale.dispose();
     _sync?.dispose();
     _credits?.dispose();
+    _xp?.dispose();
     _auth?.dispose();
     super.dispose();
   }
@@ -96,6 +103,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
     if (_credits != null) {
       out = CreditsScope(controller: _credits!, child: out);
     }
+    if (_xp != null) out = XpScope(controller: _xp!, child: out);
     return _sync == null ? out : SyncScope(controller: _sync!, child: out);
   }
 

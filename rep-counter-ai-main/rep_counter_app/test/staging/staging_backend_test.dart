@@ -170,12 +170,24 @@ void main() {
       expect(page.workouts.map((p) => p.clientId), contains('rcit-plan-$runId'));
     });
 
-    test('3. xp_progress', () async {
+    test('3. xp_progress and achievements', () async {
       needSession();
       if (!signedIn) return;
       final xp = await SupabaseXpApi(rpc).progress();
       expect(xp.xpTotal, greaterThanOrEqualTo(0));
       expect(xp.level, XpRules.levelFor(xp.xpTotal));
+      // Achievements from the server (20261031000100_achievements.sql).
+      try {
+        final unlocked = await SupabaseXpApi(rpc).achievements();
+        expect(unlocked.map((a) => a.id), contains('firstWorkout'));
+      } on BackendException catch (e) {
+        if (e.code == 'PGRST202') {
+          markTestSkipped('achievements_list missing: apply '
+              '20261031000100_achievements.sql (supabase db push)');
+          return;
+        }
+        rethrow;
+      }
     });
 
     test('4. ai-request with the JWT charges one credit, once', () async {
