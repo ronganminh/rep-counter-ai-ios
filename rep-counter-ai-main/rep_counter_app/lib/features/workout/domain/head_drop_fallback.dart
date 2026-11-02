@@ -14,6 +14,9 @@
 /// channel, so a user sitting or kneeling between sets cannot feed it.
 library;
 
+import 'dart:math' as math;
+import 'dart:ui' show Offset;
+
 import 'package:google_mlkit_pose_detection/google_mlkit_pose_detection.dart';
 
 import '../../../exercise.dart';
@@ -31,6 +34,8 @@ class HeadDropFallback {
     this.smoothWindow = 3,
     this.minPeriod = const Duration(milliseconds: 700),
     this.minWristSpanFraction = 0.15,
+    this.maxHandTravel = 0.3,
+    this.handWindow = const Duration(seconds: 2),
   });
 
   /// The head must come back above this to complete a rep.
@@ -45,14 +50,24 @@ class HeadDropFallback {
   /// Wrist span as a fraction of the short side of the view. Closer wrists
   /// mean the landmarks collapsed; such a frame carries no signal.
   final double minWristSpanFraction;
+
+  /// Hands stay planted through a push-up. A head rep is dropped when the
+  /// midpoint of the wrists moved more than this many wrist spans during the
+  /// last [handWindow]: that is a gesture (hands to the head while kneeling),
+  /// not a push-up. Measured on pushup-1 (rest between sets).
+  final double maxHandTravel;
+  final Duration handWindow;
 }
+
+/// One frame of the head-drop channel.
+typedef HeadDropFrame = ({double signal, Offset wrists, double span});
 
 /// How far the nose is above the hands, in wrist spans.
 ///
 /// The value is about 1.0–1.6 at the top of a push-up and 0.0–0.3 at the
 /// bottom on the user video. It is null when the nose or a wrist is missing,
 /// or when the wrists collapse together.
-double? headDropSignal(
+HeadDropFrame? headDropSignal(
   Landmarks lm, {
   required double minLikelihood,
   required double viewShortSide,
@@ -64,7 +79,8 @@ double? headDropSignal(
   if (nose == null || lw == null || rw == null) return null;
   final span = (lw.dx - rw.dx).abs();
   if (span < viewShortSide * config.minWristSpanFraction) return null;
-  return ((lw.dy + rw.dy) / 2 - nose.dy) / span;
+  final mid = Offset((lw.dx + rw.dx) / 2, (lw.dy + rw.dy) / 2);
+  return (signal: (mid.dy - nose.dy) / span, wrists: mid, span: span);
 }
 
 /// Lets one physical rep count once when two channels can each see it.
@@ -125,6 +141,25 @@ class HeadDropChannel {
   // still carries elbow angles for the quality checks and the history.
   double? _elbowMin, _elbowMax;
 
+  final List<({Duration at, Offset wrists, double span})> _hands = [];
+
+  bool get _handsPlanted {
+    if (_hands.isEmpty) return false;
+    var minX = double.infinity, maxX = -double.infinity;
+    var minY = double.infinity, maxY = -double.infinity;
+    final spans = <double>[];
+    for (final h in _hands) {
+      minX = math.min(minX, h.wrists.dx);
+      maxX = math.max(maxX, h.wrists.dx);
+      minY = math.min(minY, h.wrists.dy);
+      maxY = math.max(maxY, h.wrists.dy);
+      spans.add(h.span);
+    }
+    spans.sort();
+    final span = spans[spans.length ~/ 2];
+    return math.max(maxX - minX, maxY - minY) <= config.maxHandTravel * span;
+  }
+
   /// Keeps the elbow events that are not duplicates of a fallback rep.
   List<RepEvent> filterPrimary(List<RepEvent> events, double? elbowSignal) {
     if (elbowSignal != null) {
@@ -151,12 +186,19 @@ class HeadDropChannel {
   /// elbow channel already reports the same interruption.
   List<RepEvent> update({
     required Duration at,
-    required double? headSignal,
+    required HeadDropFrame? frame,
     double? torsoDeviationDeg,
     double poseConfidence = 1.0,
   }) {
-    final v = headSignal == null ? null : _smooth.add(headSignal);
-    if (v == null) _smooth.reset();
+    final v = frame == null ? null : _smooth.add(frame.signal);
+    if (frame == null) {
+      _smooth.reset();
+      _hands.clear();
+    } else {
+      _hands
+        ..add((at: at, wrists: frame.wrists, span: frame.span))
+        ..removeWhere((h) => at - h.at > config.handWindow);
+    }
     final events = _tracker.update(PoseSample(
       at: at,
       signal: v,
@@ -166,6 +208,7 @@ class HeadDropChannel {
     final out = <RepEvent>[];
     for (final e in events) {
       if (e is! RepCompleted) continue;
+      if (!_handsPlanted) continue;
       if (!fusion.acceptFallback(e.at)) continue;
       final o = e.observation;
       out.add(RepCompleted(
@@ -191,6 +234,7 @@ class HeadDropChannel {
   void interrupt(Duration at) {
     _tracker.onInterrupted(at, RepAbortReason.placementLost);
     _smooth.reset();
+    _hands.clear();
     _elbowMin = _elbowMax = null;
   }
 }

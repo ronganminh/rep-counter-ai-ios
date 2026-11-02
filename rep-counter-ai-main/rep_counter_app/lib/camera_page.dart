@@ -1026,13 +1026,13 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             signalRestored = true;
           }
           final head = _head;
-          final headSignal = head == null
+          final headFrame = head == null
               ? null
               : headDropSignal(lm,
                   minLikelihood: p.minLikelihood,
                   viewShortSide: math.min(view.width, view.height),
                   config: head.config);
-          _ciHeadSignal = headSignal;
+          _ciHeadSignal = headFrame?.signal;
           if (_workout.acceptsReps) {
             final elbow = _trackL.update(sample(v));
             _handle(head == null ? elbow : head.filterPrimary(elbow, v), now,
@@ -1041,7 +1041,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
               _handle(
                   head.update(
                     at: now,
-                    headSignal: headSignal,
+                    frame: headFrame,
                     torsoDeviationDeg: torso,
                     poseConfidence: conf,
                   ),

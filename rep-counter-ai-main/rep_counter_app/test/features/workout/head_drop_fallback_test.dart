@@ -25,7 +25,12 @@ Landmarks _frame({required double noseY, double span = 330}) {
 const _config = HeadDropFallback();
 
 double? _signal(Landmarks lm) => headDropSignal(lm,
-    minLikelihood: 0.4, viewShortSide: 720, config: _config);
+        minLikelihood: 0.4, viewShortSide: 720, config: _config)
+    ?.signal;
+
+/// A frame with planted hands at (360, 880), 330 px apart.
+HeadDropFrame _f(double h, {Offset wrists = const Offset(360, 880)}) =>
+    (signal: h, wrists: wrists, span: 330);
 
 /// Head height (in wrist spans) for one rep, 15 frames a second.
 const _oneRep = [1.3, 1.3, 1.1, 0.8, 0.4, 0.15, 0.05, 0.1, 0.4, 0.8, 1.1, 1.3, 1.3];
@@ -38,7 +43,7 @@ List<RepEvent> _feed(HeadDropChannel c, List<double> heads, int startMs,
   for (var i = 0; i < heads.length; i++) {
     final at = _ms(startMs + i * 67);
     if (elbowAt != null) out.addAll(c.filterPrimary(elbowAt(i, at), 150));
-    out.addAll(c.update(at: at, headSignal: heads[i]));
+    out.addAll(c.update(at: at, frame: _f(heads[i])));
   }
   return out;
 }
@@ -130,9 +135,22 @@ void main() {
       final out = <RepEvent>[];
       for (var i = 0; i < _oneRep.length; i++) {
         out.addAll(c.update(
-            at: _ms(i * 67), headSignal: i == 6 ? null : _oneRep[i]));
+            at: _ms(i * 67), frame: i == 6 ? null : _f(_oneRep[i])));
       }
       expect(out.whereType<RepCompleted>(), hasLength(1));
+    });
+
+    test('hands moving (a gesture while kneeling) is not a rep', () {
+      // Hands go up to the head and back: the wrists travel a full span.
+      final c = HeadDropChannel(_config);
+      final out = <RepEvent>[];
+      for (var i = 0; i < _oneRep.length; i++) {
+        final lift = 330 * (1.3 - _oneRep[i]);
+        out.addAll(c.update(
+            at: _ms(i * 67),
+            frame: _f(_oneRep[i], wrists: Offset(360, 880 - lift))));
+      }
+      expect(out.whereType<RepCompleted>(), isEmpty);
     });
 
     test('a small head bob in plank is not a rep', () {
