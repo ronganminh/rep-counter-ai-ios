@@ -102,10 +102,15 @@ class RepFeedbackTransition extends StatelessWidget {
   Widget build(BuildContext context) {
     final reducedMotion =
         MediaQuery.maybeOf(context)?.disableAnimations ?? false;
+    // A clean counted rep shows nothing: the rep number going up is the
+    // feedback (owner, 2026-11-02). Warnings and lost-pose notices still show.
+    final feedback = this.feedback?.kind == RepFeedbackKind.countedClean
+        ? null
+        : this.feedback;
     final valueKey = feedback == null
         ? const ValueKey<String>('rep-feedback-empty')
         : ValueKey<String>(
-            '${feedback!.kind.name}:${feedback!.repNumber?.toString() ?? ''}:${feedback!.primaryFlag?.name ?? ''}',
+            '${feedback.kind.name}:${feedback.repNumber?.toString() ?? ''}:${feedback.primaryFlag?.name ?? ''}',
           );
 
     return AnimatedSwitcher(
@@ -123,7 +128,7 @@ class RepFeedbackTransition extends StatelessWidget {
       },
       child: feedback == null
           ? SizedBox.shrink(key: valueKey)
-          : RepFeedbackPill(key: valueKey, feedback: feedback!),
+          : RepFeedbackPill(key: valueKey, feedback: feedback),
     );
   }
 }

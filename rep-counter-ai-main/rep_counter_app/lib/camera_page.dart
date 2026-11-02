@@ -266,7 +266,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         mode: widget.ciVideoPath == null
             ? PoseDetectionMode.stream
             : PoseDetectionMode.single,
-        model: PoseDetectionModel.base,
+        // `accurate`, not `base`: with the phone low in front, `base` put the
+        // hips on the face and straightened the arms at the bottom of real
+        // push-ups, so deep reps were not counted (user video, 2026-11-02).
+        model: PoseDetectionModel.accurate,
       ),
     );
     _buildCounters(p.repHi, p.repLo, p.minAmplitude);
