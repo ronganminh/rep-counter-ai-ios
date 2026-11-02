@@ -37,7 +37,7 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
   VideoPlayerController? _video;
   final _detector = PoseDetector(
     options: PoseDetectorOptions(
-        mode: PoseDetectionMode.single, model: PoseDetectionModel.accurate),
+        mode: PoseDetectionMode.single, model: PoseDetectionModel.base),
   );
   // Khung hướng dẫn cần chuỗi theo ngôn ngữ, mà InheritedWidget chưa dùng được
   // trong khởi tạo trường. Dựng lại ở didChangeDependencies để đổi ngôn ngữ
