@@ -2,7 +2,7 @@ name: RepCoach clip smoke replay
 
 # Plan 07 PR B: a fast, MEASURE-ONLY counting smoke set built from the CC0
 # sample clips of namnq/workout-free-videos (test/fixtures/clip_smoke_set.json).
-# Each clip is looped N times and replayed through the production workout on
+# Each clip is looped N times (re-encoded all-intra) and replayed through the production workout on
 # the iOS Simulator and the Android emulator; the app count is compared with
 # the eye-counted ground truth and reported in the job summary.
 #
@@ -64,8 +64,14 @@ jobs:
               assert len(data) == c["bytes"], (key, len(data))
               assert hashlib.sha256(data).hexdigest() == c["sha256"], key
               dst = os.path.join(out, key + ".mp4")
+              # Re-encode all-intra (-g 1): the library clips have a single
+              # keyframe, and the iOS frame extractor (AVAssetImageGenerator,
+              # default tolerance) snaps to keyframes, so with -c copy every
+              # sample on iOS was the first frame of a loop.
               subprocess.run(["ffmpeg", "-v", "error", "-y", "-stream_loop",
-                              str(c["loops"] - 1), "-i", src, "-c", "copy",
+                              str(c["loops"] - 1), "-i", src, "-an",
+                              "-c:v", "libx264", "-preset", "veryfast",
+                              "-crf", "20", "-g", "1", "-pix_fmt", "yuv420p",
                               "-movflags", "+faststart", dst], check=True)
               dur = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                                     "format=duration", "-of", "csv=p=0", dst],

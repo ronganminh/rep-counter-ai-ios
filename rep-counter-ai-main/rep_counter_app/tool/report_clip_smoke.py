@@ -38,6 +38,14 @@ def reasons(samples: list[dict[str, str]]) -> str:
         return "no timeline samples"
     n = len(samples)
     parts = []
+    positioning = [int(s["at_ms"]) for s in samples
+                   if s.get("phase") == "positioning" and s.get("at_ms", "").isdigit()]
+    if positioning:
+        total = max((int(s["total_ms"]) for s in samples
+                     if s.get("total_ms", "").isdigit()), default=0)
+        end = max(positioning) + 5000
+        parts.append("positioning the whole clip" if total and end >= total
+                     else f"positioning until ~{end / 1000:.0f} s")
     no_pose = sum(1 for s in samples if s.get("pose") == "false")
     if no_pose:
         parts.append(f"pose lost {no_pose}/{n}")
@@ -45,8 +53,13 @@ def reasons(samples: list[dict[str, str]]) -> str:
         s.get("placement") for s in samples
         if s.get("pose") == "true" and s.get("placement") not in (None, "ok", "ready"))
     if placements:
-        top = ", ".join(f"{k} {v}" for k, v in placements.most_common(2))
-        parts.append(f"placement {top}/{n}")
+        top = ", ".join(f"{k} {v}/{n}" for k, v in placements.most_common(2))
+        parts.append(f"placement {top}")
+    details = collections.Counter(
+        s.get("detail") for s in samples
+        if s.get("placement") not in (None, "ready") and s.get("detail"))
+    if details:
+        parts.append("detail " + details.most_common(1)[0][0].replace("_", " "))
     closed = sum(1 for s in samples
                  if s.get("pose") == "true" and s.get("gate") == "false")
     if closed:
@@ -82,7 +95,8 @@ def main() -> int:
 
     started = STARTED.search(timeline + "\n" + result)
     exercise = started.group(1) if started else None
-    samples = [dict(FIELD.findall(m.group(2))) for m in SAMPLE.finditer(timeline)]
+    samples = [{"at_ms": m.group(1), **dict(FIELD.findall(m.group(2)))}
+               for m in SAMPLE.finditer(timeline)]
     match = RESULT.search(result)
 
     harness_error = None
