@@ -1,6 +1,6 @@
 # 07 · Exercise library (workout-free-videos): plan for PR A and PR B
 
-Status: PLAN. The owner asked for this on 2026-11-05. Each part becomes its own small PR in a new session. Rules: open PRs only; no merge, deploy or release; no secrets; CI must be green.
+Status: PLAN — owner decisions recorded (see the end). The owner asked for this on 2026-11-05. Each part becomes its own small PR in a new session. Rules: open PRs only; no merge, deploy or release; no secrets; CI must be green.
 
 ## Source
 
@@ -79,9 +79,9 @@ Consequences:
    "Reason" is filled from the CI debug log (`placement`, `gate`, `raw_l/raw_r`, `signal`, `head`). Examples: pose lost, camera angle, shallow, gate closed.
 5. **Scope:** a separate fast replay set that never changes the baselines of the three reference videos.
 
-## Open questions for the owner
+## Owner decisions (2026-11-05)
 
-- Should the curl use `b01` (barbell) as "similar movement", or show no clip until there is a dumbbell curl clip?
-- Is it OK to bundle 2 clips (about 1 MB) in the app?
-- Where should the credit go: an existing About / Licences screen, or a new one?
-- Push-up has no clip. Should PR A show something else for push-ups (the current skeleton guide only), and should PR B wait for the owner's long videos?
+1. **Curl clip:** use `b01` `standing-barbell-curl`, labelled "minh hoạ với tạ đòn" (EN: "shown with a barbell").
+2. **Loading:** bundle the clips in the app (about 1 MB). No CDN streaming.
+3. **Credit:** put the source and CC0 on the existing About / Licences screen. Do not add a new screen.
+4. **Push-up:** keep the current skeleton guide. Push-up counting will be tested on the owner's long real videos, not on this library.
