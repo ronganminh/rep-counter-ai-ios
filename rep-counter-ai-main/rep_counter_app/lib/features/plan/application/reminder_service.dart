@@ -191,6 +191,10 @@ class ReminderService {
   final ReminderPrefsStore _prefs;
   final DateTime Function() _now;
 
+  /// The service's clock. Screens that list upcoming reminders use it too,
+  /// so they agree with what [savePrefs] schedules.
+  DateTime now() => _now();
+
   Future<ReminderPrefs> prefs() => _prefs.load();
 
   Future<ReminderPermission> permission() async {

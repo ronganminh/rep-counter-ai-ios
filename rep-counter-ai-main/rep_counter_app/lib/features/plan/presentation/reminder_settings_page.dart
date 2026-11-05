@@ -56,7 +56,7 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
       _prefs = prefs;
       _permission = permission;
       _upcoming = ReminderPlanner.plan(
-          widget.view.plan, widget.view.sessions, prefs, DateTime.now());
+          widget.view.plan, widget.view.sessions, prefs, _service.now());
     });
   }
 
