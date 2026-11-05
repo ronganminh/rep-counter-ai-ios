@@ -17903,5 +17903,65 @@
   "socialNameNotSet": "No display name yet: friends see “Friend”.",
   "@socialNameNotSet": {
     "description": "[source: S-1 follow-up; status: new]"
+  },
+  "guideClipTitle": "How it's done",
+  "@guideClipTitle": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "guideClipBarbellNote": "Shown with a barbell",
+  "@guideClipBarbellNote": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "guideClipPullUpLabel": "Looping demo video: wide-grip pull-up, seen from behind",
+  "@guideClipPullUpLabel": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "guideClipCurlLabel": "Looping demo video: standing barbell curl",
+  "@guideClipCurlLabel": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "guideClipPlay": "Play demo video",
+  "@guideClipPlay": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "guideClipPause": "Pause demo video",
+  "@guideClipPause": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "guideCuePullUp1": "Start from a dead hang",
+  "@guideCuePullUp1": {
+    "description": "[source: plan 07 PR A, cue copied from workout-free-videos exercises.json; status: new; vi: own translation, needs review]"
+  },
+  "guideCuePullUp2": "Pull the chest toward the bar",
+  "@guideCuePullUp2": {
+    "description": "[source: plan 07 PR A, cue copied from workout-free-videos exercises.json; status: new; vi: own translation, needs review]"
+  },
+  "guideCuePullUp3": "Lower all the way each rep",
+  "@guideCuePullUp3": {
+    "description": "[source: plan 07 PR A, cue copied from workout-free-videos exercises.json; status: new; vi: own translation, needs review]"
+  },
+  "guideCueCurl1": "Elbows stay pinned to the sides",
+  "@guideCueCurl1": {
+    "description": "[source: plan 07 PR A, cue copied from workout-free-videos exercises.json; status: new; vi: own translation, needs review]"
+  },
+  "guideCueCurl2": "Curl without leaning back",
+  "@guideCueCurl2": {
+    "description": "[source: plan 07 PR A, cue copied from workout-free-videos exercises.json; status: new; vi: own translation, needs review]"
+  },
+  "guideCueCurl3": "Lower all the way to full extension",
+  "@guideCueCurl3": {
+    "description": "[source: plan 07 PR A, cue copied from workout-free-videos exercises.json; status: new; vi: own translation, needs review]"
+  },
+  "settingsDemoVideosTitle": "Exercise demo videos",
+  "@settingsDemoVideosTitle": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "settingsDemoVideosBody": "The pull-up and curl demo videos come from workout-free-videos by namnq, released under CC0 1.0 (public domain). No credit is required; we credit the source anyway.",
+  "@settingsDemoVideosBody": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "settingsDemoVideosOpen": "Open source page",
+  "@settingsDemoVideosOpen": {
+    "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
   }
 }
