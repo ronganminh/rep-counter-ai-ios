@@ -85,3 +85,16 @@ Consequences:
 2. **Loading:** bundle the clips in the app (about 1 MB). No CDN streaming.
 3. **Credit:** put the source and CC0 on the existing About / Licences screen. Do not add a new screen.
 4. **Push-up:** keep the current skeleton guide. Push-up counting will be tested on the owner's long real videos, not on this library.
+
+## PR B status: clip smoke set (measure only)
+
+- **Manifest:** `test/fixtures/clip_smoke_set.json`. Both clips have **1 full rep per loop** with no partial rep, because the loop seam is at the start position (hang / arms extended). They are counted by eye, frame by frame (`counted_by: "eye, sample clip"`). Each is replayed **10 loops → 10 real reps**.
+- **Job:** `.github/workflows/smoke-replay.yml`. It runs on `workflow_dispatch` and on PRs that change its own files.
+  1. It downloads each clip from jsDelivr at the pinned tag and verifies its size and SHA-256.
+  2. It loops the clip with `ffmpeg -stream_loop 9 -c copy`.
+  3. It replays the clip on the iOS Simulator and the Android emulator (`tool/ci_ios_clip_replay.sh`, `tool/ci_android_replay.sh`).
+  4. `tool/report_clip_smoke.py` writes the table to the job summary.
+- **Failures:** no job fails on a count. A job fails only when the harness breaks: there is no result, or the replay opened another exercise.
+- **Locked exercise:** CI video mode now takes `REPCOACH_CI_VIDEO_EXERCISE` (default `push_up`). `ciVideoProfile` searches all engine profiles, so the locked pull-up opens. The start line reports `exercise=<id>`, and the report checks it.
+- **Unchanged:** the three reference replays and `video_ground_truth.json`.
+- **Results:** in the PR B description, from the smoke run.

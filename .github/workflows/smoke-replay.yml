@@ -1,0 +1,217 @@
+name: RepCoach clip smoke replay
+
+# Plan 07 PR B: a fast, MEASURE-ONLY counting smoke set built from the CC0
+# sample clips of namnq/workout-free-videos (test/fixtures/clip_smoke_set.json).
+# Each clip is looped N times and replayed through the production workout on
+# the iOS Simulator and the Android emulator; the app count is compared with
+# the eye-counted ground truth and reported in the job summary.
+#
+# - No job fails on a rep count. A job fails only when the harness breaks
+#   (no result, or the replay opened another exercise than the clip's).
+# - The three reference replays (ios-ci.yml, android-replay.yml) and their
+#   baselines in video_ground_truth.json are not touched.
+# - Pull-up is locked in the store build; the replay opens it through
+#   REPCOACH_CI_VIDEO_EXERCISE, which only exists in CI video mode.
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - ".github/workflows/smoke-replay.yml"
+      - "rep-counter-ai-main/rep_counter_app/test/fixtures/clip_smoke_set.json"
+      - "rep-counter-ai-main/rep_counter_app/tool/report_clip_smoke.py"
+      - "rep-counter-ai-main/rep_counter_app/tool/ci_ios_clip_replay.sh"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: repcoach-smoke-replay-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.47.5"
+  MANIFEST: test/fixtures/clip_smoke_set.json
+
+jobs:
+  clips:
+    name: Prepare looped clips
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    outputs:
+      matrix: ${{ steps.list.outputs.matrix }}
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+    steps:
+      - uses: actions/checkout@v7
+      - name: Install ffmpeg
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+      - name: Download, verify and loop each clip
+        id: list
+        run: |
+          set -euo pipefail
+          out="$RUNNER_TEMP/clips"; mkdir -p "$out"
+          python3 - "$MANIFEST" "$out" <<'PY'
+          import hashlib, json, os, subprocess, sys, urllib.request
+          manifest, out = sys.argv[1], sys.argv[2]
+          clips = json.load(open(manifest, encoding="utf-8"))["clips"]
+          keys = []
+          for key, c in clips.items():
+              src = os.path.join(out, c["slug"] + ".mp4")
+              urllib.request.urlretrieve(c["url"], src)
+              data = open(src, "rb").read()
+              assert len(data) == c["bytes"], (key, len(data))
+              assert hashlib.sha256(data).hexdigest() == c["sha256"], key
+              dst = os.path.join(out, key + ".mp4")
+              subprocess.run(["ffmpeg", "-v", "error", "-y", "-stream_loop",
+                              str(c["loops"] - 1), "-i", src, "-c", "copy",
+                              "-movflags", "+faststart", dst], check=True)
+              dur = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
+                                    "format=duration", "-of", "csv=p=0", dst],
+                                   check=True, capture_output=True, text=True).stdout
+              print(f"{key}: {c['loops']} loops, {float(dur):.1f} s")
+              keys.append(key)
+          with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
+              fh.write("matrix=" + json.dumps({"clip": keys}) + "\n")
+          PY
+          ls -l "$out"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: clip-smoke-fixtures
+          path: ${{ runner.temp }}/clips/clip-*.mp4
+          retention-days: 7
+
+  ios:
+    name: iOS clip replay (${{ matrix.clip }})
+    needs: clips
+    runs-on: macos-15
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.clips.outputs.matrix) }}
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
+      REPCOACH_CI_X64_SIM: "1"
+      TEST_VIDEO_ASSET: ${{ matrix.clip }}.mp4
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+    steps:
+      - uses: actions/checkout@v7
+      - uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - uses: actions/download-artifact@v7
+        with:
+          name: clip-smoke-fixtures
+          path: ${{ runner.temp }}/clips
+      - name: Resolve dependencies
+        run: |
+          sudo /usr/sbin/softwareupdate --install-rosetta --agree-to-license || true
+          flutter config --no-enable-swift-package-manager
+          flutter precache --ios
+          flutter pub get
+          cd ios && pod install --repo-update
+      - name: Build debug app for iOS Simulator (CI video mode)
+        run: |
+          exercise="$(python3 -c "import json,sys; print(json.load(open('$MANIFEST'))['clips']['${{ matrix.clip }}']['exercise'])")"
+          ./tool/build_ios.sh --simulator --debug --no-pub \
+            --dart-define=REPCOACH_CI_VIDEO_ASSET="$TEST_VIDEO_ASSET" \
+            --dart-define=REPCOACH_CI_VIDEO_EXERCISE="$exercise"
+      - name: Replay clip
+        env:
+          FIXTURE_PATH: ${{ runner.temp }}/clips/${{ matrix.clip }}.mp4
+          ART: ${{ github.workspace }}/ci-artifacts
+        run: bash tool/ci_ios_clip_replay.sh || true
+      - name: Report (measure only)
+        run: |
+          python3 tool/report_clip_smoke.py --manifest "$MANIFEST" \
+            --clip "${{ matrix.clip }}" --platform ios \
+            --result "$GITHUB_WORKSPACE/ci-artifacts/ci-video-result.txt" \
+            --timeline "$GITHUB_WORKSPACE/ci-artifacts/ci-video-timeline.txt" \
+            --json-out "$GITHUB_WORKSPACE/ci-artifacts/clip-smoke.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: clip-smoke-ios-${{ matrix.clip }}
+          path: ci-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+
+  android:
+    name: Android clip replay (${{ matrix.clip }})
+    needs: clips
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.clips.outputs.matrix) }}
+    env:
+      TEST_VIDEO_ASSET: ${{ matrix.clip }}.mp4
+      PKG: com.ronganminh.repcoach
+      REPLAY_WAIT_SECONDS: "1500"
+    defaults:
+      run:
+        working-directory: rep-counter-ai-main/rep_counter_app
+    steps:
+      - uses: actions/checkout@v7
+      - name: Enable KVM
+        working-directory: .
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+      - uses: subosito/flutter-action@v2.23.0
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+      - uses: actions/download-artifact@v7
+        with:
+          name: clip-smoke-fixtures
+          path: ${{ runner.temp }}/clips
+      - name: Build debug APK (CI video mode)
+        run: |
+          flutter pub get
+          exercise="$(python3 -c "import json,sys; print(json.load(open('$MANIFEST'))['clips']['${{ matrix.clip }}']['exercise'])")"
+          flutter build apk --debug --flavor store \
+            --dart-define=REPCOACH_CI_VIDEO_ASSET="$TEST_VIDEO_ASSET" \
+            --dart-define=REPCOACH_CI_VIDEO_EXERCISE="$exercise"
+      - name: Replay clip on emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          FIXTURE_PATH: ${{ runner.temp }}/clips/${{ matrix.clip }}.mp4
+        with:
+          api-level: 34
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          cores: 2
+          ram-size: 4096M
+          disk-size: 10G
+          disable-animations: true
+          emulator-options: -no-snapshot -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -camera-front none
+          working-directory: rep-counter-ai-main/rep_counter_app
+          script: bash tool/ci_android_replay.sh
+      - name: Report (measure only)
+        run: |
+          python3 tool/report_clip_smoke.py --manifest "$MANIFEST" \
+            --clip "${{ matrix.clip }}" --platform android \
+            --result "$GITHUB_WORKSPACE/ci-artifacts/ci-video-result.txt" \
+            --timeline "$GITHUB_WORKSPACE/ci-artifacts/android-logcat.txt" \
+            --json-out "$GITHUB_WORKSPACE/ci-artifacts/clip-smoke.json"
+      - uses: actions/upload-artifact@v7
+        if: always()
+        with:
+          name: clip-smoke-android-${{ matrix.clip }}
+          path: ci-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
