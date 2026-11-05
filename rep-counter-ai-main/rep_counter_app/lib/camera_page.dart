@@ -26,6 +26,7 @@ import 'features/routine/presentation/rest_overlay.dart';
 import 'features/workout/application/workout_draft_recorder.dart';
 import 'features/workout/application/workout_controller.dart';
 import 'features/workout/application/workout_ui_state.dart';
+import 'features/workout/domain/head_drop_fallback.dart';
 import 'features/workout/domain/quality_thresholds.dart';
 import 'features/workout/domain/rep_tracker.dart';
 import 'features/workout/domain/rep_metric.dart';
@@ -155,6 +156,11 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   /// tốt hay xấu.
   late RepTracker _trackL, _trackR;
   late RollingMean _smoothL, _smoothR;
+
+  /// Push-up only: a second channel that counts a rep from the head dropping
+  /// to the hands when the elbow channel misses it. See [HeadDropChannel].
+  HeadDropChannel? _head;
+  double? _ciHeadSignal;
   late final _countGateLatch = CountGateLatch(p.countGateGrace);
 
   /// Giữ lại để vẽ vạch ngưỡng trên đồ thị; sau hiệu chỉnh thì đổi theo.
@@ -314,6 +320,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   void _resetTransient() {
     _trackL.onInterrupted(_workout.frameTime, RepAbortReason.placementLost);
     _trackR.onInterrupted(_workout.frameTime, RepAbortReason.placementLost);
+    _head?.interrupt(_workout.frameTime);
     _smoothL.reset();
     _smoothR.reset();
     _merger.reset();
@@ -476,6 +483,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     final now = _workout.frameTime;
     _trackL.onInterrupted(now, RepAbortReason.placementLost);
     _trackR.onInterrupted(now, RepAbortReason.placementLost);
+    _head?.interrupt(now);
     _smoothL.reset();
     _smoothR.reset();
     _lastPlacementOk = null;
@@ -707,6 +715,9 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _repAmp = amp;
     _smoothL = RollingMean(p.smoothWindow);
     _smoothR = RollingMean(p.smoothWindow);
+    _head = p.id == pushUp.id
+        ? HeadDropChannel(const HeadDropFallback())
+        : null;
   }
 
   /// Độ lệch trục thân so với hướng bài tập yêu cầu (độ).
@@ -981,6 +992,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     double? rawLeft;
     double? rawRight;
     var signalRestored = false;
+    _ciHeadSignal = null;
     if (lm != null) {
       final raw = p.signal(lm, p.minLikelihood);
       rawLeft = raw.left;
@@ -1013,8 +1025,30 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             sig = v;
             signalRestored = true;
           }
+          final head = _head;
+          final headFrame = head == null
+              ? null
+              : headDropSignal(lm,
+                  minLikelihood: p.minLikelihood,
+                  viewShortSide: math.min(view.width, view.height),
+                  config: head.config);
+          _ciHeadSignal = headFrame?.signal;
           if (_workout.acceptsReps) {
-            _handle(_trackL.update(sample(v)), now, merge: false, arm: 'M');
+            final elbow = _trackL.update(sample(v));
+            _handle(head == null ? elbow : head.filterPrimary(elbow, v), now,
+                merge: false, arm: 'M');
+            if (head != null) {
+              _handle(
+                  head.update(
+                    at: now,
+                    frame: headFrame,
+                    torsoDeviationDeg: torso,
+                    poseConfidence: conf,
+                  ),
+                  now,
+                  merge: false,
+                  arm: 'H');
+            }
           }
         } else {
           final vl = raw.left == null ? null : _smoothL.add(raw.left!);
@@ -1040,6 +1074,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             _trackL.onInterrupted(now, RepAbortReason.placementLost);
         final rightAbort =
             _trackR.onInterrupted(now, RepAbortReason.placementLost);
+        _head?.interrupt(now);
         if (leftAbort != null) {
           _handle([leftAbort], now, merge: false, arm: 'L');
         }
@@ -1056,6 +1091,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       // rep that never actually happened.
       final leftAbort = _trackL.onInterrupted(now, RepAbortReason.signalLost);
       final rightAbort = _trackR.onInterrupted(now, RepAbortReason.signalLost);
+      _head?.interrupt(now);
       if (leftAbort != null) {
         _handle([leftAbort], now, merge: false, arm: 'L');
       }
@@ -1084,6 +1120,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           'pose=${pose != null} placement=${status.name} countable=$canCount '
           'raw_status=${placement.status.name} raw_l=${number(rawLeft)} '
           'raw_r=${number(rawRight)} signal=${number(sig)} '
+          'head=${number(_ciHeadSignal)} '
           'gate=${gateState == CountGateState.open} '
           'gate_state=${gateState.name} gate_raw=${rawGateOk ?? 'na'}'
           '${lm == null ? '' : _ciPushUpGateMetrics(lm)} '
@@ -1205,6 +1242,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     final now = _workout.frameTime;
     _trackL.onInterrupted(now, RepAbortReason.placementLost);
     _trackR.onInterrupted(now, RepAbortReason.placementLost);
+    _head?.interrupt(now);
     _smoothL.reset();
     _smoothR.reset();
     _lastPlacementOk = null;
@@ -1236,6 +1274,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     // user can continue/retry without joining a pre-save bottom to a new top.
     _trackL.onInterrupted(_workout.elapsed, RepAbortReason.placementLost);
     _trackR.onInterrupted(_workout.elapsed, RepAbortReason.placementLost);
+    _head?.interrupt(_workout.elapsed);
     _smoothL.reset();
     _smoothR.reset();
     try {

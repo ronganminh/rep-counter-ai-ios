@@ -35,13 +35,28 @@ Widget _host(
 }
 
 void main() {
-  testWidgets('renders clean counted state in Vietnamese', (tester) async {
+  for (final language in AppLanguage.values) {
+    testWidgets('a clean counted rep shows no pill (${language.name})',
+        (tester) async {
+      await tester.pumpWidget(
+          _host(const RepFeedback.countedClean(3), language: language));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(RepFeedbackPill), findsNothing);
+      expect(find.text('Rep tốt'), findsNothing);
+      expect(find.text('Good rep'), findsNothing);
+      expect(find.textContaining('ĐÃ TÍNH'), findsNothing);
+      expect(find.textContaining('COUNTED'), findsNothing);
+    });
+  }
+
+  testWidgets('a warning after a clean rep still shows', (tester) async {
     await tester.pumpWidget(_host(const RepFeedback.countedClean(3)));
     await tester.pumpAndSettle();
-
-    expect(find.text('✓ ĐÃ TÍNH'), findsOneWidget);
-    expect(find.text('Rep tốt'), findsOneWidget);
-    expect(find.bySemanticsLabel('ĐÃ TÍNH. Rep tốt'), findsOneWidget);
+    await tester.pumpWidget(_host(
+        const RepFeedback.countedWarning(4, RepQualityFlag.tooFast)));
+    await tester.pumpAndSettle();
+    expect(find.text('Chậm lại một chút'), findsOneWidget);
   });
 
   testWidgets('warning remains explicitly counted in English', (tester) async {
@@ -92,7 +107,7 @@ void main() {
   testWidgets('reduced motion uses fade without scale transition',
       (tester) async {
     await tester.pumpWidget(_host(
-      const RepFeedback.countedClean(1),
+      const RepFeedback.poseLost(),
       reducedMotion: true,
     ));
     await tester.pump();
