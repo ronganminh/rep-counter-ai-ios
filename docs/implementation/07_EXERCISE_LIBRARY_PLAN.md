@@ -85,3 +85,26 @@ Consequences:
 2. **Loading:** bundle the clips in the app (about 1 MB). No CDN streaming.
 3. **Credit:** put the source and CC0 on the existing About / Licences screen. Do not add a new screen.
 4. **Push-up:** keep the current skeleton guide. Push-up counting will be tested on the owner's long real videos, not on this library.
+
+## PR A status: Vietnamese strings to review
+
+PR A adds these strings to `app_vi.arb` (and the handoff copy). The library has no Vietnamese, so the cues are our own translation (`cuesViReviewed: false` in `exercise_guide_clips.dart`; the ARB description says "needs review"). Nothing different is shown to users. Please check them:
+
+| Key | EN (from the library for cues) | VI (to review) |
+|---|---|---|
+| `guideCuePullUp1` | Start from a dead hang | Bắt đầu từ tư thế treo thẳng tay |
+| `guideCuePullUp2` | Pull the chest toward the bar | Kéo ngực về phía xà |
+| `guideCuePullUp3` | Lower all the way each rep | Mỗi rep đều hạ người xuống hết |
+| `guideCueCurl1` | Elbows stay pinned to the sides | Khuỷu tay giữ sát hai bên người |
+| `guideCueCurl2` | Curl without leaning back | Cuốn lên mà không ngả người ra sau |
+| `guideCueCurl3` | Lower all the way to full extension | Hạ xuống đến khi duỗi thẳng tay |
+| `guideClipTitle` | How it's done | Cách thực hiện |
+| `guideClipBarbellNote` | Shown with a barbell | Minh hoạ với tạ đòn |
+| `guideClipPullUpLabel` | Looping demo video: wide-grip pull-up, seen from behind | Video mẫu lặp lại: kéo xà tay rộng, nhìn từ phía sau |
+| `guideClipCurlLabel` | Looping demo video: standing barbell curl | Video mẫu lặp lại: đứng cuốn tạ đòn |
+| `guideClipPlay` / `guideClipPause` | Play / Pause demo video | Phát / Tạm dừng video mẫu |
+| `settingsDemoVideosTitle` | Exercise demo videos | Video mẫu động tác |
+| `settingsDemoVideosBody` | The pull-up and curl demo videos come from workout-free-videos by namnq, released under CC0 1.0 (public domain). No credit is required; we credit the source anyway. | Video mẫu kéo xà và cuốn tạ lấy từ bộ workout-free-videos của namnq, phát hành theo CC0 1.0 (phạm vi công cộng). Nguồn này không yêu cầu ghi công; chúng tôi vẫn ghi nguồn. |
+| `settingsDemoVideosOpen` | Open source page | Mở trang nguồn |
+
+When reviewed, update `app_vi.arb` (both copies) and set `cuesViReviewed: true`.

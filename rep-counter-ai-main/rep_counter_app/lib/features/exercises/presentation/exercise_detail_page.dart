@@ -13,6 +13,8 @@ import '../../workout/data/workout_history_store.dart';
 import '../../workout/data/workout_record.dart';
 import '../../workout/presentation/exercise_help_sheet.dart';
 import '../../workout/presentation/exercise_icon.dart';
+import '../data/exercise_guide_clips.dart';
+import 'exercise_guide_card.dart';
 
 /// The user's own numbers for one exercise, derived from saved workouts only.
 class ExerciseStats {
@@ -77,6 +79,12 @@ class _ExerciseDetailPageState extends State<ExerciseDetailPage> {
             Text(profile.localizedHint(context.s),
                 style: AppTypography.body16.copyWith(color: AppColors.text2)),
             const SizedBox(height: 24),
+            // Demo clip + cues (plan 07 PR A); nothing for exercises
+            // without a library clip.
+            if (ExerciseGuideClip.forExercise(profile.id) != null) ...[
+              ExerciseGuideCard(exerciseId: profile.id),
+              const SizedBox(height: 24),
+            ],
             FutureBuilder<ExerciseStats>(
               future: _stats,
               builder: (context, snapshot) {
