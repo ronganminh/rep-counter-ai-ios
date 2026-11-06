@@ -191,6 +191,13 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   /// explain whether placement, pose confidence, or the angle signal blocked it.
   String _ciLastFrameDebug = '';
 
+  /// CI video mode only: per required landmark, how many replay frames since
+  /// the last status line had it outside the guide (`out`) or below the
+  /// likelihood threshold (`miss`). Measurement for the clip smoke report;
+  /// read after `_consumePose`, never fed back into counting.
+  final Map<String, int> _ciGuideOutside = {};
+  final Map<String, int> _ciGuideMissing = {};
+
   /// Thời điểm gần nhất tư thế còn ĐẠT. Bộ đếm vẫn chạy trong [_placementGrace]
   /// sau mốc này.
   ///
@@ -645,10 +652,11 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         mirror: false,
       );
       processed++;
+      _ciTallyGuide();
 
       if (atMs % 5000 == 0) {
         await _writeCiStatus(
-          '[CI_VIDEO_STATUS] production_workout at_ms=$atMs total_ms=$durationMs frames=$processed reps=${_ui.reps} phase=${_ui.phase.name} $_ciLastFrameDebug',
+          '[CI_VIDEO_STATUS] production_workout at_ms=$atMs total_ms=$durationMs frames=$processed reps=${_ui.reps} phase=${_ui.phase.name} $_ciLastFrameDebug ${_ciGuideTally()}',
         );
       }
     }
@@ -678,6 +686,35 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     await _writeCiStatus(
       '[CI_VIDEO_RESULT] mode=production_workout frames=$processed hud_reps=$reps saved_reps=$savedReps result_reps=$savedReps duration_ms=$durationMs',
     );
+  }
+
+  /// See [_ciGuideOutside]. Uses the landmarks `_consumePose` just mapped to
+  /// the view and the same guide zone `evaluatePlacement` checks.
+  void _ciTallyGuide() {
+    final lm = _landmarks;
+    if (lm == null) return;
+    final zone = _guide.scaled(context.size ?? MediaQuery.sizeOf(context));
+    for (final t in p.requiredLandmarks) {
+      final pt = lm.pt(t, minLikelihood: p.minLikelihood);
+      final tally = pt == null
+          ? _ciGuideMissing
+          : (zone != null && !zone.contains(pt) ? _ciGuideOutside : null);
+      if (tally != null) tally[t.name] = (tally[t.name] ?? 0) + 1;
+    }
+  }
+
+  /// `out=leftWrist:12,rightElbow:3 miss=none`, then resets the tallies.
+  String _ciGuideTally() {
+    String fmt(Map<String, int> m) {
+      if (m.isEmpty) return 'none';
+      final e = m.entries.toList()..sort((a, b) => b.value - a.value);
+      return e.map((x) => '${x.key}:${x.value}').join(',');
+    }
+
+    final line = 'out=${fmt(_ciGuideOutside)} miss=${fmt(_ciGuideMissing)}';
+    _ciGuideOutside.clear();
+    _ciGuideMissing.clear();
+    return line;
   }
 
   @override
