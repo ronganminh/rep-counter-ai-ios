@@ -1,0 +1,42 @@
+{
+  "_about": "Plan 07 PR B: fast counting smoke set from the CC0 sample clips of namnq/workout-free-videos (tag v2.0.0). Measure only: nothing here is a baseline for the three reference videos (video_ground_truth.json), and no job fails on a count. Ground truth was counted by eye, frame by frame, on the sample clip; each clip is replayed looped `loops` times, so the expected count is loops x reps_per_loop. The replay input is the verified source clip looped and re-encoded all-intra (ffmpeg -g 1), because the source has a single keyframe and the iOS frame extractor snaps to keyframes.",
+  "source": "https://github.com/namnq/workout-free-videos",
+  "source_tag": "v2.0.0",
+  "license": "CC0 1.0",
+  "clips": {
+    "clip-pull-up-l02": {
+      "exercise": "pull_up",
+      "source_id": "l02",
+      "slug": "wide-grip-pull-up",
+      "fit": "exact",
+      "url": "https://cdn.jsdelivr.net/gh/namnq/workout-free-videos@v2.0.0/media/video/wide-grip-pull-up.mp4",
+      "bytes": 419675,
+      "sha256": "36cd4dd2c16527e1fc191e5f771a72dd28e4c4e66f8ad29b4af003c2f6ff4e93",
+      "duration_ms": 5833,
+      "view": "from behind, whole body, landscape 1280x720, slow camera drift",
+      "reps_per_loop": 1,
+      "partial_reps_per_loop": 0,
+      "loops": 10,
+      "human_ground_truth": 10,
+      "counted_by": "eye, sample clip",
+      "notes": "One full rep per loop: dead hang at 0 s, chin at the bar about 3 s, back to a full hang by 5.8 s. The loop seam is at the hang, so looping adds no partial rep."
+    },
+    "clip-curl-b01": {
+      "exercise": "curl",
+      "source_id": "b01",
+      "slug": "standing-barbell-curl",
+      "fit": "similar",
+      "url": "https://cdn.jsdelivr.net/gh/namnq/workout-free-videos@v2.0.0/media/video/standing-barbell-curl.mp4",
+      "bytes": 410834,
+      "sha256": "f4b18a0452de7b5fc10fe7fc8dd73ccda67204bd0bab788aef3bfcafe5f2b182",
+      "duration_ms": 8000,
+      "view": "from the front, whole body, landscape 1280x720, slow camera orbit; barbell, not dumbbells",
+      "reps_per_loop": 1,
+      "partial_reps_per_loop": 0,
+      "loops": 10,
+      "human_ground_truth": 10,
+      "counted_by": "eye, sample clip",
+      "notes": "One full rep per loop: arms extended at 0 s, bar at the shoulders about 3-4 s, extended again by 8 s. The loop seam is at full extension."
+    }
+  }
+}

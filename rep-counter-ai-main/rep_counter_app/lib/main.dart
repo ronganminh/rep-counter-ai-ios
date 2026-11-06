@@ -28,6 +28,18 @@ import 'camera_page.dart';
 import 'exercise.dart';
 
 const _ciVideoAsset = String.fromEnvironment('REPCOACH_CI_VIDEO_ASSET');
+const _ciVideoExercise = String.fromEnvironment('REPCOACH_CI_VIDEO_EXERCISE',
+    defaultValue: 'push_up');
+
+/// CI video replay only: the exercise the fixture shows
+/// (`--dart-define=REPCOACH_CI_VIDEO_EXERCISE=<id>`, default push-up, so the
+/// three reference replays are unchanged). It looks in every engine profile,
+/// not only the visible ones, so a locked exercise (pull-up while its release
+/// gate is blocked) can still be replayed. An unknown id falls back to
+/// push-up; the replay's start line names the exercise actually used.
+@visibleForTesting
+ExerciseProfile ciVideoProfile(String id) =>
+    allExercises.where((p) => p.id == id).firstOrNull ?? pushUp;
 
 void main() => runApp(const RepCounterApp());
 
@@ -147,7 +159,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
             navigatorObservers: [appRouteObserver],
             home: _ciVideoAsset.isNotEmpty
                 ? CameraPage(
-                    profile: pushUp,
+                    profile: ciVideoProfile(_ciVideoExercise),
                     ciVideoPath:
                         '${Directory.systemTemp.path}/$_ciVideoAsset',
                   )

@@ -586,7 +586,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       _workout.requestStart();
       setState(() => _cameraState = _CameraState.ready);
       await _writeCiStatus(
-        '[CI_VIDEO_STATUS] production_workout_started duration_ms=${controller.value.duration.inMilliseconds}',
+        '[CI_VIDEO_STATUS] production_workout_started duration_ms=${controller.value.duration.inMilliseconds} exercise=${widget.profile.id}',
       );
       await _runCiVideo(controller, path);
     } catch (error) {
