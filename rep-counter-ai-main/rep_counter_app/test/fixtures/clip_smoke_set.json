@@ -1,10 +1,11 @@
 {
-  "_about": "Plan 07 PR B: fast counting smoke set from the CC0 sample clips of namnq/workout-free-videos (tag v2.0.0). Measure only: nothing here is a baseline for the three reference videos (video_ground_truth.json), and no job fails on a count. Ground truth was counted by eye, frame by frame, on the sample clip; each clip is replayed looped `loops` times, so the expected count is loops x reps_per_loop. The replay input is the verified source clip looped and re-encoded all-intra (ffmpeg -g 1), because the source has a single keyframe and the iOS frame extractor snaps to keyframes.",
+  "_about": "Plan 07 measure-only clip smoke set. Two kinds of clip: `sample` (CC0 clips of namnq/workout-free-videos, tag v2.0.0, looped `loops` times and re-encoded all-intra because the source has a single keyframe and the iOS frame extractor snaps to keyframes) and `owner_recording` (a long real workout filmed by the project owner, kept OUT of the repo: only its source link, byte size and SHA-256 are stored; CI downloads it, verifies the hash and re-encodes it all-intra at the replay sampling rate, `transcode`). Nothing here is a baseline for the three reference videos (video_ground_truth.json) and no job fails on a count. Ground truth is counted by eye; `human_reviewed` says whether a person has checked it.",
   "source": "https://github.com/namnq/workout-free-videos",
   "source_tag": "v2.0.0",
   "license": "CC0 1.0",
   "clips": {
     "clip-pull-up-l02": {
+      "kind": "sample",
       "exercise": "pull_up",
       "source_id": "l02",
       "slug": "wide-grip-pull-up",
@@ -22,6 +23,7 @@
       "notes": "One full rep per loop: dead hang at 0 s, chin at the bar about 3 s, back to a full hang by 5.8 s. The loop seam is at the hang, so looping adds no partial rep."
     },
     "clip-curl-b01": {
+      "kind": "sample",
       "exercise": "curl",
       "source_id": "b01",
       "slug": "standing-barbell-curl",
@@ -37,6 +39,171 @@
       "human_ground_truth": 10,
       "counted_by": "eye, sample clip",
       "notes": "One full rep per loop: arms extended at 0 s, bar at the shoulders about 3-4 s, extended again by 8 s. The loop seam is at full extension."
+    },
+    "clip-real-curl-img0967": {
+      "kind": "owner_recording",
+      "exercise": "curl",
+      "source": "google_drive",
+      "drive_id": "1ZKjGD59kJ1dfNaNAwEE9P3TUEIGaG0zw",
+      "url": "https://drive.usercontent.google.com/download?id=1ZKjGD59kJ1dfNaNAwEE9P3TUEIGaG0zw&export=download&confirm=t",
+      "source_name": "IMG_0967.MOV",
+      "recorded_at": "2026-11-05T10:26:16Z",
+      "bytes": 2047522941,
+      "sha256": "51484f0a278348ed0a28d5206498f85ebea0738abbf37eb6a6bdc85deeb71289",
+      "duration_ms": 693895,
+      "video": "iPhone QuickTime MOV, H.264 1920x1080 with 90-degree rotation (portrait 1080x1920), ~60 fps, AAC audio",
+      "view": "from the front, portrait; phone low on the floor about 2 m away, looking slightly up. Standing sets: head (top of frame) to mid-shin; dumbbells at the hips sit near the left and right frame edges, the curled dumbbell rises to the face. Between sets the owner walks out, sits side-on on a chair in the background, kneels with the back to the camera or stretches; the clip starts and ends on a torso close-up while the phone is handled.",
+      "fit": "exact",
+      "transcode": {
+        "fps": 5,
+        "width": 720,
+        "height": 1280
+      },
+      "loops": 1,
+      "reps_per_loop": 65,
+      "partial_reps_per_loop": 0,
+      "human_ground_truth": 65,
+      "counted_by": "eye (Claude), 2 fps contact sheets with a 10 fps dark-blob motion trace as a pointer; timestamps +-0.5 s",
+      "human_reviewed": false,
+      "rep_unit": "one single-arm curl: alternating dumbbell curls, and the app counts each arm (TwoArmMerger merges only both arms within 400 ms)",
+      "sets": [
+        {
+          "set": 1,
+          "walk_in_ms": 0,
+          "ready_ms": 5000,
+          "first_rep_ms": 14000,
+          "end_ms": 55000,
+          "image_right_ms": [
+            14000,
+            18000,
+            21500,
+            28000,
+            31500,
+            34500,
+            38000,
+            44000,
+            47500,
+            54000
+          ],
+          "image_left_ms": [
+            16000,
+            20000,
+            23500,
+            29500,
+            33000,
+            36500,
+            40000,
+            45500,
+            51000
+          ],
+          "notes": "Video opens on a close-up of the torso (owner adjusting the phone, 0-2 s), walks back and picks up the dumbbells at 3-4 s, stands still holding them 5-13 s.",
+          "reps": 19
+        },
+        {
+          "set": 2,
+          "walk_in_ms": 231000,
+          "ready_ms": 234500,
+          "first_rep_ms": 238000,
+          "end_ms": 268000,
+          "image_right_ms": [
+            238000,
+            242000,
+            245000,
+            248000,
+            254000,
+            260000,
+            264000
+          ],
+          "image_left_ms": [
+            240000,
+            243000,
+            246500,
+            250000,
+            255500,
+            262000,
+            266000
+          ],
+          "notes": "Gets up from the chair at 231 s, crouches to pick up the dumbbells 233-234 s.",
+          "reps": 14
+        },
+        {
+          "set": 3,
+          "walk_in_ms": 431000,
+          "ready_ms": 437000,
+          "first_rep_ms": 444000,
+          "end_ms": 478500,
+          "image_right_ms": [
+            444000,
+            448000,
+            451000,
+            454500,
+            462000,
+            465500,
+            469000,
+            475000
+          ],
+          "image_left_ms": [
+            446000,
+            449500,
+            453000,
+            456000,
+            464000,
+            467000,
+            472000,
+            478000
+          ],
+          "notes": "Enters side-on very close to the phone (431-434 s, head and arm cut by the frame edge), picks up at 435-436 s.",
+          "reps": 16
+        },
+        {
+          "set": 4,
+          "walk_in_ms": 631000,
+          "ready_ms": 635000,
+          "first_rep_ms": 644500,
+          "end_ms": 682500,
+          "image_right_ms": [
+            644500,
+            648000,
+            651500,
+            655000,
+            658000,
+            665000,
+            671500,
+            676500
+          ],
+          "image_left_ms": [
+            646000,
+            650000,
+            653000,
+            656500,
+            660000,
+            668000,
+            674000,
+            678500
+          ],
+          "notes": "At 682 s both dumbbells swing up part-way while setting them down: not counted.",
+          "reps": 16
+        }
+      ],
+      "rest_ms": [
+        [
+          57000,
+          231000
+        ],
+        [
+          270000,
+          431000
+        ],
+        [
+          480000,
+          631000
+        ],
+        [
+          684000,
+          693895
+        ]
+      ],
+      "notes": "Long real workout: 4 sets of alternating dumbbell curls separated by 2.5-3 min of rest. image_left/image_right are sides of the picture, not the lifter's arms. Rest windows include arm movements that are not curls (hand to the head while seated ~80-88 s, overhead stretch ~540 s)."
     }
   }
 }
