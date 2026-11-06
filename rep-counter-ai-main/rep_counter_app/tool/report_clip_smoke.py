@@ -38,14 +38,14 @@ def reasons(samples: list[dict[str, str]]) -> str:
         return "no timeline samples"
     n = len(samples)
     parts = []
-    positioning = [int(s["at_ms"]) for s in samples
-                   if s.get("phase") == "positioning" and s.get("at_ms", "").isdigit()]
-    if positioning:
-        total = max((int(s["total_ms"]) for s in samples
-                     if s.get("total_ms", "").isdigit()), default=0)
-        end = max(positioning) + 5000
-        parts.append("positioning the whole clip" if total and end >= total
-                     else f"positioning until ~{end / 1000:.0f} s")
+    timed = [s for s in samples if s.get("at_ms", "").isdigit()]
+    if timed and timed[0].get("phase") == "positioning":
+        # First time the workout leaves positioning; a long recording goes
+        # back to positioning between sets, the per-set table covers that.
+        left = next((int(s["at_ms"]) for s in timed
+                     if s.get("phase") != "positioning"), None)
+        parts.append("positioning the whole clip" if left is None
+                     else f"positioning until ~{left / 1000:.0f} s")
     no_pose = sum(1 for s in samples if s.get("pose") == "false")
     if no_pose:
         parts.append(f"pose lost {no_pose}/{n}")
@@ -218,8 +218,16 @@ def main() -> int:
         harness_error = f"replayed {exercise}, expected {clip['exercise']}"
 
     counted = int(match.group(1)) if match else None
+    sets = per_set(clip, samples) if clip.get("sets") else []
+    rests = rest_extras(clip, samples) if clip.get("rest_ms") else []
     if counted is None:
         right = missed = extra = "—"
+    elif sets:
+        # A long recording: a count during rest is not a right rep, so add
+        # the sets up instead of comparing totals.
+        right = sum(r["right"] for r in sets)
+        missed = truth - right
+        extra = counted - right
     else:
         right, missed, extra = score(truth, counted)
     reason = harness_error or reasons(samples)
@@ -243,8 +251,6 @@ def main() -> int:
                      + f"counted by {clip['counted_by']}"
                      + ("" if clip.get("human_reviewed", True)
                         else " (not yet checked by a person)") + ".\n")
-    sets = per_set(clip, samples) if clip.get("sets") else []
-    rests = rest_extras(clip, samples) if clip.get("rest_ms") else []
     if sets:
         set_md = per_set_markdown(sets, rests)
         print(set_md)
