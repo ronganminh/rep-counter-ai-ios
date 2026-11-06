@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import '../../core/config/build_info.dart';
 import '../../core/services/app_links.dart';
 import '../ai/ai_preferences.dart';
+import '../exercises/data/exercise_guide_clips.dart';
 import '../ai/presentation/ai_consent.dart';
 import '../history/export/export_data_sheet.dart';
 import '../achievements/achievement_service.dart';
@@ -393,6 +394,29 @@ class _SettingsPageState extends State<SettingsPage> {
               title: s.termsOfUse,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => const LegalPage(kind: LegalKind.terms)))),
+          SettingsRow(
+              key: const Key('settings-demo-videos'),
+              icon: LucideIcons.film,
+              title: context.l10n.settingsDemoVideosTitle,
+              subtitle: 'workout-free-videos · ${ExerciseGuideClip.license}',
+              onTap: () => showDialog<void>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                        title: Text(context.l10n.settingsDemoVideosTitle),
+                        content: SingleChildScrollView(
+                            child: Text(
+                                '${context.l10n.settingsDemoVideosBody}\n\n'
+                                '${ExerciseGuideClip.source}')),
+                        actions: [
+                          TextButton(
+                              onPressed: () =>
+                                  AppLinks.open(ExerciseGuideClip.source),
+                              child: Text(context.l10n.settingsDemoVideosOpen)),
+                          TextButton(
+                              onPressed: () => Navigator.pop(context),
+                              child: Text(context.l10n.navClose))
+                        ],
+                      ))),
           SettingsRow(
               icon: LucideIcons.heart,
               title: s.healthNotice,

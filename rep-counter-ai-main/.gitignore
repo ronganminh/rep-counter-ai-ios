@@ -12,6 +12,11 @@ push_up/
 *.mkv
 *.m4v
 *.webm
+# Ngoại lệ duy nhất: 2 clip mẫu CC0 (namnq/workout-free-videos, không phải
+# video của người dùng), ghi đích danh từng file, kèm SHA-256 trong
+# rep_counter_app/assets/guide/README.md.
+!rep_counter_app/assets/guide/wide-grip-pull-up.mp4
+!rep_counter_app/assets/guide/standing-barbell-curl.mp4
 
 # Dữ liệu trung gian sinh từ video (landmark, keypoint) — file lớn, tái tạo được
 *.npz
@@ -85,6 +90,9 @@ venv/
 # debug 17 MB lọt vào commit. Chỉ mở đúng loại ảnh cần cho build và cho store.
 !rep_counter_app/assets/branding/*.png
 !store_listing/assets/**/*.png
+# Poster (khung đầu) của 2 clip mẫu CC0, xem assets/guide/README.md.
+!rep_counter_app/assets/guide/wide-grip-pull-up.jpg
+!rep_counter_app/assets/guide/standing-barbell-curl.jpg
 # Captured room/camera images are local diagnostic evidence, not public assets.
 store_listing/assets/screenshots/rieng-tu-khong-dung/
 # Icon launcher Android: sinh từ assets/branding bằng flutter_launcher_icons,

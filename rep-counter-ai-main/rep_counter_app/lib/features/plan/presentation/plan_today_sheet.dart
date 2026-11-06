@@ -7,6 +7,8 @@ import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/product_ui.dart';
+import '../../exercises/data/exercise_guide_clips.dart';
+import '../../exercises/presentation/exercise_guide_card.dart';
 import '../../workout/presentation/goal_setup_page.dart';
 import '../application/plan_repository.dart';
 import '../domain/workout_plan.dart';
@@ -44,6 +46,11 @@ Future<void> showPlanTodaySheet(BuildContext context, ExerciseProfile profile,
                                     sessionId: sessionId,
                                     repository: repository)));
                           }),
+                    // The movement before it starts (plan 07 PR A).
+                    if (ExerciseGuideClip.forExercise(profile.id) != null) ...[
+                      ExerciseGuideCard(exerciseId: profile.id),
+                      const SizedBox(height: 20),
+                    ],
                     GoalSetupContent(
                         profile: profile,
                         onStart: (config) {

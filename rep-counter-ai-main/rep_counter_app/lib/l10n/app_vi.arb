@@ -4323,5 +4323,20 @@
   "socialNoName": "Bạn bè",
   "socialLeaderboardEmpty": "Tuần này bạn và bạn bè chưa có rep nào đếm bằng camera.",
   "socialNameShown": "Bạn bè thấy bạn là “{name}”.",
-  "socialNameNotSet": "Chưa có tên hiển thị: bạn bè thấy “Bạn bè”."
+  "socialNameNotSet": "Chưa có tên hiển thị: bạn bè thấy “Bạn bè”.",
+  "guideClipTitle": "Cách thực hiện",
+  "guideClipBarbellNote": "Minh hoạ với tạ đòn",
+  "guideClipPullUpLabel": "Video mẫu lặp lại: kéo xà tay rộng, nhìn từ phía sau",
+  "guideClipCurlLabel": "Video mẫu lặp lại: đứng cuốn tạ đòn",
+  "guideClipPlay": "Phát video mẫu",
+  "guideClipPause": "Tạm dừng video mẫu",
+  "guideCuePullUp1": "Bắt đầu từ tư thế treo thẳng tay",
+  "guideCuePullUp2": "Kéo ngực về phía xà",
+  "guideCuePullUp3": "Mỗi rep đều hạ người xuống hết",
+  "guideCueCurl1": "Khuỷu tay giữ sát hai bên người",
+  "guideCueCurl2": "Cuốn lên mà không ngả người ra sau",
+  "guideCueCurl3": "Hạ xuống đến khi duỗi thẳng tay",
+  "settingsDemoVideosTitle": "Video mẫu động tác",
+  "settingsDemoVideosBody": "Video mẫu kéo xà và cuốn tạ lấy từ bộ workout-free-videos của namnq, phát hành theo CC0 1.0 (phạm vi công cộng). Nguồn này không yêu cầu ghi công; chúng tôi vẫn ghi nguồn.",
+  "settingsDemoVideosOpen": "Mở trang nguồn"
 }
