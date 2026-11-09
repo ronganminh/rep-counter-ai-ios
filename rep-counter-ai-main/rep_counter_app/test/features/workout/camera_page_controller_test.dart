@@ -12,6 +12,7 @@ import 'package:rep_counter_app/core/i18n/locale_controller.dart';
 import 'package:rep_counter_app/exercise.dart';
 import 'package:rep_counter_app/features/workout/data/workout_history_store.dart';
 import 'package:rep_counter_app/features/workout/presentation/result_page.dart';
+import 'package:rep_counter_app/features/workout/presentation/widgets/camera_permission_view.dart';
 import 'package:rep_counter_app/theme/app_theme.dart';
 
 // Test-only native boundary: production still uses the real camera/ML Kit.
@@ -82,6 +83,10 @@ void main() {
   late FakeCamera camera;
   late CameraPlatform previous;
   var granted = false;
+  // permission_handler codes: 0 denied (iOS: not asked yet), 1 granted,
+  // 2 restricted, 4 permanentlyDenied (iOS: denied earlier).
+  var permissionStatus = 0, requestResult = 1;
+  var permissionCalls = <String>[];
   Completer<List<Object?>>? poseGate;
   var poseCalls = 0;
   setUp(() {
@@ -93,11 +98,26 @@ void main() {
         const MethodChannel('flutter_tts'),
         (call) async => call.method == 'isLanguageAvailable' ? true : 1);
     granted = false;
+    permissionStatus = 0;
+    requestResult = 1;
+    permissionCalls = <String>[];
     poseGate = null;
     poseCalls = 0;
     binding.defaultBinaryMessenger.setMockMethodCallHandler(
         const MethodChannel('flutter.baseflow.com/permissions/methods'),
-        (_) async => granted ? 1 : 0);
+        (call) async {
+      permissionCalls.add(call.method);
+      switch (call.method) {
+        case 'checkPermissionStatus':
+          return granted ? 1 : permissionStatus;
+        case 'requestPermissions':
+          if (requestResult == 1) granted = true;
+          return {1: requestResult}; // 1 = Permission.camera
+        case 'openAppSettings':
+          return true;
+      }
+      return null;
+    });
     binding.defaultBinaryMessenger.setMockMethodCallHandler(
         const MethodChannel('repcoach/diag'), (_) async => false);
     binding.defaultBinaryMessenger.setMockMethodCallHandler(
@@ -235,22 +255,105 @@ void main() {
     expect(camera.requests, 0);
     await tester.tap(find.text(S.vi.cameraContinue));
     await tester.pumpAndSettle();
-    expect(camera.requests, 1, reason: 'Continue goes to the system prompt');
+    expect(
+        permissionCalls.where((m) => m == 'requestPermissions'), hasLength(1),
+        reason: 'Continue goes to the system prompt');
+    expect(camera.requests, 1);
     await close(tester);
   });
 
-  testWidgets('denied camera preserves settings, retry and manual actions',
+  // App Store 5.1.1(iv), rejection of 1.0.0 (7).
+  for (final answer in [4, 0]) {
+    testWidgets(
+        "Don't Allow in the system prompt returns to the previous screen "
+        '(status $answer)', (tester) async {
+      requestResult = answer;
+      await open(tester);
+      await tester.tap(find.text(S.vi.cameraContinue));
+      await tester.pumpAndSettle();
+      expect(find.text('Open camera'), findsOneWidget);
+      expect(find.byType(CameraPage), findsNothing);
+      expect(find.byType(CameraOffNotice), findsNothing);
+      expect(find.text(S.vi.cameraOffMessage), findsNothing);
+      expect(
+          permissionCalls.where((m) => m == 'requestPermissions'), hasLength(1),
+          reason: 'asked once, not again');
+      expect(permissionCalls, isNot(contains('openAppSettings')));
+      expect(camera.requests, 0);
+      expect(await WorkoutHistoryStore().load(), isEmpty);
+      await close(tester);
+    });
+  }
+
+  for (final status in [4, 2]) {
+    testWidgets(
+        'camera off when the user starts: neutral notice, Back leaves '
+        '(status $status)', (tester) async {
+      permissionStatus = status;
+      await open(tester);
+      expect(find.byType(CameraOffNotice), findsOneWidget);
+      expect(find.text(S.vi.cameraOffMessage), findsOneWidget);
+      expect(find.text(S.vi.cameraPermissionTitle), findsNothing);
+      expect(find.text(S.vi.cameraContinue), findsNothing);
+      expect(find.text(S.vi.retry), findsNothing);
+      expect(permissionCalls, isNot(contains('requestPermissions')));
+      expect(permissionCalls, isNot(contains('openAppSettings')),
+          reason: 'Settings opens only when the user taps the link');
+      expect(camera.requests, 0);
+      await tester.tap(find.text(S.vi.cameraBack));
+      await tester.pumpAndSettle();
+      expect(find.text('Open camera'), findsOneWidget);
+      expect(find.text(S.vi.finishTitle), findsNothing);
+      expect(await WorkoutHistoryStore().load(), isEmpty);
+      await close(tester);
+    });
+  }
+
+  testWidgets('system back on the camera-off notice leaves the workout',
+      (tester) async {
+    permissionStatus = 4;
+    await open(tester);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Open camera'), findsOneWidget);
+    await close(tester);
+  });
+
+  testWidgets(
+      'Open Settings is a plain link; back with access on opens the camera',
+      (tester) async {
+    permissionStatus = 4;
+    await open(tester);
+    await tester.tap(find.text(S.vi.openSettings));
+    await tester.pumpAndSettle();
+    expect(permissionCalls.where((m) => m == 'openAppSettings'), hasLength(1));
+    expect(find.byType(CameraOffNotice), findsOneWidget);
+    // Returning without changing anything keeps the notice, asks nothing.
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await settleNative(tester);
+    expect(find.byType(CameraOffNotice), findsOneWidget);
+    expect(permissionCalls, isNot(contains('requestPermissions')));
+    // Access turned on in Settings: the camera opens on return.
+    granted = true;
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.inactive);
+    binding.handleAppLifecycleStateChanged(AppLifecycleState.resumed);
+    await settleNative(tester);
+    expect(find.byKey(const Key('native-preview')), findsOneWidget);
+    expect(permissionCalls, isNot(contains('requestPermissions')));
+    expect(tester.takeException(), isNull);
+    await close(tester);
+  });
+
+  testWidgets('camera refused by the OS after access shows the neutral notice',
       (tester) async {
     camera.deny = true;
     await open(tester);
     await tester.tap(find.text(S.vi.cameraContinue));
     await tester.pumpAndSettle();
-    expect(find.text(S.vi.cameraDenied), findsOneWidget);
-    expect(find.text(S.vi.openSettings), findsOneWidget);
-    expect(find.text(S.vi.cameraGrantedRetry), findsOneWidget);
-    // After the prompt: manual tracking and a way out come back.
-    expect(find.byKey(const Key('camera-track-manually')), findsOneWidget);
-    expect(find.byTooltip('Đóng'), findsOneWidget);
+    expect(find.byType(CameraOffNotice), findsOneWidget);
+    expect(find.text(S.vi.cameraOffMessage), findsOneWidget);
+    expect(permissionCalls, isNot(contains('openAppSettings')));
     await close(tester);
   });
 

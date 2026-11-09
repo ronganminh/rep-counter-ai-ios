@@ -48,6 +48,23 @@ def check_permission_screens():
            and "reminder-not-now" not in reminders
            and "canPop: !intro" in reminders,
            "Reminder explanation must only continue to the system prompt")
+    # Rejection of 1.0.0 (7), L-D38: Settings opens only from the neutral
+    # "permission off" notices, and no copy asks the user to reconsider.
+    callers = sorted(str(p.relative_to(ROOT)) for p in (ROOT / "lib").rglob("*.dart")
+                     if "openAppSettings(" in p.read_text(encoding="utf-8"))
+    ensure(callers == ["lib/camera_page.dart",
+                       "lib/features/plan/presentation/reminder_settings_page.dart"],
+           f"Settings may only open from a permission-off notice link: {callers}")
+    # lib/l10n mirrors the Final C handoff ARB byte for byte and still lists the
+    # old strings; app code must not use them.
+    app_dart = "\n".join(p.read_text(encoding="utf-8")
+                         for p in sorted((ROOT / "lib").rglob("*.dart"))
+                         if "l10n" not in p.relative_to(ROOT).parts[:2])
+    for banned in ("I granted permission", "Tôi đã cấp quyền", "permission was denied",
+                   "đã từ chối quyền", "Grant Camera permission", "Enable Camera",
+                   "reminder-denied", ".cameraDenied", ".cameraDeniedBody",
+                   ".cameraGrantedRetry", ".notifDenied", ".legacyCameraPermission"):
+        ensure(banned not in app_dart, f"5.1.1(iv): banned permission copy {banned!r}")
     for locale, word in (("en", "allow"), ("vi", "cho phép")):
         arb = json.loads(read(f"lib/l10n/app_{locale}.arb"))
         for key in ("cameraAllowAndOpen", "notifPrePermTitle", "notifPrePermBody",
