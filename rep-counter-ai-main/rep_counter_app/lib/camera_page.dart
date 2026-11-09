@@ -101,7 +101,10 @@ enum _CameraState {
   awaitingConsent,
   initializing,
   ready,
-  denied,
+
+  /// Camera access is off (denied earlier or restricted). Shows the neutral
+  /// [CameraOffNotice]; never entered from a "Don't Allow" answer just given.
+  cameraOff,
   unavailable,
 
   /// App đang ở nền, camera đã thu lại.
@@ -199,6 +202,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   bool _diagRecording = false;
   bool _repThisFrame = false;
   bool _allowPop = false;
+  bool _requestingCamera = false;
   bool _manualPaused = false, _goalBanner = false;
   bool _challengeAutoFinishRequested = false;
   bool _routineAutoFinishRequested = false;
@@ -260,7 +264,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         if (mounted) unawaited(_startCiVideo());
       });
     } else {
-      _skipConsentIfAlreadyGranted();
+      _checkCameraAccess();
     }
   }
 
@@ -495,27 +499,74 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         _finishing) {
       return;
     }
+    // Back from Settings with the notice open: open the camera only if access
+    // is now on. Nothing is asked and nothing else changes.
+    if (_cameraState == _CameraState.cameraOff) return _checkCameraAccess();
     // Chưa từng mở camera (còn ở màn giải thích) thì đừng tự mở.
     if (!_workout.hasStarted && _cameraState != _CameraState.suspended) return;
     await _start();
   }
 
-  /// Đã cấp quyền camera rồi thì vào thẳng, đừng hỏi lại.
+  /// Decides what opening the workout shows, from the current camera access.
   ///
-  /// `_cameraState` trước đây luôn bắt đầu ở `awaitingConsent`, nên mỗi lần vào
-  /// buổi tập là phải bấm "Cho phép và mở camera" một lần nữa, dù đã cấp quyền
-  /// từ lâu. Người dùng đọc câu "Cần quyền camera" thì tưởng quyền bị mất.
-  ///
-  /// Việc này KHÔNG phá yêu cầu của Google Play là phải giải thích trước khi
-  /// xin quyền: màn hình giải thích chỉ bị bỏ qua khi quyền ĐÃ được cấp.
-  Future<void> _skipConsentIfAlreadyGranted() async {
+  /// - Granted: open the camera straight away (no explanation, no prompt).
+  /// - Off (denied earlier on iOS / "don't ask again" on Android, or
+  ///   restricted): the neutral [CameraOffNotice]. This only happens because
+  ///   the user opened a camera feature themselves.
+  /// - Not decided yet: the explanation screen with "Continue"
+  ///   (App Store 5.1.1(iv) / Google Play prominent disclosure).
+  Future<void> _checkCameraAccess() async {
+    final PermissionStatus status;
     try {
-      if (!await Permission.camera.isGranted) return;
+      status = await Permission.camera.status;
     } catch (_) {
       // Không đọc được trạng thái quyền thì cứ hiện màn giải thích.
       return;
     }
-    if (mounted) await _start();
+    if (!mounted) return;
+    if (status.isGranted || status.isLimited) {
+      await _start();
+    } else if (status.isPermanentlyDenied || status.isRestricted) {
+      setState(() => _cameraState = _CameraState.cameraOff);
+    }
+  }
+
+  /// "Continue" on the explanation screen: show the system camera prompt.
+  ///
+  /// App Store 5.1.1(iv) (rejection of 1.0.0 (7)): if the user answers
+  /// "Don't Allow", go back to the previous screen. No "denied" screen, no
+  /// Settings, no second request.
+  Future<void> _requestCameraAccess() async {
+    if (_requestingCamera) return;
+    setState(() => _requestingCamera = true);
+    PermissionStatus? status;
+    try {
+      status = await Permission.camera.request();
+    } catch (error) {
+      // Plugin unavailable: the camera plugin shows the system prompt itself.
+      debugPrint('camera permission: $error');
+    }
+    if (!mounted) return;
+    setState(() => _requestingCamera = false);
+    if (status != null && !(status.isGranted || status.isLimited)) {
+      _leaveWithoutWorkout();
+      return;
+    }
+    if (_inBackground) {
+      // The prompt moved the app to inactive; resuming opens the camera.
+      setState(() => _cameraState = _CameraState.suspended);
+      return;
+    }
+    await _start();
+  }
+
+  /// Leaves the workout page without a workout (nothing was recorded yet).
+  void _leaveWithoutWorkout() {
+    if (!mounted) return;
+    _feedback.stop();
+    _workout.abort();
+    _allowPop = true;
+    Navigator.of(context).pop();
   }
 
   String get _ciResultPath =>
@@ -805,7 +856,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       final code = error.code.toLowerCase();
       setState(() {
         _cameraState = code.contains('denied') || code.contains('access')
-            ? _CameraState.denied
+            ? _CameraState.cameraOff
             : _CameraState.unavailable;
         debugPrint('camera: ${error.code} ${error.description}');
       });
@@ -1425,35 +1476,42 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   /// Before the system prompt (5.1.1(iv)) the gate has no way out: no close,
   /// no "Not now", and back does nothing, so "Continue" always reaches the
-  /// system camera prompt. Exits come back once the prompt has been answered.
+  /// system camera prompt.
   bool get _beforePrompt => _cameraState == _CameraState.awaitingConsent;
 
-  Widget _cameraGate() => PopScope(
+  Widget _cameraGate() {
+    if (_cameraState == _CameraState.cameraOff) {
+      return PopScope(
         canPop: _allowPop,
         onPopInvokedWithResult: (didPop, _) {
-          if (!didPop && !_beforePrompt) _confirmExit();
+          if (!didPop) _leaveWithoutWorkout();
         },
-        child: CameraPermissionView(
-          title: _cameraTitle,
-          body: _cameraBody,
-          denied: _cameraState == _CameraState.denied,
-          loading: _cameraState == _CameraState.initializing,
-          actionLabel: _cameraState == _CameraState.denied
-              ? context.s.openSettings
-              : _cameraState == _CameraState.awaitingConsent
-                  ? context.s.cameraContinue
-                  : context.s.retry,
-          onAction:
-              _cameraState == _CameraState.denied ? openAppSettings : _start,
-          onRetry: _cameraState == _CameraState.denied ? _start : null,
-          onExit: _beforePrompt ? null : _confirmExit,
+        child: CameraOffNotice(
+          onBack: _leaveWithoutWorkout,
+          onOpenSettings: () => unawaited(openAppSettings()),
         ),
       );
+    }
+    return PopScope(
+      canPop: _allowPop,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && !_beforePrompt) _confirmExit();
+      },
+      child: CameraPermissionView(
+        title: _cameraTitle,
+        body: _cameraBody,
+        loading: _cameraState == _CameraState.initializing || _requestingCamera,
+        actionLabel: _beforePrompt ? context.s.cameraContinue : context.s.retry,
+        onAction: _beforePrompt ? _requestCameraAccess : _start,
+        onExit: _beforePrompt ? null : _confirmExit,
+      ),
+    );
+  }
 
   String get _cameraTitle => switch (_cameraState) {
         _CameraState.awaitingConsent => context.s.cameraPermissionTitle,
         _CameraState.initializing => context.s.cameraOpening,
-        _CameraState.denied => context.s.cameraDenied,
+        _CameraState.cameraOff => '',
         _CameraState.unavailable => context.s.cameraUnavailable,
         _CameraState.ready => context.s.cameraReady,
         _CameraState.suspended => context.s.cameraPaused,
@@ -1462,7 +1520,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   String get _cameraBody => switch (_cameraState) {
         _CameraState.awaitingConsent => context.s.cameraPermissionBody,
         _CameraState.initializing => context.s.cameraOpeningBody,
-        _CameraState.denied => context.s.cameraDeniedBody,
+        _CameraState.cameraOff => '',
         _CameraState.unavailable => context.s.cameraUnavailableBody,
         _CameraState.suspended => context.s.cameraPausedBody,
         _CameraState.ready => '',

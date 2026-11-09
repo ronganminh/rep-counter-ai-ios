@@ -324,14 +324,15 @@ void main() {
     for (final denied in [false, true]) {
       await pump(
           tester,
-          CameraPermissionView(
-              title: denied ? S.vi.cameraDenied : S.vi.cameraPermissionTitle,
-              body: denied ? S.vi.cameraDeniedBody : S.vi.cameraPermissionBody,
-              denied: denied,
-              loading: false,
-              actionLabel: S.vi.cameraContinue,
-              onAction: () {},
-              onExit: () {}));
+          denied
+              ? CameraOffNotice(onBack: () {}, onOpenSettings: () {})
+              : CameraPermissionView(
+                  title: S.vi.cameraPermissionTitle,
+                  body: S.vi.cameraPermissionBody,
+                  loading: false,
+                  actionLabel: S.vi.cameraContinue,
+                  onAction: () {},
+                  onExit: () {}));
       expect(tester.takeException(), isNull);
       await screenshot(tester, denied ? 'camera-denied' : 'camera-permission');
     }

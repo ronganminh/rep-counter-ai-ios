@@ -5,27 +5,27 @@ import '../../../../theme/app_colors.dart';
 import '../../../../theme/app_typography.dart';
 import '../../../../widgets/product_ui.dart';
 
-/// Camera gate shown before and after the system permission prompt.
+/// Camera gate shown before the system permission prompt, while the camera
+/// opens, and when it cannot open for a non-permission reason.
 ///
 /// App Store Guideline 5.1.1(iv): before the prompt the only action is
 /// [actionLabel] ("Continue"), which always leads to the system prompt. Pass
-/// `onExit: null` for that state: no close button, no "Not now". Exits are
-/// offered only after the prompt (denied / unavailable).
+/// `onExit: null` for that state: no close button, no "Not now".
+///
+/// Camera access that is off is NOT shown here: see [CameraOffNotice].
 class CameraPermissionView extends StatelessWidget {
   const CameraPermissionView(
       {super.key,
       required this.title,
       required this.body,
-      required this.denied,
       required this.loading,
       required this.actionLabel,
       required this.onAction,
-      required this.onExit,
-      this.onRetry});
+      required this.onExit});
   final String title, body, actionLabel;
-  final bool denied, loading;
-  final VoidCallback onAction;
-  final VoidCallback? onExit, onRetry;
+  final bool loading;
+  final VoidCallback? onAction;
+  final VoidCallback? onExit;
   @override
   Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(
@@ -57,14 +57,8 @@ class CameraPermissionView extends StatelessWidget {
                                         color: AppColors.surface,
                                         border: Border.all(
                                             color: AppColors.borderStrong)),
-                                    child: Icon(
-                                        denied
-                                            ? LucideIcons.cameraOff
-                                            : LucideIcons.camera,
-                                        size: 60,
-                                        color: denied
-                                            ? AppColors.text2
-                                            : AppColors.accent)),
+                                    child: const Icon(LucideIcons.camera,
+                                        size: 60, color: AppColors.accent)),
                                 const SizedBox(height: 28),
                                 Text(title,
                                     textAlign: TextAlign.center,
@@ -79,29 +73,13 @@ class CameraPermissionView extends StatelessWidget {
                                     child: Padding(
                                         padding: const EdgeInsets.all(16),
                                         child: Column(children: [
-                                          if (denied) ...[
-                                            _Line(
-                                                LucideIcons.settings,
-                                                context.tr('1. Mở Cài đặt',
-                                                    '1. Open Settings')),
-                                            _Line(
-                                                LucideIcons.smartphone,
-                                                context.tr(
-                                                    '2. Chọn RepCoach AI',
-                                                    '2. Select RepCoach AI')),
-                                            _Line(
-                                                LucideIcons.camera,
-                                                context.tr('3. Bật Camera',
-                                                    '3. Enable Camera')),
-                                          ] else ...[
-                                            _Line(LucideIcons.shieldCheck,
-                                                context.s.cameraOnDeviceNote),
-                                            _Line(
-                                                LucideIcons.eye,
-                                                context.tr(
-                                                    'Camera chỉ dùng trong buổi tập',
-                                                    'Camera is used during workouts')),
-                                          ],
+                                          _Line(LucideIcons.shieldCheck,
+                                              context.s.cameraOnDeviceNote),
+                                          _Line(
+                                              LucideIcons.eye,
+                                              context.tr(
+                                                  'Camera chỉ dùng trong buổi tập',
+                                                  'Camera is used during workouts')),
                                         ]))),
                               ]),
                               Padding(
@@ -118,11 +96,6 @@ class CameraPermissionView extends StatelessWidget {
                                           FilledButton(
                                               onPressed: onAction,
                                               child: Text(actionLabel)),
-                                        if (onRetry != null)
-                                          TextButton(
-                                              onPressed: onRetry,
-                                              child: Text(context
-                                                  .s.cameraGrantedRetry)),
                                         if (onExit != null)
                                           TextButton(
                                               onPressed: onExit,
@@ -132,6 +105,52 @@ class CameraPermissionView extends StatelessWidget {
                                                       color: AppColors.text2))),
                                       ])),
                             ]))))),
+      );
+}
+
+/// Neutral notice when camera access is off (App Store Guideline 5.1.1(iv),
+/// rejection of 1.0.0 (7)).
+///
+/// Shown ONLY when the user opens a camera feature while access is already
+/// off, never right after they answer "Don't Allow" in the system prompt.
+/// It states the fact once and offers two equal actions: [onBack] and a plain
+/// link to the app's Settings page ([onOpenSettings]). No "denied" title or
+/// icon, no step-by-step instructions, no retry, no wording that asks the
+/// user to reconsider.
+class CameraOffNotice extends StatelessWidget {
+  const CameraOffNotice(
+      {super.key, required this.onBack, required this.onOpenSettings});
+  final VoidCallback onBack, onOpenSettings;
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        appBar: AppBar(automaticallyImplyLeading: false),
+        body: SafeArea(
+            child: Center(
+                child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(context.s.cameraOffMessage,
+                              key: const Key('camera-off-message'),
+                              textAlign: TextAlign.center,
+                              style: AppTypography.body16),
+                          const SizedBox(height: 24),
+                          Row(children: [
+                            Expanded(
+                                child: OutlinedButton(
+                                    key: const Key('camera-off-back'),
+                                    onPressed: onBack,
+                                    child: Text(context.s.cameraBack))),
+                            const SizedBox(width: 12),
+                            Expanded(
+                                child: OutlinedButton(
+                                    key: const Key('camera-off-settings'),
+                                    onPressed: onOpenSettings,
+                                    child: Text(context.s.openSettings))),
+                          ]),
+                        ])))),
       );
 }
 

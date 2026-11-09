@@ -15,7 +15,7 @@ def ensure(condition, message):
 
 def main():
     spec = read("pubspec.yaml")
-    ensure("version: 1.0.0+7" in spec, "Release version/build is not synchronized")
+    ensure("version: 1.0.0+8" in spec, "Release version/build is not synchronized")
     strings = read("lib/core/i18n/app_strings.dart")
     legal = read("lib/features/legal/legal_page.dart")
     ensure("Gemini" not in strings and "Gemini" not in legal, "Stale Gemini provider text")
@@ -25,7 +25,7 @@ def main():
     picker = read("lib/features/exercises/presentation/exercise_picker_screen.dart")
     ensure("FeatureFlags.visibleExerciseIds.contains" in picker, "Exercise picker must respect release gate")
     settings = read("lib/features/legal/settings_page.dart")
-    ensure("1.0.0 (7)" in settings, "Settings release version mismatched")
+    ensure("1.0.0 (8)" in settings, "Settings release version mismatched")
     ensure("AppLinks.hasAppStoreListing" in settings, "iOS review link needs listing gate")
     info = plistlib.loads((ROOT / "ios/Runner/Info.plist").read_bytes())
     for key in ("NSCameraUsageDescription", "NSPhotoLibraryAddUsageDescription"):
@@ -49,6 +49,15 @@ def main():
            "iOS privacy and localization resources are not bundled")
     ensure("com.ronganminh.repCounterApp" in project, "Bundle ID changed")
     ensure("NSPrivacyCollectedDataTypeFitness" in str(manifest), "Workout statistics privacy declaration missing")
+    # Guideline 5.1.1(iv) (rejections of 1.0.0 (6) and (7)): Settings opens only
+    # from the neutral camera-off notice, and no copy asks the user to reconsider.
+    lib_dart = "\n".join(p.read_text(encoding="utf-8")
+                         for p in sorted((ROOT / "lib").rglob("*.dart")))
+    ensure(lib_dart.count("openAppSettings(") == 1,
+           "Settings may only open from the camera-off notice link")
+    for banned in ("I granted permission", "Tôi đã cấp quyền", "permission was denied",
+                   "đã từ chối quyền", "Grant Camera permission", "Enable Camera"):
+        ensure(banned not in lib_dart, f"5.1.1(iv): banned permission copy {banned!r}")
     print("PASS: App Store v1 static release gates")
 
 if __name__ == "__main__":
