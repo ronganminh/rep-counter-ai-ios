@@ -96,7 +96,7 @@ class S {
     required this.historyEmpty,
     required this.cameraPermissionTitle,
     required this.cameraPermissionBody,
-    required this.cameraDenied,
+    required this.cameraOffMessage,
     required this.cameraUnavailable,
     required this.openSettings,
     required this.retry,
@@ -151,11 +151,10 @@ class S {
     required this.finishSave,
     required this.finishWorkoutTooltip,
     required this.cameraContinue,
-    required this.cameraGrantedRetry,
+    required this.cameraBack,
     required this.cameraOnDeviceNote,
     required this.cameraOpening,
     required this.cameraOpeningBody,
-    required this.cameraDeniedBody,
     required this.cameraUnavailableBody,
     required this.cameraReady,
     required this.cameraPaused,
@@ -320,7 +319,8 @@ class S {
   // Camera / quyền
   final String cameraPermissionTitle;
   final String cameraPermissionBody;
-  final String cameraDenied;
+  /// Neutral notice when camera access is off (App Store 5.1.1(iv)).
+  final String cameraOffMessage;
   final String cameraUnavailable;
   final String openSettings;
   final String retry;
@@ -389,11 +389,10 @@ class S {
   final String finishSave;
   final String finishWorkoutTooltip;
   final String cameraContinue;
-  final String cameraGrantedRetry;
+  final String cameraBack;
   final String cameraOnDeviceNote;
   final String cameraOpening;
   final String cameraOpeningBody;
-  final String cameraDeniedBody;
   final String cameraUnavailableBody;
   final String cameraReady;
   final String cameraPaused;
@@ -563,9 +562,10 @@ class S {
     cameraPermissionTitle: 'Cần quyền camera',
     cameraPermissionBody:
         'Camera chỉ dùng để đếm rep ngay trên máy. Video không được ghi lại và không rời khỏi thiết bị.',
-    cameraDenied: 'Bạn đã từ chối quyền camera',
+    cameraOffMessage:
+        'Quyền truy cập camera của RepCoach đang tắt. Tính năng đếm rep cần camera.',
     cameraUnavailable: 'Không mở được camera',
-    openSettings: 'Mở cài đặt',
+    openSettings: 'Mở Cài đặt',
     retry: 'Thử lại',
     cancel: 'Huỷ',
     ok: 'Đồng ý',
@@ -624,13 +624,11 @@ class S {
     finishSave: 'Lưu & kết thúc',
     finishWorkoutTooltip: 'Kết thúc buổi tập',
     cameraContinue: 'Tiếp tục',
-    cameraGrantedRetry: 'Tôi đã cấp quyền • Thử lại',
+    cameraBack: 'Quay lại',
     cameraOnDeviceNote:
         'Khung hình được xử lý trực tiếp trên thiết bị và không được tải lên máy chủ.',
     cameraOpening: 'Đang mở camera…',
     cameraOpeningBody: 'Quá trình này có thể mất vài giây.',
-    cameraDeniedBody:
-        'Hãy cấp quyền Camera trong cài đặt thiết bị rồi quay lại ứng dụng.',
     cameraUnavailableBody:
         'Camera có thể đang được ứng dụng khác sử dụng hoặc thiết bị không hỗ trợ định dạng cần thiết.',
     cameraReady: 'Camera sẵn sàng',
@@ -806,9 +804,10 @@ class S {
     cameraPermissionTitle: 'Camera permission needed',
     cameraPermissionBody:
         'The camera is only used to count reps on your device. Nothing is recorded and nothing leaves the phone.',
-    cameraDenied: 'Camera permission was denied',
+    cameraOffMessage:
+        'Camera access is off for RepCoach. Rep counting needs the camera.',
     cameraUnavailable: 'Could not open the camera',
-    openSettings: 'Open settings',
+    openSettings: 'Open Settings',
     retry: 'Retry',
     cancel: 'Cancel',
     ok: 'Allow',
@@ -868,13 +867,11 @@ class S {
     finishSave: 'Save & finish',
     finishWorkoutTooltip: 'Finish workout',
     cameraContinue: 'Continue',
-    cameraGrantedRetry: 'I granted permission • Retry',
+    cameraBack: 'Back',
     cameraOnDeviceNote:
         'Frames are processed directly on your device and are never uploaded to a server.',
     cameraOpening: 'Opening the camera…',
     cameraOpeningBody: 'This can take a few seconds.',
-    cameraDeniedBody:
-        'Grant Camera permission in your device settings, then come back to the app.',
     cameraUnavailableBody:
         'The camera may be in use by another app, or this device does not support the required format.',
     cameraReady: 'Camera ready',

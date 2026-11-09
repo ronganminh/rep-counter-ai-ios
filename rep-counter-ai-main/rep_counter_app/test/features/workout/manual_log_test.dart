@@ -146,7 +146,6 @@ void main() {
         CameraPermissionView(
             title: 't',
             body: 'b',
-            denied: true,
             loading: false,
             actionLabel: 'a',
             onAction: () {},

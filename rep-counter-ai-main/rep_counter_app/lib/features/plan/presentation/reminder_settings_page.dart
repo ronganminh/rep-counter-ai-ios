@@ -7,7 +7,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/app_button.dart';
-import '../../../widgets/app_feedback.dart';
+import '../../../widgets/permission_off_notice.dart';
 import '../../../widgets/product_ui.dart';
 import '../application/plan_repository.dart';
 import '../application/reminder_service.dart';
@@ -15,14 +15,18 @@ import '../domain/reminder_planner.dart';
 import 'plan_copy.dart';
 
 /// P10-02 / P10-03 workout reminders: an in-app explanation before the OS
-/// prompt, the denied state (planning keeps working), reminder time, quiet
-/// hours and the next reminders.
+/// prompt, reminder time, quiet hours and the next reminders.
 ///
-/// App Store 5.1.1(iv) (L-D24): the explanation's only action is "Continue",
-/// which always shows the OS prompt; no "Not now" and no back before it. Once
-/// asked, the settings are shown (toggle off if the user declined) with a way
-/// to open the system settings. Reminders follow planned sessions only:
-/// never recovery days, never a session already done, missed or skipped.
+/// App Store 5.1.1(iv) (L-D24, rejections of 1.0.0 (6) and (7)):
+/// - the explanation's only action is "Continue", which always shows the OS
+///   prompt; no "Not now" and no back before it;
+/// - "Don't Allow" in the OS prompt returns to the previous screen: no denied
+///   banner, Settings is not opened, nothing is asked again;
+/// - opening reminders later while notifications are off shows only the
+///   neutral [PermissionOffNotice] (Back / Open Settings, equal buttons).
+/// Planning and recording never depend on notifications. Reminders follow
+/// planned sessions only: never recovery days, never a session already done,
+/// missed or skipped.
 class ReminderSettingsPage extends StatefulWidget {
   const ReminderSettingsPage(
       {super.key, required this.view, this.service, this.repository});
@@ -35,26 +39,44 @@ class ReminderSettingsPage extends StatefulWidget {
   State<ReminderSettingsPage> createState() => _ReminderSettingsPageState();
 }
 
-class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
+class _ReminderSettingsPageState extends State<ReminderSettingsPage>
+    with WidgetsBindingObserver {
   late final _service = widget.service ?? ReminderService();
   ReminderPrefs? _prefs;
   ReminderPermission _permission = ReminderPermission.unknown;
   List<PlannedReminder> _upcoming = const [];
   bool _busy = false;
+  bool _asked = false;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _load();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Back from Settings with the notice open: show the settings if
+  /// notifications are on now. Nothing is asked.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _off) _load();
   }
 
   Future<void> _load() async {
     final prefs = await _service.prefs();
     final permission = await _service.permission();
+    final asked = await _service.permissionAsked();
     if (!mounted) return;
     setState(() {
       _prefs = prefs;
       _permission = permission;
+      _asked = asked;
       _upcoming = ReminderPlanner.plan(
           widget.view.plan, widget.view.sessions, prefs, _service.now());
     });
@@ -70,11 +92,28 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
   }
 
   Future<void> _enable() async {
+    setState(() => _busy = true);
     final permission = await _service.requestPermission();
     if (!mounted) return;
-    setState(() => _permission = permission);
-    // Saved either way: if the OS says no, nothing is shown, and planning
-    // and recording never depend on it.
+    if (permission != ReminderPermission.granted) {
+      // "Don't Allow": back to the previous screen, nothing else.
+      final nav = Navigator.of(context);
+      if (nav.canPop()) {
+        nav.pop();
+      } else {
+        setState(() {
+          _busy = false;
+          _asked = true;
+          _permission = permission;
+        });
+      }
+      return;
+    }
+    setState(() {
+      _busy = false;
+      _asked = true;
+      _permission = permission;
+    });
     await _save(_prefs!.copyWith(enabled: true));
   }
 
@@ -88,17 +127,34 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
   String _time(int minute) =>
       TimeOfDay(hour: minute ~/ 60, minute: minute % 60).format(context);
 
-  /// The pre-permission explanation: reminders are off and the OS has not
-  /// granted notifications yet.
-  bool get _beforePrompt =>
+  /// Notifications are off and the app already asked (or reminders were
+  /// turned on earlier): the neutral notice.
+  bool get _off =>
       _prefs != null &&
-      !_prefs!.enabled &&
-      _permission != ReminderPermission.granted;
+      _permission != ReminderPermission.granted &&
+      (_asked || _prefs!.enabled);
+
+  /// The pre-permission explanation: the OS has not granted notifications
+  /// and the app has never asked.
+  bool get _beforePrompt =>
+      _prefs != null && _permission != ReminderPermission.granted && !_off;
 
   @override
   Widget build(BuildContext context) {
     final l = context.l10n;
     final prefs = _prefs;
+    if (_off) {
+      return PermissionOffNotice(
+        keyPrefix: 'reminder-off',
+        message: context.tr(
+            'Thông báo của RepCoach đang tắt. Lời nhắc tập cần thông báo.',
+            'Notifications are off for RepCoach. Workout reminders need notifications.'),
+        backLabel: context.tr('Quay lại', 'Back'),
+        settingsLabel: l.cameraOpenSettings,
+        onBack: () => Navigator.of(context).maybePop(),
+        onOpenSettings: () => openAppSettings(),
+      );
+    }
     final intro = _beforePrompt;
     return PopScope(
       canPop: !intro,
@@ -142,23 +198,6 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage> {
   List<Widget> _settings(ReminderPrefs prefs) {
     final l = context.l10n;
     return [
-      if (_permission == ReminderPermission.denied) ...[
-        AppBanner(
-            key: const Key('reminder-denied'),
-            tone: AppBannerTone.warn,
-            title: l.notifDenied,
-            body: context.tr(
-                'Bạn có thể bật trong cài đặt hệ thống. Kế hoạch và buổi tập vẫn hoạt động bình thường.',
-                'You can turn them on in system settings. Your plan and workouts work as usual.')),
-        const SizedBox(height: 8),
-        AppButton(
-            key: const Key('reminder-open-settings'),
-            label: l.cameraOpenSettings,
-            icon: LucideIcons.settings,
-            variant: AppButtonVariant.secondary,
-            onPressed: openAppSettings),
-        const SizedBox(height: 12),
-      ],
       SwitchListTile(
         key: const Key('reminder-toggle'),
         contentPadding: EdgeInsets.zero,
