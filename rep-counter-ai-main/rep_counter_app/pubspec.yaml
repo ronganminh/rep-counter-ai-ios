@@ -45,6 +45,11 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  # QA v2: app-level journeys in integration_test/ (run on the host with
+  # `flutter test integration_test` or on a device with `flutter test
+  # integration_test -d <id>`).
+  integration_test:
+    sdk: flutter
   camera_platform_interface: ^2.14.0
   flutter_lints: ^4.0.0
   flutter_launcher_icons: ^0.14.4
