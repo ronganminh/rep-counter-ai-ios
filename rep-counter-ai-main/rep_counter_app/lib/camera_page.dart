@@ -13,6 +13,7 @@ import 'package:image/image.dart' as img;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
+import 'core/permissions/permission_off_notice.dart';
 import 'core/i18n/app_strings.dart';
 import 'core/services/training_preferences.dart';
 import 'core/services/workout_feedback.dart';
@@ -1488,7 +1489,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         },
         child: CameraOffNotice(
           onBack: _leaveWithoutWorkout,
-          onOpenSettings: () => unawaited(openAppSettings()),
+          onOpenSettings: () => unawaited(openRepCoachSettings()),
         ),
       );
     }
