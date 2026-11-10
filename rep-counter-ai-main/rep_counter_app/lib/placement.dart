@@ -56,8 +56,13 @@ class PlacementResult {
 /// mọi tỉ lệ khung hình — đúng bài học từ notebook cũ: ngưỡng pixel cứng thì
 /// đổi độ phân giải là hỏng.
 class GuideZone {
-  const GuideZone(
-      {required this.body, required this.hands, required this.label});
+  const GuideZone({
+    required this.body,
+    required this.hands,
+    required this.label,
+    this.followShoulders = false,
+    this.zoneLandmarks,
+  });
 
   /// Vùng thân người nên nằm gọn bên trong.
   ///
@@ -82,6 +87,30 @@ class GuideZone {
   final List<Offset>? hands;
 
   final String label;
+
+  /// Khung đi theo người: dời ngang để tâm khung trùng điểm giữa hai vai,
+  /// rồi cắt theo mép ảnh. Chỉ cuốn tạ dùng (L-D39): người tập không phải
+  /// đứng đúng giữa ảnh, chỉ cần vai và khuỷu nằm trong ảnh.
+  final bool followShoulders;
+
+  /// Điểm phải nằm trong khung. `null` = mọi `requiredLandmarks` của bài.
+  final List<PoseLandmarkType>? zoneLandmarks;
+
+  List<PoseLandmarkType> zoneLandmarksFor(ExerciseProfile p) =>
+      zoneLandmarks ?? p.requiredLandmarks;
+
+  /// Khung thật sự dùng để kiểm tra và vẽ ở khung hình này.
+  Rect? zoneFor(Size s, {Landmarks? lm, double minLikelihood = 0.5}) {
+    final base = scaled(s);
+    if (base == null || !followShoulders || lm == null) return base;
+    final mid = lm.mid(
+        PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
+        minLikelihood: minLikelihood);
+    if (mid == null) return base;
+    return base
+        .shift(Offset(mid.dx - base.center.dx, 0))
+        .intersect(Offset.zero & s);
+  }
 
   Rect? scaled(Size s) => body == null
       ? null
@@ -127,7 +156,28 @@ GuideZone guideFor(ExerciseProfile p, S s) {
       label: s.guideHorizontal,
     );
   }
-  // Bài đứng (cuốn tạ, đẩy tạ qua đầu): người đứng thẳng nên khung dọc hợp lý,
+  // CUỐN TẠ — khung đi theo giữa hai vai, chỉ bắt vai và khuỷu (L-D39).
+  //
+  // Đo trên video cuốn tạ thật của chủ dự án (IMG_0967, 65 rep): với khung
+  // cố định Rect(0.20, 0.10, 0.80, 0.95) set 1–2 kẹt ở `partiallyOut` cả set.
+  // Tạ ở hông nằm sát mép trái/phải ảnh nên cổ tay luôn ra ngoài khung, và
+  // người đứng lệch tâm làm vai trái ra ngoài. Cổ tay và tạ được phép ra sát
+  // mép; vai và khuỷu (trục của động tác) vẫn phải nằm trong ảnh.
+  if (p.id == 'curl') {
+    return GuideZone(
+      body: const Rect.fromLTRB(0.05, 0.05, 0.95, 0.95),
+      hands: null,
+      label: s.guideVertical,
+      followShoulders: true,
+      zoneLandmarks: const [
+        PoseLandmarkType.leftShoulder,
+        PoseLandmarkType.rightShoulder,
+        PoseLandmarkType.leftElbow,
+        PoseLandmarkType.rightElbow,
+      ],
+    );
+  }
+  // Bài đứng (đẩy tạ qua đầu): người đứng thẳng nên khung dọc hợp lý,
   // và chừa khoảng trống phía trên đầu cho động tác đưa tay lên.
   return GuideZone(
     body: const Rect.fromLTRB(0.20, 0.10, 0.80, 0.95),
@@ -177,10 +227,10 @@ PlacementResult evaluatePlacement({
   // 2) Các điểm chính phải nằm trong khung hướng dẫn — CHỈ khi bài có khung.
   //     Xem chú thích ở `GuideZone.body`: bài hít đất quay trực diện không
   //     dùng được kiểm tra này, vì tay vươn ra ngoài cả khung hình.
-  final zone = guide.scaled(viewSize);
+  final zone = guide.zoneFor(viewSize, lm: lm, minLikelihood: ml);
   if (zone != null) {
     var outside = 0, checked = 0;
-    for (final t in profile.requiredLandmarks) {
+    for (final t in guide.zoneLandmarksFor(profile)) {
       final p = lm.pt(t, minLikelihood: ml);
       if (p == null) continue;
       checked++;
