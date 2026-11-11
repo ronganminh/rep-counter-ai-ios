@@ -754,8 +754,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _repHi = hi;
     _repLo = lo;
     _repAmp = amp;
-    _smoothL = RollingMean(p.smoothWindow);
-    _smoothR = RollingMean(p.smoothWindow);
+    _smoothL = RollingMean(p.smoothWindow, maxAge: p.smoothDuration);
+    _smoothR = RollingMean(p.smoothWindow, maxAge: p.smoothDuration);
     _head = p.id == pushUp.id
         ? HeadDropChannel(const HeadDropFallback())
         : null;
@@ -1061,7 +1061,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           final vals = [raw.left, raw.right].whereType<double>().toList();
           final v = vals.isEmpty
               ? null
-              : _smoothL.add(vals.reduce((a, b) => a + b) / vals.length);
+              : _smoothL.add(vals.reduce((a, b) => a + b) / vals.length,
+                  at: now);
           if (v != null) {
             sig = v;
             signalRestored = true;
@@ -1092,7 +1093,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             }
           }
         } else {
-          final vl = raw.left == null ? null : _smoothL.add(raw.left!);
+          final vl = raw.left == null ? null : _smoothL.add(raw.left!, at: now);
           if (vl != null) {
             sig = vl;
             signalRestored = true;
@@ -1101,7 +1102,8 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
             _handle(_trackL.update(sample(vl)), now, merge: true, arm: 'L');
           }
 
-          final vr = raw.right == null ? null : _smoothR.add(raw.right!);
+          final vr =
+              raw.right == null ? null : _smoothR.add(raw.right!, at: now);
           if (sig.isNaN && vr != null) sig = vr;
           if (vr != null) signalRestored = true;
           if (_workout.acceptsReps) {
