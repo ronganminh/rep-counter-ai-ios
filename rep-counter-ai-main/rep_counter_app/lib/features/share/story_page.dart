@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/i18n/locale_controller.dart';
 import '../../exercise.dart';
@@ -12,8 +14,38 @@ import '../../theme/app_typography.dart';
 import '../workout/data/workout_record.dart';
 import '../workout/presentation/widgets/workout_hud.dart';
 import '../../core/i18n/l10n.dart';
+import '../../widgets/permission_off_notice.dart';
+
+/// Outcome of "Save image" (App Store Guideline 5.1.1(iv), L-D38).
+enum PhotoSaveResult {
+  saved,
+
+  /// The user answered "Don't Allow" just now. Say only "Image not saved.":
+  /// no Settings, no retry, and the system prompt is not shown again.
+  declined,
+
+  /// Access was already off when the user tapped Save (asked before). Show the
+  /// neutral Back / Open Settings notice, as for the camera (L-D38).
+  accessOff,
+}
+
+/// Thin seam over `gal` so tests can drive every permission answer.
+class PhotoLibrary {
+  const PhotoLibrary();
+  Future<bool> hasAccess() => Gal.hasAccess();
+  Future<bool> requestAccess() => Gal.requestAccess();
+  Future<void> put(Uint8List bytes) => Gal.putImageBytes(bytes,
+      name: 'RepCoach-${DateTime.now().millisecondsSinceEpoch}');
+}
 
 class StoryExporter {
+  StoryExporter({this.photos = const PhotoLibrary()});
+  final PhotoLibrary photos;
+
+  /// Set once the system Photos prompt has been shown from this install, so
+  /// it is never shown again and a later Save with access off gets the notice.
+  static const askedKey = 'story.photos_access_asked';
+
   Future<ShareResultStatus> share(Uint8List bytes, Rect origin) async =>
       (await SharePlus.instance.share(ShareParams(
         files: [XFile.fromData(bytes, mimeType: 'image/png')],
@@ -21,15 +53,23 @@ class StoryExporter {
         sharePositionOrigin: origin,
       )))
           .status;
-  Future<void> save(Uint8List bytes) async {
-    if (!await Gal.hasAccess() && !await Gal.requestAccess()) {
-      throw GalException(
-          type: GalExceptionType.accessDenied,
-          platformException: PlatformException(code: 'accessDenied'),
-          stackTrace: StackTrace.current);
+
+  Future<PhotoSaveResult> save(Uint8List bytes) async {
+    if (!await photos.hasAccess()) {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(askedKey) ?? false) return PhotoSaveResult.accessOff;
+      await prefs.setBool(askedKey, true);
+      if (!await photos.requestAccess()) return PhotoSaveResult.declined;
     }
-    await Gal.putImageBytes(bytes,
-        name: 'RepCoach-${DateTime.now().millisecondsSinceEpoch}');
+    try {
+      await photos.put(bytes);
+    } on GalException catch (e) {
+      if (e.type == GalExceptionType.accessDenied) {
+        return PhotoSaveResult.declined;
+      }
+      rethrow;
+    }
+    return PhotoSaveResult.saved;
   }
 }
 
@@ -51,6 +91,7 @@ class _StoryPageState extends State<StoryPage> {
     final box = originContext.findRenderObject()! as RenderBox;
     final origin = box.localToGlobal(Offset.zero) & box.size;
     setState(() => _busy = true);
+    var accessOff = false;
     try {
       await WidgetsBinding.instance.endOfFrame;
       if (!mounted) return;
@@ -67,10 +108,15 @@ class _StoryPageState extends State<StoryPage> {
       }
       if (!mounted) return;
       if (save) {
-        await _exporter.save(bytes);
-        if (mounted) {
-          _notice(
-              context.l10n.legacyStoryPageImageSavedPhotos);
+        final result = await _exporter.save(bytes);
+        if (!mounted) return;
+        switch (result) {
+          case PhotoSaveResult.saved:
+            _notice(context.l10n.legacyStoryPageImageSavedPhotos);
+          case PhotoSaveResult.declined:
+            _notice(context.l10n.storyImageNotSaved);
+          case PhotoSaveResult.accessOff:
+            accessOff = true;
         }
       } else {
         // Even "success" only means an action was selected. An unavailable
@@ -80,7 +126,7 @@ class _StoryPageState extends State<StoryPage> {
     } on GalException catch (error) {
       if (mounted) {
         _notice(error.type == GalExceptionType.accessDenied
-            ? context.l10n.legacyStoryPagePhotoAccessWasDenied
+            ? context.l10n.storyImageNotSaved
             : context.l10n.legacyStoryPageCouldNotSaveImage);
       }
     } catch (_) {
@@ -90,7 +136,20 @@ class _StoryPageState extends State<StoryPage> {
     } finally {
       if (mounted) setState(() => _busy = false);
     }
+    // Shown after the button is idle again; the user decides, nothing retries.
+    if (accessOff && mounted) await _photosOff();
   }
+
+  Future<void> _photosOff() =>
+      Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (route) => PermissionOffNotice(
+                keyPrefix: 'photos-off',
+                message: route.l10n.storyPhotosOffMessage,
+                backLabel: route.l10n.storyPhotosOffBack,
+                settingsLabel: route.l10n.cameraOpenSettings,
+                onBack: () => Navigator.of(route).pop(),
+                onOpenSettings: () => openAppSettings(),
+              )));
 
   void _notice(String text) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));

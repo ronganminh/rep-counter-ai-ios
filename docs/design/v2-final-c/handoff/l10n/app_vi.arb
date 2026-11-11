@@ -4338,5 +4338,8 @@
   "guideCueCurl3": "Hạ xuống đến khi duỗi thẳng tay",
   "settingsDemoVideosTitle": "Video mẫu động tác",
   "settingsDemoVideosBody": "Video mẫu kéo xà và cuốn tạ lấy từ bộ workout-free-videos của namnq, phát hành theo CC0 1.0 (phạm vi công cộng). Nguồn này không yêu cầu ghi công; chúng tôi vẫn ghi nguồn.",
-  "settingsDemoVideosOpen": "Mở trang nguồn"
+  "settingsDemoVideosOpen": "Mở trang nguồn",
+  "storyImageNotSaved": "Chưa lưu ảnh.",
+  "storyPhotosOffMessage": "Quyền thêm ảnh của RepCoach đang tắt. Lưu ảnh cần quyền này.",
+  "storyPhotosOffBack": "Quay lại"
 }
