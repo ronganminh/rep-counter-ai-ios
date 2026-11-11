@@ -4,8 +4,10 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
 import '../../core/i18n/locale_controller.dart';
+import '../../core/permissions/permission_off_notice.dart';
 import '../../exercise.dart';
 import '../../widgets/product_ui.dart';
 import '../../theme/app_colors.dart';
@@ -13,7 +15,36 @@ import '../../theme/app_typography.dart';
 import '../workout/data/workout_record.dart';
 import '../workout/presentation/widgets/workout_hud.dart';
 
+/// Outcome of "Save image" (App Store Guideline 5.1.1(iv)).
+enum PhotoSaveResult {
+  saved,
+
+  /// The user answered "Don't Allow" just now. Say only "Image not saved.":
+  /// no Settings, no retry, and the system prompt is not shown again.
+  declined,
+
+  /// Access was already off when the user tapped Save (asked before). Show the
+  /// neutral Back / Open Settings notice, as for the camera (L-D38).
+  accessOff,
+}
+
+/// Thin seam over `gal` so tests can drive every permission answer.
+class PhotoLibrary {
+  const PhotoLibrary();
+  Future<bool> hasAccess() => Gal.hasAccess();
+  Future<bool> requestAccess() => Gal.requestAccess();
+  Future<void> put(Uint8List bytes) => Gal.putImageBytes(bytes,
+      name: 'RepCoach-${DateTime.now().millisecondsSinceEpoch}');
+}
+
 class StoryExporter {
+  StoryExporter({this.photos = const PhotoLibrary()});
+  final PhotoLibrary photos;
+
+  /// Set once the system Photos prompt has been shown from this install, so
+  /// it is never shown again and a later Save with access off gets the notice.
+  static const askedKey = 'story.photos_access_asked';
+
   Future<ShareResultStatus> share(Uint8List bytes, Rect origin) async =>
       (await SharePlus.instance.share(ShareParams(
         files: [XFile.fromData(bytes, mimeType: 'image/png')],
@@ -21,15 +52,23 @@ class StoryExporter {
         sharePositionOrigin: origin,
       )))
           .status;
-  Future<void> save(Uint8List bytes) async {
-    if (!await Gal.hasAccess() && !await Gal.requestAccess()) {
-      throw GalException(
-          type: GalExceptionType.accessDenied,
-          platformException: PlatformException(code: 'accessDenied'),
-          stackTrace: StackTrace.current);
+
+  Future<PhotoSaveResult> save(Uint8List bytes) async {
+    if (!await photos.hasAccess()) {
+      final prefs = await SharedPreferences.getInstance();
+      if (prefs.getBool(askedKey) ?? false) return PhotoSaveResult.accessOff;
+      await prefs.setBool(askedKey, true);
+      if (!await photos.requestAccess()) return PhotoSaveResult.declined;
     }
-    await Gal.putImageBytes(bytes,
-        name: 'RepCoach-${DateTime.now().millisecondsSinceEpoch}');
+    try {
+      await photos.put(bytes);
+    } on GalException catch (e) {
+      if (e.type == GalExceptionType.accessDenied) {
+        return PhotoSaveResult.declined;
+      }
+      rethrow;
+    }
+    return PhotoSaveResult.saved;
   }
 }
 
@@ -51,6 +90,7 @@ class _StoryPageState extends State<StoryPage> {
     final box = originContext.findRenderObject()! as RenderBox;
     final origin = box.localToGlobal(Offset.zero) & box.size;
     setState(() => _busy = true);
+    var accessOff = false;
     try {
       await WidgetsBinding.instance.endOfFrame;
       if (!mounted) return;
@@ -67,10 +107,16 @@ class _StoryPageState extends State<StoryPage> {
       }
       if (!mounted) return;
       if (save) {
-        await _exporter.save(bytes);
-        if (mounted) {
-          _notice(
-              context.tr('Đã lưu ảnh vào thư viện.', 'Image saved to Photos.'));
+        final result = await _exporter.save(bytes);
+        if (!mounted) return;
+        switch (result) {
+          case PhotoSaveResult.saved:
+            _notice(context.tr(
+                'Đã lưu ảnh vào thư viện.', 'Image saved to Photos.'));
+          case PhotoSaveResult.declined:
+            _notice(context.tr('Chưa lưu ảnh.', 'Image not saved.'));
+          case PhotoSaveResult.accessOff:
+            accessOff = true;
         }
       } else {
         // Even "success" only means an action was selected. An unavailable
@@ -80,9 +126,7 @@ class _StoryPageState extends State<StoryPage> {
     } on GalException catch (error) {
       if (mounted) {
         _notice(error.type == GalExceptionType.accessDenied
-            ? context.tr(
-                'Chưa có quyền thêm ảnh. Hãy cho phép trong Cài đặt của thiết bị rồi thử lại.',
-                'Photo access was denied. Allow adding photos in device Settings and retry.')
+            ? context.tr('Chưa lưu ảnh.', 'Image not saved.')
             : context.tr('Chưa lưu được ảnh. Kiểm tra dung lượng rồi thử lại.',
                 'Could not save the image. Check available storage and retry.'));
       }
@@ -93,6 +137,14 @@ class _StoryPageState extends State<StoryPage> {
       }
     } finally {
       if (mounted) setState(() => _busy = false);
+    }
+    // Shown after the button is idle again; the user decides, nothing retries.
+    if (accessOff && mounted) {
+      await PermissionOffDialog.show(
+          context,
+          context.tr(
+              'Quyền thêm ảnh của RepCoach đang tắt. Lưu ảnh cần quyền này.',
+              'Photos access is off for RepCoach. Saving the image needs it.'));
     }
   }
 
