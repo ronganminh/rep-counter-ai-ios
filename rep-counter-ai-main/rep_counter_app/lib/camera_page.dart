@@ -152,6 +152,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   /// tốt hay xấu.
   late RepTracker _trackL, _trackR;
   late RollingMean _smoothL, _smoothR;
+  late final _countGateLatch = CountGateLatch(p.countGateGrace);
 
   /// Giữ lại để vẽ vạch ngưỡng trên đồ thị; sau hiệu chỉnh thì đổi theo.
   late double _repHi, _repLo, _repAmp;
@@ -307,6 +308,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _smoothR.reset();
     _merger.reset();
     _lastPlacementOk = null;
+    _countGateLatch.reset();
   }
 
   void _workoutChanged() {
@@ -467,6 +469,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _smoothL.reset();
     _smoothR.reset();
     _lastPlacementOk = null;
+    _countGateLatch.reset();
 
     setState(() {
       _cam = null;
@@ -575,6 +578,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
 
   Future<void> _writeCiStatus(String line) async {
     if (widget.ciVideoPath == null) return;
+    // Also emit to the log so the Android replay (which cannot poll the
+    // overwritten result file) can reconstruct the full status timeline from
+    // logcat. No-op in release builds; harmless on iOS (which reads the file).
+    debugPrint(line);
     try {
       await File(_ciResultPath).writeAsString('$line\n', flush: true);
     } catch (error) {
@@ -768,6 +775,41 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     return n == 0 ? 0 : sum / n;
   }
 
+  String _ciPushUpGateMetrics(Landmarks lm) {
+    if (p.id != 'push_up') return '';
+    final sw = lm.shoulderWidth(minLikelihood: p.minLikelihood);
+    final lw =
+        lm.pt(PoseLandmarkType.leftWrist, minLikelihood: p.minLikelihood);
+    final rw =
+        lm.pt(PoseLandmarkType.rightWrist, minLikelihood: p.minLikelihood);
+    final shoulders = lm.mid(
+        PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
+        minLikelihood: p.minLikelihood);
+    final hips = lm.mid(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip,
+        minLikelihood: p.minLikelihood);
+    if (sw == null ||
+        lw == null ||
+        rw == null ||
+        shoulders == null ||
+        hips == null) {
+      return ' support_metrics=missing';
+    }
+    final wristWidthRatio = (lw.dx - rw.dx).abs() / sw;
+    final wristsBelowHipRatio = (math.min(lw.dy, rw.dy) - hips.dy) / sw;
+    final torsoDropRatio = (hips.dy - shoulders.dy) / sw;
+    final leftKnee =
+        lm.pt(PoseLandmarkType.leftKnee, minLikelihood: p.minLikelihood);
+    final rightKnee =
+        lm.pt(PoseLandmarkType.rightKnee, minLikelihood: p.minLikelihood);
+    final kneeMetrics = leftKnee == null || rightKnee == null
+        ? ' support_k=missing'
+        : ' support_k=${((leftKnee.dx - rightKnee.dx).abs() / sw).toStringAsFixed(2)}'
+            ' support_ky=${(((leftKnee.dy + rightKnee.dy) / 2 - hips.dy) / sw).toStringAsFixed(2)}';
+    return ' support_w=${wristWidthRatio.toStringAsFixed(2)}'
+        ' support_y=${wristsBelowHipRatio.toStringAsFixed(2)}'
+        ' support_t=${torsoDropRatio.toStringAsFixed(2)}$kneeMetrics';
+  }
+
   /// Gom event của tracker. RepCompleted chỉ bổ sung presentation feedback
   /// sau khi production counter đã chấp nhận rep; RepAborted không đổi tổng rep.
   void _handle(List<RepEvent> events, Duration now,
@@ -936,15 +978,38 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     );
     final lm = pose == null ? null : remapPose(pose, mapper);
 
-    final placement = evaluatePlacement(
+    final now = _workout.frameTime;
+    bool? rawGateOk;
+    var gateState = CountGateState.open;
+    final countGate = p.countGate;
+    if (lm != null && countGate != null) {
+      rawGateOk = countGate(lm, p.minLikelihood);
+      gateState = _countGateLatch.update(rawGateOk, now);
+    }
+
+    var placement = evaluatePlacement(
       profile: p,
       lm: lm,
       viewSize: view,
       guide: _guide,
       strings: _strings,
+      // CameraPage áp dụng gate đã chống rung ngay dưới đây. Nếu kiểm lại raw
+      // gate ở đây, một frame landmark xấu vẫn đổi placement sang wrongPose và
+      // vô hiệu toàn bộ thời gian ân hạn.
+      checkCountGate: false,
     );
+    if (lm != null &&
+        countGate != null &&
+        gateState == CountGateState.closed &&
+        placement.status == PlacementStatus.ready) {
+      placement = PlacementResult(
+        PlacementStatus.wrongPose,
+        detail: p.id == 'pull_up'
+            ? _strings.detailNotHanging
+            : p.localizedHint(_strings),
+      );
+    }
     final status = _statusDebouncer.update(placement.status);
-    final now = _workout.frameTime;
     if (status.canCount) _lastPlacementOk = now;
     final canCount =
         _lastPlacementOk != null && now - _lastPlacementOk! <= _placementGrace;
@@ -953,14 +1018,12 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     double? rawLeft;
     double? rawRight;
     var signalRestored = false;
-    bool? gateOk;
     if (lm != null) {
       final raw = p.signal(lm, p.minLikelihood);
       rawLeft = raw.left;
       rawRight = raw.right;
-      gateOk = p.countGate?.call(lm, p.minLikelihood);
 
-      if (canCount && gateOk != false) {
+      if (canCount && gateState != CountGateState.closed) {
         final torso = _torsoDeviation(lm);
         final conf = _poseConfidence(lm);
         PoseSample sample(double? v) => PoseSample(
@@ -972,7 +1035,11 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
               poseConfidence: conf,
             );
 
-        if (p.combineArms == CombineArms.mean) {
+        // Khi `holding`, chỉ giữ chu kỳ đang dở; không đưa góc của frame sai
+        // tư thế vào tracker, nên lúc vừa ngồi xuống không thể sinh rep ma.
+        if (gateState == CountGateState.holding) {
+          // Chờ một frame pose ổn định hoặc hết thời gian ân hạn.
+        } else if (p.combineArms == CombineArms.mean) {
           // Hai tay ràng buộc cứng cùng pha -> lấy trung bình rồi đếm MỘT lần.
           // Đếm riêng ở đây sẽ nhân đôi rep mỗi khi pose gán nhầm trái/phải.
           final vals = [raw.left, raw.right].whereType<double>().toList();
@@ -1034,6 +1101,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       }
       _smoothL.reset();
       _smoothR.reset();
+      _countGateLatch.reset();
     }
 
     if (signalRestored) _workout.repSignalRestored();
@@ -1053,7 +1121,10 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
           'pose=${pose != null} placement=${status.name} countable=$canCount '
           'raw_status=${placement.status.name} raw_l=${number(rawLeft)} '
           'raw_r=${number(rawRight)} signal=${number(sig)} '
-          'gate=${gateOk ?? 'na'} detail=${placement.detail.replaceAll(' ', '_')}';
+          'gate=${gateState == CountGateState.open} '
+          'gate_state=${gateState.name} gate_raw=${rawGateOk ?? 'na'}'
+          '${lm == null ? '' : _ciPushUpGateMetrics(lm)} '
+          'detail=${placement.detail.replaceAll(' ', '_')}';
     }
     // Keep the legacy placement grace: a normal rep can briefly leave the guide.
     if (_workout.acceptsReps && !canCount && !_repThisFrame) {
@@ -1073,7 +1144,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         reps: _ui.reps,
         repEvent: _repThisFrame,
         rawRight: lm == null ? null : p.signal(lm, p.minLikelihood).right,
-        gate: gateOk,
+        gate: p.countGate == null ? null : gateState == CountGateState.open,
         exercise: p.id,
         view: view,
         landmarks: lm,
@@ -1174,6 +1245,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _smoothL.reset();
     _smoothR.reset();
     _lastPlacementOk = null;
+    _countGateLatch.reset();
     _pauseTimer?.cancel();
     _pauseTimer = Timer(const Duration(minutes: 5), _finishWorkout);
     setState(() {});
