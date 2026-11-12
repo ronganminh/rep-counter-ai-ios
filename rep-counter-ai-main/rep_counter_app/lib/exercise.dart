@@ -296,6 +296,7 @@ class ExerciseProfile {
     this.shoulderWidthFraction = const (min: 0.12, max: 0.42),
     this.setupHint = '',
     this.smoothWindow = 5,
+    this.smoothDuration,
     this.startFromTop = false,
     this.countGate,
     this.countGateGrace = Duration.zero,
@@ -336,6 +337,12 @@ class ExerciseProfile {
   /// Số khung của trung bình trượt. Cửa sổ tính theo KHUNG nên ở fps thấp nó
   /// dài ra theo thời gian: 5 khung ở 5 fps là 1 s, đủ san phẳng cả đỉnh rep.
   final int smoothWindow;
+
+  /// Giới hạn thêm cửa sổ làm mượt theo thời gian (L-D41). Để trống thì chỉ
+  /// dùng [smoothWindow]. Đặt thì cửa sổ là các mẫu trong khoảng này, nhưng
+  /// vẫn không quá [smoothWindow] mẫu: máy ~15 fps giữ đúng 5 khung như cũ,
+  /// còn ở 5 fps (replay CI, máy chậm) chỉ còn 2 khung nên không mất đỉnh rep.
+  final Duration? smoothDuration;
 
   /// Xem [RepCounter.startFromTop].
   final bool startFromTop;
@@ -413,6 +420,9 @@ const dumbbellCurl = ExerciseProfile(
   shoulderWidthFraction: (min: 0.25, max: 0.55),
   countGate: _standingForCurl,
   countGateGrace: Duration(seconds: 1),
+  // Đỉnh cuốn tạ chỉ dài 0,4–0,6 s. 5 khung ở 5 fps (1 s) san phẳng đỉnh và
+  // sót rep (set 4: 6–7/16); 0,35 s giữ 5 khung ở ~15 fps, 2 khung ở 5 fps.
+  smoothDuration: Duration(milliseconds: 350),
   setupHint: 'Đứng thẳng, thấy rõ vai và hai cẳng tay trong khung.',
 );
 
