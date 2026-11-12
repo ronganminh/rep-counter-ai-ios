@@ -76,7 +76,8 @@ class PoseOverlayPainter extends CustomPainter {
   }
 
   void _paintGuide(Canvas canvas, Size size) {
-    final rect = guide.scaled(size);
+    final rect = guide.zoneFor(size,
+        lm: landmarks, minLikelihood: profile.minLikelihood);
     final color = status.canCount ? AppColors.success : AppColors.text2;
 
     // Chon hinh ve theo BAI TAP, khong suy ra tu `orientation`.

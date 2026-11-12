@@ -17,21 +17,47 @@ import 'dart:math' as math;
 /// không xài được. Trung bình trượt trễ nửa cửa sổ; giữ cửa sổ ~0.15–0.2 s để
 /// độ trễ không đáng kể so với nhịp rep ~1 s.
 class RollingMean {
-  RollingMean(this.window) : assert(window >= 1);
+  RollingMean(this.window, {this.maxAge}) : assert(window >= 1);
 
   final int window;
+
+  /// Nếu đặt, cửa sổ còn bị giới hạn theo THỜI GIAN: chỉ trung bình các mẫu
+  /// trong [maxAge] tính tới mẫu mới nhất, và vẫn không quá [window] mẫu.
+  /// Cần truyền `at` cho [add]; thiếu `at` thì chỉ giới hạn theo số mẫu như cũ.
+  /// Dùng cho bài có đỉnh rep ngắn (cuốn tạ, L-D41): ở fps thấp cửa sổ theo
+  /// số mẫu dài ra theo thời gian và san phẳng mất đỉnh.
+  final Duration? maxAge;
+
   final Queue<double> _buf = Queue<double>();
+  final Queue<Duration?> _at = Queue<Duration?>();
   double _sum = 0;
 
   void reset() {
     _buf.clear();
+    _at.clear();
     _sum = 0;
   }
 
-  double add(double v) {
+  double add(double v, {Duration? at}) {
+    final age = maxAge;
+    if (age != null && at != null) {
+      final last = _at.isEmpty ? null : _at.last;
+      // Thời gian đi lùi (đổi nguồn frame): bắt đầu lại.
+      if (last != null && at < last) reset();
+      while (_buf.isNotEmpty) {
+        final first = _at.first;
+        if (first == null || at - first < age) break;
+        _at.removeFirst();
+        _sum -= _buf.removeFirst();
+      }
+    }
     _buf.addLast(v);
+    _at.addLast(at);
     _sum += v;
-    if (_buf.length > window) _sum -= _buf.removeFirst();
+    if (_buf.length > window) {
+      _sum -= _buf.removeFirst();
+      _at.removeFirst();
+    }
     return _sum / _buf.length;
   }
 }
