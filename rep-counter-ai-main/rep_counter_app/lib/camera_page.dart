@@ -28,6 +28,7 @@ import 'features/workout/application/workout_controller.dart';
 import 'features/workout/application/workout_ui_state.dart';
 import 'features/workout/domain/head_drop_fallback.dart';
 import 'features/workout/domain/quality_thresholds.dart';
+import 'features/workout/domain/positioning_signal_buffer.dart';
 import 'features/workout/domain/rep_tracker.dart';
 import 'features/workout/domain/rep_metric.dart';
 import 'features/workout/domain/workout_mode.dart';
@@ -165,6 +166,11 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   HeadDropChannel? _head;
   double? _ciHeadSignal;
   late final _countGateLatch = CountGateLatch(p.countGateGrace);
+
+  /// L-D40: 2,5 s tín hiệu gần nhất lúc chưa đếm được, để rep đầu không bị
+  /// sót khi người tập cử động trước lúc ready. Chỉ mồi trạng thái tracker;
+  /// event sinh ra lúc mồi bị bỏ. Xem [PositioningSignalBuffer].
+  final _positioningBuffer = PositioningSignalBuffer();
 
   /// Giữ lại để vẽ vạch ngưỡng trên đồ thị; sau hiệu chỉnh thì đổi theo.
   late double _repHi, _repLo, _repAmp;
@@ -337,6 +343,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _merger.reset();
     _lastPlacementOk = null;
     _countGateLatch.reset();
+    _positioningBuffer.clear();
   }
 
   void _workoutChanged() {
@@ -499,6 +506,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _smoothR.reset();
     _lastPlacementOk = null;
     _countGateLatch.reset();
+    _positioningBuffer.clear();
 
     setState(() {
       _cam = null;
@@ -1013,6 +1021,23 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     }
   }
 
+  /// Nạp lại [_positioningBuffer] vào tracker ngay trước frame đếm được đầu
+  /// tiên, để tracker nhớ đáy của rep đang dở. Event lúc mồi bị bỏ (L-D40).
+  void _primeFromPositioning() {
+    if (_positioningBuffer.isEmpty) return;
+    final frames = _positioningBuffer.drain();
+    if (!_workout.acceptsReps) return;
+    if (p.combineArms == CombineArms.mean) {
+      primeTracker(_trackL, _smoothL, frames, (f) {
+        final vals = [f.left, f.right].whereType<double>().toList();
+        return vals.isEmpty ? null : vals.reduce((a, b) => a + b) / vals.length;
+      });
+    } else {
+      primeTracker(_trackL, _smoothL, frames, (f) => f.left);
+      primeTracker(_trackR, _smoothR, frames, (f) => f.right);
+    }
+  }
+
   void _consume(Pose? pose, CameraImage image) {
     final camera = _cam;
     if (camera == null) return;
@@ -1104,6 +1129,12 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
               poseConfidence: conf,
             );
 
+        if (gateState == CountGateState.open) {
+          _primeFromPositioning();
+        } else {
+          _positioningBuffer.clear();
+        }
+
         // Khi `holding`, chỉ giữ chu kỳ đang dở; không đưa góc của frame sai
         // tư thế vào tracker, nên lúc vừa ngồi xuống không thể sinh rep ma.
         if (gateState == CountGateState.holding) {
@@ -1177,6 +1208,19 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
         }
         _smoothL.reset();
         _smoothR.reset();
+        if (_workout.acceptsReps &&
+            gateState != CountGateState.closed &&
+            rawGateOk != false) {
+          _positioningBuffer.add(BufferedPoseFrame(
+            at: now,
+            left: raw.left,
+            right: raw.right,
+            torsoDeviationDeg: _torsoDeviation(lm),
+            poseConfidence: _poseConfidence(lm),
+          ));
+        } else {
+          _positioningBuffer.clear();
+        }
       }
     } else {
       // A completely missing pose must break the current rep immediately.
@@ -1195,6 +1239,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       _smoothL.reset();
       _smoothR.reset();
       _countGateLatch.reset();
+      _positioningBuffer.clear();
     }
 
     if (signalRestored) _workout.repSignalRestored();
@@ -1341,6 +1386,7 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
     _smoothR.reset();
     _lastPlacementOk = null;
     _countGateLatch.reset();
+    _positioningBuffer.clear();
     _pauseTimer?.cancel();
     _pauseTimer = Timer(const Duration(minutes: 5), _finishWorkout);
     setState(() {});
