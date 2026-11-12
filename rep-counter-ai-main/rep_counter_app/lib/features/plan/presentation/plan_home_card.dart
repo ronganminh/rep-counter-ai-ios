@@ -48,7 +48,13 @@ class _PlanHomeCardState extends State<PlanHomeCard> {
 
   Future<void> _open(Widget page) async {
     await Navigator.of(context).push(MaterialPageRoute(builder: (_) => page));
-    if (mounted) setState(() => _view = _safeLoad());
+    if (!mounted) return;
+    // Start the load outside setState: an arrow closure would return the
+    // Future to setState, which Flutter rejects in debug (QA-07).
+    final next = _safeLoad();
+    setState(() {
+      _view = next;
+    });
   }
 
   @override
