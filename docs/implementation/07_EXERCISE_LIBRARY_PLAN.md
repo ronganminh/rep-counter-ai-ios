@@ -142,3 +142,24 @@ When reviewed, update `app_vi.arb` (both copies) and set `cuesViReviewed: true`.
   - **Sets 3 and 4 are mostly `tooNear`:** shoulder width is 42–49 % of the short side, above the curl maximum of 42 %. Both wrists are outside the guide in nearly every frame. Set 3 counted 1 rep (iOS) or 3 reps (Android) in the one or two samples that passed. Set 4 counted none.
   - **Positioning passes only during rest,** when the lifter is small in the background. From 60 s (iOS) or 65 s (Android) the workout is active while the owner sits or stretches. All the extra reps come from these windows: arm movements while seated, then towel or stretch moves.
   - The CC0 sample clips give the same counts as in PR B: pull-up 9/10 and barbell curl 0/10 on both platforms.
+
+## Curl placement fixes (L-D39, curl only)
+
+Approved by the owner on 2026-11-10 (proposals 1–3 from the owner recording above).
+
+- **Guide follows the shoulders:** the curl zone is 90 % of the view wide, centred on the shoulder midpoint and cut at the frame edge. Only shoulders and elbows must be inside; wrists and dumbbells may reach or leave the frame edge.
+- **Distance:** shoulder width 25–55 % of the short side (was 12–42 %). In the sets the lifter's shoulders span 39–50 % (5th–95th percentile); during rest, standing far in the background, 16–23 %.
+- **Standing gate:** both shoulders, elbows and hips seen; torso within 25° of vertical, shoulders above hips; if a knee is seen, the thigh is at least half the torso length in the image. Sitting, kneeling and bending fail. The gate also keeps the session in positioning.
+- **Why the old guide failed:** the app shows the camera with `BoxFit.cover`. On a phone screen (about 9:19.5) a 9:16 video loses about 9 % on each side, so dumbbells at the hips land on or past the edge.
+- **Pre-check (MediaPipe on the 5 fps replay input, cover crop for a 2.17 screen; ML Kit in CI is the real test):**
+
+  | window | old ready | new ready |
+  |---|---|---|
+  | set 1 | 8.8 % | 89.6 % |
+  | set 2 | 7.7 % | 100 % |
+  | set 3 | 19.2 % | 97.6 % |
+  | set 4 | 3.8 % | 100 % |
+  | rest | 5.0 % | 5.3 % |
+
+  Rest frames that still pass: walking out right after a set, and standing close to the camera while stretching. No placement rule can tell these from a set.
+- **Results:** in the PR description, from the smoke run and the reference replays.

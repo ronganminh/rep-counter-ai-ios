@@ -746,12 +746,16 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   void _ciTallyGuide() {
     final lm = _landmarks;
     if (lm == null) return;
-    final zone = _guide.scaled(context.size ?? MediaQuery.sizeOf(context));
+    final zone = _guide.zoneFor(context.size ?? MediaQuery.sizeOf(context),
+        lm: lm, minLikelihood: p.minLikelihood);
+    final inZone = _guide.zoneLandmarksFor(p);
     for (final t in p.requiredLandmarks) {
       final pt = lm.pt(t, minLikelihood: p.minLikelihood);
       final tally = pt == null
           ? _ciGuideMissing
-          : (zone != null && !zone.contains(pt) ? _ciGuideOutside : null);
+          : (zone != null && inZone.contains(t) && !zone.contains(pt)
+              ? _ciGuideOutside
+              : null);
       if (tally != null) tally[t.name] = (tally[t.name] ?? 0) + 1;
     }
   }

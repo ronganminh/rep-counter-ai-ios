@@ -200,6 +200,49 @@ bool _handsInPushUpSupport(Landmarks lm, double ml) {
   return wristsBelowHips >= shoulderWidth * 0.15;
 }
 
+/// Cuốn tạ chỉ đếm khi người tập đang ĐỨNG THẲNG, thấy đủ vai, khuỷu, hông.
+///
+/// Trên video cuốn tạ thật (IMG_0967), toàn bộ rep thừa rơi vào lúc nghỉ:
+/// người tập ngồi nghiêng trên ghế ở phía sau, quỳ quay lưng hoặc giãn cơ, tay
+/// vẫn gập duỗi đủ để thành một rep. Cổng này đóng trong các tư thế đó:
+///
+///  - thiếu một trong hai vai, hai khuỷu hoặc hai hông -> đóng;
+///  - trục vai -> hông lệch phương thẳng đứng quá [_curlTorsoTiltMax] độ, hoặc
+///    vai không nằm trên hông -> đóng (cúi, quỳ gập, nằm);
+///  - thấy gối mà đùi quá ngắn trong ảnh (gối gần ngang hông, tức đang ngồi)
+///    -> đóng. Không thấy gối (khung chỉ tới hông) thì bỏ qua bước này.
+bool _standingForCurl(Landmarks lm, double ml) {
+  for (final t in const [
+    PoseLandmarkType.leftShoulder,
+    PoseLandmarkType.rightShoulder,
+    PoseLandmarkType.leftElbow,
+    PoseLandmarkType.rightElbow,
+    PoseLandmarkType.leftHip,
+    PoseLandmarkType.rightHip,
+  ]) {
+    if (lm.pt(t, minLikelihood: ml) == null) return false;
+  }
+  final sh = lm.mid(
+      PoseLandmarkType.leftShoulder, PoseLandmarkType.rightShoulder,
+      minLikelihood: ml)!;
+  final hp = lm.mid(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip,
+      minLikelihood: ml)!;
+  final torso = hp.dy - sh.dy; // > 0: vai ở trên hông
+  if (torso <= 0) return false;
+  final tilt = math.atan2((hp.dx - sh.dx).abs(), torso) * 180 / math.pi;
+  if (tilt > _curlTorsoTiltMax) return false;
+  final knees = [
+    lm.pt(PoseLandmarkType.leftKnee, minLikelihood: ml),
+    lm.pt(PoseLandmarkType.rightKnee, minLikelihood: ml),
+  ].whereType<Offset>().toList();
+  if (knees.isEmpty) return true;
+  final kneeY = knees.map((k) => k.dy).reduce((a, b) => a + b) / knees.length;
+  return (kneeY - hp.dy) >= torso * _curlThighMin;
+}
+
+const _curlTorsoTiltMax = 25.0;
+const _curlThighMin = 0.5;
+
 /// Điều kiện thô của một frame trước khi áp dụng chống rung theo thời gian.
 typedef CountGate = bool Function(Landmarks lm, double minLikelihood);
 
@@ -363,6 +406,13 @@ const dumbbellCurl = ExerciseProfile(
   orientation: BodyOrientation.vertical,
   minLikelihood: 0.5,
   requiredLandmarks: _upperBody,
+  // Video cuốn tạ thật (IMG_0967): trong set vai chiếm 39–50% cạnh ngắn
+  // (bách phân vị 5–95), vượt mức 42% mặc định nên set 3–4 kẹt `tooNear`.
+  // Mức dưới 0.25: lúc nghỉ người tập đứng xa phía sau (vai 16–23%) vẫn qua
+  // được placement và tạo rep thừa (phơi khăn, đi lại).
+  shoulderWidthFraction: (min: 0.25, max: 0.55),
+  countGate: _standingForCurl,
+  countGateGrace: Duration(seconds: 1),
   setupHint: 'Đứng thẳng, thấy rõ vai và hai cẳng tay trong khung.',
 );
 
