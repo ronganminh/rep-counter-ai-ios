@@ -33,10 +33,11 @@ class FakeExporter extends StoryExporter {
   bool fail = false;
   ShareResultStatus status = ShareResultStatus.dismissed;
   @override
-  Future<void> save(Uint8List value) async {
+  Future<PhotoSaveResult> save(Uint8List value) async {
     saves++;
     bytes = value;
     if (fail) throw StateError('disk full');
+    return PhotoSaveResult.saved;
   }
 
   @override
