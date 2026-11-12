@@ -205,12 +205,31 @@ class ReminderService {
     }
   }
 
-  Future<ReminderPermission> requestPermission() async {
+  /// Set once the OS notification prompt has been shown from the app, so a
+  /// later visit shows the neutral "notifications are off" notice instead of
+  /// the explanation (iOS never shows the prompt twice).
+  static const askedKey = 'reminder_permission_asked_v1';
+
+  Future<bool> permissionAsked() async {
     try {
-      return await _platform.requestPermission();
+      return (await SharedPreferences.getInstance()).getBool(askedKey) ??
+          false;
     } catch (_) {
-      return ReminderPermission.denied;
+      return false;
     }
+  }
+
+  Future<ReminderPermission> requestPermission() async {
+    ReminderPermission result;
+    try {
+      result = await _platform.requestPermission();
+    } catch (_) {
+      result = ReminderPermission.denied;
+    }
+    try {
+      await (await SharedPreferences.getInstance()).setBool(askedKey, true);
+    } catch (_) {/* Next visit shows the explanation again. */}
+    return result;
   }
 
   Future<void> savePrefs(ReminderPrefs prefs, PlanView? view,
