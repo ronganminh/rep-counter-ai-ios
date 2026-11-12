@@ -17963,5 +17963,17 @@
   "settingsDemoVideosOpen": "Open source page",
   "@settingsDemoVideosOpen": {
     "description": "[source: plan 07 PR A, namnq/workout-free-videos; status: new]"
+  },
+  "storyImageNotSaved": "Image not saved.",
+  "@storyImageNotSaved": {
+    "description": "[source: App Store 5.1.1(iv), Photos permission (L-D38); status: new]"
+  },
+  "storyPhotosOffMessage": "Photos access is off for RepCoach. Saving the image needs it.",
+  "@storyPhotosOffMessage": {
+    "description": "[source: App Store 5.1.1(iv), Photos permission (L-D38); status: new]"
+  },
+  "storyPhotosOffBack": "Back",
+  "@storyPhotosOffBack": {
+    "description": "[source: App Store 5.1.1(iv), Photos permission (L-D38); status: new]"
   }
 }
