@@ -121,3 +121,24 @@ When reviewed, update `app_vi.arb` (both copies) and set `cuesViReviewed: true`.
 - **Locked exercise:** CI video mode now takes `REPCOACH_CI_VIDEO_EXERCISE` (default `push_up`). `ciVideoProfile` searches all engine profiles, so the locked pull-up opens. The start line reports `exercise=<id>`, and the report checks it.
 - **Unchanged:** the three reference replays and `video_ground_truth.json`.
 - **Results:** in the PR B description, from the smoke run.
+
+## Owner recording: dumbbell curl (`clip-real-curl-img0967`, measure only)
+
+- **Source:** `IMG_0967.MOV`, filmed by the project owner, on Google Drive (`1ZKjGD59kJ1dfNaNAwEE9P3TUEIGaG0zw`). It is **not** in the repo: the manifest keeps the link, 2,047,522,941 bytes and SHA-256 `51484f0a278348ed0a28d5206498f85ebea0738abbf37eb6a6bdc85deeb71289`. 693.9 s, H.264 1920×1080 stored with a 90° rotation (portrait 1080×1920), ~60 fps.
+- **View:** front, portrait, phone low on the floor about 2 m away and looking slightly up. While standing, the frame runs from the head to mid-shin; dumbbells at the hips sit near the left and right edges and the curled dumbbell rises to the face. Between sets the owner walks out, sits side-on on a chair in the background, kneels with the back to the camera or stretches. The clip starts and ends on a torso close-up while the phone is handled.
+- **Ground truth:** 4 sets of alternating curls, **65 single-arm curls** (19 / 14 / 16 / 16). The app counts each arm (`TwoArmMerger`), so one arm going up and down is one rep. Counted **by eye by the agent** on 2 fps contact sheets, using a 10 fps motion trace as a pointer, with timestamps ±0.5 s. **Not yet checked by a person** (`human_reviewed: false`). Each rep's time and side are in the manifest.
+- **Rep Annotator:** no tool of that name exists in this repo or on any branch. The per-rep timestamps in the manifest are the annotation.
+- **Replay input:** CI re-encodes the verified source all-intra at 5 fps, 720×1280 (~290 MB). This matches the replay sampling (one frame every 200 ms, at most 480 px wide), so each sample is an exact frame on iOS and Android.
+- **Report:** `report_clip_smoke.py` adds a per-set table: real / app / right / missed / extra, ready → first countable sample, first count, stuck, the main not-countable status, and the frames each required landmark spent outside the guide or missing. It also lists reps added during rest. The landmark tally comes from CI-only `out=`/`miss=` fields that `_runCiVideo` adds to the 5 s status line.
+- **Results (smoke run 42186193857, commit `eaac558`):** "right" counts only reps inside a set; a rep added during rest is extra.
+
+  | platform | real | app | right | missed | extra |
+  |---|---|---|---|---|---|
+  | iOS | 65 | 12 | 1 | 64 | 11 (all during rest: 85–200 s +6, 495–545 s +5) |
+  | Android | 65 | 7 | 3 | 62 | 4 (all during rest: 495–545 s +4) |
+
+  Per set, on both platforms:
+  - **Sets 1 and 2 are stuck in positioning the whole set** (`partiallyOut`, "3/6 landmarks outside the guide"). Left wrist and left elbow are outside the curl guide `Rect(0.20, 0.10, 0.80, 0.95)` in almost every frame, left shoulder in about half, and right wrist often. The lifter stands off-centre, and the dumbbells at the hips sit near the frame edges.
+  - **Sets 3 and 4 are mostly `tooNear`:** shoulder width is 42–49 % of the short side, above the curl maximum of 42 %. Both wrists are outside the guide in nearly every frame. Set 3 counted 1 rep (iOS) or 3 reps (Android) in the one or two samples that passed. Set 4 counted none.
+  - **Positioning passes only during rest,** when the lifter is small in the background. From 60 s (iOS) or 65 s (Android) the workout is active while the owner sits or stretches. All the extra reps come from these windows: arm movements while seated, then towel or stretch moves.
+  - The CC0 sample clips give the same counts as in PR B: pull-up 9/10 and barbell curl 0/10 on both platforms.

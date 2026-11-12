@@ -1,8 +1,9 @@
 name: RepCoach clip smoke replay
 
-# Plan 07 PR B: a fast, MEASURE-ONLY counting smoke set built from the CC0
-# sample clips of namnq/workout-free-videos (test/fixtures/clip_smoke_set.json).
-# Each clip is looped N times (re-encoded all-intra) and replayed through the production workout on
+# Plan 07: a MEASURE-ONLY counting smoke set (test/fixtures/clip_smoke_set.json):
+# CC0 sample clips of namnq/workout-free-videos, looped N times, and long owner
+# recordings that stay out of the repo (downloaded and hash-checked here).
+# Each clip is re-encoded all-intra and replayed through the production workout on
 # the iOS Simulator and the Android emulator; the app count is compared with
 # the eye-counted ground truth and reported in the job summary.
 #
@@ -21,6 +22,7 @@ on:
       - "rep-counter-ai-main/rep_counter_app/test/fixtures/clip_smoke_set.json"
       - "rep-counter-ai-main/rep_counter_app/tool/report_clip_smoke.py"
       - "rep-counter-ai-main/rep_counter_app/tool/ci_ios_clip_replay.sh"
+      - "rep-counter-ai-main/rep_counter_app/lib/camera_page.dart"
 
 permissions:
   contents: read
@@ -37,7 +39,7 @@ jobs:
   clips:
     name: Prepare looped clips
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 30
     outputs:
       matrix: ${{ steps.list.outputs.matrix }}
     defaults:
@@ -57,26 +59,46 @@ jobs:
           manifest, out = sys.argv[1], sys.argv[2]
           clips = json.load(open(manifest, encoding="utf-8"))["clips"]
           keys = []
+          def fetch(url, dst, size, digest):
+              h = hashlib.sha256(); n = 0
+              with urllib.request.urlopen(url) as r, open(dst, "wb") as fh:
+                  while chunk := r.read(1 << 20):
+                      h.update(chunk); fh.write(chunk); n += len(chunk)
+              assert n == size, (dst, n)
+              assert h.hexdigest() == digest, dst
           for key, c in clips.items():
-              src = os.path.join(out, c["slug"] + ".mp4")
-              urllib.request.urlretrieve(c["url"], src)
-              data = open(src, "rb").read()
-              assert len(data) == c["bytes"], (key, len(data))
-              assert hashlib.sha256(data).hexdigest() == c["sha256"], key
               dst = os.path.join(out, key + ".mp4")
-              # Re-encode all-intra (-g 1): the library clips have a single
-              # keyframe, and the iOS frame extractor (AVAssetImageGenerator,
-              # default tolerance) snaps to keyframes, so with -c copy every
-              # sample on iOS was the first frame of a loop.
-              subprocess.run(["ffmpeg", "-v", "error", "-y", "-stream_loop",
-                              str(c["loops"] - 1), "-i", src, "-an",
-                              "-c:v", "libx264", "-preset", "veryfast",
-                              "-crf", "20", "-g", "1", "-pix_fmt", "yuv420p",
-                              "-movflags", "+faststart", dst], check=True)
+              if c["kind"] == "owner_recording":
+                  # Owner video: not in the repo. Download, verify, then
+                  # re-encode all-intra at the replay sampling rate (the
+                  # replay reads one frame every 200 ms, at most 480 px
+                  # wide), so every sample is an exact frame on iOS and
+                  # Android and the fixture is ~300 MB instead of ~2 GB.
+                  src = os.path.join(out, "source-" + key)
+                  fetch(c["url"], src, c["bytes"], c["sha256"])
+                  t = c["transcode"]
+                  vf = f"fps={t['fps']},scale={t['width']}:{t['height']}"
+                  subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-an",
+                                  "-vf", vf, "-c:v", "libx264", "-preset", "veryfast",
+                                  "-crf", "20", "-g", "1", "-pix_fmt", "yuv420p",
+                                  "-movflags", "+faststart", dst], check=True)
+                  os.remove(src)
+              else:
+                  src = os.path.join(out, c["slug"] + ".mp4")
+                  fetch(c["url"], src, c["bytes"], c["sha256"])
+                  # Re-encode all-intra (-g 1): the library clips have a single
+                  # keyframe, and the iOS frame extractor (AVAssetImageGenerator,
+                  # default tolerance) snaps to keyframes, so with -c copy every
+                  # sample on iOS was the first frame of a loop.
+                  subprocess.run(["ffmpeg", "-v", "error", "-y", "-stream_loop",
+                                  str(c["loops"] - 1), "-i", src, "-an",
+                                  "-c:v", "libx264", "-preset", "veryfast",
+                                  "-crf", "20", "-g", "1", "-pix_fmt", "yuv420p",
+                                  "-movflags", "+faststart", dst], check=True)
               dur = subprocess.run(["ffprobe", "-v", "error", "-show_entries",
                                     "format=duration", "-of", "csv=p=0", dst],
                                    check=True, capture_output=True, text=True).stdout
-              print(f"{key}: {c['loops']} loops, {float(dur):.1f} s")
+              print(f"{key}: {c['kind']}, {float(dur):.1f} s, {os.path.getsize(dst)} bytes")
               keys.append(key)
           with open(os.environ["GITHUB_OUTPUT"], "a") as fh:
               fh.write("matrix=" + json.dumps({"clip": keys}) + "\n")
@@ -92,7 +114,8 @@ jobs:
     name: iOS clip replay (${{ matrix.clip }})
     needs: clips
     runs-on: macos-15
-    timeout-minutes: 60
+    # The owner recording (~11.5 min) takes far longer than the sample clips.
+    timeout-minutes: 110
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.clips.outputs.matrix) }}
@@ -100,6 +123,7 @@ jobs:
       DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
       REPCOACH_CI_X64_SIM: "1"
       TEST_VIDEO_ASSET: ${{ matrix.clip }}.mp4
+      REPLAY_WAIT_SECONDS: "5400"
     defaults:
       run:
         working-directory: rep-counter-ai-main/rep_counter_app
@@ -151,14 +175,14 @@ jobs:
     name: Android clip replay (${{ matrix.clip }})
     needs: clips
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    timeout-minutes: 140
     strategy:
       fail-fast: false
       matrix: ${{ fromJSON(needs.clips.outputs.matrix) }}
     env:
       TEST_VIDEO_ASSET: ${{ matrix.clip }}.mp4
       PKG: com.ronganminh.repcoach
-      REPLAY_WAIT_SECONDS: "1500"
+      REPLAY_WAIT_SECONDS: "7200"
     defaults:
       run:
         working-directory: rep-counter-ai-main/rep_counter_app
