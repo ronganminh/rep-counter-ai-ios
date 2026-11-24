@@ -14,6 +14,14 @@ LEGAL = (
     / "legal"
     / "legal_config.dart"
 ).read_text(encoding="utf-8-sig")
+APP_CONFIG = (
+    PROJECT
+    / "rep_counter_app"
+    / "lib"
+    / "core"
+    / "config"
+    / "app_config.dart"
+).read_text(encoding="utf-8")
 CONSENT = (
     PROJECT
     / "rep_counter_app"
@@ -50,16 +58,18 @@ class PrivacyContractTests(unittest.TestCase):
         self.assertIn('lang="vi"', POLICY)
 
     def test_policy_and_app_share_effective_date_and_consent_version(self):
-        self.assertIn("October 1, 2026", POLICY)
+        self.assertIn("November 24, 2026", POLICY)
         self.assertIn("2026-10-01-groq", POLICY)
-        self.assertIn("effectiveDate = '01/10/2026'", LEGAL)
-        self.assertIn("effectiveDateEn = 'October 1, 2026'", LEGAL)
+        self.assertIn("effectiveDate = '24/11/2026'", LEGAL)
+        self.assertIn("effectiveDateEn = 'November 24, 2026'", LEGAL)
         self.assertIn("aiConsentVersion = '2026-10-01-groq'", LEGAL)
         self.assertIn("LegalConfig.aiConsentVersion", CONSENT)
 
     def test_public_url_matches_nginx_route(self):
+        # F-2 moved the URL into AppConfig; LegalConfig re-exports it.
+        self.assertIn("privacyPolicyUrl = AppConfig.privacyPolicyUrl", LEGAL)
         self.assertIn(
-            "https://repcoach-ai.duckdns.org/privacy-policy.html", LEGAL
+            "https://repcoach-ai.duckdns.org/privacy-policy.html", APP_CONFIG
         )
         self.assertIn("location = /privacy-policy.html", NGINX)
         privacy_block = NGINX.split(

@@ -247,6 +247,20 @@ class S {
     required this.privChoicesBody,
     required this.privChangesTitle,
     required this.privChangesBody,
+    required this.privAccountTitle,
+    required this.privAccountBody,
+    required this.privSyncTitle,
+    required this.privSyncBody,
+    required this.privSocialTitle,
+    required this.privSocialBody,
+    required this.privCoachTitle,
+    required this.privCoachBody,
+    required this.privNotifTitle,
+    required this.privNotifBody,
+    required this.privDeletionTitle,
+    required this.privDeletionBody,
+    required this.privNoAdsTitle,
+    required this.privNoAdsBody,
     required this.termsContactTitle,
     required this.termsContactBody,
   });
@@ -501,6 +515,20 @@ class S {
   final String privChoicesBody;
   final String privChangesTitle;
   final String privChangesBody;
+  final String privAccountTitle;
+  final String privAccountBody;
+  final String privSyncTitle;
+  final String privSyncBody;
+  final String privSocialTitle;
+  final String privSocialBody;
+  final String privCoachTitle;
+  final String privCoachBody;
+  final String privNotifTitle;
+  final String privNotifBody;
+  final String privDeletionTitle;
+  final String privDeletionBody;
+  final String privNoAdsTitle;
+  final String privNoAdsBody;
   final String termsContactTitle;
   final String termsContactBody;
 
@@ -695,22 +723,22 @@ class S {
     legalEffective: 'Có hiệu lực',
     legalDate: LegalConfig.effectiveDate,
     privacyIntroBody:
-        'tôn trọng quyền riêng tư. Bộ đếm rep chạy trên thiết bị; nhận xét AI là tùy chọn và chỉ gửi bản tóm tắt giới hạn khi bạn đồng ý.',
+        'tôn trọng quyền riêng tư của bạn. Bộ đếm rep chạy trên thiết bị và bạn có thể tập mà không cần tài khoản. Tài khoản là tùy chọn: nó sao lưu buổi tập và mở bạn bè, AI Coach. Chính sách này nêu mỗi lựa chọn gửi gì đi và cách xóa.',
     privCameraTitle: 'Camera và video',
     privCameraBody:
         'Ứng dụng dùng camera để nhận diện tư thế và đếm rep. Khung hình camera trực tiếp và landmark dùng cho việc đếm được xử lý trên thiết bị. Ảnh camera, video buổi tập và tọa độ landmark thô không được gửi tới backend để đếm rep hoặc nhận xét AI.',
     privWorkoutTitle: 'Dữ liệu buổi tập',
     privWorkoutBody:
-        'Lịch sử tập được lưu cục bộ trên thiết bị và có thể gồm rep, set, thời lượng, mục tiêu, thống kê pose/chất lượng, chi tiết từng rep, hiệu chỉnh và nhận xét AI đã trả về. Kho lịch sử giữ tối đa 100 bản ghi đọc được gần nhất.',
+        'Lịch sử tập, kế hoạch, hiệu chỉnh và cài đặt được lưu trên thiết bị. Một bản ghi buổi tập có thể gồm bài tập, thời điểm bắt đầu, thời lượng, rep, set, mục tiêu, thống kê tư thế/chất lượng, chi tiết từng rep và nhận xét AI đã trả về. Nếu không có tài khoản, các dữ liệu này không rời khỏi điện thoại, ngoại trừ yêu cầu AI mô tả bên dưới.',
     privAiTitle: 'Nhận xét AI',
     privAiBody:
-        'Khi bạn chủ động yêu cầu hoặc đã đồng ý bật AI tự động, app gửi bản tóm tắt giới hạn gồm bài tập, mục tiêu, rep/set, thời lượng, thống kê pose và chỉ số chất lượng tới backend RepCoach AI. Production gửi prompt tối giản tới GroqCloud bằng API key chỉ lưu trên server. Không gửi ảnh, video, âm thanh hoặc tọa độ landmark thô.',
+        'Khi bạn yêu cầu nhận xét AI cho một buổi tập, hoặc đã đồng ý bật AI tự động, app gửi bản tóm tắt giới hạn (bài tập, mục tiêu, rep/set, thời lượng, thống kê tư thế và chỉ số chất lượng) tới máy chủ RepCoach AI; máy chủ gửi prompt tối giản tới GroqCloud bằng API key chỉ lưu trên máy chủ. Yêu cầu này không kèm ID tài khoản, tên hay email. Không gửi ảnh, video, âm thanh hoặc tọa độ landmark thô.',
     privRetentionTitle: 'Lưu giữ và xóa dữ liệu',
     privRetentionBody:
-        'Lịch sử tập và nhận xét AI đã lưu nằm trên thiết bị cho đến khi bạn xóa trong app, xóa dữ liệu ứng dụng hoặc gỡ app. Backend không chủ ý lưu workout body/prompt/response thành lịch sử server. Nginx log xoay mỗi ngày, giữ log hiện tại cộng 14 bản xoay; metadata backend còn đi vào system journal theo cấu hình VPS.',
+        'Dữ liệu trên điện thoại được giữ cho tới khi bạn xóa trong app, xóa dữ liệu ứng dụng hoặc gỡ app. Dữ liệu tài khoản được giữ khi tài khoản còn tồn tại. Buổi tập bạn xóa bị gỡ khỏi tài khoản và dấu xóa của chúng được dọn sau 90 ngày. Lời mời kết bạn chưa trả lời hết hạn sau 7 ngày. Máy chủ RepCoach AI không lưu lịch sử tập; log Nginx xoay mỗi ngày, giữ log hiện tại cộng 14 bản xoay, metadata backend vào system journal của máy chủ. GroqCloud có thể giữ dữ liệu inference tối đa 30 ngày để bảo đảm độ tin cậy hoặc điều tra lạm dụng.',
     privSecurityTitle: 'Bảo mật và bên xử lý',
     privSecurityBody:
-        'Dữ liệu AI được truyền qua HTTPS. RepCoach production dùng GroqCloud. Theo tài liệu GroqCloud hiện hành, dữ liệu inference không được lưu mặc định, ngoại trừ trường hợp cần cho độ tin cậy hệ thống hoặc điều tra lạm dụng; khi đó có thể được giữ tối đa 30 ngày. RepCoach hiện không tuyên bố Zero Data Retention.',
+        'Mọi dữ liệu rời thiết bị đi qua HTTPS. Bên xử lý dữ liệu thay mặt RepCoach: Supabase (tài khoản, cơ sở dữ liệu, Edge Functions; máy chủ ở vùng Asia-Pacific, Tokyo), GroqCloud (AI) và máy chủ RepCoach AI. Apple và Google chỉ tham gia khi bạn chọn đăng nhập bằng họ. Cơ sở dữ liệu dùng row-level security để mỗi người chỉ đọc được dữ liệu của mình. Theo tài liệu GroqCloud hiện hành, dữ liệu inference không được lưu mặc định, trừ khi cần cho độ tin cậy hoặc điều tra lạm dụng (tối đa 30 ngày). RepCoach hiện không tuyên bố Zero Data Retention.',
     privContactTitle: 'Liên hệ',
     termsIntroPrefix: 'Khi sử dụng',
     termsIntroSuffix: ', bạn đồng ý với các điều khoản dưới đây.',
@@ -734,13 +762,41 @@ class S {
         'Các tính năng có thể thay đổi, bị gián đoạn hoặc ngừng cung cấp. Điều khoản có thể được cập nhật và ngày hiệu lực mới sẽ được công bố tại đây.',
     privChildrenTitle: 'Quyền riêng tư của trẻ em',
     privChildrenBody:
-        'Groq cho phép tích hợp API vào ứng dụng của khách hàng và cung cấp AI cho người dùng cuối. Nếu ứng dụng hướng tới hoặc có khả năng được người chưa đủ tuổi trưởng thành sử dụng, nhà phát triển chịu trách nhiệm tuân thủ các luật áp dụng về trẻ em và dữ liệu cá nhân.',
+        'RepCoach AI không hướng tới trẻ em dưới 13 tuổi; tài khoản, bạn bè và AI Coach không dành cho trẻ em dưới 13 tuổi. Groq cho phép tích hợp API vào ứng dụng của khách hàng và cung cấp AI cho người dùng cuối. Nếu ứng dụng hướng tới hoặc có khả năng được người chưa đủ tuổi trưởng thành sử dụng, nhà phát triển chịu trách nhiệm tuân thủ các luật áp dụng về trẻ em và dữ liệu cá nhân.',
     privChoicesTitle: 'Lựa chọn của bạn',
     privChoicesBody:
-        'Bạn có thể dùng bộ đếm rep trên thiết bị mà không bật AI. Bạn có thể thu hồi quyền camera trong cài đặt thiết bị, tắt AI tự động cho các yêu cầu tương lai và xóa lịch sử tập/hiệu chỉnh lưu trên máy trong ứng dụng. Việc tắt hoặc xóa cục bộ không thể thu hồi yêu cầu AI đã gửi.',
+        'Bạn có thể tập như khách, không cần tài khoản và không cần AI. Bạn có thể thu hồi quyền camera trong cài đặt thiết bị, tắt AI tự động cho các yêu cầu tương lai, xuất hoặc xóa lịch sử tập trong Cài đặt, đổi tên hiển thị hoặc chặn một người trong Bạn bè, đăng xuất và xóa tài khoản. Tắt AI hoặc xóa dữ liệu cục bộ không thu hồi được yêu cầu AI đã gửi.',
     privChangesTitle: 'Thay đổi và liên hệ',
     privChangesBody:
         'Chính sách này có thể được cập nhật. Ngày hiệu lực ở trên cho biết bản sửa đổi mới nhất. Mọi câu hỏi về quyền riêng tư xin gửi về địa chỉ dưới đây.',
+    privAccountTitle:
+        'Tài khoản (tùy chọn)',
+    privAccountBody:
+        'Bạn có thể tạo tài khoản bằng email và mật khẩu, Đăng nhập bằng Apple hoặc Đăng nhập bằng Google. Tài khoản do Supabase Auth vận hành và gồm địa chỉ email, ID người dùng, nhà cung cấp đăng nhập và, với Apple hoặc Google, tên và email mà nhà cung cấp chia sẻ (Apple có thể cho địa chỉ chuyển tiếp ẩn). Supabase chỉ lưu mật khẩu ở dạng băm. Token đăng nhập được giữ trong Keychain (iOS) hoặc Keystore (Android) trên điện thoại. Bạn có thể đặt tên hiển thị trong Bạn bè.',
+    privSyncTitle:
+        'Đồng bộ đám mây',
+    privSyncBody:
+        'Khi đã đăng nhập, buổi tập lưu trong lúc đăng nhập được đồng bộ vào tài khoản: bài tập, thời điểm bắt đầu, thời lượng, rep, ghi tay hay dang dở, và bản ghi buổi tập kèm chi tiết từng rep và thống kê chất lượng. Buổi tập lưu khi là khách chỉ được tải lên nếu bạn chọn gộp vào tài khoản. Kế hoạch, XP, thành tích, sổ tín dụng AI (thay đổi tín dụng kèm request ID ngẫu nhiên) và tin trong hộp thư của app cũng được lưu theo tài khoản. Ảnh và video camera không bao giờ được đồng bộ.',
+    privSocialTitle:
+        'Bạn bè và bảng xếp hạng',
+    privSocialBody:
+        'Bạn bè là tính năng tùy chọn. Bạn bè thấy tên hiển thị và tổng tuần các buổi tập đếm bằng camera của bạn trên bảng xếp hạng bạn bè. Lời mời hết hạn sau 7 ngày. Bạn có thể chặn hoặc báo cáo một người kèm lý do; báo cáo được giữ để nhà phát triển xử lý lạm dụng. Không ai tìm được bạn theo tên.',
+    privCoachTitle:
+        'AI Coach',
+    privCoachBody:
+        'AI Coach, phân tích nâng cao và đánh giá tiến bộ cần tài khoản và dùng tín dụng AI miễn phí hằng tuần. Tin nhắn bạn gõ, phần hội thoại trước đó trong phiên và, với phân tích, số liệu tổng hợp của buổi tập được gửi tới dịch vụ ai-request trên Supabase; dịch vụ chuyển tới GroqCloud và trả câu trả lời về. Hội thoại không được lưu trên máy chủ; chỉ ghi lại thay đổi tín dụng và một request ID ngẫu nhiên. Đoạn chat chỉ nằm trong bộ nhớ trên điện thoại và không được lưu lại.',
+    privNotifTitle:
+        'Thông báo',
+    privNotifBody:
+        'Nhắc lịch tập là thông báo cục bộ, được điện thoại lên lịch từ kế hoạch của bạn. Chúng tắt cho tới khi bạn bật. Phiên bản này không dùng thông báo đẩy từ máy chủ.',
+    privDeletionTitle:
+        'Xóa tài khoản',
+    privDeletionBody:
+        'Trong app, mở Hồ sơ › Xóa tài khoản và xác nhận. Việc này thu hồi Đăng nhập bằng Apple (nếu dùng), xóa hồ sơ, buổi tập đã đồng bộ, kế hoạch, XP, thành tích, tín dụng, bạn bè, danh sách chặn, lời mời và hộp thư, rồi xóa chính tài khoản. Báo cáo bạn gửi hoặc bị gửi được giữ lại nhưng bỏ ID người dùng. Buổi tập trên điện thoại vẫn còn cho tới khi bạn xóa trong Cài đặt › Xóa lịch sử tập hoặc gỡ app. Bạn cũng có thể yêu cầu xóa trên web tại ${LegalConfig.accountDeletionUrl} hoặc qua email từ địa chỉ của tài khoản.',
+    privNoAdsTitle:
+        'Không quảng cáo, không theo dõi',
+    privNoAdsBody:
+        'RepCoach AI không có SDK quảng cáo, analytics hay báo lỗi, không theo dõi bạn qua ứng dụng hoặc trang web khác và không bán dữ liệu cá nhân.',
     termsContactTitle: 'Liên hệ',
     termsContactBody:
         'Mọi câu hỏi về điều khoản xin gửi về địa chỉ dưới đây.',
@@ -938,22 +994,22 @@ class S {
     legalEffective: 'Effective',
     legalDate: LegalConfig.effectiveDateEn,
     privacyIntroBody:
-        'respects your privacy. Rep counting runs on-device; AI feedback is optional and sends only a limited workout summary after consent.',
+        'respects your privacy. Rep counting runs on your device, and you can train without an account. An account is optional: it backs up your workouts and unlocks friends and AI Coach. This policy explains what each choice sends and how to delete it.',
     privCameraTitle: 'Camera and video',
     privCameraBody:
         'The app uses your camera to detect body pose and count repetitions. Live camera frames and landmarks used for counting are processed on-device. Camera images, workout video and raw landmark coordinates are not sent to the backend for rep counting or AI feedback.',
     privWorkoutTitle: 'Workout data',
     privWorkoutBody:
-        'Workout history is stored locally and can include reps, sets, duration, goals, pose/quality statistics, per-rep detail, calibration and returned AI feedback. The history store keeps up to the latest 100 readable workout records.',
+        'Workout history, plans, calibration and settings are stored on your device. A workout record can include the exercise, start time, duration, reps, sets, goals, pose and quality statistics, per-rep detail and returned AI feedback. Without an account none of this leaves the phone, except the AI requests described below.',
     privAiTitle: 'AI feedback',
     privAiBody:
-        'When you request AI feedback or opt in to automatic feedback, the app sends a limited summary including exercise, goal, reps/sets, duration, pose statistics and quality metrics to the RepCoach AI backend. Production sends the minimized prompt to GroqCloud using an API key stored only on the server. No images, video, audio or raw landmark coordinates are sent.',
+        'When you request AI feedback on a workout, or opt in to automatic feedback, the app sends a limited summary (exercise, goal, reps/sets, duration, pose statistics and quality metrics) to the RepCoach AI server, which sends a minimized prompt to GroqCloud using an API key stored only on the server. This request carries no account ID, name or email. No images, video, audio or raw landmark coordinates are sent.',
     privRetentionTitle: 'Data retention and deletion',
     privRetentionBody:
-        'Workout history and saved AI feedback remain on your device until deleted in the app, app storage is cleared, or the app is uninstalled. The backend does not intentionally keep workout bodies/prompts/responses as server history. Nginx logs rotate daily with the current log plus 14 rotations; backend metadata also enters the host system journal under VPS retention settings.',
+        'Data on your phone stays until you delete it in the app, clear the app\'s storage or uninstall it. Account data stays while your account exists. Workouts you delete are removed from your account and their deletion markers are purged after 90 days. Unanswered friend invites expire after 7 days. The RepCoach AI server keeps no workout history; its Nginx logs rotate daily, keeping the current log plus 14 rotations, and backend metadata goes to the host system journal. GroqCloud may keep inference data for up to 30 days for reliability or abuse checks.',
     privSecurityTitle: 'Security and processors',
     privSecurityBody:
-        'AI data is sent over HTTPS. RepCoach production uses GroqCloud. Under GroqCloud\'s current documentation, inference customer data is not retained by default except when needed for system reliability or abuse investigation; in those cases it may be retained for up to 30 days. RepCoach does not currently claim Zero Data Retention.',
+        'All data that leaves the device is sent over HTTPS. Processors acting for RepCoach: Supabase (accounts, database, Edge Functions; servers in the Asia-Pacific Tokyo region), GroqCloud (AI) and the RepCoach AI server. Apple and Google take part only when you choose to sign in with them. The database uses row-level security so each person can read only their own data. Under GroqCloud\'s current documentation, inference data is not retained by default except for reliability or abuse investigation (up to 30 days). RepCoach does not currently claim Zero Data Retention.',
     privContactTitle: 'Contact',
     termsIntroPrefix: 'By using',
     termsIntroSuffix: ', you agree to the terms below.',
@@ -977,13 +1033,41 @@ class S {
         'Features may change, be interrupted, or be discontinued. We may update these terms, and a new effective date will be published here.',
     privChildrenTitle: 'Children and privacy',
     privChildrenBody:
-        'Groq permits API integration into a Customer Application and making AI services available to End Users. If the app is directed toward or likely to be accessed by people under the age of majority, the developer is responsible for complying with applicable child and personal-data laws.',
+        'RepCoach AI is not directed to children under 13, and accounts, friends and AI Coach are not intended for them. Groq permits API integration into a Customer Application and making AI services available to End Users. If the app is directed toward or likely to be accessed by people under the age of majority, the developer is responsible for complying with applicable child and personal-data laws.',
     privChoicesTitle: 'Your choices',
     privChoicesBody:
-        'You can use the on-device rep counter without AI. You may revoke camera permission in your device settings, disable automatic AI for future requests, and delete locally stored workout history/calibration in the app. Disabling AI or deleting local data cannot recall an AI request already sent.',
+        'You can train as a guest, without an account and without AI. You may revoke camera permission in your device settings, turn off automatic AI for future requests, export or delete your workout history in Settings, change your display name or block a person in Friends, sign out, and delete your account. Turning off AI or deleting local data cannot recall an AI request already sent.',
     privChangesTitle: 'Changes and contact',
     privChangesBody:
         'We may update this policy. The effective date above identifies the latest revision. Send privacy questions to the address below.',
+    privAccountTitle:
+        'Account (optional)',
+    privAccountBody:
+        'You can create an account with email and password, Sign in with Apple or Google Sign-In. The account is run by Supabase Auth and holds your email address, a user ID, the sign-in provider and, for Apple or Google, the name and email the provider shares (Apple may give a private relay address). Supabase stores passwords only as a hash. Sign-in tokens are kept in the iOS Keychain or Android Keystore on your phone. You can set a display name in Friends.',
+    privSyncTitle:
+        'Cloud sync',
+    privSyncBody:
+        'When you are signed in, workouts saved while signed in are synced to your account: exercise, start time, duration, reps, whether it was manual or partial, and the workout record with its per-rep detail and quality statistics. Workouts saved as a guest are uploaded only if you choose to merge them into your account. Your plans, XP, achievements, the AI credit ledger (credit changes with a random request ID) and in-app inbox messages are stored with your account too. Camera images and video are never synced.',
+    privSocialTitle:
+        'Friends and leaderboard',
+    privSocialBody:
+        'Friends is optional. Friends see your display name and your weekly totals from camera-counted workouts on the friends leaderboard. Invites expire after 7 days. You can block or report a person with a reason; reports are kept so the developer can act on abuse. Nobody can search for you by name.',
+    privCoachTitle:
+        'AI Coach',
+    privCoachBody:
+        'AI Coach, advanced analysis and progress reviews need an account and use weekly free AI credits. The messages you type, the earlier messages of that session and, for analyses, aggregate workout numbers are sent to the ai-request service on Supabase, which forwards them to GroqCloud and returns the answer. The conversation is not stored on the server; only the credit change and a random request ID are recorded. The chat is kept in memory on your phone only and is not saved.',
+    privNotifTitle:
+        'Notifications',
+    privNotifBody:
+        'Workout reminders are local notifications that your phone schedules from your plan. They stay off until you turn them on. This version does not use remote push notifications.',
+    privDeletionTitle:
+        'Deleting your account',
+    privDeletionBody:
+        'In the app, open Profile › Delete account and confirm. This revokes Sign in with Apple when used, deletes your profile, synced workouts, plans, XP, achievements, credits, friends, blocks, invites and inbox, then deletes the account itself. Reports you sent or received are kept without your user ID. Workouts on your phone stay until you delete them in Settings › Delete workout history or uninstall the app. You can also request deletion on the web at ${LegalConfig.accountDeletionUrl} or by email from your account\'s address.',
+    privNoAdsTitle:
+        'No ads, no tracking',
+    privNoAdsBody:
+        'RepCoach AI has no advertising, analytics or crash-reporting SDK, does not track you across other apps or websites, and does not sell personal data.',
     termsContactTitle: 'Contact',
     termsContactBody:
         'Questions about these terms may be sent to the address below.',

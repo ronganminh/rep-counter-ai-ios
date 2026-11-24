@@ -231,7 +231,7 @@ Future<void> reveal(WidgetTester tester, Finder finder) async {
         if (finder.evaluate().isNotEmpty) break;
         try {
           await tester.scrollUntilVisible(finder, delta,
-              scrollable: scrollables.at(i), maxScrolls: 30);
+              scrollable: scrollables.at(i), maxScrolls: 80);
         } catch (_) {
           // This scrollable did not reach it; try the other way / next one.
         }

@@ -28,6 +28,13 @@ abstract final class AppConfig {
     defaultValue: 'https://repcoach-ai.duckdns.org/support.html',
   );
 
+  /// Web page for account-deletion requests (Google Play Account Deletion
+  /// Requirement; D-14 addition 2026-11-24).
+  static const accountDeletionUrl = String.fromEnvironment(
+    'REPCOACH_ACCOUNT_DELETION_URL',
+    defaultValue: 'https://repcoach-ai.duckdns.org/delete-account.html',
+  );
+
   static const websiteUrl = String.fromEnvironment(
     'REPCOACH_WEBSITE_URL',
     defaultValue: 'https://repcoach-ai.duckdns.org/',

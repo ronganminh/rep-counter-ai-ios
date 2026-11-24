@@ -122,7 +122,7 @@ App Store guideline 5.1.1(v) requires in-app account deletion. The app (Profile 
 **Deploy:** the agent has no Supabase access token, so it has not deployed anything. The exact `supabase link` / `secrets set` / `db push` / `functions deploy` commands for the owner are in `supabase/README.md`. Production waits for a production project and a separate approval.
 
 Still open:
-- **A web page for deletion requests:** Google Play requires one. D-14 gives the site (`https://repcoach-ai.duckdns.org/`) and support page (`https://repcoach-ai.duckdns.org/support.html`); the deletion-request page itself is still to be published there by the owner.
+- **A web page for deletion requests:** Google Play requires one. D-14 gives the site (`https://repcoach-ai.duckdns.org/`) and support page (`https://repcoach-ai.duckdns.org/support.html`); the deletion-request page is `https://repcoach-ai.duckdns.org/delete-account.html` (`backend/static/delete-account.html`, L-D42), published there by the owner. Enter it in Play Console › Data safety › Delete account URL.
 - **Grace period wording:** the copy mentions "the grace period set in the Privacy Policy (if any)"; the Privacy Policy at `https://repcoach-ai.duckdns.org/privacy-policy.html` must state it (owner / Legal).
 
 ## 8. Row-level security
@@ -259,7 +259,7 @@ Google sign-in works on the Play build, because Play App Signing's SHA-1 is regi
 | 10 | Sign in with Apple on the App ID, Apple provider ON | ✅ entitlement in `Runner.entitlements` |
 | 10b | Apple **Secret Key (for OAuth)** | ⏳ **open:** generate with `tool/apple_oauth_secret.py` (below) and paste into Supabase; renew every ≤ 6 months |
 | 11 | `delete-account` Edge Function | ✅ deployed by the owner 2026-10-31: ACTIVE v1, JWT verification ON, `APPLE_*` secrets set; unauthenticated call → 401 ✅ |
-| 12 | Support / legal URLs for consent screens and stores (D-14) | ✅ decided 2026-10-27: support `ronganminh221@gmail.com`, `https://repcoach-ai.duckdns.org/support.html`; privacy `https://repcoach-ai.duckdns.org/privacy-policy.html`; terms `https://repcoach-ai.duckdns.org/terms.html`; home `https://repcoach-ai.duckdns.org/`. ⏳ **open:** account-deletion request page on that site (Google Play) |
+| 12 | Support / legal URLs for consent screens and stores (D-14) | ✅ decided 2026-10-27: support `ronganminh221@gmail.com`, `https://repcoach-ai.duckdns.org/support.html`; privacy `https://repcoach-ai.duckdns.org/privacy-policy.html`; terms `https://repcoach-ai.duckdns.org/terms.html`; home `https://repcoach-ai.duckdns.org/`. ✅ account deletion `https://repcoach-ai.duckdns.org/delete-account.html` (2026-11-24, L-D42; `AppConfig.accountDeletionUrl`, served by `backend/server.py`; the owner publishes it) |
 | 13 | Backend v2 migrations (06) | ✅ 8/8 applied 2026-10-31, Local == Remote |
 | 14 | `ai-request` Edge Function | ✅ ACTIVE v1, JWT verification ON, `GROQ_API_KEY` + `GROQ_MODEL` set; unauthenticated call → 401 ✅ |
 | 15 | Tombstone purge (`purge_sync_tombstones`, daily 03:17 UTC) | ✅ scheduled by the owner (`pg_cron`, job `purge-sync-tombstones`) |

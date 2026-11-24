@@ -13,7 +13,7 @@ Scale: Likelihood / Impact = L(ow) · M(edium) · H(igh). Status: OPEN · MITIGA
 | R-07 | Material widgets show English in VI (no `flutter_localizations`) | H | L | F-1 | Mobile | MITIGATING |
 | R-08 | Accessibility: 40 px chips, `text3` captions 4.36:1 on cards | H | M | DS-1/DS-2/Q-1 (48 dp hit areas, `text2` on surfaces); device screen-reader tests UNVERIFIED | Mobile | MITIGATING |
 | R-09 | Hard-coded version string drifts from build (happened before `5a61ab8`) | M | L | F-2 reads `package_info_plus` | Mobile | MITIGATING |
-| R-10 | Legal/support values not confirmed canonical (D-14) | M | M | Keep shipping values; owner confirms before release | Owner | OPEN |
+| R-10 | Legal/support values not confirmed canonical (D-14) | M | M | Decided (L-D23); account-deletion URL added 2026-11-24 (L-D42); owner publishes the v2 web pages before submitting | Owner | MITIGATED |
 | R-11 | iOS has no `diag` flavor; bundle IDs differ between iOS and Android | L | M | Document; matters for IAP/push config later | Mobile | ACCEPTED |
 | R-12 | `camera_page.dart` (1.5k lines) mixes view and engine glue | H | M | W-1 limits edits to view code; any extraction is a separate, engine-owner-reviewed PR | Mobile | OPEN |
 | R-13 | Stacked PRs: long chain waiting for review; later PRs conflict if early ones change | M | M | Small PRs, rebase-free merges bottom-up | Owner | OPEN |
