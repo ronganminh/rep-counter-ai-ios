@@ -4,12 +4,12 @@
   "production_regression": {
     "pushup_1": {
       "fixture_key": "pushup-1",
-      "expected_engine_count": 28,
+      "expected_engine_count": 15,
       "human_ground_truth": null
     },
     "pushup_2": {
       "fixture_key": "pushup-2",
-      "expected_engine_count": 67,
+      "expected_engine_count": 21,
       "human_ground_truth": null
     }
   },

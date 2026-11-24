@@ -15,7 +15,7 @@ def ensure(condition, message):
 
 def main():
     spec = read("pubspec.yaml")
-    ensure("version: 1.0.0+9" in spec, "Release version/build is not synchronized")
+    ensure("version: 1.0.1+10" in spec, "Release version/build is not synchronized")
     strings = read("lib/core/i18n/app_strings.dart")
     legal = read("lib/features/legal/legal_page.dart")
     ensure("Gemini" not in strings and "Gemini" not in legal, "Stale Gemini provider text")
@@ -25,7 +25,7 @@ def main():
     picker = read("lib/features/exercises/presentation/exercise_picker_screen.dart")
     ensure("FeatureFlags.visibleExerciseIds.contains" in picker, "Exercise picker must respect release gate")
     settings = read("lib/features/legal/settings_page.dart")
-    ensure("1.0.0 (9)" in settings, "Settings release version mismatched")
+    ensure("1.0.1 (10)" in settings, "Settings release version mismatched")
     ensure("AppLinks.hasAppStoreListing" in settings, "iOS review link needs listing gate")
     info = plistlib.loads((ROOT / "ios/Runner/Info.plist").read_bytes())
     for key in ("NSCameraUsageDescription", "NSPhotoLibraryAddUsageDescription"):
@@ -76,7 +76,7 @@ def main():
             if re.search(r"permission|access|quyền|settings|cài đặt", low) and \
                     re.search(r"retry|thử lại|try again", low):
                 raise AssertionError(f"5.1.1(iv): retry in permission copy in {f}: {lit!r}")
-    print("PASS: App Store v1 static release gates for 1.0.0 (9)")
+    print("PASS: App Store v1 static release gates for 1.0.1 (10)")
 
 if __name__ == "__main__":
     try:

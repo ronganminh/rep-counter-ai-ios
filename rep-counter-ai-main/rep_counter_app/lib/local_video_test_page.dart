@@ -51,7 +51,9 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
     _strings = context.s;
     _guide = guideFor(pushUp, _strings);
   }
+
   final _smooth = RollingMean(5);
+  final _countGateLatch = CountGateLatch(pushUp.countGateGrace);
   late RepCounter _counter;
   List<_VideoPoseFrame> _frames = const [];
   int _frameIndex = -1;
@@ -99,6 +101,7 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
       minPeriod: pushUp.minPeriod,
     );
     _smooth.reset();
+    _countGateLatch.reset();
     _positionLocked = false;
     _frameIndex = -1;
     _consumedIndex = -1;
@@ -139,8 +142,7 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
     const stepMs = 200; // 5 FPS is enough for 0.7 s minimum rep period.
     // Debug replay phải xem toàn bộ clip; giới hạn cũ 60 giây làm video
     // 100pushup trả 0 vì phần động tác nằm sau phút đầu.
-    final analyzeMs =
-        controller.value.duration.inMilliseconds.clamp(0, 600000);
+    final analyzeMs = controller.value.duration.inMilliseconds.clamp(0, 600000);
     final output = <_VideoPoseFrame>[];
     try {
       for (var atMs = 0; atMs <= analyzeMs; atMs += stepMs) {
@@ -279,13 +281,18 @@ class _LocalVideoTestPageState extends State<LocalVideoTestPage> {
     if (placement.status.canCount) _positionLocked = true;
     final raw = pushUp.signal(landmarks, pushUp.minLikelihood);
     final arms = [raw.left, raw.right].whereType<double>().toList();
-    final signal = arms.isEmpty
+    final rawGateOk =
+        pushUp.countGate?.call(landmarks, pushUp.minLikelihood) ?? true;
+    final gateState =
+        _countGateLatch.update(rawGateOk, _frames[_frameIndex].at);
+    final signal = arms.isEmpty || gateState != CountGateState.open
         ? double.nan
         : _smooth.add(arms.reduce((a, b) => a + b) / arms.length);
-    if (_positionLocked && !signal.isNaN) {
+    if (_positionLocked && gateState == CountGateState.open && !signal.isNaN) {
       if (_counter.update(signal, _frames[_frameIndex].at) != null) _flash = 1;
-    } else {
+    } else if (!_positionLocked || gateState == CountGateState.closed) {
       _counter.onSignalLost();
+      _smooth.reset();
     }
     _trace.add(signal);
     if (_trace.length > 150) _trace.removeAt(0);

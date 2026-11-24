@@ -345,7 +345,7 @@ class _SettingsPageState extends State<SettingsPage> {
           SettingsRow(
               icon: LucideIcons.info,
               title: s.versionLabel,
-              trailing: Text('1.0.0 (9)', style: TextStyle(color: p.text2))),
+              trailing: Text('1.0.1 (10)', style: TextStyle(color: p.text2))),
           SettingsRow(
               icon: LucideIcons.fileText,
               title: s.termsOfUse,

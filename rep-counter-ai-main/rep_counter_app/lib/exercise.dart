@@ -145,13 +145,95 @@ bool _handsAtBarLevel(Landmarks lm, double ml) {
     lm.pt(PoseLandmarkType.rightWrist, minLikelihood: ml),
   ].whereType<Offset>().toList();
   if (wrists.isEmpty) return false;
-  final wristY = wrists.map((w) => w.dy).reduce((a, b) => a + b) / wrists.length;
+  final wristY =
+      wrists.map((w) => w.dy).reduce((a, b) => a + b) / wrists.length;
   final shoulderY = (ls.dy + rs.dy) / 2;
   return (shoulderY - wristY) / sw > _pullUpGateMargin;
 }
 
-/// Điều kiện phải đúng ở TỪNG khung thì khung đó mới được đưa vào bộ đếm.
+/// Chỉ mở bộ đếm hít đất khi hai tay đang chống xuống sàn.
+///
+/// Góc khuỷu tay của người ngồi cầm điện thoại vẫn có thể đi qua đầy đủ hai
+/// ngưỡng 100°/140° và trông hệt một rep đối với bộ đếm một chiều. Camera lại
+/// quay trực diện nên trục vai-hông của tư thế ngồi và hít đất đều gần thẳng
+/// đứng trong ảnh; chỉ kiểm hướng thân không phân biệt được hai trường hợp.
+///
+/// Ở góc quay trực diện, tư thế chống đẩy có hai cổ tay mở rộng và hai gối thu
+/// vào phía sau. Không dùng vị trí dọc cổ tay-hông làm điều kiện bắt buộc: phép
+/// chiếu ở nhiều góc camera thật đảo thứ tự đó trong phần lớn một rep.
+///
+/// Khi thấy đủ hai gối, dùng chúng làm bằng chứng chính: người ngồi
+/// xếp bằng có hai gối mở rộng bằng hoặc hơn hai cổ tay. So sánh mọi khoảng
+/// cách theo bề rộng vai để không phụ thuộc độ phân giải hay khoảng cách máy.
+bool _handsInPushUpSupport(Landmarks lm, double ml) {
+  final leftWrist = lm.pt(PoseLandmarkType.leftWrist, minLikelihood: ml);
+  final rightWrist = lm.pt(PoseLandmarkType.rightWrist, minLikelihood: ml);
+  final hips = lm.mid(PoseLandmarkType.leftHip, PoseLandmarkType.rightHip,
+      minLikelihood: ml);
+  final shoulderWidth = lm.shoulderWidth(minLikelihood: ml);
+  if (leftWrist == null ||
+      rightWrist == null ||
+      hips == null ||
+      shoulderWidth == null) {
+    return false;
+  }
+
+  final wristWidth = (leftWrist.dx - rightWrist.dx).abs();
+  if (wristWidth < shoulderWidth * 0.75) return false;
+
+  final leftKnee = lm.pt(PoseLandmarkType.leftKnee, minLikelihood: ml);
+  final rightKnee = lm.pt(PoseLandmarkType.rightKnee, minLikelihood: ml);
+  if (leftKnee != null && rightKnee != null) {
+    final kneeWidth = (leftKnee.dx - rightKnee.dx).abs();
+    // Ở 269 mốc lấy mẫu nằm trong 9 khoảng nghỉ của fixture thật, quy tắc này
+    // chặn 269/269; các mốc chống đẩy có knee/shoulder chủ yếu 0.3-0.7.
+    final clearlySeated =
+        kneeWidth >= shoulderWidth * 0.90 && kneeWidth >= wristWidth * 0.70;
+    if (clearlySeated) return false;
+    return true;
+  }
+
+  // Khi gối tạm mất, chỉ dùng dấu hiệu cổ tay thấp hơn hông làm fallback.
+  // Không bắt buộc điều này khi thấy gối: ở nhiều góc camera thật, phép chiếu
+  // khiến cổ tay có thể nằm ngang hoặc cao hơn hông dù người vẫn đang chống.
+  final wristsBelowHips = math.min(leftWrist.dy, rightWrist.dy) - hips.dy;
+  return wristsBelowHips >= shoulderWidth * 0.15;
+}
+
+/// Điều kiện thô của một frame trước khi áp dụng chống rung theo thời gian.
 typedef CountGate = bool Function(Landmarks lm, double minLikelihood);
+
+enum CountGateState { open, holding, closed }
+
+/// Giữ cổng đếm mở trong một khoảng ngắn khi landmark chập chờn.
+///
+/// MLKit có thể làm cổ tay/gối nhảy sai 1-2 frame ngay ở đáy rep. Nếu coi một
+/// frame đó là mất tư thế và hủy chu kỳ thì video thật gần như không còn rep.
+/// Cổng vẫn tự đóng sau [grace], nên một quãng nghỉ dài không thể tiếp tục dùng
+/// trạng thái chống tay cũ.
+class CountGateLatch {
+  CountGateLatch(this.grace);
+
+  final Duration grace;
+  Duration? _lastAllowedAt;
+
+  CountGateState update(bool rawAllowed, Duration at) {
+    if (rawAllowed) {
+      _lastAllowedAt = at;
+      return CountGateState.open;
+    }
+    final last = _lastAllowedAt;
+    if (last == null || at < last) {
+      _lastAllowedAt = null;
+      return CountGateState.closed;
+    }
+    if (at - last <= grace) return CountGateState.holding;
+    _lastAllowedAt = null;
+    return CountGateState.closed;
+  }
+
+  void reset() => _lastAllowedAt = null;
+}
 
 class ExerciseProfile {
   const ExerciseProfile({
@@ -173,6 +255,7 @@ class ExerciseProfile {
     this.smoothWindow = 5,
     this.startFromTop = false,
     this.countGate,
+    this.countGateGrace = Duration.zero,
     this.minRepsPerSet = 1,
   });
 
@@ -214,12 +297,13 @@ class ExerciseProfile {
   /// Xem [RepCounter.startFromTop].
   final bool startFromTop;
 
-  /// Chặn từng khung, KHÔNG qua thời gian ân hạn của trạng thái đặt người.
+  /// Cổng tư thế riêng của bài.
   ///
-  /// Trạng thái đặt người được giữ thêm 2 s sau khi mất (cần cho hít đất, vì ở
-  /// đáy pose hay vỡ). Với kéo xà, 2 s đó đúng lúc buông xà: tay gập rồi thả
-  /// xuống duỗi thẳng — đủ một vòng để bị tính rep.
+  /// [countGateGrace] chỉ dùng cho bài đã đo được landmark chập chờn giữa rep.
+  /// Kéo xà giữ mặc định bằng 0: lúc buông xà, tay gập rồi duỗi đủ tạo một rep
+  /// ma nếu còn bất kỳ thời gian ân hạn nào.
   final CountGate? countGate;
+  final Duration countGateGrace;
 
   /// Ngưỡng nhóm set cũ, giữ lại để tương thích cấu hình.
   ///
@@ -262,6 +346,8 @@ const pushUp = ExerciseProfile(
     PoseLandmarkType.rightHip
   ],
   shoulderWidthFraction: (min: 0.20, max: 0.65),
+  countGate: _handsInPushUpSupport,
+  countGateGrace: Duration(seconds: 2),
   setupHint:
       'Đặt máy thấp trước mặt, chống tay sao cho khung xương trùng với mẫu.',
 );

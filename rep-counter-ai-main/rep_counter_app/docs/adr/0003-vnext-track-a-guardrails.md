@@ -69,7 +69,9 @@ challenge controller hoặc routine controller.
   annotate thủ công.
 
 Không copy engine count sang human ground truth để tạo cảm giác accuracy hoàn hảo.
-Re-baseline engine count phải có lý do được ghi lại và review.
+Re-baseline engine count phải có lý do được ghi lại và review. Thay đổi chủ đích
+trong engine được phép tạo baseline mới sau khi cùng fixture chạy lặp lại cho kết
+quả xác định; không được biến số engine mới thành human ground truth.
 
 ## Hệ quả
 
@@ -77,5 +79,14 @@ Re-baseline engine count phải có lý do được ghi lại và review.
 - Feedback warning sau rep phải giữ semantics "counted".
 - Mọi màn mới phải derive count từ `WorkoutUiState` / saved `WorkoutRecord`.
 - Form/quality UI chỉ hiển thị dữ liệu deterministic có thật.
-- Mọi thay đổi engine-neutral phải giữ production replay baseline 28 / 67 và
-  `HUD == saved == result`.
+- Mọi thay đổi engine-neutral phải giữ production replay baseline hiện hành trong
+  manifest và `HUD == saved == result`.
+
+### Re-baseline 2026-10-14 sau sửa false positive lúc ngồi nghỉ
+
+Gate tư thế hít đất là thay đổi có chủ đích trong engine, không phải thay đổi
+engine-neutral. Production replay ở GitHub Actions run `38581459034` cho kết quả
+xác định `pushup-a: 28 -> 15` và `pushup-b: 67 -> 21`, với
+`HUD == saved == result`. Hai số mới chỉ là regression baseline; human ground
+truth vẫn là `null`. Baseline cũ được giữ ở trường `previous_engine_count` để
+không mất lịch sử.
