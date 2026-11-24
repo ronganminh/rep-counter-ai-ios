@@ -13,6 +13,7 @@ import 'package:image/image.dart' as img;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 
+import 'core/permissions/permission_explanation.dart';
 import 'core/i18n/app_strings.dart';
 import 'core/services/training_preferences.dart';
 import 'core/services/workout_feedback.dart';
@@ -1663,8 +1664,9 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
   }
 
   /// Before the system prompt (5.1.1(iv), L-D24) the gate has no way out: no
-  /// close, no "Not now", no manual logging, and back does nothing, so
-  /// "Continue" always reaches the system camera prompt. Exits and manual
+  /// close, no "Not now", no manual logging, and on iOS back does nothing, so
+  /// "Continue" always reaches the system camera prompt. On Android the
+  /// system Back button returns to the previous screen (QA-06, L-D42). Exits and manual
   /// logging come back once the prompt has been answered.
   bool get _beforePrompt => _cameraState == _CameraState.awaitingConsent;
 
@@ -1685,6 +1687,13 @@ class _CameraPageState extends State<CameraPage> with WidgetsBindingObserver {
       canPop: _allowPop,
       onPopInvokedWithResult: (didPop, _) {
         if (!didPop && !_beforePrompt) _confirmExit();
+        // QA-06 (L-D42): Android's system Back cancels the explanation.
+        if (!didPop &&
+            _beforePrompt &&
+            !_requestingCamera &&
+            systemBackLeavesPermissionExplanation) {
+          _leaveWithoutWorkout();
+        }
       },
       child: CameraPermissionView(
         title: _cameraTitle,

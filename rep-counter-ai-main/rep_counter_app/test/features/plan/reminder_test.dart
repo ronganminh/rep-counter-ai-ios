@@ -393,8 +393,8 @@ void main() {
         reason: 'Tuesday is a recovery day');
   });
 
-  testWidgets('5.1.1(iv): no back before the prompt, back after it',
-      (tester) async {
+  testWidgets('5.1.1(iv) iOS: no back before the prompt, back after it',
+      variant: TargetPlatformVariant.only(TargetPlatform.iOS), (tester) async {
     await tester
         .runAsync(() => ReminderPrefsStore().save(const ReminderPrefs()));
     platform.granted = ReminderPermission.unknown;
@@ -412,6 +412,27 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byKey(const Key('reminder-toggle')), findsOneWidget);
     expect(find.byType(BackButton), findsOneWidget);
+  });
+
+  testWidgets(
+      'QA-06 Android: system back leaves the explanation without the prompt',
+      variant: TargetPlatformVariant.only(TargetPlatform.android),
+      (tester) async {
+    await tester
+        .runAsync(() => ReminderPrefsStore().save(const ReminderPrefs()));
+    platform.granted = ReminderPermission.unknown;
+    final view = (await tester.runAsync(repo.load))!;
+    await openRoute(tester, view);
+    expect(find.byKey(const Key('reminder-enable')), findsOneWidget);
+    // Still one button and no visible back arrow: only the system Back.
+    expect(find.byType(BackButton), findsNothing);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.byType(ReminderSettingsPage), findsNothing);
+    expect(platform.scheduled, isEmpty);
+    expect(
+        (await tester.runAsync(() => ReminderPrefsStore().load()))!.enabled,
+        isFalse);
   });
 
   testWidgets('reminders off with notifications granted: no explanation again',

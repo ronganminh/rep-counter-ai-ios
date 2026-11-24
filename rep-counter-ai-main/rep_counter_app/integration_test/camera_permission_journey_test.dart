@@ -6,6 +6,7 @@
 // (no camera on the fake platform).
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rep_counter_app/core/permissions/permission_explanation.dart';
 import 'package:rep_counter_app/app/app_shell.dart';
 import 'package:rep_counter_app/app/app_tab_bar.dart';
 import 'package:rep_counter_app/camera_page.dart';
@@ -43,7 +44,8 @@ void main() {
   }
 
   testWidgets(
-      'not asked yet: explanation with Continue only; back does nothing; '
+      'not asked yet: explanation with Continue only; back stays (iOS) or '
+      'leaves (Android); '
       'Continue shows the OS prompt once', (tester) async {
     await pumpApp(tester, prefs: {'onboarding_v1': true, 'app_language': 'en'});
     expect(fakes.permissionCalls, isEmpty, reason: 'nothing at launch');
@@ -61,8 +63,15 @@ void main() {
     expect(fakes.cameraPrompts, 0, reason: 'no prompt before Continue');
 
     await systemBack(tester);
+    if (systemBackLeavesPermissionExplanation) {
+      // QA-06 (L-D42): Android's system Back cancels the explanation and
+      // returns to Home without the OS prompt.
+      expect(find.byType(CameraPage), findsNothing);
+      expect(fakes.cameraPrompts, 0);
+      await startFreeWorkout(tester);
+    }
     expect(find.text(s.cameraPermissionTitle), findsOneWidget,
-        reason: 'no way out before the prompt (iOS rule, applied to both)');
+        reason: 'iOS: no way out before the prompt (HIG pre-alert)');
 
     await tapText(tester, s.cameraContinue);
     expect(fakes.cameraPrompts, 1);
