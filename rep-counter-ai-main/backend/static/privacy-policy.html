@@ -72,33 +72,49 @@
   <section class="hero">
     <div class="eyebrow">Smart coaching · private data</div>
     <h1>Privacy Policy</h1>
-    <p class="muted">This page explains what stays on your device, what is sent when you choose AI feedback, and how RepCoach AI and its service provider process that limited data.</p>
+    <p class="muted">This page explains what stays on your device, what an optional account syncs, what is sent when you use AI feedback or AI Coach, which service providers process it, and how to delete it.</p>
     <div class="meta">
-      <div><b>Effective date</b>October 1, 2026</div>
+      <div><b>Effective date</b>November 24, 2026</div>
       <div><b>AI consent version</b>2026-10-01-groq</div>
       <div><b>Developer</b>RỒNG ẨN MÌNH</div>
       <div><b>Contact</b><a href="mailto:ronganminh221@gmail.com">ronganminh221@gmail.com</a></div>
     </div>
-    <div class="notice"><strong>AI feedback is optional.</strong> Core rep counting works on-device without sending a workout summary to the AI service.</div>
+    <div class="notice"><strong>Accounts and AI are optional.</strong> Core rep counting works on-device as a guest. To delete an account, use <strong>Profile › Delete account</strong> in the app or <a href="/delete-account.html">request deletion on the web</a>.</div>
   </section>
 
   <section id="en" class="language" lang="en">
     <h2>English <span class="tag">EN</span></h2>
 
     <h3>1. Scope</h3>
-    <p>This policy describes the current RepCoach AI mobile app and the RepCoach AI workout-feedback backend. The app has no user-account system and does not use an account to build cloud workout history.</p>
+    <p>This policy describes the RepCoach AI mobile app (iOS and Android), its optional account and cloud services run on Supabase, the AI Coach service (<code>ai-request</code>), and the RepCoach AI workout-feedback server. You can use the rep counter, plans, history and reminders as a guest without an account. An account is optional: it backs up your workouts and enables friends, the leaderboard and AI Coach.</p>
 
     <h3>2. Camera, video, audio and pose processing</h3>
-    <p>RepCoach AI uses the camera to detect body pose and count repetitions. Live camera frames and pose landmarks used for counting are processed on your device. Camera images, workout video, and raw pose-landmark coordinates are not sent to the RepCoach AI backend for rep counting or AI feedback.</p>
-    <p>The app may use on-device/system speech and local sound effects for rep counts, cues and set sounds. The current workout flow does not require microphone recordings for AI feedback.</p>
+    <p>RepCoach AI uses the camera to detect body pose and count repetitions. Live camera frames and pose landmarks used for counting are processed on your device. Camera images, workout video, and raw pose-landmark coordinates are not sent to any RepCoach server, are not synced to your account, and are not sent for AI feedback or AI Coach.</p>
+    <p>The app may use on-device/system speech and local sound effects for rep counts, cues and set sounds. The app does not record the microphone.</p>
 
-    <h3>3. Workout information stored on your device</h3>
-    <p>Workout history is stored locally on your device. Depending on the workout, a local record can include exercise type, start time, duration, reps, sets, target reps, placement/pose statistics, movement-quality metrics, per-rep detail, calibration-derived values, and AI feedback returned for that workout. The history store keeps up to the latest 100 readable workout records.</p>
-    <p>Local settings can also include language, voice/sound/haptic/cue preferences, exercise calibration, onboarding state and the current automatic-AI consent preference.</p>
+    <h3>3. Information stored on your device</h3>
+    <p>Workout history is stored locally on your device. Depending on the workout, a local record can include exercise type, start time, duration, reps, sets, target reps, whether it was counted manually or saved partially, placement/pose statistics, movement-quality metrics, per-rep detail, calibration-derived values, and AI feedback returned for that workout. Plans, reminder settings, an unfinished-workout draft, calibration, language, voice/sound/haptic/cue preferences, onboarding state and the automatic-AI consent preference are also stored locally.</p>
+    <p>Without an account, none of this leaves your device except the AI requests you choose (section 7).</p>
 
-    <h3>4. Optional AI feedback: data sent off-device</h3>
+    <h3>4. Optional account</h3>
+    <p>You can create an account with email and password, <strong>Sign in with Apple</strong> or <strong>Google Sign-In</strong>. Accounts are provided by Supabase Auth. Your account holds:</p>
+    <ul>
+      <li>your email address and a random user ID;</li>
+      <li>the sign-in provider you used and, for Apple or Google, the name and email address that provider shares with us (Apple may give a private relay address instead of your real email);</li>
+      <li>your password, stored by Supabase only as a salted hash (email accounts only);</li>
+      <li>the display name you choose in Friends (optional, up to 80 characters).</li>
+    </ul>
+    <p>Sign-in session tokens are kept on your phone in the iOS Keychain or the Android Keystore. Email confirmation and password-reset emails are sent by Supabase Auth.</p>
+
+    <h3>5. Cloud sync</h3>
+    <p>When you are signed in, workouts saved while signed in are synced to your account: exercise, start time, duration, reps, whether the workout was manual or partial, and the workout record including per-rep detail and quality statistics. Workouts saved as a guest are uploaded only if you choose to merge them into your account. Your account also stores your plans, XP events and level progress, unlocked achievements, the AI credit ledger (each credit change with its type and a random request ID), and in-app inbox messages (for example friend requests and system notices). Camera images and video are never synced.</p>
+
+    <h3>6. Friends and leaderboard</h3>
+    <p>Friends is optional and needs an account. When you add friends, they can see your display name and your weekly totals from camera-counted workouts on the friends leaderboard. Invites are links that expire after 7 days. You can block a person or report a person with a reason (up to 500 characters); reports are kept so the developer can act on abuse. Nobody can search for you by name or email.</p>
+
+    <h3>7. Optional AI feedback on a workout: data sent off-device</h3>
     <p>You can request AI feedback manually. Automatic AI feedback is off by default and becomes enabled only after you accept the in-app automatic-AI consent. When enabled, it applies to newly saved workouts; older history is not automatically uploaded.</p>
-    <p>For an AI request, the app sends a limited workout summary over HTTPS to the RepCoach AI backend. The current allowed summary fields are:</p>
+    <p>For an AI request, the app sends a limited workout summary over HTTPS to the RepCoach AI server. The current allowed summary fields are:</p>
     <ul>
       <li>exercise identifier;</li>
       <li>workout duration, reps, sets and target reps;</li>
@@ -108,69 +124,106 @@
       <li>response language; and</li>
       <li>contract/consent version metadata when the app version supports sending it.</li>
     </ul>
-    <p>The AI request does <strong>not</strong> include your name, email address, account ID, exact workout timestamp, routine library, full workout/PR history, badges/streaks, camera images, photos, videos, audio recordings, raw pose-landmark coordinates, precise location, contacts, or the locally stored per-rep detail list.</p>
+    <p>This request does <strong>not</strong> include your name, email address, account ID, exact workout timestamp, full workout history, camera images, photos, videos, audio recordings, raw pose-landmark coordinates, precise location, contacts, or the locally stored per-rep detail list.</p>
 
-    <h3>5. RepCoach AI backend</h3>
-    <p>The backend validates a strict allowlist, creates a minimized text prompt and sends that prompt to the configured AI provider. The application backend does not intentionally store workout request bodies, prompts or AI response text as server-side workout history.</p>
+    <h3>8. AI Coach and AI analyses (account required)</h3>
+    <p>AI Coach chat, advanced analysis and progress reviews need an account and use free weekly AI credits. For each request the app sends, over HTTPS to the <code>ai-request</code> Edge Function on Supabase: the request type, the response language, the messages you typed and the earlier messages of that chat session, and, for analyses and reviews, aggregate workout numbers (for example totals, averages and counts). The function checks your sign-in, charges one credit, sends a minimized prompt to GroqCloud (section 11) and returns the answer to the app.</p>
+    <p>The conversation is not stored or logged on the server. Only the credit change and a random request ID are recorded in your AI credit ledger. The chat is kept in memory on your phone only and is not saved. Credits are a free weekly allowance; they are not sold.</p>
+
+    <h3>9. RepCoach AI feedback server</h3>
+    <p>The feedback server validates a strict allowlist, creates a minimized text prompt and sends that prompt to the configured AI provider. It does not intentionally store workout request bodies, prompts or AI response text as server-side workout history, and it has no link to your account.</p>
     <p>Application logs contain operational metadata only, such as timestamp, a random per-request request ID, route, HTTP method, status, duration, a coarse request-size bucket, error code and provider status class. The request ID is for debugging one request and is not used as a user identifier. They do not contain the workout body, prompt, AI response text or API key.</p>
     <p>The reverse proxy processes network/operational metadata needed for HTTPS delivery, reliability, security and rate limiting. The dedicated RepCoach access log is configured to contain source IP address, timestamp, a random request ID, request method and URI path, HTTP status, response bytes and request duration. It is not configured to log request bodies, authorization headers, referrer or user-agent.</p>
 
-    <h3>6. Server-log retention</h3>
-    <p>RepCoach Nginx access/error logs are configured to rotate daily, keeping the current log plus 14 rotated files; older rotations are removed by log rotation. The Python backend writes its metadata-only operational events to the host system journal. Journal retention is controlled by VPS administration settings and is not assigned a separate fixed duration by the app repository.</p>
-    <p>Because RepCoach AI has no user account or server-side workout-history database, these operational logs are not organized as a user workout profile and the app does not provide an account-based delete-log control.</p>
+    <h3>10. Service providers</h3>
+    <ul>
+      <li><strong>Supabase</strong> (Supabase, Inc.): account authentication, the cloud database, and the <code>ai-request</code> and <code>delete-account</code> Edge Functions. The project is hosted in the Asia-Pacific (Tokyo) region. Database row-level security lets each signed-in person read only their own rows; friends see only what section 6 describes.</li>
+      <li><strong>GroqCloud</strong> (Groq, Inc.): AI inference for workout feedback and AI Coach (section 11).</li>
+      <li><strong>Apple</strong> and <strong>Google</strong>: only when you choose Sign in with Apple or Google Sign-In; they handle that sign-in under their own privacy policies.</li>
+      <li>The server host that runs the RepCoach AI feedback server and these web pages.</li>
+    </ul>
+    <p>We do not sell personal data and do not share it with third parties for their own purposes. These providers process data only to run the service for RepCoach AI.</p>
 
-    <h3>7. GroqCloud AI service</h3>
-    <p>RepCoach production uses GroqCloud as its AI inference provider. The backend sends only the minimized workout prompt described above and keeps the Groq API credential on the server. The current model is <code>openai/gpt-oss-20b</code>, a Groq production model.</p>
+    <h3>11. GroqCloud AI service</h3>
+    <p>RepCoach production uses GroqCloud as its AI inference provider for both workout feedback and AI Coach. Only the minimized prompts described above are sent, and the Groq API credential stays on the server. The current model is <code>openai/gpt-oss-20b</code>, a Groq production model.</p>
     <p>According to GroqCloud's current data documentation, usage metadata is retained for service measurement and performance and does not contain customer inputs or outputs. Inference customer data is not retained by default, except when a feature requires retention or when data is needed for platform reliability, troubleshooting, or abuse investigation. For ordinary inference reliability/abuse monitoring, Groq documents a retention period of up to 30 days. Groq also offers Zero Data Retention controls, but RepCoach AI does <strong>not</strong> currently claim that ZDR is enabled.</p>
     <p>Groq's current Services Agreement states that customer inputs and outputs are not used to train or fine-tune models unless the customer explicitly permits or instructs that use. The agreement also allows a customer to integrate Groq APIs into a Customer Application and make the AI services available to End Users.</p>
     <p>Official sources: <a href="https://console.groq.com/docs/your-data" rel="noopener noreferrer">GroqCloud data documentation</a>, <a href="https://console.groq.com/docs/legal/services-agreement" rel="noopener noreferrer">Groq Services Agreement</a>, and <a href="https://console.groq.com/docs/models" rel="noopener noreferrer">Groq supported models</a>.</p>
 
-    <h3>8. Age, end users and AI-provider restrictions</h3>
-    <p>Groq's account/cloud-services agreement requires the customer accessing the Cloud Services to be at least 18. It expressly allows AI services to be made available to End Users through a Customer Application. If a Customer Application is directed toward or likely to be accessed by people under the age of majority, Groq places responsibility on the customer to comply with applicable laws and regulations concerning minors and personal data.</p>
-    <p>AI feedback is general workout information, not medical advice, diagnosis or treatment.</p>
+    <h3>12. Age, end users and AI-provider restrictions</h3>
+    <p>RepCoach AI is not directed to children under 13, and accounts, friends and AI Coach are not intended for them. Groq's account/cloud-services agreement requires the customer accessing the Cloud Services to be at least 18. It expressly allows AI services to be made available to End Users through a Customer Application. If a Customer Application is directed toward or likely to be accessed by people under the age of majority, Groq places responsibility on the customer to comply with applicable laws and regulations concerning minors and personal data.</p>
+    <p>AI feedback and AI Coach answers are general workout information, not medical advice, diagnosis or treatment.</p>
 
-    <h3>9. Automatic AI consent and control</h3>
+    <h3>13. Automatic AI consent and control</h3>
     <p>Automatic AI feedback is opt-in. The app records the opt-in locally on the device for the current consent version. A new consent version uses a new local preference key, so an older automatic-AI opt-in is not treated as consent to materially revised wording. Turning automatic AI off affects future requests only and cannot recall a request already sent.</p>
-    <p>Manual AI feedback requires a per-request confirmation in the current app flow.</p>
+    <p>Manual AI feedback requires a per-request confirmation in the current app flow. AI Coach asks for consent before its first request.</p>
 
-    <h3>10. Generated images and sharing</h3>
+    <h3>14. Notifications, generated images and sharing</h3>
+    <p>Workout reminders are local notifications scheduled on your phone from your plan; they are off until you turn them on. This version does not use remote push notifications and does not collect push tokens.</p>
     <p>The app can generate a workout story image from workout statistics and, when available, an excerpt of AI feedback. The generated story does not contain a camera image. Saving to Photos or sharing through the system share sheet happens only when you choose that action. A receiving app/service applies its own privacy practices.</p>
 
-    <h3>11. Retention and deletion on your device</h3>
+    <h3>15. Retention</h3>
     <ul>
-      <li><strong>Workout history and saved AI feedback:</strong> remain on your device until deleted in the app, app storage is cleared, or the app is uninstalled.</li>
-      <li><strong>Calibration:</strong> stored locally and can be reset by exercise or cleared with the app's local workout-data deletion action.</li>
-      <li><strong>Preferences and consent state:</strong> remain locally until changed, app storage is cleared, or the app is uninstalled. The workout-history deletion action does not claim to erase every preference.</li>
-      <li><strong>Already-sent AI requests:</strong> disabling AI or deleting local workout history cannot recall data already transmitted to the backend/provider. Backend and provider retention follow the rules described above.</li>
+      <li><strong>On your device:</strong> workout history, plans, calibration, preferences and consent state remain until you delete them in the app (Settings › Delete workout history), clear the app's storage, or uninstall the app.</li>
+      <li><strong>Account data:</strong> kept while your account exists. A workout or plan you delete is removed from your account; its deletion marker is purged after 90 days.</li>
+      <li><strong>Invites:</strong> expire after 7 days.</li>
+      <li><strong>Reports:</strong> kept after account deletion with the user IDs removed.</li>
+      <li><strong>AI Coach conversations:</strong> not stored on the server; GroqCloud's retention is in section 11.</li>
+      <li><strong>Server logs:</strong> RepCoach Nginx access/error logs rotate daily, keeping the current log plus 14 rotated files; older rotations are removed by log rotation. The feedback server writes metadata-only operational events to the host system journal, whose retention is set by server administration. Supabase keeps its own platform logs for a limited period under its terms.</li>
+      <li><strong>Already-sent AI requests:</strong> turning off AI or deleting local workout history cannot recall data already transmitted to the server/provider.</li>
     </ul>
 
-    <h3>12. Other data practices</h3>
-    <p>The current app does not include a RepCoach user-account system, advertising SDK, analytics SDK or crash-reporting SDK for core app operation. RepCoach AI does not require your name, email, phone number, contacts, payment information or precise location to use the on-device rep counter.</p>
+    <h3>16. Deleting your account and data</h3>
+    <p><strong>In the app:</strong> open <strong>Profile › Delete account</strong>, type the confirmation word and confirm. This revokes your Sign in with Apple token when you used Apple, deletes your profile, synced workouts, plans, AI credit ledger, XP, level progress, achievements, entitlements, push tokens, inbox, friendships, blocks and invites, and then deletes the account itself. Reports you sent or received are kept with your user ID removed.</p>
+    <p><strong>On the web:</strong> follow <a href="/delete-account.html">repcoach-ai.duckdns.org/delete-account.html</a> to request deletion by email without the app.</p>
+    <p>Workouts stored on your phone are separate: delete them in <strong>Settings › Delete workout history</strong> or uninstall the app. You can also delete local history without an account.</p>
 
-    <h3>13. Security</h3>
-    <p>The production endpoint is designed for HTTPS. The provider credential remains on the server rather than in the mobile app. The backend limits request size, validates allowed fields, uses bounded timeouts and applies rate limiting. No security method can guarantee absolute protection, so RepCoach AI minimizes what leaves the device.</p>
+    <h3>17. Other data practices</h3>
+    <p>RepCoach AI has no advertising SDK, analytics SDK or crash-reporting SDK, does not track you across other companies' apps or websites, and does not sell personal data. It does not request your phone number, contacts, payment information or precise location.</p>
 
-    <h3>14. Changes and contact</h3>
-    <p>We may update this policy when the app, backend, provider or data flow changes. The effective date and AI consent version above identify this revision. For privacy questions, contact <strong>RỒNG ẨN MÌNH</strong> at <a href="mailto:ronganminh221@gmail.com">ronganminh221@gmail.com</a>.</p>
+    <h3>18. Security</h3>
+    <p>All data that leaves the device is sent over HTTPS. Provider credentials remain on servers rather than in the mobile app. The database uses row-level security; account deletion and AI Coach run in server functions that check your sign-in. The feedback server limits request size, validates allowed fields, uses bounded timeouts and applies rate limiting. No security method can guarantee absolute protection, so RepCoach AI minimizes what leaves the device.</p>
+
+    <h3>19. Your choices</h3>
+    <p>You can train as a guest, keep AI off, revoke camera permission in your device settings, turn reminders off, export or delete your workout history, change your display name, block people, sign out, and delete your account at any time. To ask about your data, contact us at the address below.</p>
+
+    <h3>20. Changes and contact</h3>
+    <p>We may update this policy when the app, backend, provider or data flow changes. The effective date and AI consent version above identify this revision. For privacy questions or deletion requests, contact <strong>RỒNG ẨN MÌNH</strong> at <a href="mailto:ronganminh221@gmail.com">ronganminh221@gmail.com</a>.</p>
   </section>
 
   <section id="vi" class="language" lang="vi">
     <h2>Tiếng Việt <span class="tag">VI</span></h2>
 
     <h3>1. Phạm vi</h3>
-    <p>Chính sách này mô tả phiên bản hiện tại của ứng dụng RepCoach AI và backend tạo nhận xét buổi tập. Ứng dụng hiện không có hệ thống tài khoản người dùng và không dùng tài khoản để tạo lịch sử tập trên đám mây.</p>
+    <p>Chính sách này mô tả ứng dụng RepCoach AI (iOS và Android), tài khoản và dịch vụ đám mây tùy chọn chạy trên Supabase, dịch vụ AI Coach (<code>ai-request</code>) và máy chủ nhận xét buổi tập RepCoach AI. Bạn có thể dùng bộ đếm rep, kế hoạch, lịch sử và nhắc lịch như khách, không cần tài khoản. Tài khoản là tùy chọn: nó sao lưu buổi tập và mở tính năng bạn bè, bảng xếp hạng và AI Coach.</p>
 
     <h3>2. Camera, video, âm thanh và xử lý tư thế</h3>
-    <p>RepCoach AI dùng camera để nhận diện tư thế và đếm rep. Khung hình camera trực tiếp và landmark tư thế dùng cho việc đếm được xử lý trên thiết bị. Ảnh camera, video buổi tập và tọa độ landmark thô không được gửi tới backend RepCoach AI để đếm rep hoặc tạo nhận xét AI.</p>
-    <p>Ứng dụng có thể dùng giọng đọc hệ thống/trên thiết bị và âm thanh cục bộ để đọc rep, nhắc tư thế và báo set. Luồng tập hiện tại không cần gửi bản ghi micro để nhận xét AI.</p>
+    <p>RepCoach AI dùng camera để nhận diện tư thế và đếm rep. Khung hình camera trực tiếp và landmark tư thế dùng cho việc đếm được xử lý trên thiết bị. Ảnh camera, video buổi tập và tọa độ landmark thô không được gửi tới máy chủ nào của RepCoach, không được đồng bộ vào tài khoản và không được gửi cho nhận xét AI hay AI Coach.</p>
+    <p>Ứng dụng có thể dùng giọng đọc hệ thống/trên thiết bị và âm thanh cục bộ để đọc rep, nhắc tư thế và báo set. Ứng dụng không ghi âm micro.</p>
 
-    <h3>3. Dữ liệu buổi tập lưu trên thiết bị</h3>
-    <p>Lịch sử tập được lưu cục bộ trên thiết bị. Tùy buổi tập, bản ghi có thể gồm loại bài, thời điểm bắt đầu, thời lượng, rep, set, mục tiêu, thống kê vị trí/pose, chỉ số chất lượng động tác, chi tiết từng rep, giá trị liên quan hiệu chỉnh và nhận xét AI đã trả về cho buổi tập. Kho lịch sử giữ tối đa 100 bản ghi đọc được gần nhất.</p>
-    <p>Cài đặt cục bộ cũng có thể gồm ngôn ngữ, giọng đọc/âm thanh/rung/nhắc tư thế, hiệu chỉnh bài tập, trạng thái onboarding và tùy chọn đồng ý AI tự động hiện tại.</p>
+    <h3>3. Dữ liệu lưu trên thiết bị</h3>
+    <p>Lịch sử tập được lưu cục bộ trên thiết bị. Tùy buổi tập, bản ghi có thể gồm loại bài, thời điểm bắt đầu, thời lượng, rep, set, mục tiêu, việc buổi tập được ghi tay hay lưu dang dở, thống kê vị trí/pose, chỉ số chất lượng động tác, chi tiết từng rep, giá trị liên quan hiệu chỉnh và nhận xét AI đã trả về. Kế hoạch, cài đặt nhắc lịch, bản nháp buổi tập chưa xong, hiệu chỉnh, ngôn ngữ, tùy chọn giọng đọc/âm thanh/rung/nhắc tư thế, trạng thái onboarding và tùy chọn đồng ý AI tự động cũng được lưu cục bộ.</p>
+    <p>Nếu không có tài khoản, các dữ liệu này không rời khỏi thiết bị, trừ yêu cầu AI do bạn chọn (mục 7).</p>
 
-    <h3>4. Nhận xét AI tùy chọn: dữ liệu gửi ra khỏi thiết bị</h3>
+    <h3>4. Tài khoản tùy chọn</h3>
+    <p>Bạn có thể tạo tài khoản bằng email và mật khẩu, <strong>Đăng nhập bằng Apple</strong> hoặc <strong>Đăng nhập bằng Google</strong>. Tài khoản do Supabase Auth cung cấp và gồm:</p>
+    <ul>
+      <li>địa chỉ email và một ID người dùng ngẫu nhiên;</li>
+      <li>nhà cung cấp đăng nhập bạn dùng và, với Apple hoặc Google, tên và email mà nhà cung cấp đó chia sẻ (Apple có thể cho địa chỉ chuyển tiếp ẩn thay cho email thật);</li>
+      <li>mật khẩu, được Supabase lưu chỉ ở dạng băm có salt (chỉ với tài khoản email);</li>
+      <li>tên hiển thị bạn chọn trong Bạn bè (tùy chọn, tối đa 80 ký tự).</li>
+    </ul>
+    <p>Token phiên đăng nhập được giữ trên điện thoại trong Keychain (iOS) hoặc Keystore (Android). Email xác nhận và email đặt lại mật khẩu do Supabase Auth gửi.</p>
+
+    <h3>5. Đồng bộ đám mây</h3>
+    <p>Khi đã đăng nhập, buổi tập lưu trong lúc đăng nhập được đồng bộ vào tài khoản: bài tập, thời điểm bắt đầu, thời lượng, rep, buổi tập ghi tay hay dang dở, và bản ghi buổi tập gồm chi tiết từng rep và thống kê chất lượng. Buổi tập lưu khi là khách chỉ được tải lên nếu bạn chọn gộp vào tài khoản. Tài khoản cũng lưu kế hoạch, sự kiện XP và tiến độ cấp, thành tích đã mở, sổ tín dụng AI (mỗi thay đổi tín dụng kèm loại và một request ID ngẫu nhiên) và tin trong hộp thư của app (ví dụ lời mời kết bạn, thông báo hệ thống). Ảnh và video camera không bao giờ được đồng bộ.</p>
+
+    <h3>6. Bạn bè và bảng xếp hạng</h3>
+    <p>Bạn bè là tính năng tùy chọn và cần tài khoản. Khi bạn thêm bạn, họ thấy tên hiển thị và tổng tuần các buổi tập đếm bằng camera của bạn trên bảng xếp hạng bạn bè. Lời mời là liên kết hết hạn sau 7 ngày. Bạn có thể chặn hoặc báo cáo một người kèm lý do (tối đa 500 ký tự); báo cáo được giữ để nhà phát triển xử lý lạm dụng. Không ai tìm được bạn theo tên hay email.</p>
+
+    <h3>7. Nhận xét AI tùy chọn cho buổi tập: dữ liệu gửi ra khỏi thiết bị</h3>
     <p>Bạn có thể chủ động yêu cầu nhận xét AI. AI tự động mặc định tắt và chỉ được bật sau khi bạn đồng ý trong ứng dụng. Khi bật, AI tự động chỉ áp dụng cho các buổi tập mới được lưu; lịch sử cũ không tự động được tải lên.</p>
-    <p>Khi có yêu cầu AI, app gửi một bản tóm tắt giới hạn qua HTTPS tới backend RepCoach AI. Các trường hiện được phép gồm:</p>
+    <p>Khi có yêu cầu AI, app gửi một bản tóm tắt giới hạn qua HTTPS tới máy chủ RepCoach AI. Các trường hiện được phép gồm:</p>
     <ul>
       <li>mã bài tập;</li>
       <li>thời lượng, số rep, số set và mục tiêu rep;</li>
@@ -180,55 +233,76 @@
       <li>ngôn ngữ phản hồi; và</li>
       <li>metadata phiên bản contract/đồng ý khi phiên bản app hỗ trợ gửi trường này.</li>
     </ul>
-    <p>Yêu cầu AI <strong>không</strong> chứa tên, email, ID tài khoản, thời điểm chính xác của buổi tập, thư viện routine, toàn bộ lịch sử tập/PR, badge/streak, ảnh camera, ảnh, video, bản ghi âm, tọa độ landmark thô, vị trí chính xác, danh bạ hoặc danh sách chi tiết từng rep đang lưu cục bộ.</p>
+    <p>Yêu cầu này <strong>không</strong> chứa tên, email, ID tài khoản, thời điểm chính xác của buổi tập, toàn bộ lịch sử tập, ảnh camera, ảnh, video, bản ghi âm, tọa độ landmark thô, vị trí chính xác, danh bạ hoặc danh sách chi tiết từng rep đang lưu cục bộ.</p>
 
-    <h3>5. Backend RepCoach AI</h3>
-    <p>Backend kiểm tra allowlist nghiêm ngặt, tạo prompt văn bản tối giản rồi gửi prompt đó đến nhà cung cấp AI đã cấu hình. Backend ứng dụng không chủ ý lưu request body buổi tập, prompt hoặc nội dung phản hồi AI thành lịch sử tập phía máy chủ.</p>
+    <h3>8. AI Coach và phân tích AI (cần tài khoản)</h3>
+    <p>Chat AI Coach, phân tích nâng cao và đánh giá tiến bộ cần tài khoản và dùng tín dụng AI miễn phí hằng tuần. Với mỗi yêu cầu, app gửi qua HTTPS tới Edge Function <code>ai-request</code> trên Supabase: loại yêu cầu, ngôn ngữ trả lời, tin nhắn bạn gõ và các tin trước đó trong phiên chat, và với phân tích/đánh giá là số liệu tổng hợp của buổi tập (ví dụ tổng, trung bình, số lần). Function kiểm tra đăng nhập, trừ một tín dụng, gửi prompt tối giản tới GroqCloud (mục 11) rồi trả câu trả lời về app.</p>
+    <p>Hội thoại không được lưu hay ghi log trên máy chủ. Chỉ thay đổi tín dụng và một request ID ngẫu nhiên được ghi vào sổ tín dụng AI của bạn. Đoạn chat chỉ nằm trong bộ nhớ trên điện thoại và không được lưu lại. Tín dụng là hạn mức miễn phí hằng tuần, không bán.</p>
+
+    <h3>9. Máy chủ nhận xét RepCoach AI</h3>
+    <p>Máy chủ nhận xét kiểm tra allowlist nghiêm ngặt, tạo prompt văn bản tối giản rồi gửi prompt đó đến nhà cung cấp AI đã cấu hình. Máy chủ không chủ ý lưu request body buổi tập, prompt hoặc nội dung phản hồi AI thành lịch sử tập phía máy chủ và không liên kết với tài khoản của bạn.</p>
     <p>Log ứng dụng chỉ chứa metadata vận hành như thời điểm, request ID ngẫu nhiên cho từng request, route, HTTP method, status, thời lượng, nhóm kích thước request, mã lỗi và nhóm trạng thái provider. Request ID chỉ dùng để debug một request, không dùng làm định danh người dùng. Log không chứa workout body, prompt, nội dung phản hồi AI hoặc API key.</p>
     <p>Reverse proxy xử lý metadata mạng/vận hành cần cho HTTPS, ổn định, bảo mật và rate limit. Access log riêng của RepCoach được cấu hình chứa địa chỉ IP nguồn, thời điểm, request ID ngẫu nhiên, method và đường dẫn URI, HTTP status, số byte phản hồi và thời gian xử lý request. Log này không được cấu hình để ghi request body, header Authorization, referrer hoặc user-agent.</p>
 
-    <h3>6. Thời gian lưu log máy chủ</h3>
-    <p>Access/error log Nginx của RepCoach được cấu hình xoay vòng mỗi ngày, giữ log hiện tại cộng 14 file đã xoay vòng; bản cũ hơn bị xóa theo cấu hình logrotate. Backend Python ghi sự kiện vận hành chỉ-metadata vào system journal của máy chủ. Thời gian giữ journal do cấu hình quản trị VPS quyết định và repo ứng dụng hiện không đặt một thời hạn riêng cố định cho journal.</p>
-    <p>Do RepCoach AI không có tài khoản người dùng hay cơ sở dữ liệu lịch sử tập phía server, các log vận hành này không được tổ chức thành hồ sơ lịch sử tập theo tài khoản và app không có nút xóa log theo tài khoản.</p>
+    <h3>10. Bên cung cấp dịch vụ</h3>
+    <ul>
+      <li><strong>Supabase</strong> (Supabase, Inc.): xác thực tài khoản, cơ sở dữ liệu đám mây và các Edge Function <code>ai-request</code>, <code>delete-account</code>. Dự án đặt ở vùng Asia-Pacific (Tokyo). Row-level security của cơ sở dữ liệu cho mỗi người đã đăng nhập chỉ đọc được dữ liệu của mình; bạn bè chỉ thấy những gì mục 6 nêu.</li>
+      <li><strong>GroqCloud</strong> (Groq, Inc.): AI inference cho nhận xét buổi tập và AI Coach (mục 11).</li>
+      <li><strong>Apple</strong> và <strong>Google</strong>: chỉ khi bạn chọn Đăng nhập bằng Apple hoặc Google; họ xử lý việc đăng nhập theo chính sách riêng.</li>
+      <li>Máy chủ chạy máy chủ nhận xét RepCoach AI và các trang web này.</li>
+    </ul>
+    <p>Chúng tôi không bán dữ liệu cá nhân và không chia sẻ cho bên thứ ba dùng vào mục đích riêng của họ. Các bên trên chỉ xử lý dữ liệu để vận hành dịch vụ cho RepCoach AI.</p>
 
-    <h3>7. Dịch vụ AI GroqCloud</h3>
-    <p>RepCoach production dùng GroqCloud làm nhà cung cấp AI inference. Backend chỉ gửi prompt buổi tập đã tối giản như mô tả ở trên và giữ Groq API key trên máy chủ. Model hiện tại là <code>openai/gpt-oss-20b</code>, một production model của Groq.</p>
+    <h3>11. Dịch vụ AI GroqCloud</h3>
+    <p>RepCoach production dùng GroqCloud làm nhà cung cấp AI inference cho cả nhận xét buổi tập và AI Coach. Chỉ các prompt tối giản như mô tả ở trên được gửi đi, và Groq API key nằm trên máy chủ. Model hiện tại là <code>openai/gpt-oss-20b</code>, một production model của Groq.</p>
     <p>Theo tài liệu dữ liệu GroqCloud hiện hành, usage metadata được giữ để đo lường hoạt động và hiệu năng dịch vụ và không chứa input/output của khách hàng. Dữ liệu khách hàng của inference mặc định không được lưu, ngoại trừ khi một tính năng cần lưu dữ liệu hoặc khi cần cho độ tin cậy nền tảng, khắc phục sự cố hay điều tra lạm dụng. Với giám sát reliability/abuse của inference thông thường, Groq công bố thời gian lưu tối đa 30 ngày. Groq có cung cấp Zero Data Retention, nhưng RepCoach AI hiện <strong>không</strong> tuyên bố ZDR đã được bật.</p>
     <p>Services Agreement hiện hành của Groq nêu rằng input/output của khách hàng không được dùng để train hoặc fine-tune model trừ khi khách hàng cho phép hoặc chỉ thị rõ ràng. Thỏa thuận cũng cho phép khách hàng tích hợp Groq API vào Customer Application và cung cấp AI cho End Users.</p>
     <p>Nguồn chính thức: <a href="https://console.groq.com/docs/your-data" rel="noopener noreferrer">Tài liệu dữ liệu GroqCloud</a>, <a href="https://console.groq.com/docs/legal/services-agreement" rel="noopener noreferrer">Groq Services Agreement</a>, và <a href="https://console.groq.com/docs/models" rel="noopener noreferrer">Danh sách model Groq</a>.</p>
 
-    <h3>8. Độ tuổi, người dùng cuối và giới hạn của nhà cung cấp AI</h3>
-    <p>Thỏa thuận Cloud Services của Groq yêu cầu khách hàng trực tiếp sử dụng Cloud Services phải từ 18 tuổi trở lên. Thỏa thuận cho phép cung cấp AI cho End Users thông qua Customer Application. Nếu ứng dụng hướng tới hoặc có khả năng được người chưa đủ tuổi trưởng thành truy cập, Groq đặt trách nhiệm tuân thủ các luật/quy định áp dụng về trẻ em và dữ liệu cá nhân lên phía khách hàng.</p>
-    <p>Nhận xét AI chỉ là thông tin tập luyện chung, không phải lời khuyên y tế, chẩn đoán hoặc điều trị.</p>
+    <h3>12. Độ tuổi, người dùng cuối và giới hạn của nhà cung cấp AI</h3>
+    <p>RepCoach AI không hướng tới trẻ em dưới 13 tuổi; tài khoản, bạn bè và AI Coach không dành cho trẻ em dưới 13 tuổi. Thỏa thuận Cloud Services của Groq yêu cầu khách hàng trực tiếp sử dụng Cloud Services phải từ 18 tuổi trở lên. Thỏa thuận cho phép cung cấp AI cho End Users thông qua Customer Application. Nếu ứng dụng hướng tới hoặc có khả năng được người chưa đủ tuổi trưởng thành truy cập, Groq đặt trách nhiệm tuân thủ các luật/quy định áp dụng về trẻ em và dữ liệu cá nhân lên phía khách hàng.</p>
+    <p>Nhận xét AI và câu trả lời của AI Coach chỉ là thông tin tập luyện chung, không phải lời khuyên y tế, chẩn đoán hoặc điều trị.</p>
 
-    <h3>9. Đồng ý AI tự động và quyền kiểm soát</h3>
+    <h3>13. Đồng ý AI tự động và quyền kiểm soát</h3>
     <p>AI tự động là opt-in. App lưu trạng thái đồng ý cục bộ trên thiết bị theo phiên bản đồng ý hiện tại. Khi có phiên bản đồng ý mới, app dùng một khóa tùy chọn cục bộ mới để trạng thái opt-in cũ không tự động được coi là đồng ý với nội dung đã thay đổi đáng kể. Tắt AI tự động chỉ ảnh hưởng các yêu cầu tương lai và không thể thu hồi yêu cầu đã gửi.</p>
-    <p>Nhận xét AI thủ công yêu cầu xác nhận theo từng request trong luồng app hiện tại.</p>
+    <p>Nhận xét AI thủ công yêu cầu xác nhận theo từng request trong luồng app hiện tại. AI Coach hỏi đồng ý trước yêu cầu đầu tiên.</p>
 
-    <h3>10. Ảnh kết quả và chia sẻ</h3>
+    <h3>14. Thông báo, ảnh kết quả và chia sẻ</h3>
+    <p>Nhắc lịch tập là thông báo cục bộ do điện thoại lên lịch từ kế hoạch của bạn; chúng tắt cho tới khi bạn bật. Phiên bản này không dùng thông báo đẩy từ máy chủ và không thu thập push token.</p>
     <p>Ứng dụng có thể tạo ảnh story từ số liệu buổi tập và, nếu có, một đoạn nhận xét AI. Ảnh story không chứa ảnh camera. Việc lưu vào thư viện hoặc chia sẻ qua bảng chia sẻ hệ thống chỉ xảy ra khi bạn chọn thao tác tương ứng. Ứng dụng/dịch vụ nhận ảnh áp dụng chính sách riêng của họ.</p>
 
-    <h3>11. Lưu giữ và xóa dữ liệu trên thiết bị</h3>
+    <h3>15. Thời gian lưu giữ</h3>
     <ul>
-      <li><strong>Lịch sử tập và nhận xét AI đã lưu:</strong> nằm trên thiết bị cho đến khi bạn xóa trong app, xóa dữ liệu ứng dụng hoặc gỡ app.</li>
-      <li><strong>Hiệu chỉnh:</strong> lưu cục bộ và có thể đặt lại theo bài hoặc xóa cùng thao tác xóa dữ liệu tập cục bộ.</li>
-      <li><strong>Tùy chọn và trạng thái đồng ý:</strong> lưu cục bộ cho đến khi thay đổi, xóa dữ liệu ứng dụng hoặc gỡ app. Nút xóa lịch sử tập không được mô tả là xóa mọi tùy chọn.</li>
-      <li><strong>Yêu cầu AI đã gửi:</strong> tắt AI hoặc xóa lịch sử cục bộ không thể thu hồi dữ liệu đã truyền tới backend/provider. Việc lưu giữ phía backend/provider theo mô tả ở trên.</li>
+      <li><strong>Trên thiết bị:</strong> lịch sử tập, kế hoạch, hiệu chỉnh, tùy chọn và trạng thái đồng ý được giữ cho tới khi bạn xóa trong app (Cài đặt › Xóa lịch sử tập), xóa dữ liệu ứng dụng hoặc gỡ app.</li>
+      <li><strong>Dữ liệu tài khoản:</strong> giữ khi tài khoản còn tồn tại. Buổi tập hoặc kế hoạch bạn xóa bị gỡ khỏi tài khoản; dấu xóa được dọn sau 90 ngày.</li>
+      <li><strong>Lời mời:</strong> hết hạn sau 7 ngày.</li>
+      <li><strong>Báo cáo:</strong> được giữ sau khi xóa tài khoản nhưng bỏ ID người dùng.</li>
+      <li><strong>Hội thoại AI Coach:</strong> không lưu trên máy chủ; thời gian lưu của GroqCloud nêu ở mục 11.</li>
+      <li><strong>Log máy chủ:</strong> access/error log Nginx của RepCoach xoay vòng mỗi ngày, giữ log hiện tại cộng 14 file đã xoay vòng; bản cũ hơn bị xóa theo cấu hình logrotate. Máy chủ nhận xét ghi sự kiện vận hành chỉ-metadata vào system journal của máy chủ, thời gian giữ do quản trị máy chủ đặt. Supabase giữ log nền tảng của họ trong thời gian giới hạn theo điều khoản của họ.</li>
+      <li><strong>Yêu cầu AI đã gửi:</strong> tắt AI hoặc xóa lịch sử cục bộ không thể thu hồi dữ liệu đã truyền tới máy chủ/provider.</li>
     </ul>
 
-    <h3>12. Các thực hành dữ liệu khác</h3>
-    <p>Phiên bản hiện tại không có hệ thống tài khoản RepCoach, SDK quảng cáo, SDK analytics hoặc SDK crash-reporting cho hoạt động cốt lõi. RepCoach AI không yêu cầu tên, email, số điện thoại, danh bạ, thông tin thanh toán hoặc vị trí chính xác để dùng bộ đếm rep trên thiết bị.</p>
+    <h3>16. Xóa tài khoản và dữ liệu</h3>
+    <p><strong>Trong app:</strong> mở <strong>Hồ sơ › Xóa tài khoản</strong>, gõ từ xác nhận và xác nhận. Việc này thu hồi token Đăng nhập bằng Apple nếu bạn dùng Apple, xóa hồ sơ, buổi tập đã đồng bộ, kế hoạch, sổ tín dụng AI, XP, tiến độ cấp, thành tích, quyền lợi gói, push token, hộp thư, bạn bè, danh sách chặn và lời mời, rồi xóa chính tài khoản. Báo cáo bạn gửi hoặc bị gửi được giữ lại nhưng bỏ ID người dùng.</p>
+    <p><strong>Trên web:</strong> vào <a href="/delete-account.html">repcoach-ai.duckdns.org/delete-account.html</a> để yêu cầu xóa qua email mà không cần app.</p>
+    <p>Buổi tập lưu trên điện thoại là riêng: xóa trong <strong>Cài đặt › Xóa lịch sử tập</strong> hoặc gỡ app. Bạn cũng có thể xóa lịch sử cục bộ khi không có tài khoản.</p>
 
-    <h3>13. Bảo mật</h3>
-    <p>Endpoint production được thiết kế chỉ dùng HTTPS. Credential của provider nằm trên server thay vì nhúng trong app. Backend giới hạn kích thước request, xác thực field được phép, dùng timeout hữu hạn và áp dụng rate limit. Không có biện pháp bảo mật nào đảm bảo tuyệt đối, vì vậy RepCoach AI giảm dữ liệu rời thiết bị xuống mức cần thiết.</p>
+    <h3>17. Các thực hành dữ liệu khác</h3>
+    <p>RepCoach AI không có SDK quảng cáo, analytics hay báo lỗi, không theo dõi bạn qua ứng dụng hoặc trang web của công ty khác và không bán dữ liệu cá nhân. App không yêu cầu số điện thoại, danh bạ, thông tin thanh toán hoặc vị trí chính xác.</p>
 
-    <h3>14. Thay đổi và liên hệ</h3>
-    <p>Chúng tôi có thể cập nhật chính sách khi ứng dụng, backend, provider hoặc luồng dữ liệu thay đổi. Ngày hiệu lực và phiên bản đồng ý AI ở đầu trang xác định bản sửa đổi này. Nếu có câu hỏi về quyền riêng tư, liên hệ <strong>RỒNG ẨN MÌNH</strong> qua <a href="mailto:ronganminh221@gmail.com">ronganminh221@gmail.com</a>.</p>
+    <h3>18. Bảo mật</h3>
+    <p>Mọi dữ liệu rời thiết bị đi qua HTTPS. Credential của các provider nằm trên máy chủ thay vì nhúng trong app. Cơ sở dữ liệu dùng row-level security; xóa tài khoản và AI Coach chạy trong function phía máy chủ có kiểm tra đăng nhập. Máy chủ nhận xét giới hạn kích thước request, xác thực field được phép, dùng timeout hữu hạn và áp dụng rate limit. Không có biện pháp bảo mật nào đảm bảo tuyệt đối, vì vậy RepCoach AI giảm dữ liệu rời thiết bị xuống mức cần thiết.</p>
+
+    <h3>19. Lựa chọn của bạn</h3>
+    <p>Bạn có thể tập như khách, tắt AI, thu hồi quyền camera trong cài đặt thiết bị, tắt nhắc lịch, xuất hoặc xóa lịch sử tập, đổi tên hiển thị, chặn người khác, đăng xuất và xóa tài khoản bất cứ lúc nào. Muốn hỏi về dữ liệu của bạn, hãy liên hệ địa chỉ dưới đây.</p>
+
+    <h3>20. Thay đổi và liên hệ</h3>
+    <p>Chúng tôi có thể cập nhật chính sách khi ứng dụng, backend, provider hoặc luồng dữ liệu thay đổi. Ngày hiệu lực và phiên bản đồng ý AI ở đầu trang xác định bản sửa đổi này. Nếu có câu hỏi về quyền riêng tư hoặc yêu cầu xóa, liên hệ <strong>RỒNG ẨN MÌNH</strong> qua <a href="mailto:ronganminh221@gmail.com">ronganminh221@gmail.com</a>.</p>
   </section>
 </main>
 
 <footer>
-  <div class="wrap">© 2026 RepCoach AI / RỒNG ẨN MÌNH · No advertising or analytics scripts on this page.</div>
+  <div class="wrap">© 2026 RepCoach AI / RỒNG ẨN MÌNH · <a href="/support.html">Support</a> · <a href="/delete-account.html">Delete account</a> · No advertising or analytics scripts on this page.</div>
 </footer>
 </body>
 </html>

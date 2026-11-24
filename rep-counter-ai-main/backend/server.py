@@ -32,6 +32,9 @@ REQUEST_ID_PATTERN = re.compile(r"^[0-9a-fA-F]{32}$")
 PRIVACY_POLICY_PATH = Path(__file__).with_name("static") / "privacy-policy.html"
 SUPPORT_PAGE_PATH = Path(__file__).with_name("static") / "support.html"
 TERMS_PAGE_PATH = Path(__file__).with_name("static") / "terms.html"
+DELETE_ACCOUNT_PAGE_PATH = (
+    Path(__file__).with_name("static") / "delete-account.html"
+)
 
 CORE_FIELDS = {
     "exercise",
@@ -354,6 +357,18 @@ class Handler(BaseHTTPRequestHandler):
         if route == "/terms.html":
             try:
                 body = TERMS_PAGE_PATH.read_bytes()
+            except OSError:
+                self.reply(500, error_response("SERVER_ERROR"))
+                return
+            self.reply_content(
+                200,
+                body,
+                content_type="text/html; charset=utf-8",
+            )
+            return
+        if route == "/delete-account.html":
+            try:
+                body = DELETE_ACCOUNT_PAGE_PATH.read_bytes()
             except OSError:
                 self.reply(500, error_response("SERVER_ERROR"))
                 return

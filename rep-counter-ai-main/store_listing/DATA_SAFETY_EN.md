@@ -1,5 +1,7 @@
 # Google Play Data Safety — Suggested Answers
 
+> **v1 (no accounts) only.** For v2 builds with accounts, sync, friends or AI Coach use `PRIVACY_DECLARATIONS_V2.md`.
+
 These answers describe the current MVP. Recheck them whenever analytics, crash reporting, authentication, cloud history, ads, or video upload is added.
 
 ## Data collection and security
@@ -14,7 +16,7 @@ These answers describe the current MVP. Recheck them whenever analytics, crash r
 ### Health and fitness → Fitness info
 
 - Collected: **Yes**
-- Shared: **No**, if your backend and Google Gemini act only as service providers processing data on your behalf and do not use it for independent purposes.
+- Shared: **No**, if your backend and GroqCloud act only as service providers processing data on your behalf and do not use it for independent purposes.
 - Processing: **Ephemeral**, if the summary is used only to produce the response and is not stored afterward.
 - Required or optional: **Optional**
 - Purposes:
@@ -47,7 +49,7 @@ Do not declare the following as collected if the released build truly never tran
 
 - Confirm the production server does not log request bodies.
 - Review reverse-proxy and hosting access logs; IP-address retention may change the declaration.
-- Confirm Gemini data handling under the exact Google API plan and terms used in production.
+- Confirm GroqCloud data handling under the plan and terms used in production.
 - If Firebase Analytics, Crashlytics, sign-in, cloud sync, ads, or user-uploaded videos are added, complete a fresh Data safety audit.
 - Keep the privacy policy consistent with the released binary and backend behavior.
 
