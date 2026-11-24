@@ -55,9 +55,11 @@ Future<AuthRepository?> createAuthRepository({
   } catch (_) {
     return const UnconfiguredAuthRepository();
   }
-  final google = c.googleConfigured(ios: ios);
   // Apple's native sheet exists on iOS only; Android would need the web flow.
   final apple = ios && c.appleSignInEnabled;
+  // App Store 4.8 (S-5, L-D42): on iOS a third-party login needs Sign in with
+  // Apple next to it, so Google is hidden whenever Apple is off.
+  final google = c.googleConfigured(ios: ios) && (!ios || apple);
   return SupabaseAuthRepository(
     api: api,
     redirectUrl: c.redirectUrl,

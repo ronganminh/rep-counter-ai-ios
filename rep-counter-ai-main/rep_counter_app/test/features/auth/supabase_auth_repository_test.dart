@@ -399,6 +399,43 @@ void main() {
       expect(android!.providers, {AuthProvider.email, AuthProvider.google});
     });
 
+    test('4.8: iOS hides Google when Sign in with Apple is off (S-5)',
+        () async {
+      const googleOnly = AuthConfig(
+          supabaseUrl: 'https://project.supabase.co',
+          supabaseAnonKey: 'anon-key',
+          googleWebClientId: 'web.apps.googleusercontent.com',
+          googleIosClientId: 'ios.apps.googleusercontent.com');
+      final ios = await createAuthRepository(
+          enabled: true,
+          config: googleOnly,
+          connect: connect,
+          isIos: true,
+          nativeTokens: FakeTokens());
+      expect(ios!.providers, {AuthProvider.email});
+      final android = await createAuthRepository(
+          enabled: true,
+          config: googleOnly,
+          connect: connect,
+          isIos: false,
+          nativeTokens: FakeTokens());
+      expect(android!.providers, {AuthProvider.email, AuthProvider.google});
+      const both = AuthConfig(
+          supabaseUrl: 'https://project.supabase.co',
+          supabaseAnonKey: 'anon-key',
+          googleWebClientId: 'web.apps.googleusercontent.com',
+          googleIosClientId: 'ios.apps.googleusercontent.com',
+          appleSignInEnabled: true);
+      final iosBoth = await createAuthRepository(
+          enabled: true,
+          config: both,
+          connect: connect,
+          isIos: true,
+          nativeTokens: FakeTokens());
+      expect(iosBoth!.providers,
+          {AuthProvider.email, AuthProvider.apple, AuthProvider.google});
+    });
+
     test('the redirect defaults to the app callback scheme', () {
       expect(const AuthConfig().redirectUrl, _redirect);
       expect(AuthConfig.fromEnvironment().isConfigured, isFalse,

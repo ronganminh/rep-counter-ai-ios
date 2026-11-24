@@ -3,6 +3,7 @@ import 'package:lucide_icons_flutter/lucide_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 
 import '../../../core/i18n/l10n.dart';
+import '../../../core/permissions/permission_explanation.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../theme/app_colors.dart';
 import '../../../theme/app_typography.dart';
@@ -157,7 +158,9 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage>
     }
     final intro = _beforePrompt;
     return PopScope(
-      canPop: !intro,
+      // iOS: no way out before the system prompt (L-D24). Android: the system
+      // Back button leaves the explanation (QA-06, L-D42).
+      canPop: !intro || systemBackLeavesPermissionExplanation,
       child: Scaffold(
         appBar: AppBar(
             automaticallyImplyLeading: !intro,

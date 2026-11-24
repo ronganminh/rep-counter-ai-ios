@@ -240,8 +240,9 @@ void main() {
     await close(tester);
   });
 
-  testWidgets('5.1.1(iv): no way out before the prompt; Continue always asks',
-      (tester) async {
+  testWidgets(
+      '5.1.1(iv) iOS: no way out before the prompt; Continue always asks',
+      variant: TargetPlatformVariant.only(TargetPlatform.iOS), (tester) async {
     await open(tester);
     expect(find.text(S.vi.cameraPermissionTitle), findsOneWidget);
     expect(find.text('Để sau'), findsNothing);
@@ -259,6 +260,28 @@ void main() {
         permissionCalls.where((m) => m == 'requestPermissions'), hasLength(1),
         reason: 'Continue goes to the system prompt');
     expect(camera.requests, 1);
+    await close(tester);
+  });
+
+  testWidgets(
+      'QA-06 Android: system back leaves the explanation without the prompt',
+      variant: TargetPlatformVariant.only(TargetPlatform.android),
+      (tester) async {
+    await open(tester);
+    expect(find.text(S.vi.cameraPermissionTitle), findsOneWidget);
+    // The screen itself is unchanged: Continue only, no close, no manual.
+    expect(find.text('Để sau'), findsNothing);
+    expect(find.byTooltip('Đóng'), findsNothing);
+    expect(find.byKey(const Key('camera-track-manually')), findsNothing);
+    await tester.binding.handlePopRoute();
+    await tester.pumpAndSettle();
+    expect(find.text('Open camera'), findsOneWidget);
+    expect(find.byType(CameraPage), findsNothing);
+    expect(find.text(S.vi.finishTitle), findsNothing);
+    expect(permissionCalls, isNot(contains('requestPermissions')));
+    expect(permissionCalls, isNot(contains('openAppSettings')));
+    expect(camera.requests, 0);
+    expect(await WorkoutHistoryStore().load(), isEmpty);
     await close(tester);
   });
 

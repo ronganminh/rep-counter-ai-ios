@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
-"""Fail closed for deterministic App Store source / metadata regressions."""
+"""Fail closed for deterministic App Store source / metadata regressions.
+
+Usage: check_app_store_readiness.py [--dart-define-from-file=<build defines>]
+"""
 import json
 import pathlib
 import plistlib
@@ -46,8 +49,15 @@ def check_permission_screens():
     reminders = read("lib/features/plan/presentation/reminder_settings_page.dart")
     ensure("label: l.commonContinue" in reminders
            and "reminder-not-now" not in reminders
-           and "canPop: !intro" in reminders,
+           and "canPop: !intro || systemBackLeavesPermissionExplanation" in reminders,
            "Reminder explanation must only continue to the system prompt")
+    # QA-06 (L-D42): only Android's system Back may leave an explanation
+    # screen; iOS keeps the HIG pre-alert screen with no way out.
+    explanation = read("lib/core/permissions/permission_explanation.dart")
+    ensure(re.search(r"systemBackLeavesPermissionExplanation\s*=>\s*"
+                     r"defaultTargetPlatform == TargetPlatform\.android;",
+                     explanation),
+           "Only Android may leave a permission explanation with system Back")
     # Rejection of 1.0.0 (7), L-D38: Settings opens only from the neutral
     # "permission off" notices, and no copy asks the user to reconsider.
     callers = sorted(str(p.relative_to(ROOT)) for p in (ROOT / "lib").rglob("*.dart")
@@ -93,6 +103,30 @@ def check_permission_screens():
                    f"Pre-permission copy {key} ({locale}) must not say Allow")
 
 
+def _truthy(value):
+    return str(value).strip().lower() == "true"
+
+
+def check_login_services(define_files=()):
+    """App Store 4.8 (S-5, L-D42): an iOS build that offers Google Sign-In
+    must also offer Sign in with Apple. The app hides Google on iOS when
+    Apple is off (fail-safe), and no dart-define file may ask for Google on
+    iOS without Apple."""
+    bootstrap = read("lib/features/auth/data/auth_bootstrap.dart")
+    ensure("c.googleConfigured(ios: ios) && (!ios || apple)" in bootstrap,
+           "4.8: iOS must hide Google Sign-In when Sign in with Apple is off")
+    files = sorted(ROOT.glob("dart_defines*.json")) + [
+        pathlib.Path(f) for f in define_files]
+    for path in files:
+        values = json.loads(path.read_text(encoding="utf-8-sig"))
+        if not _truthy(values.get("ENABLE_ACCOUNTS", "false")):
+            continue
+        if str(values.get("GOOGLE_IOS_CLIENT_ID", "")).strip():
+            ensure(_truthy(values.get("APPLE_SIGN_IN_ENABLED", "false")),
+                   f"4.8: {path.name} enables Google Sign-In on iOS without "
+                   "APPLE_SIGN_IN_ENABLED=true")
+
+
 def check_flag_defaults():
     """Every ENABLE_* switch in the app defaults to off, so a build without
     --dart-define never ships accounts, sync, credits, XP, social, billing
@@ -104,7 +138,9 @@ def check_flag_defaults():
                    f"{match.group(1)} must default to false ({path.relative_to(ROOT)})")
 
 
-def main():
+def main(argv=()):
+    define_files = [a.split("=", 1)[1] for a in argv
+                    if a.startswith("--dart-define-from-file=")]
     spec = read("pubspec.yaml")
     version_match = re.search(
         r"(?m)^version:\s*(\d+\.\d+\.\d+)\+(\d+)\s*$", spec
@@ -172,6 +208,7 @@ def main():
     ensure("NSPrivacyCollectedDataTypeFitness" in str(manifest), "Workout statistics privacy declaration missing")
     check_permission_screens()
     check_flag_defaults()
+    check_login_services(define_files)
     print(
         f"PASS: App Store static release gates for "
         f"{release_version} ({release_build})"
@@ -179,7 +216,7 @@ def main():
 
 if __name__ == "__main__":
     try:
-        main()
+        main(sys.argv[1:])
     except (AssertionError, KeyError, OSError, ValueError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         sys.exit(1)

@@ -15,6 +15,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:rep_counter_app/core/permissions/permission_explanation.dart';
 import 'package:rep_counter_app/app/app_tab_bar.dart';
 import 'package:rep_counter_app/features/plan/application/plan_repository.dart';
 import 'package:rep_counter_app/features/plan/data/plan_store.dart';
@@ -109,8 +110,18 @@ void main() {
     expect(fakes.notificationCalls,
         isNot(contains('requestNotificationsPermission')));
     await systemBack(tester);
+    if (systemBackLeavesPermissionExplanation) {
+      // QA-06 (L-D42): Android's system Back returns to the overview without
+      // the OS prompt; open the reminders again to continue the journey.
+      expect(find.byType(ReminderSettingsPage), findsNothing);
+      expect(find.byType(PlanOverviewPage), findsOneWidget);
+      expect(fakes.notificationCalls,
+          isNot(contains('requestNotificationsPermission')));
+      await tapKey(tester, 'plan-menu');
+      await tapText(tester, 'Workout reminders');
+    }
     expect(find.byType(ReminderSettingsPage), findsOneWidget,
-        reason: 'no way out before the prompt');
+        reason: 'iOS: no way out before the prompt');
 
     // Continue → OS prompt → Don't Allow → back to the overview.
     await tapKey(tester, 'reminder-enable');
