@@ -9,6 +9,7 @@ import '../../credits/credits_controller.dart';
 import '../../workout/data/workout_record.dart';
 import '../../workout/domain/workout_mode.dart';
 import '../coach_v2.dart';
+import 'coach_chat_page.dart';
 import 'coach_consent_page.dart';
 import 'coach_review_page.dart';
 import 'coach_widgets.dart';
@@ -22,9 +23,6 @@ class CoachReviewEntry extends StatelessWidget {
 
   /// Overrides the flag (tests).
   final bool? enabled;
-
-  /// "Ask a follow-up" from the review (set by the chat screen, AC-03).
-  static void Function(BuildContext context)? askFollowUp;
 
   @override
   Widget build(BuildContext context) {
@@ -51,14 +49,13 @@ class CoachReviewEntry extends StatelessWidget {
               if (!await CoachConsentPage.ensure(context) || !context.mounted) {
                 return;
               }
-              final ask = askFollowUp;
               await Navigator.of(context, rootNavigator: true).push(
                   MaterialPageRoute<void>(
                       builder: (pageContext) => CoachReviewPage(
                           record: record,
                           credits: credits,
-                          onAskFollowUp:
-                              ask == null ? null : () => ask(pageContext))));
+                          onAskFollowUp: () =>
+                              openCoachChat(pageContext, credits))));
             },
           ),
           const SizedBox(height: 8),
