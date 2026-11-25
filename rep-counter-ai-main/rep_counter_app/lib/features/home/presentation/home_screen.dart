@@ -10,6 +10,8 @@ import '../../../theme/app_typography.dart';
 import '../../../widgets/product_ui.dart';
 import '../../exercises/presentation/exercise_picker_screen.dart';
 import '../../inbox/presentation/inbox_page.dart';
+import '../../coach/presentation/coach_today_card.dart';
+import '../../credits/ai_coach_v2.dart';
 import '../../plan/presentation/plan_home_card.dart';
 import '../../progression/presentation/xp_widgets.dart';
 import '../../plan/presentation/plan_today_sheet.dart';
@@ -131,6 +133,10 @@ class _HomeScreenState extends State<HomeScreen> with ReloadOnSync {
                             style: AppTypography.display40
                                 .copyWith(fontSize: 36))),
                     const SizedBox(height: 16),
+                    if (AiCoachV2.enabled)
+                      CoachTodayCard(
+                          onCameraWorkout: () =>
+                              showPlanTodaySheet(context, pushUp)),
                     const PlanHomeCard(),
                     const SizedBox(height: 28),
                     const RoutineListSection(),

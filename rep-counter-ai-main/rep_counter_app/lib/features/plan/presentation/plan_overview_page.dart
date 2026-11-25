@@ -1,3 +1,5 @@
+import '../../coach/presentation/coach_week_card.dart';
+import '../../credits/ai_coach_v2.dart';
 import 'dart:async';
 
 import 'package:flutter/material.dart';
@@ -318,6 +320,7 @@ class _PlanOverviewPageState extends State<PlanOverviewPage> {
                   'This week · $weekDone of ${weekSessions.length} sessions done'),
               key: const Key('plan-week-summary'),
               style: AppTypography.body14.copyWith(color: AppColors.text2)),
+          if (AiCoachV2.enabled) CoachWeekCard(plans: _repo, onChanged: _load),
         ],
       ),
     );
