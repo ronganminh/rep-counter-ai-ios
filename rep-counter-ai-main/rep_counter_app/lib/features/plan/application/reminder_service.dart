@@ -8,7 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../core/i18n/app_strings.dart';
+import '../../../exercise.dart';
 import '../../../l10n/app_localizations.dart';
+import '../domain/local_date.dart';
+import '../domain/reminder_copy.dart';
 import '../domain/reminder_planner.dart';
 import 'plan_repository.dart';
 
@@ -153,6 +157,81 @@ class LocalNotificationsPlatform implements ReminderPlatform {
   }
 }
 
+/// The lines chosen for upcoming reminders and when each was last used
+/// (NT-2 rotation), kept on the phone.
+class ReminderCopyStore {
+  static const key = 'reminder_copy_v1';
+
+  Future<ReminderCopyState> load() async {
+    final raw = (await SharedPreferences.getInstance()).getString(key);
+    if (raw == null) return const ReminderCopyState();
+    try {
+      return ReminderCopyState.fromJson(
+          jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return const ReminderCopyState();
+    }
+  }
+
+  Future<void> save(ReminderCopyState state) async {
+    await (await SharedPreferences.getInstance())
+        .setString(key, jsonEncode(state.toJson()));
+  }
+}
+
+/// NT-2 layer 2: lines the AI coach wrote for upcoming sessions, and when
+/// it was last asked (at most once a week; a failed try waits a day).
+class ReminderAiStore {
+  static const key = 'reminder_ai_copy_v1';
+
+  Future<({Map<String, String> lines, LocalDate? requested, LocalDate? tried})>
+      load() async {
+    try {
+      final raw = (await SharedPreferences.getInstance()).getString(key);
+      if (raw == null) return (lines: <String, String>{}, requested: null, tried: null);
+      final j = jsonDecode(raw) as Map<String, dynamic>;
+      LocalDate? day(Object? v) {
+        try {
+          return v is String ? LocalDate.parse(v) : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      return (
+        lines: {
+          for (final e in (j['lines'] as Map? ?? const {}).entries)
+            if (ReminderCopy.cleanAi(e.value) case final String t) '${e.key}': t
+        },
+        requested: day(j['requested']),
+        tried: day(j['tried']),
+      );
+    } catch (_) {
+      return (lines: <String, String>{}, requested: null, tried: null);
+    }
+  }
+
+  Future<void> save(Map<String, String> lines,
+      {LocalDate? requested, LocalDate? tried}) async {
+    await (await SharedPreferences.getInstance()).setString(
+        key,
+        jsonEncode({
+          'lines': lines,
+          if (requested != null) 'requested': requested.toIso(),
+          if (tried != null) 'tried': tried.toIso(),
+        }));
+  }
+
+  Future<void> clear() async =>
+      (await SharedPreferences.getInstance()).remove(key);
+}
+
+/// Writes AI reminder lines for the upcoming sessions (NT-2 layer 2).
+/// Installed by the app when AI coach v2 and an account are available;
+/// returns whether new lines were stored.
+typedef ReminderAiWriter = Future<bool> Function(
+    PlanView view, ReminderPrefs prefs, Locale locale);
+
 class ReminderPrefsStore {
   static const key = 'reminder_prefs_v1';
 
@@ -182,13 +261,26 @@ class ReminderService {
   ReminderService({
     ReminderPlatform? platform,
     ReminderPrefsStore? prefs,
+    ReminderCopyStore? copy,
+    ReminderAiStore? ai,
+    ReminderAiWriter? aiWriter,
     DateTime Function()? now,
   })  : _platform = platform ?? LocalNotificationsPlatform(),
         _prefs = prefs ?? ReminderPrefsStore(),
+        _copy = copy ?? ReminderCopyStore(),
+        _ai = ai ?? ReminderAiStore(),
+        _aiWriter = aiWriter,
         _now = now ?? DateTime.now;
+
+  /// The app's AI writer (set at start-up when AI coach v2 is on).
+  static ReminderAiWriter? installedAiWriter;
 
   final ReminderPlatform _platform;
   final ReminderPrefsStore _prefs;
+  final ReminderCopyStore _copy;
+  final ReminderAiStore _ai;
+  final ReminderAiWriter? _aiWriter;
+  ReminderAiWriter? get _writer => _aiWriter ?? installedAiWriter;
   final DateTime Function() _now;
 
   /// The service's clock. Screens that list upcoming reminders use it too,
@@ -239,7 +331,28 @@ class ReminderService {
   }
 
   /// Returns the reminders that are scheduled after the sync.
-  Future<List<PlannedReminder>> sync(PlanView? view, {Locale? locale}) async {
+  ///
+  /// [name], when known, lets the friendly lines greet the user by name.
+  Future<List<PlannedReminder>> sync(PlanView? view,
+      {Locale? locale, String? name}) async {
+    final wanted = await _syncOnce(view, locale: locale, name: name);
+    // NT-2 layer 2: ask the AI coach for lines (at most weekly), then
+    // re-schedule with them. Any failure keeps the layer-1 lines.
+    final writer = _writer;
+    if (view != null && wanted.isNotEmpty && writer != null) {
+      try {
+        final prefs = await _prefs.load();
+        if (prefs.aiCopy &&
+            await writer(view, prefs, locale ?? const Locale('en'))) {
+          return await _syncOnce(view, locale: locale, name: name);
+        }
+      } catch (_) {}
+    }
+    return wanted;
+  }
+
+  Future<List<PlannedReminder>> _syncOnce(PlanView? view,
+      {Locale? locale, String? name}) async {
     try {
       final prefs = await _prefs.load();
       final wanted = ReminderPlanner.plan(
@@ -253,17 +366,95 @@ class ReminderService {
       }
       if (wanted.isEmpty) return wanted;
       final l = lookupAppLocalizations(locale ?? const Locale('en'));
+      final lines = <String, String>{
+        if (prefs.friendly) ...await _friendly(view!, wanted, prefs, l, name),
+        if (prefs.aiCopy) ...(await _ai.load()).lines,
+      };
       for (final r in wanted) {
         final plan = view!.plan;
-        final name = plan.template(r.templateId)?.name ?? plan.name;
-        await _platform.schedule(
-            r, l.notifReminderTitle(name), _body(view, r, l));
+        final title = plan.template(r.templateId)?.name ?? plan.name;
+        await _platform.schedule(r, l.notifReminderTitle(title),
+            lines[r.sessionId] ?? _body(view, r, l));
       }
       return wanted;
     } catch (_) {
       // No permission, plugin unavailable, …: plans and workouts carry on.
       return const [];
     }
+  }
+
+  /// NT-2 layer 1: a warm line per reminder, by situation, not repeated
+  /// within 14 days. Any failure falls back to the neutral line.
+  Future<Map<String, String>> _friendly(PlanView view,
+      List<PlannedReminder> wanted, ReminderPrefs prefs, AppLocalizations l,
+      String? name) async {
+    try {
+      final now = _now();
+      final today = LocalDate.of(now);
+      final streak = _streak(view, today);
+      final slots = [
+        for (final (i, r) in wanted.indexed)
+          ReminderSlot(
+              r.sessionId,
+              r.date,
+              ReminderCopy.situation(
+                  plan: view.plan,
+                  sessions: view.sessions,
+                  today: today,
+                  date: r.date,
+                  minuteOfDay: r.fireAt.hour * 60 + r.fireAt.minute,
+                  first: i == 0,
+                  streak: streak))
+      ];
+      final hasName = name != null && name.trim().isNotEmpty;
+      final (keys, state) = ReminderCopy.assign(slots, await _copy.load(),
+          hasName: hasName, today: today);
+      await _copy.save(state);
+      final vi = l.localeName.startsWith('vi');
+      final s = vi ? S.vi : S.en;
+      String time(DateTime t) {
+        final mm = t.minute.toString().padLeft(2, '0');
+        if (vi) return '${t.hour}:$mm';
+        final h = t.hour % 12 == 0 ? 12 : t.hour % 12;
+        return '$h:$mm ${t.hour < 12 ? 'AM' : 'PM'}';
+      }
+      return {
+        for (final r in wanted)
+          if (keys[r.sessionId] != null)
+            r.sessionId: ReminderCopy.text(
+                l, keys[r.sessionId]!, _vars(view, r, s, time, streak, name)),
+      };
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  static ReminderVars _vars(PlanView view, PlannedReminder r, S s,
+      String Function(DateTime) time, int streak, String? name) {
+    final session = view.sessions.firstWhere((x) => x.id == r.sessionId);
+    final targets = session.exerciseTargets;
+    return ReminderVars(
+      name: name?.trim() ?? '',
+      exercise: targets.isEmpty ? '' : exerciseNameFor(targets.first.exerciseId, s),
+      time: time(r.fireAt),
+      streak: '$streak',
+      sets: '${targets.fold(0, (sum, t) => sum + t.sets)}',
+    );
+  }
+
+  /// Days in a row with a saved workout, up to today (or yesterday).
+  static int _streak(PlanView view, LocalDate today) {
+    final days = {
+      for (final w in view.workouts.values)
+        if (w.reps > 0 || w.durationSeconds > 0) w.date
+    };
+    var cursor = days.contains(today) ? today : today.addDays(-1);
+    var n = 0;
+    while (days.contains(cursor)) {
+      n++;
+      cursor = cursor.addDays(-1);
+    }
+    return n;
   }
 
   static String _body(PlanView view, PlannedReminder r, AppLocalizations l) {

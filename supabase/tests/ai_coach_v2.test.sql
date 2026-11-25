@@ -52,6 +52,7 @@ insert into t values ('c2', public.ai_credit_consume(:'u1', 'q2', 'plan_suggesti
 insert into t values ('c3', public.ai_credit_consume(:'u1', 'q3', 'coach_chat'));
 select public.ai_credit_refund(:'u1', 'q3');
 insert into t values ('c4', public.ai_credit_consume(:'u2', 'q1', 'coach_chat'));
+insert into t values ('c5', public.ai_credit_consume(:'u2', 'q5', 'reminder_batch'));
 insert into t values ('bad-kind', to_jsonb(test.error_of(format(
   'select public.ai_credit_consume(%L, ''q9'', ''photo_check'')', :'u1'))));
 insert into t values ('usage-u1', public.ai_usage_counts(:'u1'));
@@ -80,10 +81,11 @@ begin
   assert (select v ->> 'status' from t where k = 'c1') = 'charged';
   assert (select v ->> 'status' from t where k = 'c2') = 'charged';
   assert (select v #>> '{}' from t where k = 'bad-kind') = '22023';
+  assert (select v ->> 'status' from t where k = 'c5') = 'charged', 'NT-2 reminder_batch';
   -- The refunded request does not count.
   assert (u1 ->> 'user_today')::int = 2, u1::text;
-  assert (u2 ->> 'user_today')::int = 1, u2::text;
-  assert (u1 ->> 'total_month')::int = 3, u1::text;
+  assert (u2 ->> 'user_today')::int = 2, u2::text;
+  assert (u1 ->> 'total_month')::int = 4, u1::text;
   assert (u1 ->> 'total_month') = (u2 ->> 'total_month');
 end $$;
 

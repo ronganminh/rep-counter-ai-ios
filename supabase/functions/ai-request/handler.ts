@@ -41,6 +41,7 @@ export const KINDS_V2 = [
   "workout_review",
   "plan_suggestion",
   "progress_review",
+  "reminder_batch",
 ] as const;
 export type Kind = typeof KINDS[number] | typeof KINDS_V2[number];
 export type Locale = "en" | "vi";
@@ -201,6 +202,12 @@ export function parseBody(text: string): Parsed | null {
   if (kind === "coach_chat") {
     if (messages.length === 0 || messages.at(-1)!.role !== "user") return null;
   } else if (context === null && version === 1) {
+    return null;
+  } else if (
+    kind === "reminder_batch" &&
+    (context === null || !Array.isArray(context["sessions"]))
+  ) {
+    // NT-2 layer 2: the upcoming sessions to word.
     return null;
   }
 

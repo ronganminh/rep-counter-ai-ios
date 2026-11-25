@@ -58,10 +58,10 @@ class PrivacyContractTests(unittest.TestCase):
         self.assertIn('lang="vi"', POLICY)
 
     def test_policy_and_app_share_effective_date_and_consent_version(self):
-        self.assertIn("November 24, 2026", POLICY)
+        self.assertIn("November 25, 2026", POLICY)
         self.assertIn("2026-10-01-groq", POLICY)
-        self.assertIn("effectiveDate = '24/11/2026'", LEGAL)
-        self.assertIn("effectiveDateEn = 'November 24, 2026'", LEGAL)
+        self.assertIn("effectiveDate = '25/11/2026'", LEGAL)
+        self.assertIn("effectiveDateEn = 'November 25, 2026'", LEGAL)
         self.assertIn("aiConsentVersion = '2026-10-01-groq'", LEGAL)
         self.assertIn("LegalConfig.aiConsentVersion", CONSENT)
 

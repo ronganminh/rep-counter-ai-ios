@@ -263,7 +263,9 @@ void main() {
           reason: 'planning does not depend on notifications');
     });
 
-    test('titles are localized', () async {
+    test('titles are localized; friendly off uses the neutral line',
+        () async {
+      await ReminderPrefsStore().save(on.copyWith(friendly: false));
       await service.sync(await repo.load(), locale: const Locale('vi'));
       expect(platform.scheduled.values.first.$2, 'Hôm nay có buổi Full Body A');
       expect(platform.scheduled.values.first.$3, startsWith('Khoảng '));
