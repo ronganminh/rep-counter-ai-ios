@@ -10,6 +10,8 @@ import '../domain/workout_mode.dart';
 import 'widgets/rep_pace_chart.dart';
 import '../../share/story_page.dart';
 import '../../ai/ai_preferences.dart';
+import '../../coach/presentation/coach_review_entry.dart';
+import '../../credits/ai_coach_v2.dart';
 import '../../achievements/achievement.dart';
 import '../../achievements/achievement_service.dart';
 import '../../achievements/presentation/achievement_earned_card.dart';
@@ -295,6 +297,7 @@ class _ResultPageState extends State<ResultPage> {
                     const SizedBox(height: 28),
                     ResultFeedbackCard(
                         controller: _controller, allowRefresh: !widget.readOnly),
+                    if (AiCoachV2.enabled) CoachReviewEntry(record: r),
                     const SizedBox(height: 24),
                     SectionLabel(context.tr('Điểm form', 'Form score')),
                     FormScoreSection(record: r),
