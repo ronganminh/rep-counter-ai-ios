@@ -18,3 +18,19 @@ Every modified active file has an untouched copy on the Backups page named `*.pr
 | C-10 | New project files `finalc/**` | All handoff deliverables (Markdown, JSON, ARB, CSV) and `finalc/evidence/*.png` published next to the canvas | Final C §17 | ZIP integrity + read-back |
 
 **Not changed (by decision):** v1 Vietnamese boards (source preserved), App Store screenshots (no separately approved task), Phases 2–10 and Final A files (40 px chips and caption contrast are handled in the spec — D-24/D-25 — because a bulk rewrite of approved screens was judged unsafe), Final B docs board (historical record; superseded by Final C).
+
+## AI Coach · PT ảo · 2026-11-25
+
+Baseline: live canvas version `1795572370-fefd`; every Final C file compared by SHA-256 with `ASSET_MANIFEST.json` before editing (unchanged). **No locked screen was modified.**
+
+| ID | File | Change | Reason |
+|---|---|---|---|
+| C-11 | New `RepCoach-AI-v2-AI-Coach-PT.dc.html` | Screens 1–4: 22 frames × EN/VI | Owner brief (AI Coach · PT ảo) |
+| C-12 | New `RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html` | Screen 5: 7 frames × EN/VI | Owner brief, built after 1–4 |
+| C-13 | `canvas.json` | New page "AI Coach · PT ảo" after Final C with the two boards and a title note; launch opens this page | Owner review on canvas |
+| C-14 | `finalc/*` docs | Appended sections to APP_NAVIGATION_MAP, PRODUCT_DECISIONS (D-29–D-41), SCREEN_INVENTORY (+58 rows), SCREEN_TO_FLUTTER_MAPPING, API_AND_BACKEND_GAP_ANALYSIS; 158 new ARB keys in app_en/app_vi; new `aicoach/AI_COACH_PT_HANDOFF.md`; manifest regenerated | Handoff like Final C |
+
+| C-15 | Both AI Coach boards | Owner decisions applied: credits (D-29) on Home pick (free once a day + "New suggestion · 1 credit"), AC-01d redefined as "new suggestion, no credits", next week 2 credits, body check-in 3; Anthropic Claude named in body consent (D-38); 18+ self-confirmation (D-37); camera + library and new preview frame AC-05g; moderation copy (D-40); AC-03e badged DRAFT (D-34); EN primary / VI needs-review badges (D-41) | Owner review 2026-11-25 |
+| C-16 | Both AI Coach boards | Render-QA fixes: "No change" text #7C7C82 → #A1A1A6 (4.36 → 7.0:1); disabled-composer hint #5C5C62 → #A1A1A6; chips, banner links, inline Apply, Undo, toast and Delete-result targets 44/40 → 48 px; chat workout-card buttons stacked (VI label wrapped to 3 lines in a 48 px button) | AI_COACH_QA_REPORT.md |
+
+Not changed: design tokens, component registry, all Phase 1–10, Final A/B/C boards.

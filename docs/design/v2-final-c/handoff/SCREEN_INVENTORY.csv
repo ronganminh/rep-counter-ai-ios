@@ -535,3 +535,61 @@ RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12e,FA-12
 RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12f,FA-12f Feedback sent,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
 RepCoach-AI-Final-A-Missing-Screens-Data-and-Support.dc.html,finala,FA-12g,FA-12g Offline support fallback,393,852,FA-12,/profile/help · /profile/help/contact · /profile/about,PARTIAL (legal pages),P1
 RepCoach-AI-Final-B-Integrated-Prototype.dc.html,finalb,dc-root,FB-00 Integrated prototype,393,852,FB-00,reference only,DESIGN-ONLY (behaviour reference),—
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01a,AC-01a Home · Coach pick ready,393,1060,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01a-vi,AC-01a Home · Coach pick ready (VI),393,1060,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01b,AC-01b Home · not enough data,393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01b-vi,AC-01b Home · not enough data (VI),393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01c,AC-01c Home · generating,393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01c-vi,AC-01c Home · generating (VI),393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01d,"AC-01d Home · new suggestion, no AI credits",393,1240,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01d-vi,"AC-01d Home · new suggestion, no AI credits (VI)",393,1240,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01e,AC-01e Home · offline,393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01e-vi,AC-01e Home · offline (VI),393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01f,AC-01f Edit today · sheet,393,852,AC-01 Coach pick (Home),/home · sheet,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01f-vi,AC-01f Edit today · sheet (VI),393,852,AC-01 Coach pick (Home),/home · sheet,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01g,AC-01g Home · pick skipped,393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-01g-vi,AC-01g Home · pick skipped (VI),393,852,AC-01 Coach pick (Home),/home (tab 0),NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02a,AC-02a Coach review · ready,393,1330,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02a-vi,AC-02a Coach review · ready (VI),393,1330,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02b,AC-02b Coach review · generating,393,852,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02b-vi,AC-02b Coach review · generating (VI),393,852,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02c,"AC-02c Coach review · failed, retry",393,852,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02c-vi,"AC-02c Coach review · failed, retry (VI)",393,852,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02d,AC-02d Apply to plan · Accept / Edit / Dismiss,393,852,AC-02 Coach review,/workout/:id/coach-review · sheet,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02d-vi,AC-02d Apply to plan · Accept / Edit / Dismiss (VI),393,852,AC-02 Coach review,/workout/:id/coach-review · sheet,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02e,AC-02e Coach review · no AI credits,393,852,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-02e-vi,AC-02e Coach review · no AI credits (VI),393,852,AC-02 Coach review,/workout/:id/coach-review,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03a,AC-03a AI Coach consent,393,1000,AC-03 Coach chat,/coach/consent,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03a-vi,AC-03a AI Coach consent (VI),393,1000,AC-03 Coach chat,/coach/consent,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03b,AC-03b Coach chat · quick questions,393,852,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03b-vi,AC-03b Coach chat · quick questions (VI),393,852,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03c,AC-03c Coach chat · thinking,393,852,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03c-vi,AC-03c Coach chat · thinking (VI),393,852,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03d,AC-03d Coach chat · reply with workout card,393,940,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03d-vi,AC-03d Coach chat · reply with workout card (VI),393,940,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03e,AC-03e Coach chat · pain safety reply,393,1010,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03e-vi,AC-03e Coach chat · pain safety reply (VI),393,1010,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03f,AC-03f Coach chat · no AI credits,393,852,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-03f-vi,AC-03f Coach chat · no AI credits (VI),393,852,AC-03 Coach chat,/coach/chat,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04a,AC-04a Plan · Coach suggests next week,393,1170,AC-04 Next week,/home/plan,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04a-vi,AC-04a Plan · Coach suggests next week (VI),393,1170,AC-04 Next week,/home/plan,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04b,AC-04b Plan · one day applied,393,1170,AC-04 Next week,/home/plan,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04b-vi,AC-04b Plan · one day applied (VI),393,1170,AC-04 Next week,/home/plan,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04c,AC-04c Apply all · confirm,393,852,AC-04 Next week,/home/plan · sheet,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04c-vi,AC-04c Apply all · confirm (VI),393,852,AC-04 Next week,/home/plan · sheet,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04d,AC-04d Plan · not enough history / offline,393,852,AC-04 Next week,/home/plan,NEW,P2
+RepCoach-AI-v2-AI-Coach-PT.dc.html,aicoach,AC-04d-vi,AC-04d Plan · not enough history / offline (VI),393,852,AC-04 Next week,/home/plan,NEW,P2
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05a,AC-05a AI privacy · Body check-in off,393,852,AC-05 Body check-in,/profile/settings/ai-privacy,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05a-vi,AC-05a AI privacy · Body check-in off (VI),393,852,AC-05 Body check-in,/profile/settings/ai-privacy,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05b,AC-05b Body check-in · separate consent,393,960,AC-05 Body check-in,/coach/body-check-in/consent,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05b-vi,AC-05b Body check-in · separate consent (VI),393,960,AC-05 Body check-in,/coach/body-check-in/consent,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05c,AC-05c Body check-in · how to take the photo,393,900,AC-05 Body check-in,/coach/body-check-in/guide,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05c-vi,AC-05c Body check-in · how to take the photo (VI),393,900,AC-05 Body check-in,/coach/body-check-in/guide,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05g,AC-05g Body check-in · photo preview,393,852,AC-05 Body check-in,/coach/body-check-in/*,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05g-vi,AC-05g Body check-in · photo preview (VI),393,852,AC-05 Body check-in,/coach/body-check-in/*,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05d,AC-05d Body check-in · analysing,393,852,AC-05 Body check-in,/coach/body-check-in/analysing,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05d-vi,AC-05d Body check-in · analysing (VI),393,852,AC-05 Body check-in,/coach/body-check-in/analysing,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05e,AC-05e Body check-in · result,393,1010,AC-05 Body check-in,/coach/body-check-in/result,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05e-vi,AC-05e Body check-in · result (VI),393,1010,AC-05 Body check-in,/coach/body-check-in/result,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05f,AC-05f Body check-in · photo not usable,393,852,AC-05 Body check-in,/coach/body-check-in/rejected,NEW,P3
+RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html,aicoach,AC-05f-vi,AC-05f Body check-in · photo not usable (VI),393,852,AC-05 Body check-in,/coach/body-check-in/rejected,NEW,P3

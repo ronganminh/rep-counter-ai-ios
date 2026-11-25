@@ -90,3 +90,17 @@ Guest + account-only target → auth gate with `returnTo`. During a live workout
 - App backgrounded → auto-pause + camera release (VERIFIED existing `_suspendCamera`); returning stays paused until the user resumes.
 - Process killed → next launch shows Recovery (Resume / Save partial / Discard), 12 h window PROPOSED and configurable; never silently discard; one record only.
 - Results replace the camera route (`pushReplacement`, VERIFIED) so Back from Results cannot reopen the HUD.
+
+## 9 · AI Coach · PT ảo (added 2026-11-25, PROPOSED)
+
+No new tab: the five tabs stay (D-01). Plan-related Coach screens live in the Home stack; chat, review and body check-in are full-screen root routes (no tab bar), like the rest of `/coach/*`.
+
+| Entry | Route | Presentation | Next | Gate |
+|---|---|---|---|---|
+| Home card "Coach's pick" (AC-01a) | `/home` | card in tab 0 | Start → `[Train flow]` · Edit → sheet (AC-01f) · Skip → inline (AC-01g) | AI Coach on + consent; otherwise H1 card (D-30) |
+| Results → "Coach review" | `/workout/:sessionId/coach-review` (AC-02a–e) | root, no tab bar | Apply to plan → sheet (AC-02d) → Accept / Edit (`P4-04b`) / Dismiss · Ask a follow-up → `/coach/chat` | account (D-11); 1 credit |
+| Home / Coach overview / review "Ask" | `/coach/consent` (AC-03a) → `/coach/chat` (AC-03b–f) | root, no tab bar | workout card "Apply to today" → `/home` with updated pick | guest → `/auth/gate?returnTo=/coach/chat` |
+| Home › My plan | `/home/plan` (AC-04a–d) | Home stack, tab bar visible | Apply day (inline) · Apply all → sheet (AC-04c) | 14 days of history (D-32) |
+| Profile › Settings › AI privacy | `/profile/settings/ai-privacy` (AC-05a) → `/coach/body-check-in/consent` → `/guide` → camera → `/analysing` → `/result` \| `/rejected` | root after the settings row | result "Apply to plan" → apply-all sheet (AC-04c pattern) | off by default, later release, 18+ (D-37) |
+
+Back-stack: closing chat or review returns to the origin; the consent screen's "Not now" returns to the origin and never blocks training. Sheets follow §7. Deep link (PROPOSED) `repcoach://coach/review/{workoutId}` → AC-02a, fallback the workout detail.
