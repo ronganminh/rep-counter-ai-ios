@@ -127,6 +127,59 @@ def check_login_services(define_files=()):
                    "APPLE_SIGN_IN_ENABLED=true")
 
 
+PRIVACY_MANIFEST = "ios/Runner/PrivacyInfo.xcprivacy"
+PRIVACY_DECLARATIONS = ROOT.parent / "store_listing/PRIVACY_DECLARATIONS_V2.md"
+# App Privacy label (PRIVACY_DECLARATIONS_V2.md A.2) -> manifest data type key.
+APP_PRIVACY_TYPES = {
+    "Email Address": "EmailAddress",
+    "Name": "Name",
+    "User ID": "UserID",
+    "Fitness": "Fitness",
+    "Other User Content": "OtherUserContent",
+    "Product Interaction": "ProductInteraction",
+}
+# Required reason APIs the app's own code reaches (plugins ship their own
+# manifests): UserDefaults through shared_preferences, read by this app only.
+REQUIRED_REASONS = {"NSPrivacyAccessedAPICategoryUserDefaults": {"CA92.1"}}
+
+
+def declared_app_privacy_types(text=None):
+    """Data types ticked in table A.2 of PRIVACY_DECLARATIONS_V2.md."""
+    text = PRIVACY_DECLARATIONS.read_text(encoding="utf-8") if text is None else text
+    section = text.split("### A.2", 1)[1].split("\n### ", 1)[0]
+    labels = re.findall(r"^\| \[ \] \| \*\*[^*›]+› ([^*]+)\*\*", section, re.M)
+    return [label.strip() for label in labels]
+
+
+def check_privacy_manifest(manifest=None, declared=None):
+    """App Store 5.1.1 / 5.1.2, S-3 (L-D42): PrivacyInfo.xcprivacy declares
+    exactly the App Privacy data types of PRIVACY_DECLARATIONS_V2.md A.2,
+    all linked to the user, never for tracking, for app functionality, with
+    no tracking domains, and a valid reason for each required reason API."""
+    if manifest is None:
+        manifest = plistlib.loads((ROOT / PRIVACY_MANIFEST).read_bytes())
+    declared = declared_app_privacy_types() if declared is None else declared
+    ensure(manifest.get("NSPrivacyTracking") is False, "Privacy manifest: tracking must be false")
+    ensure(not manifest.get("NSPrivacyTrackingDomains"), "Privacy manifest: no tracking domains allowed")
+    unknown = [d for d in declared if d not in APP_PRIVACY_TYPES]
+    ensure(not unknown, f"Privacy manifest: no manifest key for App Privacy type(s) {unknown}")
+    expected = {"NSPrivacyCollectedDataType" + APP_PRIVACY_TYPES[d] for d in declared}
+    entries = manifest.get("NSPrivacyCollectedDataTypes", [])
+    found = [e.get("NSPrivacyCollectedDataType") for e in entries]
+    ensure(len(found) == len(set(found)), "Privacy manifest: duplicate data type")
+    ensure(set(found) == expected,
+           f"Privacy manifest data types {sorted(found)} differ from App Privacy A.2 {sorted(expected)}")
+    for e in entries:
+        name = e["NSPrivacyCollectedDataType"]
+        ensure(e.get("NSPrivacyCollectedDataTypeLinked") is True, f"{name} must be linked to the user")
+        ensure(e.get("NSPrivacyCollectedDataTypeTracking") is False, f"{name} must not be used for tracking")
+        ensure(e.get("NSPrivacyCollectedDataTypePurposes") == ["NSPrivacyCollectedDataTypePurposeAppFunctionality"],
+               f"{name} purpose must be App Functionality only")
+    apis = {x.get("NSPrivacyAccessedAPIType"): set(x.get("NSPrivacyAccessedAPITypeReasons", []))
+            for x in manifest.get("NSPrivacyAccessedAPITypes", [])}
+    ensure(apis == REQUIRED_REASONS, f"Privacy manifest required reason APIs {apis} != {REQUIRED_REASONS}")
+
+
 def check_flag_defaults():
     """Every ENABLE_* switch in the app defaults to off, so a build without
     --dart-define never ships accounts, sync, credits, XP, social, billing
@@ -181,11 +234,7 @@ def main(argv=()):
            "Export-compliance declaration must stay synchronized")
     ensure(info["CFBundleDisplayName"] == "RepCoach AI", "Incorrect iOS display name")
     ensure(set(info["CFBundleLocalizations"]) == {"en", "vi"}, "Native localization missing")
-    manifest = plistlib.loads((ROOT / "ios/Runner/PrivacyInfo.xcprivacy").read_bytes())
-    ensure(manifest["NSPrivacyTracking"] is False, "Tracking declaration changed")
-    ensure(any(x["NSPrivacyAccessedAPIType"] == "NSPrivacyAccessedAPICategoryUserDefaults"
-               and "CA92.1" in x["NSPrivacyAccessedAPITypeReasons"]
-               for x in manifest["NSPrivacyAccessedAPITypes"]), "UserDefaults reason missing")
+    check_privacy_manifest()
     for lang in ("en", "vi"):
         localized = read(f"ios/Runner/{lang}.lproj/InfoPlist.strings")
         ensure("NSCameraUsageDescription" in localized and "NSPhotoLibraryAddUsageDescription" in localized,
@@ -205,7 +254,6 @@ def main(argv=()):
     ensure("com.ronganminh.repcoach" in schemes, "Auth callback URL scheme missing")
     ensure(any(s.startswith("com.googleusercontent.apps.") for s in schemes),
            "Google Sign-In reversed client ID URL scheme missing")
-    ensure("NSPrivacyCollectedDataTypeFitness" in str(manifest), "Workout statistics privacy declaration missing")
     check_permission_screens()
     check_flag_defaults()
     check_login_services(define_files)

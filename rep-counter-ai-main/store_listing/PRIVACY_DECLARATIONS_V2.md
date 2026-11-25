@@ -38,8 +38,8 @@ Ghi chú khi điền:
 - [ ] Other User Content: tin nhắn AI Coach không lưu trên máy chủ, nhưng GroqCloud có thể giữ tối đa 30 ngày để kiểm tra lạm dụng, và lý do báo cáo được lưu. Vì vậy khai là collected.
 - [ ] Privacy Policy URL (App Information): `https://repcoach-ai.duckdns.org/privacy-policy.html`. Chỉ lưu **sau khi** đã đưa bản v2 lên web.
 
-### A.3 Đồng bộ manifest (cần quyết, không chặn console)
-- [ ] `ios/Runner/PrivacyInfo.xcprivacy` hiện chỉ khai `Fitness` (linked = false). Apple dùng manifest cho Privacy Report của archive. Nên cập nhật cho khớp bảng A.2 trước khi nộp App Review build có tài khoản. Việc này chưa làm trong PR này, chờ chủ dự án duyệt.
+### A.3 Đồng bộ manifest
+- [x] `ios/Runner/PrivacyInfo.xcprivacy` khai đúng 6 loại của bảng A.2 (EmailAddress, Name, UserID, Fitness, OtherUserContent, ProductInteraction): tất cả Linked = true, Tracking = false, mục đích App Functionality; `NSPrivacyTracking = false`, không tracking domain; required reason API: UserDefaults `CA92.1` (shared_preferences, chỉ app đọc). Không khai Diagnostics vì app không có crash/analytics SDK. Gate `check_privacy_manifest` trong `tool/check_app_store_readiness.py` fail nếu manifest lệch bảng A.2 (thêm/bớt dòng ở A.2 thì phải sửa manifest cùng lúc).
 - [ ] Chạy Xcode › Product › Archive › **Generate Privacy Report** trên archive release; đối chiếu các SDK (google_sign_in_ios, sign_in_with_apple, supabase, sqflite, share_plus, url_launcher_ios, video_player, package_info_plus, flutter_local_notifications, ML Kit).
 
 ---
