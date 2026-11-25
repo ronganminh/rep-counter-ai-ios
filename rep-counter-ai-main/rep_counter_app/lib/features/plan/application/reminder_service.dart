@@ -179,6 +179,59 @@ class ReminderCopyStore {
   }
 }
 
+/// NT-2 layer 2: lines the AI coach wrote for upcoming sessions, and when
+/// it was last asked (at most once a week; a failed try waits a day).
+class ReminderAiStore {
+  static const key = 'reminder_ai_copy_v1';
+
+  Future<({Map<String, String> lines, LocalDate? requested, LocalDate? tried})>
+      load() async {
+    try {
+      final raw = (await SharedPreferences.getInstance()).getString(key);
+      if (raw == null) return (lines: <String, String>{}, requested: null, tried: null);
+      final j = jsonDecode(raw) as Map<String, dynamic>;
+      LocalDate? day(Object? v) {
+        try {
+          return v is String ? LocalDate.parse(v) : null;
+        } catch (_) {
+          return null;
+        }
+      }
+
+      return (
+        lines: {
+          for (final e in (j['lines'] as Map? ?? const {}).entries)
+            if (ReminderCopy.cleanAi(e.value) case final String t) '${e.key}': t
+        },
+        requested: day(j['requested']),
+        tried: day(j['tried']),
+      );
+    } catch (_) {
+      return (lines: <String, String>{}, requested: null, tried: null);
+    }
+  }
+
+  Future<void> save(Map<String, String> lines,
+      {LocalDate? requested, LocalDate? tried}) async {
+    await (await SharedPreferences.getInstance()).setString(
+        key,
+        jsonEncode({
+          'lines': lines,
+          if (requested != null) 'requested': requested.toIso(),
+          if (tried != null) 'tried': tried.toIso(),
+        }));
+  }
+
+  Future<void> clear() async =>
+      (await SharedPreferences.getInstance()).remove(key);
+}
+
+/// Writes AI reminder lines for the upcoming sessions (NT-2 layer 2).
+/// Installed by the app when AI coach v2 and an account are available;
+/// returns whether new lines were stored.
+typedef ReminderAiWriter = Future<bool> Function(
+    PlanView view, ReminderPrefs prefs, Locale locale);
+
 class ReminderPrefsStore {
   static const key = 'reminder_prefs_v1';
 
@@ -209,15 +262,25 @@ class ReminderService {
     ReminderPlatform? platform,
     ReminderPrefsStore? prefs,
     ReminderCopyStore? copy,
+    ReminderAiStore? ai,
+    ReminderAiWriter? aiWriter,
     DateTime Function()? now,
   })  : _platform = platform ?? LocalNotificationsPlatform(),
         _prefs = prefs ?? ReminderPrefsStore(),
         _copy = copy ?? ReminderCopyStore(),
+        _ai = ai ?? ReminderAiStore(),
+        _aiWriter = aiWriter,
         _now = now ?? DateTime.now;
+
+  /// The app's AI writer (set at start-up when AI coach v2 is on).
+  static ReminderAiWriter? installedAiWriter;
 
   final ReminderPlatform _platform;
   final ReminderPrefsStore _prefs;
   final ReminderCopyStore _copy;
+  final ReminderAiStore _ai;
+  final ReminderAiWriter? _aiWriter;
+  ReminderAiWriter? get _writer => _aiWriter ?? installedAiWriter;
   final DateTime Function() _now;
 
   /// The service's clock. Screens that list upcoming reminders use it too,
@@ -272,6 +335,24 @@ class ReminderService {
   /// [name], when known, lets the friendly lines greet the user by name.
   Future<List<PlannedReminder>> sync(PlanView? view,
       {Locale? locale, String? name}) async {
+    final wanted = await _syncOnce(view, locale: locale, name: name);
+    // NT-2 layer 2: ask the AI coach for lines (at most weekly), then
+    // re-schedule with them. Any failure keeps the layer-1 lines.
+    final writer = _writer;
+    if (view != null && wanted.isNotEmpty && writer != null) {
+      try {
+        final prefs = await _prefs.load();
+        if (prefs.aiCopy &&
+            await writer(view, prefs, locale ?? const Locale('en'))) {
+          return await _syncOnce(view, locale: locale, name: name);
+        }
+      } catch (_) {}
+    }
+    return wanted;
+  }
+
+  Future<List<PlannedReminder>> _syncOnce(PlanView? view,
+      {Locale? locale, String? name}) async {
     try {
       final prefs = await _prefs.load();
       final wanted = ReminderPlanner.plan(
@@ -285,9 +366,10 @@ class ReminderService {
       }
       if (wanted.isEmpty) return wanted;
       final l = lookupAppLocalizations(locale ?? const Locale('en'));
-      final lines = prefs.friendly
-          ? await _friendly(view!, wanted, prefs, l, name)
-          : const <String, String>{};
+      final lines = <String, String>{
+        if (prefs.friendly) ...await _friendly(view!, wanted, prefs, l, name),
+        if (prefs.aiCopy) ...(await _ai.load()).lines,
+      };
       for (final r in wanted) {
         final plan = view!.plan;
         final title = plan.template(r.templateId)?.name ?? plan.name;

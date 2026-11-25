@@ -207,7 +207,9 @@ Changes needed before AI-2 ships (none are made now):
 - The rotation state is kept on the phone (`reminder_copy_v1`).
 - "Friendly reminders" in reminder settings can be turned off, which brings back the neutral "About N min." line.
 
-**Layer 2 (behind `ENABLE_AI_COACH_V2`, optional in settings, off by default):**
+**Layer 2 (behind `ENABLE_AI_COACH_V2`, optional in settings, off by default; second NT-2 PR):**
+- Owner deploy: `supabase db push` (applies `20261125000200_reminder_batch.sql`), then `supabase functions deploy ai-request`. Before that, a `reminder_batch` request gets 400 and the app keeps layer 1.
+- App: `ReminderAiWriterImpl` (`lib/features/credits/reminder_ai.dart`) is installed at start-up, only with an account and the v2 flag. The "Reminders written by the AI coach" switch (`reminder-ai`) is shown only then.
 - When the app opens or the plan changes, `ai-request` kind `reminder_batch` writes lines for the next 3–7 sessions.
 - Input: the session targets plus the numbers-only history, and possibly a fix from the last review. Nothing else is sent.
 - Output: JSON with one line per session id. Lines are length-capped and filtered for banned words on the server and again in the app.

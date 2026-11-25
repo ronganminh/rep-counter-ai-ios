@@ -47,11 +47,70 @@ export interface ChatAnswer {
   memory: string;
 }
 
+export interface ReminderBatch {
+  lines: { session_id: string; text: string }[];
+}
+
 export type StructuredAnswer =
   | WorkoutReview
   | PlanSuggestion
   | ProgressReview
-  | ChatAnswer;
+  | ChatAnswer
+  | ReminderBatch;
+
+// NT-2 layer 2 (L-D44): reminder lines are short, single-line, at most one
+// emoji, and never carry blame, body talk, diet or promotion. The app
+// applies the same filter again.
+export const REMINDER_MAX_CHARS = 120;
+export const REMINDER_BANNED = [
+  "lazy",
+  "fat",
+  "ugly",
+  "pathetic",
+  "loser",
+  "shame",
+  "guilt",
+  "diet",
+  "weight loss",
+  "calorie",
+  "burn fat",
+  "hurry",
+  "last chance",
+  "buy",
+  "subscribe",
+  "premium",
+  "discount",
+  "http",
+  "www.",
+  "lười",
+  "béo",
+  "mập",
+  "xấu",
+  "thảm hại",
+  "xấu hổ",
+  "tội lỗi",
+  "ăn kiêng",
+  "giảm cân",
+  "calo",
+  "nhanh lên",
+  "cơ hội cuối",
+  "mua",
+  "đăng ký",
+  "khuyến mãi",
+  "giảm giá",
+];
+const EMOJI = /\p{Extended_Pictographic}/gu;
+
+/** A reminder line the app may show, or null. */
+export function cleanReminder(v: unknown): string | null {
+  if (typeof v !== "string") return null;
+  const t = v.replace(/\s+/g, " ").trim();
+  if (t.length === 0 || t.length > REMINDER_MAX_CHARS) return null;
+  if ((t.match(EMOJI) ?? []).length > 1) return null;
+  const lower = t.toLowerCase();
+  if (REMINDER_BANNED.some((w) => lower.includes(w))) return null;
+  return t;
+}
 
 export const CAPS = {
   text: 1_200,
@@ -134,6 +193,25 @@ export const JSON_SCHEMAS: Partial<Record<Kind, Record<string, unknown>>> = {
       focus_next_week: { type: "string" },
     },
   },
+  reminder_batch: {
+    type: "object",
+    additionalProperties: false,
+    required: ["lines"],
+    properties: {
+      lines: {
+        type: "array",
+        items: {
+          type: "object",
+          additionalProperties: false,
+          required: ["session_id", "text"],
+          properties: {
+            session_id: { type: "string" },
+            text: { type: "string" },
+          },
+        },
+      },
+    },
+  },
   coach_chat: {
     type: "object",
     additionalProperties: false,
@@ -158,6 +236,8 @@ export function outputShape(kind: Kind): string {
         `"sessions": [{"day_offset": 1-7, "focus": string, "exercises": [${TARGET_SHAPE}]}]}`;
     case "progress_review":
       return `{"summary": string, "highlights": [2-3 strings], "focus_next_week": string}`;
+    case "reminder_batch":
+      return `{"lines": [{"session_id": string, "text": string (one sentence, at most 100 characters)}]}`;
     default:
       return `{"reply": string, "memory": string}`;
   }
@@ -266,6 +346,23 @@ export function validateAnswer(
         focus_next_week: str(v["focus_next_week"], CAPS.item) ?? "",
       };
     }
+    case "reminder_batch": {
+      const seen = new Set<string>();
+      const lines = Array.isArray(v["lines"])
+        ? v["lines"].flatMap((l) => {
+          if (!isObj(l)) return [];
+          const id = l["session_id"];
+          const text = cleanReminder(l["text"]);
+          if (
+            typeof id !== "string" || !/^[A-Za-z0-9_-]{1,80}$/.test(id) ||
+            !text || seen.has(id)
+          ) return [];
+          seen.add(id);
+          return [{ session_id: id, text }];
+        }).slice(0, 7)
+        : [];
+      return lines.length === 0 ? null : { lines };
+    }
     case "coach_chat": {
       const reply = str(v["reply"], CAPS.text * 2);
       if (!reply) return null;
@@ -289,6 +386,9 @@ export function parseJsonText(raw: string): unknown {
 /** Plain text the app can show for any answer (the v1 `text` field). */
 export function answerText(kind: Kind, a: StructuredAnswer): string {
   if (kind === "coach_chat") return (a as ChatAnswer).reply;
+  if (kind === "reminder_batch") {
+    return (a as ReminderBatch).lines.map((l) => l.text).join("\n");
+  }
   const lines: string[] = [];
   if ("summary" in a) lines.push(a.summary);
   if ("fixes" in a) lines.push(...a.fixes.map((f) => `• ${f}`));

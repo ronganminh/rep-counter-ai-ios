@@ -30,11 +30,19 @@ import 'plan_copy.dart';
 /// missed or skipped.
 class ReminderSettingsPage extends StatefulWidget {
   const ReminderSettingsPage(
-      {super.key, required this.view, this.service, this.repository});
+      {super.key,
+      required this.view,
+      this.service,
+      this.repository,
+      this.aiAvailable});
 
   final PlanView view;
   final ReminderService? service;
   final PlanRepository? repository;
+
+  /// Shows the NT-2 layer-2 switch (AI coach v2 with an account). Defaults
+  /// to whether the app installed the AI reminder writer.
+  final bool? aiAvailable;
 
   @override
   State<ReminderSettingsPage> createState() => _ReminderSettingsPageState();
@@ -236,6 +244,19 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage>
         value: prefs.friendly,
         onChanged: _busy ? null : (v) => _save(prefs.copyWith(friendly: v)),
       ),
+      if (widget.aiAvailable ??
+          ReminderService.installedAiWriter != null)
+        SwitchListTile(
+          key: const Key('reminder-ai'),
+          contentPadding: EdgeInsets.zero,
+          title: Text(context.tr(
+              'Lời nhắc do HLV AI viết', 'Reminders written by the AI coach')),
+          subtitle: Text(context.tr(
+              'HLV AI viết sẵn lời nhắc cho các buổi sắp tới dựa trên số liệu tập. Tối đa 1 lượt AI mỗi tuần. Khi không có mạng hay có lỗi, app dùng lời nhắc thân mật.',
+              'The AI coach writes reminders for your next sessions from your training numbers. At most 1 AI credit a week. Offline or on errors, the friendly reminders are used.')),
+          value: prefs.aiCopy,
+          onChanged: _busy ? null : (v) => _save(prefs.copyWith(aiCopy: v)),
+        ),
       if (prefs.quietHours && prefs.isQuiet(prefs.minuteOfDay))
         Text(
             context.tr(
