@@ -11,7 +11,7 @@ abstract final class LegalConfig {
   static const accountDeletionUrl = AppConfig.accountDeletionUrl;
   static const websiteUrl = AppConfig.websiteUrl;
 
-  static const effectiveDate = '24/11/2026';
-  static const effectiveDateEn = 'November 24, 2026';
+  static const effectiveDate = '25/11/2026';
+  static const effectiveDateEn = 'November 25, 2026';
   static const aiConsentVersion = '2026-10-01-groq';
 }
