@@ -19109,5 +19109,796 @@
         "type": "String"
       }
     }
+  },
+  "ptHomeGreeting": "Good morning, {name}",
+  "@ptHomeGreeting": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "ptTodayCardCap": "Coach's pick · today",
+  "@ptTodayCardCap": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptAiChip": "Coach",
+  "@ptAiChip": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTodayMeta": "{exercises} exercises · {sets} sets · about {minutes} min",
+  "@ptTodayMeta": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "exercises": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "ptMinRest": "rest {s} s",
+  "@ptMinRest": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "s": {
+        "type": "int"
+      }
+    }
+  },
+  "ptStart": "Start",
+  "@ptStart": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptCreatedToday": "Made this morning from your last {weeks} weeks · free once a day",
+  "@ptCreatedToday": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "weeks": {
+        "type": "int"
+      }
+    }
+  },
+  "ptRegenerate": "New suggestion · 1 AI credit",
+  "@ptRegenerate": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptEdit": "Edit",
+  "@ptEdit": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSkip": "Skip",
+  "@ptSkip": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNoDataTitle": "Coach needs a few workouts first",
+  "@ptNoDataTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNoDataBody": "After {needed} saved workouts, Coach suggests a session each day from your reps, sets and pace.",
+  "@ptNoDataBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "ptNoDataProgress": "{done} of {needed} workouts saved",
+  "@ptNoDataProgress": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "ptNoDataCta": "Start a camera workout",
+  "@ptNoDataCta": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptQuickCamera": "Quick camera workout",
+  "@ptQuickCamera": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptExerciseLibrary": "Exercise library",
+  "@ptExerciseLibrary": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptMyPlan": "My plan · week {week}",
+  "@ptMyPlan": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "ptGenerating": "Coach is planning today…",
+  "@ptGenerating": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptGeneratingBody": "Reading your saved workouts. You can start your plan session now.",
+  "@ptGeneratingBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptStartPlanInstead": "Start plan session",
+  "@ptStartPlanInstead": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptRegenNoCreditsTitle": "A new suggestion needs 1 AI credit",
+  "@ptRegenNoCreditsTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptRegenNoCreditsBody": "Today's pick stays free. Credits reset {date}.",
+  "@ptRegenNoCreditsBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ptSeeOptions": "See options",
+  "@ptSeeOptions": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptOfflineTitle": "You're offline",
+  "@ptOfflineTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptOfflineBody": "Coach's pick needs a connection. Training works offline and saves on this phone.",
+  "@ptOfflineBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptFromPlan": "From your plan · today",
+  "@ptFromPlan": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptPlanChip": "Plan",
+  "@ptPlanChip": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptPlanMeta": "{exercises} exercises · {sets} sets · about {minutes} min",
+  "@ptPlanMeta": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "exercises": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "ptEditTitle": "Edit today's session",
+  "@ptEditTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptEditOpt1": "Use the suggestion",
+  "@ptEditOpt1": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptEditOpt2": "Keep as planned",
+  "@ptEditOpt2": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptEditNoCharge": "Editing never uses AI credits.",
+  "@ptEditNoCharge": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSkippedTitle": "Skipped today's pick",
+  "@ptSkippedTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSkippedBody": "Your plan isn't changed. Coach suggests again tomorrow.",
+  "@ptSkippedBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTrainAnyway": "Train anyway",
+  "@ptTrainAnyway": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSkippedToast": "Skipped for today",
+  "@ptSkippedToast": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewTitle": "Coach review",
+  "@ptReviewTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewBackResults": "Back to results",
+  "@ptReviewBackResults": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptStrengths": "What went well",
+  "@ptStrengths": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptFixes": "Fix next time",
+  "@ptFixes": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTrend": "Compared with last time",
+  "@ptTrend": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTrendUp": "up",
+  "@ptTrendUp": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTrendDown": "down",
+  "@ptTrendDown": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTrendSame": "no comparison",
+  "@ptTrendSame": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNextSession": "Next session",
+  "@ptNextSession": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptApplyToPlan": "Apply to plan",
+  "@ptApplyToPlan": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptUsedOneCredit": "1 AI credit used",
+  "@ptUsedOneCredit": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptAskFollowUp": "Ask a follow-up",
+  "@ptAskFollowUp": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewGenerating": "Coach is reviewing your workout…",
+  "@ptReviewGenerating": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewSaved": "Your workout is saved. This usually takes a few seconds.",
+  "@ptReviewSaved": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewErrorTitle": "Couldn't create the review",
+  "@ptReviewErrorTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewErrorBody": "Your workout is saved. No AI credit was used.",
+  "@ptReviewErrorBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptApplySheetTitle": "Apply to {weekday}?",
+  "@ptApplySheetTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "ptApplySheetBody": "{session} on {date} changes like this:",
+  "@ptApplySheetBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "session": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ptDiffSame": "no change",
+  "@ptDiffSame": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptApplySheetNote": "Logged workouts are never changed. You can undo after applying.",
+  "@ptApplySheetNote": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptAccept": "Accept",
+  "@ptAccept": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptDismiss": "Dismiss",
+  "@ptDismiss": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewNoCreditsTitle": "Coach review needs 1 AI credit",
+  "@ptReviewNoCreditsTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReviewNoCreditsBody": "Basic feedback on the results screen stays free. Credits reset {date}.",
+  "@ptReviewNoCreditsBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ptGetReview": "Get Coach review",
+  "@ptGetReview": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptUsesOneCredit": "Uses 1 AI credit",
+  "@ptUsesOneCredit": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptConsentTitle": "Turn on AI Coach?",
+  "@ptConsentTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptConsentBody": "To plan and review your training, the app sends workout summaries to the RepCoach server, which uses a third-party AI model provider.",
+  "@ptConsentBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSent": "Sent",
+  "@ptSent": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSent1": "Reps, sets, pace and form score",
+  "@ptSent1": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSent2": "Last 2–4 weeks of workout summaries",
+  "@ptSent2": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptSent3": "Your plan and goal",
+  "@ptSent3": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNeverSent": "Never sent",
+  "@ptNeverSent": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNever1": "Video or photos",
+  "@ptNever1": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNever2": "Your face or body keypoints",
+  "@ptNever2": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNever3": "Name or contacts",
+  "@ptNever3": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptConsentCredits": "Coach answers, reviews and plans use AI credits. Basic feedback after a workout stays free.",
+  "@ptConsentCredits": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptConsentOff": "You can turn this off in Profile at any time. Saying no never blocks training.",
+  "@ptConsentOff": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTurnOn": "Turn on AI Coach",
+  "@ptTurnOn": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChatTitle": "AI Coach",
+  "@ptChatTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptCreditsLeft": "{n} of {max} left",
+  "@ptCreditsLeft": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "ptChatSub": "Reads workout summaries · can't see your camera",
+  "@ptChatSub": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChatEmptyTitle": "Ask your coach",
+  "@ptChatEmptyTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChatEmptyBody": "Answers come from your saved workouts, your plan and your goal.",
+  "@ptChatEmptyBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChipToday": "What should I train today?",
+  "@ptChipToday": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChipPain": "My shoulder hurts",
+  "@ptChipPain": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChipNextWeek": "How should I progress next week?",
+  "@ptChipNextWeek": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChipLast": "How was my last workout?",
+  "@ptChipLast": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptComposer": "Ask about your training",
+  "@ptComposer": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptEachMessage": "Each message uses 1 AI credit",
+  "@ptEachMessage": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptThinking": "Coach is thinking…",
+  "@ptThinking": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptThinkingSub": "Reading your saved workouts",
+  "@ptThinkingSub": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptWorkoutCardCap": "Suggested session",
+  "@ptWorkoutCardCap": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptApplyToday": "Apply to today",
+  "@ptApplyToday": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptFromWorkouts": "From your workouts",
+  "@ptFromWorkouts": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReplyPain1": "I can't assess pain. If it's sharp, doesn't ease, or started with an injury, stop and see a doctor or physiotherapist.",
+  "@ptReplyPain1": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptReplyPain2": "If you still want to train today, here is a session without push-ups or planks.",
+  "@ptReplyPain2": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptPainCardMeta": "{exercises} exercises · {sets} sets · about {minutes} min",
+  "@ptPainCardMeta": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "exercises": {
+        "type": "int"
+      },
+      "sets": {
+        "type": "int"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "ptPainNoCharge": "Safety replies don’t use AI credits",
+  "@ptPainNoCharge": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChatOutTitle": "You've used this week's AI credits",
+  "@ptChatOutTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChatOutBody": "Workouts, counting, plans and basic feedback still work. Messages return when credits reset.",
+  "@ptChatOutBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptResetsOn": "Resets {date}",
+  "@ptResetsOn": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ptChatPaused": "Messages paused until reset",
+  "@ptChatPaused": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptPlanTitle": "My plan",
+  "@ptPlanTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptWeekCap": "Coach · next week",
+  "@ptWeekCap": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptWeekTitle": "Week {week} · {range}",
+  "@ptWeekTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "week": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "ptApplyDay": "Apply {day}",
+  "@ptApplyDay": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "day": {
+        "type": "String"
+      }
+    }
+  },
+  "ptApply": "Apply",
+  "@ptApply": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptNoChange": "No change",
+  "@ptNoChange": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptLinked": "Moves together with Sun",
+  "@ptLinked": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptApplyAll": "Apply all ({n} changes)",
+  "@ptApplyAll": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "ptKeepWeek": "Keep my plan",
+  "@ptKeepWeek": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptWeekMade": "Made {date} · {credits} AI credits used",
+  "@ptWeekMade": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "ptApplied": "Applied",
+  "@ptApplied": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptAppliedToast": "{weekday} updated",
+  "@ptAppliedToast": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "weekday": {
+        "type": "String"
+      }
+    }
+  },
+  "ptApplyAllTitle": "Apply {n} changes to week {week}?",
+  "@ptApplyAllTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "week": {
+        "type": "int"
+      }
+    }
+  },
+  "ptApplyAllNote": "Reminders move with their sessions. Logged workouts are never changed.",
+  "@ptApplyAllNote": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptWeekNoDataTitle": "Not enough history yet",
+  "@ptWeekNoDataTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptWeekNoDataBody": "Coach suggests next week after 2 weeks of workouts. Your plan for week 3 is ready as it is.",
+  "@ptWeekNoDataBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptWeekNoDataProgress": "{days} of {needed} days tracked",
+  "@ptWeekNoDataProgress": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "days": {
+        "type": "int"
+      },
+      "needed": {
+        "type": "int"
+      }
+    }
+  },
+  "ptBodyAiCoachRow": "AI Coach",
+  "@ptBodyAiCoachRow": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyAiCoachSub": "Workout summaries only",
+  "@ptBodyAiCoachSub": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyRow": "Body check-in",
+  "@ptBodyRow": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyRowSub": "Off · uses a photo · later release",
+  "@ptBodyRowSub": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyBeta": "LATER",
+  "@ptBodyBeta": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodySettingsTitle": "AI privacy",
+  "@ptBodySettingsTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyRowNote": "Body check-in stays off until you turn it on and agree to its own consent.",
+  "@ptBodyRowNote": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyConsentTitle": "Body check-in uses a photo",
+  "@ptBodyConsentTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyConsentLead": "Coach can suggest which muscle groups to focus on from one full-body photo.",
+  "@ptBodyConsentLead": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyC1": "Your photo is sent to our AI provider, Anthropic (Claude), only to be analysed. It isn’t used to train AI models.",
+  "@ptBodyC1": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyC2": "RepCoach doesn’t keep the photo on its servers. Only the text result is saved, on this phone.",
+  "@ptBodyC2": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyC3": "No measurements, weight, body fat or diagnosis.",
+  "@ptBodyC3": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyC4": "You can delete the result at any time.",
+  "@ptBodyC4": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyCost": "Each check-in uses {credits} AI credits.",
+  "@ptBodyCost": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "ptBodyAge": "I confirm I’m 18 or older",
+  "@ptBodyAge": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyAgeNote": "Body check-in is for adults only. The rest of RepCoach stays available.",
+  "@ptBodyAgeNote": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptAgree": "Agree",
+  "@ptAgree": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyGuideTitle": "Taking your photo",
+  "@ptBodyGuideTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyG1": "Stand straight, whole body in frame",
+  "@ptBodyG1": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyG2": "Even, bright light · plain background",
+  "@ptBodyG2": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyG3": "Training clothes or shirtless are fine",
+  "@ptBodyG3": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyG4": "Keep genitals covered · no sexual content · only you in frame",
+  "@ptBodyG4": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyGuideNote": "Each photo is checked first. Nothing is analysed until you tap Analyse.",
+  "@ptBodyGuideNote": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptTakePhoto": "Take photo",
+  "@ptTakePhoto": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptChooseLibrary": "Choose from library",
+  "@ptChooseLibrary": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyPreviewTitle": "Check your photo",
+  "@ptBodyPreviewTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyPreviewNote": "Analysing uses {credits} AI credits. A photo that can’t be used is never charged.",
+  "@ptBodyPreviewNote": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)",
+    "placeholders": {
+      "credits": {
+        "type": "int"
+      }
+    }
+  },
+  "ptRetake": "Retake",
+  "@ptRetake": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptAnalyse": "Analyse",
+  "@ptAnalyse": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyAnalysing": "Analysing your photo…",
+  "@ptBodyAnalysing": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyAnalysingSub": "Checked, then analysed once. RepCoach keeps only the text result.",
+  "@ptBodyAnalysingSub": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyResultTitle": "Your check-in",
+  "@ptBodyResultTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyOverview": "Overview",
+  "@ptBodyOverview": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyFocus": "Focus muscle groups",
+  "@ptBodyFocus": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBody4w": "Suggested 4 weeks",
+  "@ptBody4w": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyNoMeasure": "No measurements or diagnosis. Not medical advice.",
+  "@ptBodyNoMeasure": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyStored": "Photo not kept · text result saved on this phone",
+  "@ptBodyStored": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptDeleteResult": "Delete result",
+  "@ptDeleteResult": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyRejectTitle": "We couldn't use this photo",
+  "@ptBodyRejectTitle": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyRejectBody": "That happens. A photo works best with your whole body in frame, even light, and only you in the picture.",
+  "@ptBodyRejectBody": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyRejectPolicy": "Every photo is checked before analysis. Photos showing genitals, sexual content, children, or no person can’t be analysed.",
+  "@ptBodyRejectPolicy": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
+  },
+  "ptBodyRejectNote": "The photo was discarded. No AI credit was used.",
+  "@ptBodyRejectNote": {
+    "description": "AI Coach · PT (2026-11-25) · source EN · VI machine-assisted, needs native review (D-41)"
   }
 }

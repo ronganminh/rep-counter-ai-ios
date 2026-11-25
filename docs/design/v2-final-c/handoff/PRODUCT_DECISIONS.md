@@ -40,6 +40,28 @@ Status: **CONFIRMED** = approved in an earlier phase brief or verified in shippi
 | BE-3 | Cloud sync rules (A-2): a workout that differs between the phone and the account gets one choice for all of them (keep the account's or the phone's version, never both); when a different account signs in on the phone, its workouts are offered to the new account with the merge preview; plans are uploaded automatically at sign-in, the latest edit wins per plan and the newer of two started plans stays active | **DECIDED (owner, 2026-11-01)** | decision log L-D33; #88 | Product |
 | BE-4 | Server achievements (G-1) count days in UTC (the 7-day streak is any run of 7 UTC days); unlocks are never revoked (D-05) and award no XP | **DECIDED (owner, 2026-11-01)** | decision log L-D34; #90; `20261031000100_achievements.sql` | Product |
 
+## AI Coach · PT ảo (added 2026-11-25, owner decisions applied the same day)
+
+Screens: `RepCoach-AI-v2-AI-Coach-PT.dc.html` (AC-01…AC-04) and `RepCoach-AI-v2-AI-Coach-Body-Check-in.dc.html` (AC-05). Details: `aicoach/AI_COACH_PT_HANDOFF.md`.
+
+| ID | Decision | Status | Evidence / source | Owner to approve |
+|---|---|---|---|---|
+| D-29 | AI credits: basic Results feedback free (D-07) · Coach review 1 · each chat message 1 · next-week suggestion 2 · Home "Coach's pick" free once a day, a new suggestion 1 · body check-in 3 · safety replies and failed/invalid requests 0. Allowances stay D-08. | CONFIRMED | AC-01a/02a/03b/04a; extends D-07, D-08, D-09 | Product + Finance |
+| D-30 | Coach's pick card replaces the H1 "Today · AI suggested" card only when AI Coach is on and consented; otherwise H1 is unchanged. | PROPOSED | AC-01a vs v2 Home H1 (unchanged) | Product + Design |
+| D-31 | Daily pick is made on the first Home open of the day when online (free, D-29) and cached for that day; never generated in the background. A new suggestion needs 1 credit. | PROPOSED | AC-01c/d/e | Product + Backend |
+| D-32 | Minimum data: daily pick after 3 saved workouts; next-week suggestion after 14 days of history. | PROPOSED | AC-01b, AC-04d | Product |
+| D-33 | AI receives summaries only (reps, sets, pace, quality, 2–4 weeks history, plan, goal) and must return schema-valid JSON; anything else is an error with no charge. | PROPOSED | Handoff §4 contract | Backend |
+| D-34 | Pain or injury messages get the fixed safety reply in AC-03e (no diagnosis, see a professional) plus an optional no-load session; no credit. Current wording is a DRAFT; development proceeds. | DRAFT · PENDING LEGAL/MEDICAL REVIEW | AC-03e | Product + Legal (medical wording) |
+| D-35 | "Apply to plan" reuses the Phase 4 Accept / Edit / Dismiss flow (P4-04a/b); logged workouts never change; Undo after apply. | CONFIRMED | AC-02d → P4-04b | Product |
+| D-36 | Next-week suggestion lives in Home › My plan (/home/plan). No new Plan tab — the five tabs stay (D-01). | CONFIRMED | AC-04a; D-01 | Product + Design |
+| D-37 | Body check-in: off by default, later release, separate consent with equal choices; 18+ for this feature only (self-confirmation on the consent screen; the app stays 13+); camera capture and photo library both allowed. | CONFIRMED | AC-05a/b/c | Product + Legal |
+| D-38 | Body check-in vision provider: Anthropic Claude API (API data not used for training). RepCoach does not store the photo. Before launch, legal confirms Anthropic retention terms for API inputs and the privacy-policy text. | CONFIRMED · retention terms to verify | repo `GROQ_MODEL` default (Final C audit) | Backend + Legal |
+| D-39 | Body check-in result: overview, ≤3 focus groups, 4-week outline. No measurements, weight, body fat, diagnosis or appearance judgement. Text stored on device only. | PROPOSED | AC-05e | Product + Legal |
+| D-40 | Moderation before analysis: shirtless and sportswear allowed; blocked = exposed genitals, sexual content, children, no human body. Blocked photos are discarded, never analysed, never charged; neutral copy. Legal defines the handling/reporting process if child sexual abuse material is detected. | CONFIRMED · CSAM process to define | AC-05f | Backend + Legal |
+| D-41 | Language: English is the source and primary frame; Vietnamese is the secondary translation, marked "needs review" like Final C. | CONFIRMED | both boards (EN left · VI right, "VI · NEEDS REVIEW") | Product + Localization |
+
+Brief references corrected: AI credits are defined in **D-07/D-08** (D-12 is the auth-provider decision). No frame or decision named **PL-1 / PL-1c** exists on the canvas; the plan is Phase 2 (`P2-04a`, `P2-05`) and the Accept / Edit / Dismiss flow is Phase 4 (`P4-04a`, `P4-04b`, `P4-05a`). The "explain first, never force" consent rule is Final C APP_NAVIGATION_MAP §7 + P4-08a (D-02 is the tab-bar rule).
+
 ## Legal / store-policy questions (not verified in this session — web access was unavailable)
 
 1. Account deletion in-app requirement and web-deletion link (App Store / Google Play) — needed before accounts ship.
@@ -50,3 +72,5 @@ Status: **CONFIRMED** = approved in an earlier phase brief or verified in shippi
 6. Data safety (Play) / privacy nutrition labels (App Store) once accounts, sync, AI and analytics change data flows.
 7. AI consent text vs privacy policy (provider: Groq per repo docs) — legal review.
 8. Children / age rating for social features and AI chat.
+9. Body check-in (D-38/D-40): Anthropic API retention terms for images and the matching privacy-policy text; App Store 5.1.1 consent wording; the handling/reporting process if child sexual abuse material is detected. (Provider, 18+ feature gate, camera + library and moderation rules were decided by the owner on 2026-11-25.)
+10. Pain/injury safety reply wording (D-34) — draft in use, not blocking development.

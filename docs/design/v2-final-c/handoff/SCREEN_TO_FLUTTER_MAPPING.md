@@ -148,3 +148,13 @@ Priority: **P0** core loop + shell + l10n infrastructure · **P1** progress, pla
 
 - Existing: `SectionLabel`, `SettingsGroup`, `SettingsRow`, `SegmentChip`, `MetricCard` (widgets/product_ui.dart), `WorkoutHud`, `RepFeedbackPill`, `ResultHero`, `ResultFeedbackCard`, `AchievementEarnedCard`, `CameraPermissionView`.
 - New (PROPOSED): `AppTabScaffold`, `TrainTabButton`, `StatTile`, `ChallengeMeter`, `SyncStatusBadge`, `AppBanner`, `AppToast`, `StatusHero`, `TypeToConfirmField`, `HoldToFinishButton` (extract from HUD), `PrivacyBadge`, `AuthGateView`, `MergePreview`, `CreditsChip`, `ProPlanCard`, `InboxRow`, `PushBanner` (in-app).
+
+## AI Coach · PT ảo (added 2026-11-25)
+
+| Family | Frames | Screen | Route | Flutter widget (PROPOSED) | State | Data | Backend | Status | Priority | Reuses |
+|---|---|---|---|---|---|---|---|---|---|---|
+| AC-01 | AC-01a–g | Coach's pick card on Home | /home | `CoachTodayCard` in `HomePage` | `CoachPickController` (idle, noData, generating, ready, skipped, noCredits, offline) | `DailyPick` | NEW API PROPOSED: POST /v1/coach/daily-pick | NEW | P2 | registry #2, #3, #10, #12, #29 |
+| AC-02 | AC-02a–e | Coach review after a workout | /workout/:id/coach-review | `CoachReviewPage` | `CoachReviewController` (generating, ready, failed, noCredits) | `SessionReview` | NEW API PROPOSED: POST /v1/coach/session-review | NEW | P2 | #3, #10, #14, #26 |
+| AC-03 | AC-03a–f | Consent + Coach chat | /coach/consent · /coach/chat | `CoachConsentPage`, `CoachChatPage` (extends P4-06) | `CoachChatController` (+ `thinking`, `safety`) | `ChatReply` | POST /v1/coach/messages (already proposed) | NEW | P2 | #2, #7, #8, #12, #29 |
+| AC-04 | AC-04a–d | Next-week suggestion in My plan | /home/plan | `CoachWeekCard` in `PlanPage` | `CoachWeekController` (noData, ready, partiallyApplied, applied) | `WeekPlan` | NEW API PROPOSED: POST /v1/coach/week-plan | NEW | P2 | #3, #10, #13 |
+| AC-05 | AC-05a–f | Body check-in (later release) | /coach/body-check-in/* | `BodyCheckInFlow` | `BodyCheckInController` (off, consent, guide, capturing, analysing, result, rejected) | `BodyCheckIn` | NEW API PROPOSED: POST /v1/coach/body-check-in (no storage) | NEW | P3 | #5, #2, #14 |

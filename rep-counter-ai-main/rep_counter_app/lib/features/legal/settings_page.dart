@@ -6,6 +6,8 @@ import '../../core/services/app_links.dart';
 import '../ai/ai_preferences.dart';
 import '../exercises/data/exercise_guide_clips.dart';
 import '../ai/presentation/ai_consent.dart';
+import '../coach/coach_v2.dart';
+import '../coach/presentation/coach_privacy_rows.dart';
 import '../history/export/export_data_sheet.dart';
 import '../achievements/achievement_service.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
@@ -328,6 +330,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   icon: LucideIcons.shieldCheck,
                   title: context.l10n.legacySettingsPageProcessedDevice,
                   subtitle: context.l10n.legacySettingsPageCameraImagesStayPhone),
+              if (CoachGate.available(context)) const CoachPrivacyRows(),
               SettingsRow(
                   icon: LucideIcons.lock,
                   title: s.privacyPolicy,
