@@ -226,6 +226,16 @@ class _ReminderSettingsPageState extends State<ReminderSettingsPage>
         value: prefs.quietHours,
         onChanged: (v) => _save(prefs.copyWith(quietHours: v)),
       ),
+      SwitchListTile(
+        key: const Key('reminder-friendly'),
+        contentPadding: EdgeInsets.zero,
+        title: Text(context.tr('Lời nhắc thân mật', 'Friendly reminders')),
+        subtitle: Text(context.tr(
+            'Câu nhắc ấm áp theo tình huống, không lặp lại trong 14 ngày. Tắt để dùng câu ngắn trung tính.',
+            'Warm lines that fit the day, not repeated within 14 days. Turn off for a short neutral line.')),
+        value: prefs.friendly,
+        onChanged: _busy ? null : (v) => _save(prefs.copyWith(friendly: v)),
+      ),
       if (prefs.quietHours && prefs.isQuiet(prefs.minuteOfDay))
         Text(
             context.tr(

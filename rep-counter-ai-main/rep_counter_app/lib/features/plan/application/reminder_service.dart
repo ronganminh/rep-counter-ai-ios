@@ -8,7 +8,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:timezone/data/latest.dart' as tzdata;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../../../core/i18n/app_strings.dart';
+import '../../../exercise.dart';
 import '../../../l10n/app_localizations.dart';
+import '../domain/local_date.dart';
+import '../domain/reminder_copy.dart';
 import '../domain/reminder_planner.dart';
 import 'plan_repository.dart';
 
@@ -153,6 +157,28 @@ class LocalNotificationsPlatform implements ReminderPlatform {
   }
 }
 
+/// The lines chosen for upcoming reminders and when each was last used
+/// (NT-2 rotation), kept on the phone.
+class ReminderCopyStore {
+  static const key = 'reminder_copy_v1';
+
+  Future<ReminderCopyState> load() async {
+    final raw = (await SharedPreferences.getInstance()).getString(key);
+    if (raw == null) return const ReminderCopyState();
+    try {
+      return ReminderCopyState.fromJson(
+          jsonDecode(raw) as Map<String, dynamic>);
+    } catch (_) {
+      return const ReminderCopyState();
+    }
+  }
+
+  Future<void> save(ReminderCopyState state) async {
+    await (await SharedPreferences.getInstance())
+        .setString(key, jsonEncode(state.toJson()));
+  }
+}
+
 class ReminderPrefsStore {
   static const key = 'reminder_prefs_v1';
 
@@ -182,13 +208,16 @@ class ReminderService {
   ReminderService({
     ReminderPlatform? platform,
     ReminderPrefsStore? prefs,
+    ReminderCopyStore? copy,
     DateTime Function()? now,
   })  : _platform = platform ?? LocalNotificationsPlatform(),
         _prefs = prefs ?? ReminderPrefsStore(),
+        _copy = copy ?? ReminderCopyStore(),
         _now = now ?? DateTime.now;
 
   final ReminderPlatform _platform;
   final ReminderPrefsStore _prefs;
+  final ReminderCopyStore _copy;
   final DateTime Function() _now;
 
   /// The service's clock. Screens that list upcoming reminders use it too,
@@ -239,7 +268,10 @@ class ReminderService {
   }
 
   /// Returns the reminders that are scheduled after the sync.
-  Future<List<PlannedReminder>> sync(PlanView? view, {Locale? locale}) async {
+  ///
+  /// [name], when known, lets the friendly lines greet the user by name.
+  Future<List<PlannedReminder>> sync(PlanView? view,
+      {Locale? locale, String? name}) async {
     try {
       final prefs = await _prefs.load();
       final wanted = ReminderPlanner.plan(
@@ -253,17 +285,94 @@ class ReminderService {
       }
       if (wanted.isEmpty) return wanted;
       final l = lookupAppLocalizations(locale ?? const Locale('en'));
+      final lines = prefs.friendly
+          ? await _friendly(view!, wanted, prefs, l, name)
+          : const <String, String>{};
       for (final r in wanted) {
         final plan = view!.plan;
-        final name = plan.template(r.templateId)?.name ?? plan.name;
-        await _platform.schedule(
-            r, l.notifReminderTitle(name), _body(view, r, l));
+        final title = plan.template(r.templateId)?.name ?? plan.name;
+        await _platform.schedule(r, l.notifReminderTitle(title),
+            lines[r.sessionId] ?? _body(view, r, l));
       }
       return wanted;
     } catch (_) {
       // No permission, plugin unavailable, …: plans and workouts carry on.
       return const [];
     }
+  }
+
+  /// NT-2 layer 1: a warm line per reminder, by situation, not repeated
+  /// within 14 days. Any failure falls back to the neutral line.
+  Future<Map<String, String>> _friendly(PlanView view,
+      List<PlannedReminder> wanted, ReminderPrefs prefs, AppLocalizations l,
+      String? name) async {
+    try {
+      final now = _now();
+      final today = LocalDate.of(now);
+      final streak = _streak(view, today);
+      final slots = [
+        for (final (i, r) in wanted.indexed)
+          ReminderSlot(
+              r.sessionId,
+              r.date,
+              ReminderCopy.situation(
+                  plan: view.plan,
+                  sessions: view.sessions,
+                  today: today,
+                  date: r.date,
+                  minuteOfDay: r.fireAt.hour * 60 + r.fireAt.minute,
+                  first: i == 0,
+                  streak: streak))
+      ];
+      final hasName = name != null && name.trim().isNotEmpty;
+      final (keys, state) = ReminderCopy.assign(slots, await _copy.load(),
+          hasName: hasName, today: today);
+      await _copy.save(state);
+      final vi = l.localeName.startsWith('vi');
+      final s = vi ? S.vi : S.en;
+      String time(DateTime t) {
+        final mm = t.minute.toString().padLeft(2, '0');
+        if (vi) return '${t.hour}:$mm';
+        final h = t.hour % 12 == 0 ? 12 : t.hour % 12;
+        return '$h:$mm ${t.hour < 12 ? 'AM' : 'PM'}';
+      }
+      return {
+        for (final r in wanted)
+          if (keys[r.sessionId] != null)
+            r.sessionId: ReminderCopy.text(
+                l, keys[r.sessionId]!, _vars(view, r, s, time, streak, name)),
+      };
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  static ReminderVars _vars(PlanView view, PlannedReminder r, S s,
+      String Function(DateTime) time, int streak, String? name) {
+    final session = view.sessions.firstWhere((x) => x.id == r.sessionId);
+    final targets = session.exerciseTargets;
+    return ReminderVars(
+      name: name?.trim() ?? '',
+      exercise: targets.isEmpty ? '' : exerciseNameFor(targets.first.exerciseId, s),
+      time: time(r.fireAt),
+      streak: '$streak',
+      sets: '${targets.fold(0, (sum, t) => sum + t.sets)}',
+    );
+  }
+
+  /// Days in a row with a saved workout, up to today (or yesterday).
+  static int _streak(PlanView view, LocalDate today) {
+    final days = {
+      for (final w in view.workouts.values)
+        if (w.reps > 0 || w.durationSeconds > 0) w.date
+    };
+    var cursor = days.contains(today) ? today : today.addDays(-1);
+    var n = 0;
+    while (days.contains(cursor)) {
+      n++;
+      cursor = cursor.addDays(-1);
+    }
+    return n;
   }
 
   static String _body(PlanView view, PlannedReminder r, AppLocalizations l) {

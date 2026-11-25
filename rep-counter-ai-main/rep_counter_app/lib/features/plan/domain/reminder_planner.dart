@@ -14,9 +14,14 @@ class ReminderPrefs {
     this.quietHours = true,
     this.quietStart = 22 * 60,
     this.quietEnd = 7 * 60,
+    this.friendly = true,
   });
 
   final bool enabled;
+
+  /// NT-2 (L-D44): warm reminder lines chosen by situation (on by default);
+  /// off uses the neutral "About N min." line.
+  final bool friendly;
   final int minuteOfDay;
   final bool quietHours;
   final int quietStart, quietEnd;
@@ -26,13 +31,15 @@ class ReminderPrefs {
           int? minuteOfDay,
           bool? quietHours,
           int? quietStart,
-          int? quietEnd}) =>
+          int? quietEnd,
+          bool? friendly}) =>
       ReminderPrefs(
         enabled: enabled ?? this.enabled,
         minuteOfDay: minuteOfDay ?? this.minuteOfDay,
         quietHours: quietHours ?? this.quietHours,
         quietStart: quietStart ?? this.quietStart,
         quietEnd: quietEnd ?? this.quietEnd,
+        friendly: friendly ?? this.friendly,
       );
 
   /// Whether [minute] (0…1439) falls in quiet hours, which may wrap midnight.
@@ -49,6 +56,7 @@ class ReminderPrefs {
         'quiet': quietHours,
         'quiet_start': quietStart,
         'quiet_end': quietEnd,
+        'friendly': friendly,
       };
 
   factory ReminderPrefs.fromJson(Map<String, dynamic> j) {
@@ -64,6 +72,7 @@ class ReminderPrefs {
       quietHours: j['quiet'] as bool? ?? true,
       quietStart: minute(j['quiet_start'], d.quietStart),
       quietEnd: minute(j['quiet_end'], d.quietEnd),
+      friendly: j['friendly'] as bool? ?? true,
     );
   }
 }

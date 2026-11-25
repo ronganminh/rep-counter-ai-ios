@@ -179,3 +179,27 @@ Changes needed before AI-2 ships (none are made now):
 - **iOS `Info.plist`:** `NSPhotoLibraryUsageDescription` (read) if the photo picker is used. The camera prompt text is updated (EN/VI).
 - **Store review:** a demo account, the review note describing moderation, and age-rating answers rechecked (no UGC sharing; photos are not shared with other users).
 - **`aiConsentVersion` / coach consent:** unchanged. Body check-in has its own consent.
+
+## 8. NT-2 friendly reminders (L-D44)
+
+**Layer 1 (shipped first, on by default, offline, no AI):**
+- 54 EN/VI lines from the ARB catalog, listed in `09_REMINDER_COPY.md`.
+- Lines are chosen when NT-1 schedules the local notifications (`ReminderService.sync`, `ReminderCopy`), by situation, and never repeat within 14 days.
+- The rotation state is kept on the phone (`reminder_copy_v1`).
+- "Friendly reminders" in reminder settings can be turned off, which brings back the neutral "About N min." line.
+
+**Layer 2 (behind `ENABLE_AI_COACH_V2`, optional in settings, off by default):**
+- When the app opens or the plan changes, `ai-request` kind `reminder_batch` writes lines for the next 3–7 sessions.
+- Input: the session targets plus the numbers-only history, and possibly a fix from the last review. Nothing else is sent.
+- Output: JSON with one line per session id. Lines are length-capped and filtered for banned words on the server and again in the app.
+- The lines are stored on the phone and used when scheduling.
+- At most one AI request (one credit) per week.
+- Offline or on any error, layer 1 is used.
+
+**Later, with remote push (`ENABLE_PUSH`):** generation moves to the server. A scheduled job (`send-push`) would call the same `reminder_batch` prompt per user and send the line as a push, so the phone no longer asks for it. The rotation and quick-off rules stay. The App Privacy and Data safety forms must then be checked again for push tokens (Device ID).
+
+**Store:**
+- Reminders exist only for sessions the user planned.
+- They are never used for promotion (App Store 4.5.4; Play notification policy).
+- Two switches turn them off quickly: the main reminder switch and "Friendly reminders".
+- App Privacy and Data safety are unchanged. Layer 1 sends nothing. Layer 2 sends the same Fitness numbers to `ai-request` as AI Coach does.

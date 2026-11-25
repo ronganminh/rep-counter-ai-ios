@@ -17975,5 +17975,1139 @@
   "storyPhotosOffBack": "Back",
   "@storyPhotosOffBack": {
     "description": "[source: App Store 5.1.1(iv), Photos permission (L-D38); status: new]"
+  },
+  "reminderNudgeRegular01": "{exercise} is waiting for you at {time}. A few easy sets and you're done.",
+  "@reminderNudgeRegular01": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular02": "Today's plan: {sets} sets. Start whenever you're ready.",
+  "@reminderNudgeRegular02": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular03": "Your session is on for today. Warm up, then {exercise} first.",
+  "@reminderNudgeRegular03": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular04": "A little movement today keeps the habit going. See you at {time}.",
+  "@reminderNudgeRegular04": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular05": "Ready when you are: {sets} sets of good, steady reps.",
+  "@reminderNudgeRegular05": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular06": "Small session, real progress. {exercise} is first up.",
+  "@reminderNudgeRegular06": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular07": "Time for today's training. Go at your own pace.",
+  "@reminderNudgeRegular07": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular08": "{name}, your plan has a session for you today.",
+  "@reminderNudgeRegular08": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular09": "Set the phone up, step back, and let's count some reps.",
+  "@reminderNudgeRegular09": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular10": "Today: {exercise} and more. Quality over speed.",
+  "@reminderNudgeRegular10": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular11": "One session closer to your goal, whenever you're ready.",
+  "@reminderNudgeRegular11": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular12": "Your {sets}-set session is ready. Short breaks, steady form.",
+  "@reminderNudgeRegular12": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular13": "{name}, a few good sets today will feel great later.",
+  "@reminderNudgeRegular13": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeRegular14": "Training day. Start with {exercise} and see how it feels.",
+  "@reminderNudgeRegular14": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed01": "Welcome back! Today is a fresh start, no catching up needed.",
+  "@reminderNudgeAfterMissed01": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed02": "Life gets busy. A short session today is a great way back in.",
+  "@reminderNudgeAfterMissed02": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed03": "Start from where you are. {exercise} at an easy pace is plenty.",
+  "@reminderNudgeAfterMissed03": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed04": "No pressure: even a few reps today count.",
+  "@reminderNudgeAfterMissed04": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed05": "Your plan is still here for you. Ready at {time}?",
+  "@reminderNudgeAfterMissed05": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed06": "{name}, good to have you back. Let's keep it light today.",
+  "@reminderNudgeAfterMissed06": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed07": "Every comeback starts with one set. Today is a good day for it.",
+  "@reminderNudgeAfterMissed07": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeAfterMissed08": "Easy does it: warm up well and go at your own pace.",
+  "@reminderNudgeAfterMissed08": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak01": "{streak} days in a row. Nice rhythm! Keep it easy and steady.",
+  "@reminderNudgeStreak01": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak02": "Your streak is at {streak} days 🔥 Today's session keeps it going.",
+  "@reminderNudgeStreak02": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak03": "{streak} days of showing up. That's how habits are built.",
+  "@reminderNudgeStreak03": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak04": "Great consistency: {streak} days. Listen to your body today.",
+  "@reminderNudgeStreak04": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak05": "{name}, {streak} days strong. One more good session today?",
+  "@reminderNudgeStreak05": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak06": "Day {streak}! Steady form beats fast reps.",
+  "@reminderNudgeStreak06": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak07": "{streak} days and counting. A rest day is fine too when you need it.",
+  "@reminderNudgeStreak07": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeStreak08": "{streak} days in a row says it all. See you at {time}.",
+  "@reminderNudgeStreak08": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend01": "Weekend session! A relaxed {sets} sets whenever suits you.",
+  "@reminderNudgeWeekend01": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend02": "A weekend workout fits nicely between plans. Ready at {time}?",
+  "@reminderNudgeWeekend02": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend03": "Slow weekend morning or busy afternoon, {exercise} fits in.",
+  "@reminderNudgeWeekend03": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend04": "Weekend energy: a few good sets, then enjoy your day.",
+  "@reminderNudgeWeekend04": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend05": "{name}, a quick weekend session and the rest of the day is yours.",
+  "@reminderNudgeWeekend05": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend06": "No rush this weekend. Your session is ready when you are.",
+  "@reminderNudgeWeekend06": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend07": "Weekend check-in: {exercise} first, then take it easy.",
+  "@reminderNudgeWeekend07": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeWeekend08": "End the week on a good note with today's session.",
+  "@reminderNudgeWeekend08": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening01": "Evening session at {time}. Keep it calm and controlled.",
+  "@reminderNudgeEvening01": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening02": "Wind down the day with {sets} steady sets.",
+  "@reminderNudgeEvening02": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening03": "A short evening workout, then time to relax.",
+  "@reminderNudgeEvening03": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening04": "Evening reps: smooth and steady, no need to push hard.",
+  "@reminderNudgeEvening04": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening05": "{name}, a few sets tonight and today's plan is done.",
+  "@reminderNudgeEvening05": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening06": "Tonight's session is ready. {exercise} first, at your pace.",
+  "@reminderNudgeEvening06": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening07": "Good evening! Today's session fits before or after dinner.",
+  "@reminderNudgeEvening07": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeEvening08": "Finish the day strong, then get some good rest.",
+  "@reminderNudgeEvening08": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession01": "Your plan starts today. Let's begin with {exercise}!",
+  "@reminderNudgeFirstSession01": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession02": "Day one! Go easy, learn the moves, and enjoy it.",
+  "@reminderNudgeFirstSession02": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession03": "First session: {sets} sets. Focus on good form, not speed.",
+  "@reminderNudgeFirstSession03": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession04": "Welcome to your new plan. See you at {time}.",
+  "@reminderNudgeFirstSession04": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession05": "{name}, your first planned session is today. You've got this.",
+  "@reminderNudgeFirstSession05": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession06": "New plan, fresh start. Set up the phone and let's count.",
+  "@reminderNudgeFirstSession06": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession07": "The first session is the start of a habit. Take it slow.",
+  "@reminderNudgeFirstSession07": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
+  },
+  "reminderNudgeFirstSession08": "Today is day one. Warm up, then {exercise} at your own pace.",
+  "@reminderNudgeFirstSession08": {
+    "description": "[source: NT-2 friendly reminders, L-D44; status: new]",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "exercise": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      },
+      "streak": {
+        "type": "String"
+      },
+      "sets": {
+        "type": "String"
+      }
+    }
   }
 }
