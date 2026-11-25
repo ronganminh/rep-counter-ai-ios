@@ -49,6 +49,8 @@ class FakeCreditedAi implements CreditedAiApi {
     required String locale,
     List<CoachMessage> messages = const [],
     Map<String, Object?>? context,
+    int version = 1,
+    String? memory,
   }) async {
     requests.add((
       id: requestId,

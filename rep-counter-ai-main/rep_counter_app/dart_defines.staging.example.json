@@ -5,6 +5,7 @@
   "ENABLE_XP": "true",
   "ENABLE_SOCIAL": "true",
   "ENABLE_INBOX": "true",
+  "ENABLE_AI_COACH_V2": "true",
   "ENABLE_BILLING": "false",
   "ENABLE_PUSH": "false",
   "SUPABASE_URL": "https://rvysencgtomkzwgdjaqh.supabase.co",

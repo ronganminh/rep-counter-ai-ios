@@ -102,9 +102,12 @@ void main() {
     api = SupabaseAiCreditsApi(AsyncContractRpc(contract, server));
   });
 
-  test('kind names match the contract', () {
+  test('kind names match the contract (v1 kinds, then v2-only kinds)', () {
     final edge = (contract['edge_functions'] as Map)['ai-request'] as Map;
-    expect([for (final k in CreditedRequest.values) k.wireName], edge['kinds']);
+    final names = [for (final k in CreditedRequest.values) k.wireName];
+    expect(names.take(3).toList(), edge['kinds']);
+    expect({...edge['kinds'] as List, ...edge['kinds_v2'] as List},
+        names.toSet());
   });
 
   test('balance reads the weekly allowance (10 Free, Q5)', () async {

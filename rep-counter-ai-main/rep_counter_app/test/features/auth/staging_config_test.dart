@@ -68,6 +68,7 @@ void main() {
         'ENABLE_XP',
         'ENABLE_SOCIAL',
         'ENABLE_INBOX',
+        'ENABLE_AI_COACH_V2',
         'ENABLE_BILLING',
         'ENABLE_PUSH',
         'SUPABASE_URL',
@@ -106,6 +107,7 @@ void main() {
         'ENABLE_XP',
         'ENABLE_SOCIAL',
         'ENABLE_INBOX',
+        'ENABLE_AI_COACH_V2',
         'APPLE_SIGN_IN_ENABLED',
       ]) {
         expect(d[on], 'true', reason: on);

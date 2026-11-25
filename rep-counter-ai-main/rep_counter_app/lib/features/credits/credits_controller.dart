@@ -6,6 +6,7 @@ import '../../core/backend/backend_rpc.dart';
 import '../auth/application/auth_controller.dart';
 import '../workout/data/workout_database.dart';
 import '../workout/data/workout_record.dart';
+import 'ai_coach_v2.dart';
 import 'ai_credits.dart';
 import 'supabase_ai_credits_api.dart';
 
@@ -107,7 +108,8 @@ CreditsController? createCreditsController(AuthController auth,
 enum CoachTurnState { waiting, answered, failed, outOfCredits }
 
 /// Why a turn failed; the UI explains each without red error styling.
-enum CoachFailure { offline, timeout, provider, other }
+/// [limit]: a daily or monthly usage limit of the AI service (nothing charged).
+enum CoachFailure { offline, timeout, provider, limit, other }
 
 /// One question (or analysis) and its answer. [requestId] stays the same
 /// across retries, so a retry is never charged twice (D-09).
@@ -127,19 +129,37 @@ class CoachTurn {
   CoachTurnState state = CoachTurnState.waiting;
   CoachFailure? failure;
   String? answer;
+
+  /// v2: the structured answer (cards, "Apply to plan"); null for text.
+  Map<String, Object?>? data;
 }
 
 /// An AI Coach session: kept in memory on this phone only and never on the
 /// server (D-21). Each question or analysis costs one credit; a failed
 /// provider call is refunded by the server.
+///
+/// Coach v2 ([v2], L-D43): chat keeps the last 15 turns, and the coach's
+/// long-term summary of the user ([CoachMemoryStore]) is kept on this phone
+/// per account and sent with each chat message.
 class CoachConversation extends ChangeNotifier {
   CoachConversation(this.credits,
-      {this.timeout = const Duration(seconds: 30), String Function()? newId})
-      : _newId = newId ?? WorkoutDatabase.newClientId;
+      {this.timeout = const Duration(seconds: 30),
+      String Function()? newId,
+      this.v2 = false,
+      CoachMemoryStore? memory})
+      : _newId = newId ?? WorkoutDatabase.newClientId,
+        _memory = memory ?? CoachMemoryStore();
 
   final CreditsController credits;
   final Duration timeout;
   final String Function() _newId;
+  final bool v2;
+  final CoachMemoryStore _memory;
+
+  String? get _userId => switch (credits.auth.state) {
+        AuthSignedIn(:final user) => user.id,
+        _ => null,
+      };
   final turns = <CoachTurn>[];
   bool _disposed = false;
 
@@ -168,8 +188,8 @@ class CoachConversation extends ChangeNotifier {
   }
 
   /// A credited analysis with [context] (aggregate workout numbers only).
-  Future<void> analyze(CreditedRequest kind, String label,
-          Map<String, Object?> context,
+  Future<void> analyze(
+          CreditedRequest kind, String label, Map<String, Object?> context,
           {required String locale}) =>
       busy
           ? Future.value()
@@ -211,13 +231,18 @@ class CoachConversation extends ChangeNotifier {
     if (upTo.kind == CreditedRequest.coachChat) {
       out.add(CoachMessage.user(upTo.text));
     }
-    return out.length > 20 ? out.sublist(out.length - 20) : out;
+    final max = v2 ? AiCoachV2.chatTurns * 2 : 20;
+    return out.length > max ? out.sublist(out.length - max) : out;
   }
 
   static String _cap(String s) => s.length > 2000 ? s.substring(0, 2000) : s;
 
   Future<void> _send(CoachTurn turn, String locale) async {
     try {
+      final user = _userId;
+      final chat = turn.kind == CreditedRequest.coachChat;
+      final memory =
+          v2 && chat && user != null ? await _memory.load(user) : null;
       final answer = await credits.api
           .ask(
             requestId: turn.requestId,
@@ -225,12 +250,21 @@ class CoachConversation extends ChangeNotifier {
             locale: locale,
             messages: _history(turn),
             context: turn.context,
+            version: v2 ? 2 : 1,
+            memory: memory,
           )
           .timeout(timeout);
       turn
         ..answer = answer.text
+        ..data = answer.data
         ..state = CoachTurnState.answered;
       credits._update(answer.balance);
+      final updated = answer.memory;
+      if (v2 && chat && user != null && updated != null) {
+        await _memory.save(user, updated);
+      }
+    } on AiLimitReached {
+      _fail(turn, CoachFailure.limit);
     } on InsufficientCredits catch (e) {
       turn.state = CoachTurnState.outOfCredits;
       credits._update(e.balance);
@@ -281,9 +315,8 @@ abstract final class CoachContext {
     final weeks = <String, ({int workouts, int reps})>{};
     final exercises = <String, int>{};
     for (final r in recent) {
-      final d = DateTime.utc(
-          r.startedAt.toUtc().year, r.startedAt.toUtc().month,
-          r.startedAt.toUtc().day);
+      final d = DateTime.utc(r.startedAt.toUtc().year,
+          r.startedAt.toUtc().month, r.startedAt.toUtc().day);
       final monday = d.subtract(Duration(days: d.weekday - 1));
       final key = monday.toIso8601String().substring(0, 10);
       final w = weeks[key] ?? (workouts: 0, reps: 0);
@@ -297,7 +330,11 @@ abstract final class CoachContext {
       'total_reps': recent.fold<int>(0, (n, r) => n + r.reps),
       'weeks': [
         for (final k in keys)
-          {'week_start': k, 'workouts': weeks[k]!.workouts, 'reps': weeks[k]!.reps}
+          {
+            'week_start': k,
+            'workouts': weeks[k]!.workouts,
+            'reps': weeks[k]!.reps
+          }
       ],
       'reps_by_exercise': exercises,
     };
