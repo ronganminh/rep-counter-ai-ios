@@ -128,13 +128,29 @@ Smoke test:
 - With no session, the function returns 401.
 - With a staging account, `test/staging/staging_backend_test.dart` passes. v1 answers are unchanged.
 
-Anthropic as the main provider with Groq as the fallback (the staging choice of 2026-11-25). Do this only after the privacy policy and consent text naming Anthropic are live:
+**Staging now (owner decision 2026-11-25):** GroqCloud only. `AI_PROVIDER=groq` (also the default when unset), `AI_FALLBACK_PROVIDER` unset (or `groq`, which is the same thing: a fallback equal to the primary is ignored), and **no** `ANTHROPIC_API_KEY`. The policy published now names only GroqCloud for AI Coach.
 
-```bash
-supabase secrets set AI_PROVIDER=anthropic AI_FALLBACK_PROVIDER=groq ANTHROPIC_API_KEY=<from console.anthropic.com> ANTHROPIC_MODEL=claude-haiku-5-5 ANTHROPIC_MODEL_PLAN=claude-haiku-5-5
-```
+### Switching provider: secrets only, no app rebuild
 
-Then watch the function logs: `"provider":"groq","fallback":true` lines show Groq answering when Anthropic failed.
+The app never knows which provider answers. The request and response of `ai-request` are the same for both. Switching is therefore a secrets change on Supabase:
+- no new app build;
+- no store review;
+- no function redeploy: Supabase restarts the function with the new secrets.
+
+Before switching to Anthropic, publish the Anthropic wording of §5(b) and update the coach consent text (app release).
+1. Anthropic main, Groq backup, after the app is tested on staging:
+   ```bash
+   supabase secrets set ANTHROPIC_API_KEY=<from console.anthropic.com> ANTHROPIC_MODEL=claude-haiku-5-5 ANTHROPIC_MODEL_PLAN=claude-haiku-5-5
+   supabase secrets set AI_PROVIDER=anthropic AI_FALLBACK_PROVIDER=groq
+   ```
+   Optional: stronger plans with `ANTHROPIC_MODEL_PLAN=claude-sonnet-5-5` or `claude-opus-5-5`.
+2. Check: the function logs show `"provider":"anthropic"`. Lines with `"provider":"groq","fallback":true` mean Groq answered because Anthropic failed.
+3. Back to Groq only:
+   ```bash
+   supabase secrets set AI_PROVIDER=groq
+   supabase secrets unset AI_FALLBACK_PROVIDER
+   ```
+   `ANTHROPIC_API_KEY` may stay set. It is only used when `anthropic` is the provider or the fallback.
 
 **Rollback:**
 - Set `AI_PROVIDER=groq` and unset `AI_FALLBACK_PROVIDER`, or redeploy the previous function version.
