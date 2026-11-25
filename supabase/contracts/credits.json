@@ -1,5 +1,5 @@
 {
-  "description": "AI-1 credits. The app calls ai_credit_balance (PostgREST RPC) and the ai-request Edge Function; ai-request calls ai_credit_consume / ai_credit_refund with the service role. Checked by supabase/tests/credits.test.sql, supabase/functions/ai-request/handler_test.ts and the Flutter test test/features/credits/supabase_ai_credits_api_test.dart.",
+  "description": "AI-1 credits. The app calls ai_credit_balance (PostgREST RPC) and the ai-request Edge Function; ai-request calls ai_credit_consume / ai_credit_refund with the service role. Checked by supabase/tests/credits.test.sql, supabase/functions/ai-request/handler_test.ts and the Flutter test test/features/credits/supabase_ai_credits_api_test.dart. v2 (L-D43, ENABLE_AI_COACH_V2): body \"version\": 2 with kinds_v2 and an optional memory; response adds data (the validated JSON answer or null) and memory; 429 limit_reached when a per-user daily or monthly total limit is reached. Checked also by supabase/tests/ai_coach_v2.test.sql.",
   "functions": {
     "ai_credit_balance": {
       "params": [],
@@ -13,7 +13,11 @@
   },
   "service_functions": {
     "ai_credit_consume": {
-      "params": ["p_user", "p_request_id", "p_kind"],
+      "params": [
+        "p_user",
+        "p_request_id",
+        "p_kind"
+      ],
       "returns": {
         "balance": "number",
         "weekly_allowance": "number",
@@ -23,7 +27,10 @@
       }
     },
     "ai_credit_refund": {
-      "params": ["p_user", "p_request_id"],
+      "params": [
+        "p_user",
+        "p_request_id"
+      ],
       "returns": {
         "balance": "number",
         "weekly_allowance": "number",
@@ -31,21 +38,74 @@
         "pro": "boolean",
         "refunded": "boolean"
       }
+    },
+    "ai_usage_counts": {
+      "params": [
+        "p_user"
+      ],
+      "returns": {
+        "user_today": "number",
+        "total_month": "number"
+      }
+    },
+    "ai_coach_history": {
+      "params": [
+        "p_user",
+        "p_days"
+      ],
+      "returns": "array"
     }
   },
   "edge_functions": {
     "ai-request": {
-      "request": ["request_id", "kind", "locale", "messages", "context"],
-      "kinds": ["coach_chat", "advanced_analysis", "progress_review"],
-      "response": ["request_id", "text", "balance"],
+      "request": [
+        "request_id",
+        "kind",
+        "locale",
+        "messages",
+        "context"
+      ],
+      "kinds": [
+        "coach_chat",
+        "advanced_analysis",
+        "progress_review"
+      ],
+      "response": [
+        "request_id",
+        "text",
+        "balance"
+      ],
       "errors": {
         "400": "invalid_body",
         "401": "unauthorized",
         "402": "insufficient_credits",
         "409": "duplicate_request",
         "502": "provider_error",
-        "503": "not_configured"
-      }
+        "503": "not_configured",
+        "429": "limit_reached"
+      },
+      "request_v2": [
+        "request_id",
+        "kind",
+        "locale",
+        "messages",
+        "context",
+        "version",
+        "memory"
+      ],
+      "kinds_v2": [
+        "coach_chat",
+        "workout_review",
+        "plan_suggestion",
+        "progress_review"
+      ],
+      "response_v2": [
+        "request_id",
+        "text",
+        "balance",
+        "data",
+        "memory"
+      ]
     }
   }
 }
