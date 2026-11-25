@@ -8,6 +8,8 @@ import '../../../theme/app_typography.dart';
 import '../../../widgets/app_feedback.dart';
 import '../../../widgets/metric_widgets.dart';
 import '../../../widgets/product_ui.dart';
+import '../../coach/presentation/coach_chat_page.dart';
+import '../ai_coach_v2.dart';
 import '../credits_controller.dart';
 import 'coach_page.dart';
 
@@ -67,8 +69,8 @@ class CreditsProfileSection extends StatelessWidget {
             ChallengeMeter(
               key: const Key('credits-meter'),
               title: l.creditsMeterTitle,
-              value: (b.weeklyAllowance - b.balance)
-                  .clamp(0, b.weeklyAllowance),
+              value:
+                  (b.weeklyAllowance - b.balance).clamp(0, b.weeklyAllowance),
               target: b.weeklyAllowance > 0 ? b.weeklyAllowance : 1,
               valueLabel: l.creditsMeterValue(
                   (b.weeklyAllowance - b.balance).clamp(0, b.weeklyAllowance),
@@ -91,8 +93,10 @@ class CreditsProfileSection extends StatelessWidget {
               title: l.aiCoach,
               subtitle: l.fbAskAboutTrainingEach,
               trailing: b == null ? null : CreditsChip(credits: b.balance),
-              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                  builder: (_) => CoachPage(credits: credits))),
+              onTap: () => AiCoachV2.enabled
+                  ? openCoachChat(context, credits)
+                  : Navigator.of(context).push(MaterialPageRoute<void>(
+                      builder: (_) => CoachPage(credits: credits))),
             ),
           ),
         ],

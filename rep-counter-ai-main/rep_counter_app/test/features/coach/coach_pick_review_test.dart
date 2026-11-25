@@ -57,11 +57,13 @@ class FakeCoachAi implements CreditedAiApi {
     if (f != null) throw f;
     if (credits < 1) throw InsufficientCredits(credits);
     credits--;
+    final d = (data ?? _default)(kind);
     return CreditedAnswer(
         requestId: requestId,
-        text: 'text',
+        // The server's `text` for chat is the reply (answerText).
+        text: d['reply'] is String ? d['reply'] as String : 'text',
         balance: credits,
-        data: (data ?? _default)(kind));
+        data: d);
   }
 
   static Map<String, Object?> _default(CreditedRequest kind) => switch (kind) {
