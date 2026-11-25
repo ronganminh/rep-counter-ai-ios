@@ -844,3 +844,85 @@ Deno.test("router: Anthropic models from the secrets", () => {
     ),
   ]).then(() => {});
 });
+
+// ------------------------------------------------- NT-2 reminder_batch
+
+Deno.test("reminder_batch: needs sessions; lines cleaned and capped", async () => {
+  const f = deps({
+    complete: () =>
+      Promise.resolve(JSON.stringify({
+        lines: [
+          {
+            session_id: "s1",
+            text: "  Keep your elbows in today,  easy pace. ",
+          },
+          { session_id: "s2", text: "Don't be lazy, hurry up!" },
+          { session_id: "s3", text: "x".repeat(121) },
+          { session_id: "s4", text: "Two emoji 🔥🔥" },
+          { session_id: "s5", text: "Buy premium for better plans" },
+          { session_id: "s1", text: "Duplicate session" },
+          { session_id: "bad id!", text: "Fine text" },
+          { session_id: "s6", text: "Weekend session 💪 at your pace." },
+        ],
+      })),
+  });
+  const res = await handleAiRequest(
+    v2({
+      kind: "reminder_batch",
+      context: { sessions: [{ session_id: "s1", in_days: 1 }] },
+    }),
+    f.d,
+  );
+  assertEquals(res.status, 200);
+  const body = await res.json();
+  assertEquals(body.data.lines, [
+    { session_id: "s1", text: "Keep your elbows in today, easy pace." },
+    { session_id: "s6", text: "Weekend session 💪 at your pace." },
+  ]);
+  // Without sessions the request is refused before any charge.
+  for (const context of [null, {}, { sessions: "s1" }]) {
+    const g = deps();
+    const r = await handleAiRequest(
+      v2({ kind: "reminder_batch", context }),
+      g.d,
+    );
+    assertEquals(r.status, 400);
+    assertEquals(g.balance(), 10);
+  }
+  // Nothing usable → refund.
+  const junk = deps({
+    complete: () =>
+      Promise.resolve(
+        JSON.stringify({ lines: [{ session_id: "s1", text: "diet tips" }] }),
+      ),
+  });
+  assertEquals(
+    (await handleAiRequest(
+      v2({ kind: "reminder_batch", context: { sessions: [] } }),
+      junk.d,
+    )).status,
+    502,
+  );
+  assertEquals(junk.balance(), 10);
+});
+
+Deno.test("reminder_batch: prompt rules in both languages", () => {
+  const en = systemPrompt(2, "reminder_batch", "en");
+  for (
+    const s of [
+      "never blaming",
+      "never hurrying",
+      "no promotion",
+      "100 characters",
+    ]
+  ) {
+    assertStringIncludes(en, s);
+  }
+  const vi = systemPrompt(2, "reminder_batch", "vi");
+  for (
+    const s of ["không trách móc", "không hối thúc", "không quảng cáo", "100"]
+  ) {
+    assertStringIncludes(vi, s);
+  }
+  assert(JSON_SCHEMAS.reminder_batch);
+});

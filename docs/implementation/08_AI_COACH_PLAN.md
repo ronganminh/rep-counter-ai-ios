@@ -92,25 +92,44 @@ The in-app "not medical advice" disclaimer is unchanged.
 - `PrivacyInfo.xcprivacy` and `store_listing/PRIVACY_DECLARATIONS_V2.md` stay as they are.
 - If Anthropic is added, the Play "shared" answers stay **No**, because Anthropic is a service provider processing on our behalf.
 
-**Policy text: draft only, NOT applied.** The draft below is for `backend/static/privacy-policy.html` and the in-app EN/VI copy. Apply it before the v2 flag ships, and change the effective date at the same time.
+**Policy text.**
 
-(a) Section 8, AI Coach, with v2 on:
+(a) **Applied** (privacy PR, effective 25/11/2026). This is section 8 in `backend/static/privacy-policy.html` and `privCoachBody` in the app, EN/VI. It covers:
+- the 4-week synced history (numbers only);
+- the last 15 turns plus a chat summary kept on the phone, which the user can clear in AI Coach and which is removed when the account is deleted;
+- the plan, goal and last workout;
+- usage limits;
+- that AI Coach is an AI, not a human;
+- that plan changes happen only on Accept;
+- the provider: **GroqCloud only**.
 
-> EN: For each request the app sends, over HTTPS to the `ai-request` Edge Function on Supabase: the request type, the response language, the messages you typed and up to the last 15 turns of that chat, a short summary of earlier chats that the app keeps on your phone, and workout numbers (your last workout, your active plan's targets and goal). To personalise answers, the function also reads your **synced** workouts of the last 4 weeks from your account and turns them into totals and averages. The function checks your sign-in and usage limits, charges one credit, sends this minimized prompt to our AI provider (section 11) and returns the answer. The conversation and the summary are not stored on our servers. Suggested plan changes are applied only if you accept them.
+`aiConsentVersion` is unchanged, because the free feedback is unchanged.
+
+(b) **Prepared, NOT published.** Publish this only when `AI_PROVIDER` or `AI_FALLBACK_PROVIDER` is set to `anthropic`, together with a new effective date and the coach consent text naming Anthropic (new consent key). Until then the published policy names only GroqCloud, and `privacy_policy_v2_test` fails if "Anthropic" appears in it.
+
+Sources were read on 2026-11-25 (official pages):
+- Retention: https://privacy.claude.com/en/articles/7996866-how-long-do-you-store-my-organization-s-data (updated July 1, 2026). Quote: "For Anthropic API users, we automatically delete inputs and outputs on our backend within 30 days of receipt or generation". The exceptions are a longer-retention feature you control, a separate agreement (e.g. zero data retention), Usage Policy enforcement, and the law. Inputs and outputs flagged as violating the Usage Policy are kept for up to 2 years, and trust-and-safety classification scores for up to 7 years.
+- Training: https://privacy.claude.com/en/articles/7996868-is-my-data-used-for-model-training (updated August 18, 2026). Quote: "By default, we will not use your inputs or outputs from our commercial products (e.g. … Anthropic API …) to train our models." The exceptions are explicit feedback or opt-in.
+- Minors:
+  - Usage Policy https://www.anthropic.com/legal/aup (effective Nov 12, 2026) defines a minor as anyone under 18, regardless of jurisdiction. Products serving minors must follow the support guidelines.
+  - Guidelines https://support.claude.com/en/articles/9307344-responsible-use-of-anthropic-s-models-guidelines-for-organizations-serving-minors (updated March 16, 2026) list safeguards: age verification, content moderation and filtering, monitoring and reporting, education for minors, and the child-safety system prompt Anthropic may provide. They also require compliance with child-safety and privacy laws such as COPPA, stated on the organization's website, and **disclosure that users interact with an AI, not a human**.
+  - The guidelines set no age floor; an age floor, if any, would be in the Terms of Service. Before switching, the owner decides whether RepCoach meets these for users aged 13–17. The app already discloses the AI and has safety rules and moderation through the prompt; there is no age verification. Otherwise the coach must be limited to 18+ when Anthropic is used.
+
+Draft text:
+
+> EN, section 10 list: **Anthropic** (Anthropic, PBC): AI inference for AI Coach (section 11), [as the main provider | as a backup when GroqCloud is unavailable].
 >
-> VI: Với mỗi yêu cầu, app gửi qua HTTPS tới Edge Function `ai-request` trên Supabase: loại yêu cầu, ngôn ngữ trả lời, tin nhắn bạn gõ và tối đa 15 lượt gần nhất của cuộc trò chuyện, một bản tóm tắt ngắn các lần trò chuyện trước (app giữ trên điện thoại của bạn), và số liệu tập (buổi gần nhất, mục tiêu và chỉ tiêu của kế hoạch đang theo). Để cá nhân hoá câu trả lời, function còn đọc các buổi tập **đã đồng bộ** trong 4 tuần gần nhất từ tài khoản của bạn và chuyển thành tổng và trung bình. Function kiểm tra đăng nhập và hạn mức, trừ một tín dụng, gửi lời nhắc đã tối giản này tới nhà cung cấp AI (mục 11) và trả câu trả lời về app. Cuộc trò chuyện và bản tóm tắt không được lưu trên máy chủ của chúng tôi. Thay đổi kế hoạch được gợi ý chỉ được áp dụng khi bạn chấp nhận.
-
-(b) Only when `AI_PROVIDER` or `AI_FALLBACK_PROVIDER` is set to `anthropic`: add Anthropic as a processor. This goes in section 10 (list) and section 11. Before publishing, check the retention and minimum-age wording against Anthropic's current Commercial Terms and Usage Policy.
-
-> EN (section 10 list): **Anthropic** (Anthropic, PBC): AI inference for AI Coach (section 11).
+> EN, section 11, new paragraph: AI Coach may also use Anthropic's Claude API, [as the main provider | as a backup when GroqCloud is unavailable]. Only the same minimized prompt described in section 8 is sent; the API key stays on our server. Under Anthropic's current privacy documentation, API inputs and outputs are deleted within 30 days and are not used to train its models; requests that Anthropic's automated systems flag as violating its Usage Policy may be kept for up to 2 years, and data may be kept longer where the law requires. RepCoach AI does not claim zero data retention with Anthropic. Sources: Anthropic Privacy Center, "How long do you store my organization's data?" and "Is my data used for model training?".
 >
-> EN (section 11): AI Coach may also use Anthropic's Claude API, as the main provider or as a fallback when GroqCloud is unavailable. Only the same minimized prompt is sent; the API key stays on our server. Under Anthropic's commercial terms, API inputs and outputs are not used to train its models, and they are deleted after a limited retention period, except where Anthropic must keep them longer to enforce its usage policy or comply with law. RepCoach AI does not currently claim zero data retention with Anthropic.
+> EN, section 12, new sentence: Anthropic's Usage Policy treats users under 18 as minors and requires extra safeguards for products they use. AI Coach tells users it is an AI, follows safety rules (no diagnosis, no comments on appearance, see a doctor for pain or injury), and we comply with applicable child-safety and privacy laws such as COPPA.
 >
-> VI (mục 10): **Anthropic** (Anthropic, PBC): suy luận AI cho AI Coach (mục 11).
+> VI, mục 10: **Anthropic** (Anthropic, PBC): suy luận AI cho AI Coach (mục 11), [là nhà cung cấp chính | dự phòng khi GroqCloud không khả dụng].
 >
-> VI (mục 11): AI Coach có thể dùng thêm Claude API của Anthropic, làm nhà cung cấp chính hoặc dự phòng khi GroqCloud không khả dụng. Chỉ gửi cùng một lời nhắc đã tối giản; khoá API nằm trên máy chủ của chúng tôi. Theo điều khoản thương mại của Anthropic, dữ liệu vào/ra qua API không được dùng để huấn luyện mô hình và bị xoá sau một thời hạn lưu giữ giới hạn, trừ khi Anthropic phải giữ lâu hơn để thực thi chính sách sử dụng hoặc tuân thủ pháp luật. RepCoach AI hiện không tuyên bố bật lưu giữ bằng không (ZDR) với Anthropic.
+> VI, mục 11, đoạn mới: AI Coach có thể dùng Claude API của Anthropic, [là nhà cung cấp chính | dự phòng khi GroqCloud không khả dụng]. Chỉ gửi cùng lời nhắc đã tối giản như mục 8; khoá API nằm trên máy chủ của chúng tôi. Theo tài liệu quyền riêng tư hiện hành của Anthropic, dữ liệu vào/ra qua API bị xoá trong vòng 30 ngày và không được dùng để huấn luyện mô hình; yêu cầu bị hệ thống tự động của Anthropic đánh dấu là vi phạm Chính sách sử dụng có thể được giữ tới 2 năm, và dữ liệu có thể được giữ lâu hơn khi pháp luật yêu cầu. RepCoach AI không tuyên bố lưu giữ bằng không (ZDR) với Anthropic.
+>
+> VI, mục 12, câu mới: Chính sách sử dụng của Anthropic coi người dưới 18 tuổi là trẻ vị thành niên và yêu cầu thêm biện pháp bảo vệ. AI Coach cho người dùng biết đó là AI, tuân theo quy tắc an toàn (không chẩn đoán, không bình phẩm ngoại hình, gặp bác sĩ khi đau hoặc chấn thương), và chúng tôi tuân thủ các luật về an toàn và quyền riêng tư của trẻ em như COPPA.
 
-With (b), the coach consent text also names Anthropic, and the consent key is bumped again.
+The in-app copy changes in the same places: `privSecurityBody` (processors), `privRetentionBody` (the Anthropic retention sentence) and `privChildrenBody` (the minors sentence).
 
 ## 6. Owner: deploy (the agent deploys nothing)
 
@@ -179,3 +198,29 @@ Changes needed before AI-2 ships (none are made now):
 - **iOS `Info.plist`:** `NSPhotoLibraryUsageDescription` (read) if the photo picker is used. The camera prompt text is updated (EN/VI).
 - **Store review:** a demo account, the review note describing moderation, and age-rating answers rechecked (no UGC sharing; photos are not shared with other users).
 - **`aiConsentVersion` / coach consent:** unchanged. Body check-in has its own consent.
+
+## 8. NT-2 friendly reminders (L-D44)
+
+**Layer 1 (shipped first, on by default, offline, no AI):**
+- 54 EN/VI lines from the ARB catalog, listed in `09_REMINDER_COPY.md`.
+- Lines are chosen when NT-1 schedules the local notifications (`ReminderService.sync`, `ReminderCopy`), by situation, and never repeat within 14 days.
+- The rotation state is kept on the phone (`reminder_copy_v1`).
+- "Friendly reminders" in reminder settings can be turned off, which brings back the neutral "About N min." line.
+
+**Layer 2 (behind `ENABLE_AI_COACH_V2`, optional in settings, off by default; second NT-2 PR):**
+- Owner deploy: `supabase db push` (applies `20261125000200_reminder_batch.sql`), then `supabase functions deploy ai-request`. Before that, a `reminder_batch` request gets 400 and the app keeps layer 1.
+- App: `ReminderAiWriterImpl` (`lib/features/credits/reminder_ai.dart`) is installed at start-up, only with an account and the v2 flag. The "Reminders written by the AI coach" switch (`reminder-ai`) is shown only then.
+- When the app opens or the plan changes, `ai-request` kind `reminder_batch` writes lines for the next 3–7 sessions.
+- Input: the session targets plus the numbers-only history, and possibly a fix from the last review. Nothing else is sent.
+- Output: JSON with one line per session id. Lines are length-capped and filtered for banned words on the server and again in the app.
+- The lines are stored on the phone and used when scheduling.
+- At most one AI request (one credit) per week.
+- Offline or on any error, layer 1 is used.
+
+**Later, with remote push (`ENABLE_PUSH`):** generation moves to the server. A scheduled job (`send-push`) would call the same `reminder_batch` prompt per user and send the line as a push, so the phone no longer asks for it. The rotation and quick-off rules stay. The App Privacy and Data safety forms must then be checked again for push tokens (Device ID).
+
+**Store:**
+- Reminders exist only for sessions the user planned.
+- They are never used for promotion (App Store 4.5.4; Play notification policy).
+- Two switches turn them off quickly: the main reminder switch and "Friendly reminders".
+- App Privacy and Data safety are unchanged. Layer 1 sends nothing. Layer 2 sends the same Fitness numbers to `ai-request` as AI Coach does.
