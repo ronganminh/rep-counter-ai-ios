@@ -7,6 +7,7 @@ import '../../../theme/app_typography.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_feedback.dart';
 import '../../../widgets/type_to_confirm_field.dart';
+import '../../credits/ai_coach_v2.dart';
 import '../application/auth_controller.dart';
 import '../application/auth_scope.dart';
 import '../domain/auth_repository.dart';
@@ -275,6 +276,8 @@ class _DeleteAccountPageState extends State<DeleteAccountPage> {
     setState(() => _failed = false);
     try {
       await widget.controller.deleteAccount();
+      // The AI coach's notes about the user live only on this phone (L-D43).
+      await CoachMemoryStore().clearAll();
       if (mounted) setState(() => _done = true);
     } on AuthFailure {
       if (mounted) setState(() => _failed = true);

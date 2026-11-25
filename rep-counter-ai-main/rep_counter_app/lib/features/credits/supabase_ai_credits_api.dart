@@ -29,6 +29,8 @@ class SupabaseAiCreditsApi implements CreditedAiApi {
     required String locale,
     List<CoachMessage> messages = const [],
     Map<String, Object?>? context,
+    int version = 1,
+    String? memory,
   }) async {
     final Object? res;
     try {
@@ -41,6 +43,10 @@ class SupabaseAiCreditsApi implements CreditedAiApi {
             {'role': m.fromUser ? 'user' : 'assistant', 'content': m.content}
         ],
         'context': context,
+        // v2 only: v1 bodies stay exactly as before.
+        if (version == 2) 'version': 2,
+        if (version == 2 && memory != null && memory.isNotEmpty)
+          'memory': memory,
       });
     } on BackendException catch (e) {
       final balance = (e.body?['balance'] as num?)?.toInt() ?? 0;
@@ -48,16 +54,22 @@ class SupabaseAiCreditsApi implements CreditedAiApi {
         'insufficient_credits' => InsufficientCredits(balance),
         'duplicate_request' => DuplicateAiRequest(balance),
         'provider_error' => AiProviderFailed(balance),
+        'limit_reached' =>
+          AiLimitReached(e.body?['scope'] as String? ?? 'user_daily'),
         _ => e,
       };
     }
     if (res is! Map || res['text'] is! String) {
       throw const BackendException('invalid_response');
     }
+    final data = res['data'];
+    final memoryOut = res['memory'];
     return CreditedAnswer(
       requestId: res['request_id'] as String,
       text: res['text'] as String,
       balance: (res['balance'] as num).toInt(),
+      data: data is Map ? data.cast<String, Object?>() : null,
+      memory: memoryOut is String ? memoryOut : null,
     );
   }
 }

@@ -41,6 +41,15 @@ class OverloadSuggestion {
       '$templateId|$index|${current.exerciseId}|${current.sets}|${current.reps}|${current.seconds}';
 }
 
+/// A change proposed from outside the advisor (the AI coach v2, L-D43),
+/// reviewed in the same Accept / Edit / Dismiss flow; [note] explains it.
+@immutable
+class ProposedChange {
+  const ProposedChange(this.suggestion, this.note);
+  final OverloadSuggestion suggestion;
+  final String note;
+}
+
 /// PL-1 rule 5: optional, OFF by default, conservative and explainable.
 ///
 /// For each template target, look at the most recent sessions that used it.

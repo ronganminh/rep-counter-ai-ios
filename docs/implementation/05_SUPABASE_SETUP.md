@@ -148,6 +148,7 @@ Still open:
 | `ENABLE_XP` | flag | G-1 XP |
 | `ENABLE_SOCIAL` | flag | S-1 friends, block, report, leaderboard |
 | `ENABLE_INBOX` | flag | NT-2 in-app inbox (works without pushes) |
+| `ENABLE_AI_COACH_V2` | flag | AI-1 coach v2 "virtual PT" (L-D43, `08_AI_COACH_PLAN.md`): workout review and plan cards with "Apply to plan", 15-turn chat with memory kept on the phone; needs `ENABLE_AI_CREDITS` and the `20261125000100_ai_coach_v2.sql` migration + new `ai-request` deployed |
 | `ENABLE_PUSH` | flag | NT-2 remote pushes; **off** until APNs / Firebase exist (implies the inbox) |
 | `ENABLE_BILLING` | flag | P-1; **off** until D-14 (prices, product ids) |
 

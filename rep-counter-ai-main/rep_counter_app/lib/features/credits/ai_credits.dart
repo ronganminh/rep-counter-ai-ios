@@ -27,7 +27,14 @@ class AiCredits {
 }
 
 /// What an AI request costs credits for (D-07: basic feedback is free).
-enum CreditedRequest { coachChat, advancedAnalysis, progressReview }
+/// [workoutReview] and [planSuggestion] are coach v2 only (L-D43).
+enum CreditedRequest {
+  coachChat,
+  advancedAnalysis,
+  progressReview,
+  workoutReview,
+  planSuggestion,
+}
 
 @immutable
 class CreditCharge {
@@ -136,6 +143,8 @@ extension CreditedRequestWire on CreditedRequest {
         CreditedRequest.coachChat => 'coach_chat',
         CreditedRequest.advancedAnalysis => 'advanced_analysis',
         CreditedRequest.progressReview => 'progress_review',
+        CreditedRequest.workoutReview => 'workout_review',
+        CreditedRequest.planSuggestion => 'plan_suggestion',
       };
 }
 
@@ -162,9 +171,28 @@ class CoachMessage {
 @immutable
 class CreditedAnswer {
   const CreditedAnswer(
-      {required this.requestId, required this.text, required this.balance});
+      {required this.requestId,
+      required this.text,
+      required this.balance,
+      this.data,
+      this.memory});
   final String requestId, text;
   final int balance;
+
+  /// v2: the validated JSON answer, or null when the server fell back to text.
+  final Map<String, Object?>? data;
+
+  /// v2 chat: the coach's updated long-term summary (kept on the phone).
+  final String? memory;
+}
+
+/// A usage limit of the AI service was reached (per user per day, or the
+/// service's monthly total). Nothing was charged.
+class AiLimitReached implements Exception {
+  const AiLimitReached(this.scope);
+
+  /// `user_daily` or `monthly_total`.
+  final String scope;
 }
 
 /// This request id was already charged; the app asks again with a new id
@@ -187,12 +215,15 @@ class AiProviderFailed implements Exception {
 abstract interface class CreditedAiApi {
   Future<CreditBalance> balance();
 
-  /// Throws [InsufficientCredits], [DuplicateAiRequest] or [AiProviderFailed].
+  /// Throws [InsufficientCredits], [DuplicateAiRequest], [AiProviderFailed]
+  /// or [AiLimitReached]. [version] 2 is coach v2 (with [memory] for chat).
   Future<CreditedAnswer> ask({
     required String requestId,
     required CreditedRequest kind,
     required String locale,
     List<CoachMessage> messages = const [],
     Map<String, Object?>? context,
+    int version = 1,
+    String? memory,
   });
 }
