@@ -100,7 +100,8 @@ class WebApplyTest(unittest.TestCase):
     def test_script_is_valid_bash(self):
         subprocess.run(["bash", "-n", str(SCRIPT)], check=True)
         if shutil.which("shellcheck"):
-            subprocess.run(["shellcheck", str(SCRIPT)], check=True)
+            r = subprocess.run(["shellcheck", str(SCRIPT)], capture_output=True, text=True)
+            self.assertEqual(r.returncode, 0, r.stdout + r.stderr)
 
     def test_requires_expected_sha(self):
         r = self.run_script(EXPECTED_SHA="")

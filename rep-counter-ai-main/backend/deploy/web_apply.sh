@@ -91,7 +91,7 @@ restore_backup() {
     sudo cp -a "$BACKUP_PATH/static" "$APP_DIR/static"
   fi
   sudo cp -a "$BACKUP_PATH/nginx-site" "$NGINX_SITE"
-  sudo nginx -t && sudo systemctl reload nginx || true
+  if sudo nginx -t; then sudo systemctl reload nginx; fi
   sudo systemctl restart repcoach-backend || true
   echo "web_apply: restored from $BACKUP_PATH" >&2
   exit 1
