@@ -5,7 +5,9 @@
 //   AI_PROVIDER            groq (default) | anthropic
 //   AI_FALLBACK_PROVIDER   optional: the other provider, used on error / timeout
 //   GROQ_API_KEY, GROQ_MODEL
-//   ANTHROPIC_API_KEY, ANTHROPIC_MODEL, ANTHROPIC_MAX_TOKENS, ANTHROPIC_EFFORT
+//   ANTHROPIC_API_KEY, ANTHROPIC_MODEL (default claude-haiku-5-5),
+//   ANTHROPIC_MODEL_PLAN (plan_suggestion only, default claude-haiku-5-5),
+//   ANTHROPIC_MAX_TOKENS, ANTHROPIC_EFFORT
 //   AI_DAILY_LIMIT_PER_USER   requests per user per UTC day (0 = no limit)
 //   AI_MONTHLY_LIMIT_TOTAL    requests of all users per UTC month (0 = no limit)
 import { createClient } from "jsr:@supabase/supabase-js@2";

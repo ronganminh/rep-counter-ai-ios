@@ -19,11 +19,14 @@ import { type HistoryRow, summarizeHistory } from "./coach_context.ts";
 import {
   type AiProvider,
   ANTHROPIC_DEFAULT_MODEL,
+  ANTHROPIC_DEFAULT_PLAN_MODEL,
   ANTHROPIC_VERSION,
   anthropicBody,
+  type AnthropicConfig,
   completeWithAnthropic,
   completeWithFallback,
   providersFromEnv,
+  supportsServerFallback,
 } from "./providers.ts";
 import { completeWithGroq } from "./provider.ts";
 import { neutralPrompt, PT_RULES, systemPrompt } from "./prompts.ts";
@@ -94,7 +97,10 @@ Deno.test("anthropic: Messages API request with cached system prompt", async () 
   assertEquals(h["anthropic-version"], ANTHROPIC_VERSION);
   assertFalse("authorization" in h);
   const body = JSON.parse(String(seen!.init.body));
-  assertEquals(body.model, "claude-opus-5-5");
+  assertEquals(body.model, "claude-haiku-5-5");
+  // Haiku has no server-side refusal fallback: no parameter, no beta header.
+  assertFalse("fallbacks" in body);
+  assertFalse("anthropic-beta" in h);
   assert(body.max_tokens <= 4_096, "small max_tokens");
   assertEquals(body.system.length, 1);
   assertEquals(body.system[0].cache_control, { type: "ephemeral" });
@@ -757,4 +763,84 @@ Deno.test("limits: per-user daily and monthly total, before any charge", async (
     (await handleAiRequest(v2({ kind: "workout_review" }), fine.d)).status,
     200,
   );
+});
+
+Deno.test("anthropic: plan_suggestion uses ANTHROPIC_MODEL_PLAN", async () => {
+  assertEquals(ANTHROPIC_DEFAULT_MODEL, "claude-haiku-5-5");
+  assertEquals(ANTHROPIC_DEFAULT_PLAN_MODEL, "claude-haiku-5-5");
+  const config: AnthropicConfig = {
+    apiKey: "k",
+    model: "claude-haiku-5-5",
+    planModel: "claude-sonnet-5-5",
+  };
+  const plan: ProviderPrompt = {
+    kind: "plan_suggestion",
+    locale: "en",
+    messages: [],
+    context: { horizon: "tomorrow" },
+    version: 2,
+  };
+  const p = anthropicBody(plan, config);
+  assertEquals(p.model, "claude-sonnet-5-5");
+  assertEquals((p as Record<string, unknown>).fallbacks, "default");
+  const r = anthropicBody({ ...plan, kind: "workout_review" }, config);
+  assertEquals(r.model, "claude-haiku-5-5");
+  assertFalse("fallbacks" in r);
+  // Unset plan model: the main model.
+  assertEquals(
+    anthropicBody(plan, { apiKey: "k", model: "claude-haiku-5-5" }).model,
+    "claude-haiku-5-5",
+  );
+  // The beta header follows the model actually used.
+  let headers: Record<string, string> = {};
+  await completeWithAnthropic(plan, config, (_u, init) => {
+    headers = init!.headers as Record<string, string>;
+    return Promise.resolve(
+      new Response(JSON.stringify({
+        stop_reason: "end_turn",
+        content: [{ type: "text", text: "{}" }],
+      })),
+    );
+  });
+  assertEquals(headers["anthropic-beta"], "server-side-fallback-2026-07-01");
+
+  for (
+    const m of ["claude-opus-5-5", "claude-sonnet-5-5", "claude-fable-5-2"]
+  ) {
+    assert(supportsServerFallback(m), m);
+  }
+  for (const m of ["claude-haiku-5-5", "claude-sonnet-5", "claude-haiku-4-5"]) {
+    assertFalse(supportsServerFallback(m), m);
+  }
+});
+
+Deno.test("router: Anthropic models from the secrets", () => {
+  const env = (vars: Record<string, string>) => ({
+    get: (k: string) => vars[k],
+  });
+  const body = (vars: Record<string, string>, kind: ProviderPrompt["kind"]) => {
+    let sent: Record<string, unknown> = {};
+    const [p] = providersFromEnv(
+      env({ AI_PROVIDER: "anthropic", ANTHROPIC_API_KEY: "k", ...vars }),
+      (_u, init) => {
+        sent = JSON.parse(String(init!.body));
+        return Promise.resolve(new Response("{}", { status: 500 }));
+      },
+    );
+    return p.complete({ ...chatPrompt, kind, messages: [], context: {} }).catch(
+      () => sent.model,
+    );
+  };
+  return Promise.all([
+    body({}, "workout_review").then((m) => assertEquals(m, "claude-haiku-5-5")),
+    body({}, "plan_suggestion").then((m) =>
+      assertEquals(m, "claude-haiku-5-5")
+    ),
+    body({ ANTHROPIC_MODEL_PLAN: "claude-opus-5-5" }, "plan_suggestion").then(
+      (m) => assertEquals(m, "claude-opus-5-5"),
+    ),
+    body({ ANTHROPIC_MODEL_PLAN: "claude-opus-5-5" }, "coach_chat").then((m) =>
+      assertEquals(m, "claude-haiku-5-5")
+    ),
+  ]).then(() => {});
 });

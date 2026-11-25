@@ -28,6 +28,31 @@ Staging project: `rvysencgtomkzwgdjaqh` (Tokyo). No production project yet.
 | `20261031000100_achievements.sql`        | G-1 achievements | `achievements_unlocked` gets a writer: a trigger on `workouts` unlocks the app's six achievements from live synced workouts (UTC days), never revoked (D-05); `achievements_list()` for the app; one-time backfill. **Applied to staging 2026-11-01** (SQL editor; version recorded in `supabase_migrations.schema_migrations`)              |
 | `20261125000100_ai_coach_v2.sql`         | AI-1 coach v2    | Kinds `workout_review`, `plan_suggestion` in the ledger and `ai_credit_consume`; `ai_usage_counts(user)` (charged, not refunded: user today, everyone this month, UTC) and `ai_coach_history(user, days)` (live synced workouts, numbers only) for `ai-request` only (service role). **Apply before deploying the new `ai-request`** (08 §6) |
 
+## `ai-request`: provider and limits (secrets only)
+
+The AI provider is chosen by Edge Function secrets, not by the app. Switching
+provider needs **no app rebuild, no store review and no redeploy**: the app
+sends the same request and gets the same response whichever provider answers.
+
+| Secret                                               | Staging now                  | Meaning                                                                                            |
+| ---------------------------------------------------- | ---------------------------- | -------------------------------------------------------------------------------------------------- |
+| `AI_PROVIDER`                                        | `groq` (default when unset)  | `groq` or `anthropic`                                                                              |
+| `AI_FALLBACK_PROVIDER`                               | unset (or `groq`)            | the other provider, used when the primary errors or times out; ignored when equal to `AI_PROVIDER` |
+| `GROQ_API_KEY`, `GROQ_MODEL`                         | set (`openai/gpt-oss-20b`)   | GroqCloud                                                                                          |
+| `ANTHROPIC_API_KEY`                                  | **not set**                  | needed only once `anthropic` is the provider or the fallback                                       |
+| `ANTHROPIC_MODEL` / `ANTHROPIC_MODEL_PLAN`           | (default `claude-haiku-5-5`) | plans may use `claude-sonnet-5-5` / `claude-opus-5-5`                                              |
+| `AI_DAILY_LIMIT_PER_USER` / `AI_MONTHLY_LIMIT_TOTAL` | `30` / `5000`                | 0 = no limit; 429 `limit_reached` before any charge                                                |
+
+Switch to Anthropic, with Groq as the backup, only after the privacy policy
+names Anthropic (`docs/implementation/08_AI_COACH_PLAN.md` §5(b), §6):
+
+```bash
+supabase secrets set ANTHROPIC_API_KEY=<from console.anthropic.com> AI_PROVIDER=anthropic AI_FALLBACK_PROVIDER=groq
+```
+
+Back to Groq only: `supabase secrets set AI_PROVIDER=groq` and
+`supabase secrets unset AI_FALLBACK_PROVIDER`.
+
 ## Tests
 
 ```

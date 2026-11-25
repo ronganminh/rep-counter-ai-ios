@@ -38,8 +38,10 @@ coach_context.ts ── 28-day numbers-only history summary
   - The system prompt is one block with `cache_control: {type: "ephemeral"}`. Its text depends only on version, kind and language, so it is cacheable.
   - JSON answers use `output_config.format` (`json_schema`). Thinking stays adaptive, with `output_config.effort` `low` for short answers.
   - Small `max_tokens` (2048, `ANTHROPIC_MAX_TOKENS`).
-  - Server-side refusal fallbacks are on (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`).
-  - Default model `claude-opus-5-5` (`ANTHROPIC_MODEL`).
+  - **Models** (owner decision 2026-11-25):
+    - `ANTHROPIC_MODEL` defaults to **`claude-haiku-5-5`**, the latest Haiku. The ID was read on 2026-11-25 from the Claude API ID / alias row of https://platform.claude.com/docs/en/about-claude/models/overview (docs.claude.com redirects there). It is used for every kind except plans.
+    - `ANTHROPIC_MODEL_PLAN` is used for `plan_suggestion` only. It also defaults to `claude-haiku-5-5` and can be set to `claude-sonnet-5-5` or `claude-opus-5-5` (same page) for stronger plans.
+  - Server-side refusal fallback (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`) is sent only for models that support it (Opus 5 / 5.5, Sonnet 5.5, Fable 5.1 / 5.2). Haiku has no server-side fallback, so a Haiku refusal goes to `AI_FALLBACK_PROVIDER` instead.
   - A refusal, a cut-off answer, 429, 529 or 5xx throws, and the router moves on to the fallback provider.
 - **Fallback.** Providers are tried in order, each with its own timeout (Groq 20 s, Anthropic 25 s). A provider without a key is skipped. The log records only the provider name and `error` / `timeout`.
 - **Limits** (Edge Function secrets, on top of credits, checked before any charge):
@@ -126,13 +128,29 @@ Smoke test:
 - With no session, the function returns 401.
 - With a staging account, `test/staging/staging_backend_test.dart` passes. v1 answers are unchanged.
 
-Later, only after the policy and consent text in §5(b) are live:
+**Staging now (owner decision 2026-11-25):** GroqCloud only. `AI_PROVIDER=groq` (also the default when unset), `AI_FALLBACK_PROVIDER` unset (or `groq`, which is the same thing: a fallback equal to the primary is ignored), and **no** `ANTHROPIC_API_KEY`. The policy published now names only GroqCloud for AI Coach.
 
-```bash
-supabase secrets set ANTHROPIC_API_KEY=<from console.anthropic.com> ANTHROPIC_MODEL=claude-opus-5-5 AI_FALLBACK_PROVIDER=anthropic
-```
+### Switching provider: secrets only, no app rebuild
 
-Then watch the function logs: `"provider":"anthropic","fallback":true` lines show the fallback in use.
+The app never knows which provider answers. The request and response of `ai-request` are the same for both. Switching is therefore a secrets change on Supabase:
+- no new app build;
+- no store review;
+- no function redeploy: Supabase restarts the function with the new secrets.
+
+Before switching to Anthropic, publish the Anthropic wording of §5(b) and update the coach consent text (app release).
+1. Anthropic main, Groq backup, after the app is tested on staging:
+   ```bash
+   supabase secrets set ANTHROPIC_API_KEY=<from console.anthropic.com> ANTHROPIC_MODEL=claude-haiku-5-5 ANTHROPIC_MODEL_PLAN=claude-haiku-5-5
+   supabase secrets set AI_PROVIDER=anthropic AI_FALLBACK_PROVIDER=groq
+   ```
+   Optional: stronger plans with `ANTHROPIC_MODEL_PLAN=claude-sonnet-5-5` or `claude-opus-5-5`.
+2. Check: the function logs show `"provider":"anthropic"`. Lines with `"provider":"groq","fallback":true` mean Groq answered because Anthropic failed.
+3. Back to Groq only:
+   ```bash
+   supabase secrets set AI_PROVIDER=groq
+   supabase secrets unset AI_FALLBACK_PROVIDER
+   ```
+   `ANTHROPIC_API_KEY` may stay set. It is only used when `anthropic` is the provider or the fallback.
 
 **Rollback:**
 - Set `AI_PROVIDER=groq` and unset `AI_FALLBACK_PROVIDER`, or redeploy the previous function version.
