@@ -15,6 +15,7 @@ class ReminderPrefs {
     this.quietStart = 22 * 60,
     this.quietEnd = 7 * 60,
     this.friendly = true,
+    this.aiCopy = false,
   });
 
   final bool enabled;
@@ -22,6 +23,10 @@ class ReminderPrefs {
   /// NT-2 (L-D44): warm reminder lines chosen by situation (on by default);
   /// off uses the neutral "About N min." line.
   final bool friendly;
+
+  /// NT-2 layer 2 (L-D44, AI coach v2 only): lines written by the AI coach
+  /// for the next sessions, at most one AI request a week; off by default.
+  final bool aiCopy;
   final int minuteOfDay;
   final bool quietHours;
   final int quietStart, quietEnd;
@@ -32,7 +37,8 @@ class ReminderPrefs {
           bool? quietHours,
           int? quietStart,
           int? quietEnd,
-          bool? friendly}) =>
+          bool? friendly,
+          bool? aiCopy}) =>
       ReminderPrefs(
         enabled: enabled ?? this.enabled,
         minuteOfDay: minuteOfDay ?? this.minuteOfDay,
@@ -40,6 +46,7 @@ class ReminderPrefs {
         quietStart: quietStart ?? this.quietStart,
         quietEnd: quietEnd ?? this.quietEnd,
         friendly: friendly ?? this.friendly,
+        aiCopy: aiCopy ?? this.aiCopy,
       );
 
   /// Whether [minute] (0…1439) falls in quiet hours, which may wrap midnight.
@@ -57,6 +64,7 @@ class ReminderPrefs {
         'quiet_start': quietStart,
         'quiet_end': quietEnd,
         'friendly': friendly,
+        'ai_copy': aiCopy,
       };
 
   factory ReminderPrefs.fromJson(Map<String, dynamic> j) {
@@ -73,6 +81,7 @@ class ReminderPrefs {
       quietStart: minute(j['quiet_start'], d.quietStart),
       quietEnd: minute(j['quiet_end'], d.quietEnd),
       friendly: j['friendly'] as bool? ?? true,
+      aiCopy: j['ai_copy'] as bool? ?? false,
     );
   }
 }

@@ -124,6 +124,18 @@ const TASK_V2: Record<string, Record<Locale, string>> = {
     vi: "Đánh giá tiến bộ trong context.history: xu hướng, độ đều đặn, hai " +
       "ba điểm nổi bật và một trọng tâm thực tế cho tuần tới.",
   },
+  reminder_batch: {
+    en: "Write one workout reminder for each session in context.sessions " +
+      "(use its session_id). Each reminder is ONE short, warm sentence of " +
+      "at most 100 characters: encouraging, never blaming, never hurrying, " +
+      "no promotion, no links, at most one emoji. You may mention one small " +
+      "technique point from context.history or the session targets.",
+    vi: "Viết một lời nhắc tập cho mỗi buổi trong context.sessions (dùng " +
+      "session_id của buổi). Mỗi lời nhắc là MỘT câu ngắn, ấm áp, tối đa 100 " +
+      "ký tự: khích lệ, không trách móc, không hối thúc, không quảng cáo, " +
+      "không đường link, tối đa một emoji. Có thể nhắc một điểm kỹ thuật " +
+      "nhỏ từ context.history hoặc chỉ tiêu của buổi.",
+  },
   coach_chat: {
     en: "Answer the user's latest message using the context and " +
       "context.memory (what you know about them from earlier chats). Also " +

@@ -34,6 +34,9 @@ enum CreditedRequest {
   progressReview,
   workoutReview,
   planSuggestion,
+
+  /// NT-2 layer 2: reminder lines for the next planned sessions.
+  reminderBatch,
 }
 
 @immutable
@@ -145,6 +148,7 @@ extension CreditedRequestWire on CreditedRequest {
         CreditedRequest.progressReview => 'progress_review',
         CreditedRequest.workoutReview => 'workout_review',
         CreditedRequest.planSuggestion => 'plan_suggestion',
+        CreditedRequest.reminderBatch => 'reminder_batch',
       };
 }
 

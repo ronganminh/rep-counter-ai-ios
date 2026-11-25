@@ -117,6 +117,34 @@ abstract final class ReminderCopy {
   /// A line is not used again within this many days (NT-2).
   static const noRepeatDays = 14;
 
+  /// NT-2 layer 2: AI lines longer than this are not used.
+  static const aiMaxChars = 120;
+
+  /// Words an AI line must not contain (blame, body talk, diet, promotion,
+  /// links). Same list as `ai-request` (`schema.ts`, REMINDER_BANNED).
+  static const banned = [
+    'lazy', 'fat', 'ugly', 'pathetic', 'loser', 'shame', 'guilt', 'diet',
+    'weight loss', 'calorie', 'burn fat', 'hurry', 'last chance', 'buy',
+    'subscribe', 'premium', 'discount', 'http', 'www.', 'lười', 'béo', 'mập',
+    'xấu', 'thảm hại', 'xấu hổ', 'tội lỗi', 'ăn kiêng', 'giảm cân', 'calo',
+    'nhanh lên', 'cơ hội cuối', 'mua', 'đăng ký', 'khuyến mãi', 'giảm giá',
+  ];
+
+  static final _emoji = RegExp(
+      r'[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}]',
+      unicode: true);
+
+  /// An AI-written line the app may show, or null (then layer 1 is used).
+  static String? cleanAi(Object? v) {
+    if (v is! String) return null;
+    final t = v.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (t.isEmpty || t.length > aiMaxChars) return null;
+    if (_emoji.allMatches(t).length > 1) return null;
+    final lower = t.toLowerCase();
+    if (banned.any(lower.contains)) return null;
+    return t;
+  }
+
   /// Streak needed for the streak lines.
   static const streakDays = 7;
 

@@ -97,7 +97,8 @@
         "coach_chat",
         "workout_review",
         "plan_suggestion",
-        "progress_review"
+        "progress_review",
+        "reminder_batch"
       ],
       "response_v2": [
         "request_id",
