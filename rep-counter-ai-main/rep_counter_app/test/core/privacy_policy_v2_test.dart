@@ -70,8 +70,8 @@ void main() {
   }
 
   test('effective date is the v2 revision in both languages', () {
-    expect(LegalConfig.effectiveDate, '24/11/2026');
-    expect(LegalConfig.effectiveDateEn, 'November 24, 2026');
+    expect(LegalConfig.effectiveDate, '25/11/2026');
+    expect(LegalConfig.effectiveDateEn, 'November 25, 2026');
   });
 
   test('web privacy policy matches the app (v2, bilingual)', () {
@@ -94,6 +94,39 @@ void main() {
     expect(html, isNot(contains('up to the latest 100')));
     expect(html, isNot(contains('Gemini')));
     expect(html.toLowerCase(), isNot(contains('<script')));
+  });
+
+  // AI Coach v2 (L-D43): section 8 says what the coach reads and keeps.
+  // Anthropic is prepared in docs/implementation/08_AI_COACH_PLAN.md §5(b)
+  // and published only when AI_PROVIDER / AI_FALLBACK_PROVIDER use it.
+  for (final (name, s, facts) in [
+    ('en', S.en, ['4 weeks', '15 turns', 'summary', 'not a human', 'GroqCloud']),
+    ('vi', S.vi, ['4 tuần', '15 lượt', 'tóm tắt', 'không phải con người', 'GroqCloud']),
+  ]) {
+    test('AI Coach v2 section ($name): history, memory, plan; GroqCloud only', () {
+      for (final f in facts) {
+        expect(s.privCoachBody, contains(f), reason: 'missing "$f"');
+      }
+      expect(_privacyText(s), isNot(contains('Anthropic')));
+      expect(_privacyText(s), isNot(contains('Claude')));
+    });
+  }
+
+  test('web AI Coach section matches (EN/VI), Anthropic not yet published', () {
+    final html = File('$_web/privacy-policy.html').readAsStringSync();
+    for (final f in [
+      'last 4 weeks',
+      'up to the last 15 turns',
+      'short summary of earlier chats',
+      'not a human',
+      '4 tuần gần nhất',
+      'tối đa 15 lượt',
+      'không phải con người',
+    ]) {
+      expect(html, contains(f), reason: 'missing "$f"');
+    }
+    expect(html, isNot(contains('Anthropic')));
+    expect(html, isNot(contains('The chat is kept in memory on your phone only')));
   });
 
   test('web delete-account page lets people request deletion without the app',

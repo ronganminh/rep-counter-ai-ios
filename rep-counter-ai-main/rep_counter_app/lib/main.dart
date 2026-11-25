@@ -17,6 +17,7 @@ import 'features/auth/application/auth_scope.dart';
 import 'features/auth/data/auth_bootstrap.dart';
 import 'features/auth/presentation/password_reset_pages.dart';
 import 'features/credits/credits_controller.dart';
+import 'features/credits/reminder_ai.dart';
 import 'features/inbox/inbox_controller.dart';
 import 'features/legal/onboarding_page.dart';
 import 'features/progression/xp_controller.dart';
@@ -88,6 +89,7 @@ class _RepCounterAppState extends State<RepCounterApp> {
     final auth = AuthController(repository);
     final sync = createSyncController(auth)?..start();
     final credits = createCreditsController(auth);
+    installReminderAiWriter(credits);
     final xp = createXpController(auth, sync: sync);
     final social = createSocialApi();
     final inbox = createInboxController(auth);
