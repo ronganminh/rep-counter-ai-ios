@@ -30,7 +30,10 @@ export interface AiProvider {
 
 export interface AnthropicConfig {
   apiKey: string;
+  /** ANTHROPIC_MODEL: every kind except plan_suggestion. */
   model: string;
+  /** ANTHROPIC_MODEL_PLAN: plan_suggestion only (defaults to [model]). */
+  planModel?: string;
   /** Output budget, kept small: coaching answers are short. */
   maxTokens?: number;
   /** output_config.effort; "low" suits short chat-style answers. */
@@ -38,12 +41,30 @@ export interface AnthropicConfig {
   timeoutMs?: number;
 }
 
-export const ANTHROPIC_DEFAULT_MODEL = "claude-opus-5-5";
+// Latest Haiku, from the models overview (Claude API ID and alias
+// `claude-haiku-5-5`), read 2026-11-25:
+// https://platform.claude.com/docs/en/about-claude/models/overview
+// Override with ANTHROPIC_MODEL / ANTHROPIC_MODEL_PLAN (e.g.
+// `claude-sonnet-5-5` or `claude-opus-5-5` for plans).
+export const ANTHROPIC_DEFAULT_MODEL = "claude-haiku-5-5";
+export const ANTHROPIC_DEFAULT_PLAN_MODEL = "claude-haiku-5-5";
 export const ANTHROPIC_VERSION = "2026-10-21";
 const ANTHROPIC_ENDPOINT = "https://api.anthropic.com/v1/messages";
-// Server-side refusal fallback (routes by refusal category), recommended
-// for this model family.
+// Server-side refusal fallback (routes by refusal category). Only models
+// that support it get the parameter: Haiku has no server-side fallback, so
+// a Haiku refusal goes to AI_FALLBACK_PROVIDER instead.
 const ANTHROPIC_BETA = "server-side-fallback-2026-07-01";
+export const supportsServerFallback = (model: string) =>
+  /^claude-(opus-5(-5)?|sonnet-5-5|fable-5-[12])$/.test(model);
+
+/** The model for a request: plans may use a stronger model. */
+export const anthropicModelFor = (
+  prompt: ProviderPrompt,
+  config: AnthropicConfig,
+) =>
+  prompt.kind === "plan_suggestion"
+    ? config.planModel || config.model
+    : config.model;
 const MAX_RESPONSE_BYTES = 262_144;
 
 /** Messages API body: cached system block, alternating user/assistant turns. */
@@ -61,8 +82,9 @@ export function anthropicBody(prompt: ProviderPrompt, config: AnthropicConfig) {
     messages.unshift({ role: "user", content: "(conversation so far)" });
   }
   const schema = p.json ? JSON_SCHEMAS[prompt.kind] : undefined;
+  const model = anthropicModelFor(prompt, config);
   return {
-    model: config.model,
+    model,
     max_tokens: config.maxTokens ?? 2_048,
     // The system text depends only on version, kind and locale, so it is
     // cached across users (prompt caching, ephemeral).
@@ -74,7 +96,7 @@ export function anthropicBody(prompt: ProviderPrompt, config: AnthropicConfig) {
       effort: config.effort ?? "low",
       ...(schema ? { format: { type: "json_schema", schema } } : {}),
     },
-    fallbacks: "default",
+    ...(supportsServerFallback(model) ? { fallbacks: "default" } : {}),
   };
 }
 
@@ -90,7 +112,9 @@ export async function completeWithAnthropic(
       "content-type": "application/json",
       "x-api-key": config.apiKey,
       "anthropic-version": ANTHROPIC_VERSION,
-      "anthropic-beta": ANTHROPIC_BETA,
+      ...(supportsServerFallback(anthropicModelFor(prompt, config))
+        ? { "anthropic-beta": ANTHROPIC_BETA }
+        : {}),
     },
     body: JSON.stringify(anthropicBody(prompt, config)),
     signal: options.signal ?? AbortSignal.timeout(config.timeoutMs ?? 25_000),
@@ -192,6 +216,7 @@ export function providersFromEnv(
   const anthropic: AnthropicConfig = {
     apiKey: env.get("ANTHROPIC_API_KEY") ?? "",
     model: env.get("ANTHROPIC_MODEL") || ANTHROPIC_DEFAULT_MODEL,
+    planModel: env.get("ANTHROPIC_MODEL_PLAN") || ANTHROPIC_DEFAULT_PLAN_MODEL,
     maxTokens: Number(env.get("ANTHROPIC_MAX_TOKENS")) || 2_048,
     effort: effort === "medium" || effort === "high" ? effort : "low",
   };

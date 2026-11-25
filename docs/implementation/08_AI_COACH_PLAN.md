@@ -38,8 +38,10 @@ coach_context.ts ── 28-day numbers-only history summary
   - The system prompt is one block with `cache_control: {type: "ephemeral"}`. Its text depends only on version, kind and language, so it is cacheable.
   - JSON answers use `output_config.format` (`json_schema`). Thinking stays adaptive, with `output_config.effort` `low` for short answers.
   - Small `max_tokens` (2048, `ANTHROPIC_MAX_TOKENS`).
-  - Server-side refusal fallbacks are on (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`).
-  - Default model `claude-opus-5-5` (`ANTHROPIC_MODEL`).
+  - **Models** (owner decision 2026-11-25):
+    - `ANTHROPIC_MODEL` defaults to **`claude-haiku-5-5`**, the latest Haiku. The ID was read on 2026-11-25 from the Claude API ID / alias row of https://platform.claude.com/docs/en/about-claude/models/overview (docs.claude.com redirects there). It is used for every kind except plans.
+    - `ANTHROPIC_MODEL_PLAN` is used for `plan_suggestion` only. It also defaults to `claude-haiku-5-5` and can be set to `claude-sonnet-5-5` or `claude-opus-5-5` (same page) for stronger plans.
+  - Server-side refusal fallback (`fallbacks: "default"`, beta `server-side-fallback-2026-07-01`) is sent only for models that support it (Opus 5 / 5.5, Sonnet 5.5, Fable 5.1 / 5.2). Haiku has no server-side fallback, so a Haiku refusal goes to `AI_FALLBACK_PROVIDER` instead.
   - A refusal, a cut-off answer, 429, 529 or 5xx throws, and the router moves on to the fallback provider.
 - **Fallback.** Providers are tried in order, each with its own timeout (Groq 20 s, Anthropic 25 s). A provider without a key is skipped. The log records only the provider name and `error` / `timeout`.
 - **Limits** (Edge Function secrets, on top of credits, checked before any charge):
@@ -126,13 +128,13 @@ Smoke test:
 - With no session, the function returns 401.
 - With a staging account, `test/staging/staging_backend_test.dart` passes. v1 answers are unchanged.
 
-Later, only after the policy and consent text in §5(b) are live:
+Anthropic as the main provider with Groq as the fallback (the staging choice of 2026-11-25). Do this only after the privacy policy and consent text naming Anthropic are live:
 
 ```bash
-supabase secrets set ANTHROPIC_API_KEY=<from console.anthropic.com> ANTHROPIC_MODEL=claude-opus-5-5 AI_FALLBACK_PROVIDER=anthropic
+supabase secrets set AI_PROVIDER=anthropic AI_FALLBACK_PROVIDER=groq ANTHROPIC_API_KEY=<from console.anthropic.com> ANTHROPIC_MODEL=claude-haiku-5-5 ANTHROPIC_MODEL_PLAN=claude-haiku-5-5
 ```
 
-Then watch the function logs: `"provider":"anthropic","fallback":true` lines show the fallback in use.
+Then watch the function logs: `"provider":"groq","fallback":true` lines show Groq answering when Anthropic failed.
 
 **Rollback:**
 - Set `AI_PROVIDER=groq` and unset `AI_FALLBACK_PROVIDER`, or redeploy the previous function version.
