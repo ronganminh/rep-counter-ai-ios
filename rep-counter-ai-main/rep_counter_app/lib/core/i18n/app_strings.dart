@@ -784,7 +784,7 @@ class S {
     privCoachTitle:
         'AI Coach',
     privCoachBody:
-        'AI Coach, phân tích nâng cao và đánh giá tiến bộ cần tài khoản và dùng tín dụng AI miễn phí hằng tuần. Tin nhắn bạn gõ, phần hội thoại trước đó trong phiên và, với phân tích, số liệu tổng hợp của buổi tập được gửi tới dịch vụ ai-request trên Supabase; dịch vụ chuyển tới GroqCloud và trả câu trả lời về. Hội thoại không được lưu trên máy chủ; chỉ ghi lại thay đổi tín dụng và một request ID ngẫu nhiên. Đoạn chat chỉ nằm trong bộ nhớ trên điện thoại và không được lưu lại.',
+        'AI Coach, nhận xét buổi tập, gợi ý lịch tập và đánh giá tiến bộ cần tài khoản và dùng tín dụng AI miễn phí hằng tuần. Với mỗi yêu cầu, app gửi tới dịch vụ ai-request trên Supabase: loại yêu cầu và ngôn ngữ, tin nhắn bạn gõ cùng tối đa 15 lượt gần nhất của cuộc trò chuyện, một bản tóm tắt ngắn các lần trò chuyện trước (app giữ trên điện thoại của bạn), và số liệu tập (buổi gần nhất, mục tiêu và chỉ tiêu của kế hoạch đang theo). Để cá nhân hoá câu trả lời, dịch vụ còn đọc các buổi tập đã đồng bộ trong 4 tuần gần nhất từ tài khoản của bạn và chuyển thành tổng và trung bình. Dịch vụ kiểm tra đăng nhập và hạn mức, trừ một tín dụng, gửi lời nhắc đã tối giản này tới GroqCloud và trả câu trả lời về. AI Coach là hệ thống AI, không phải con người. Cuộc trò chuyện và bản tóm tắt không được lưu trên máy chủ của chúng tôi; chỉ ghi lại thay đổi tín dụng và một request ID ngẫu nhiên. Thay đổi kế hoạch được gợi ý chỉ được áp dụng khi bạn chấp nhận. Bạn có thể xoá bản tóm tắt trong AI Coach, và nó bị xoá khi bạn xoá tài khoản.',
     privNotifTitle:
         'Thông báo',
     privNotifBody:
@@ -1055,7 +1055,7 @@ class S {
     privCoachTitle:
         'AI Coach',
     privCoachBody:
-        'AI Coach, advanced analysis and progress reviews need an account and use weekly free AI credits. The messages you type, the earlier messages of that session and, for analyses, aggregate workout numbers are sent to the ai-request service on Supabase, which forwards them to GroqCloud and returns the answer. The conversation is not stored on the server; only the credit change and a random request ID are recorded. The chat is kept in memory on your phone only and is not saved.',
+        'AI Coach, workout reviews, plan suggestions and progress reviews need an account and use weekly free AI credits. For each request the app sends to the ai-request service on Supabase: the request type and language, the messages you type with up to the last 15 turns of that chat, a short summary of earlier chats that the app keeps on your phone, and workout numbers (your last workout, your active plan\'s targets and goal). To personalise answers, the service also reads your synced workouts of the last 4 weeks from your account and turns them into totals and averages. It checks your sign-in and usage limits, charges one credit, sends this minimized prompt to GroqCloud and returns the answer. AI Coach is an AI system, not a human. The conversation and the summary are not stored on our servers; only the credit change and a random request ID are recorded. Suggested plan changes apply only if you accept them. You can clear the coach\'s summary in AI Coach, and it is removed when you delete your account.',
     privNotifTitle:
         'Notifications',
     privNotifBody:
