@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:supabase_flutter/supabase_flutter.dart' as sb;
 
@@ -9,7 +10,9 @@ import 'native_id_tokens.dart';
 import 'supabase_auth_api.dart';
 
 /// [AuthRepository] on Supabase Auth (D-12). Email + password with
-/// verification and reset links; Apple and Google through native ID tokens.
+/// verification and reset links; Google through native ID tokens; Apple
+/// through the native sheet on iOS and Supabase's web (OAuth) flow
+/// elsewhere ([appleNative]).
 /// Error messages and tokens are never logged or shown; only the mapped
 /// [AuthFailureKind] reaches the UI.
 class SupabaseAuthRepository implements AuthRepository {
@@ -18,13 +21,35 @@ class SupabaseAuthRepository implements AuthRepository {
     required this.providers,
     required this.redirectUrl,
     NativeIdTokens? nativeTokens,
-  }) : _native = nativeTokens;
+    this.appleNative = true,
+    Stream<void> Function()? appResumes,
+    this.appleWebGrace = const Duration(seconds: 20),
+    this.appleWebTimeout = const Duration(minutes: 5),
+  })  : _native = nativeTokens,
+        _resumes = appResumes ?? appResumeStream;
 
   final SupabaseAuthApi api;
   @override
   final Set<AuthProvider> providers;
   final String redirectUrl;
   final NativeIdTokens? _native;
+
+  /// Sign in with Apple through the native sheet (iOS). False: the web
+  /// flow (Android), which also cannot fetch an authorization code for
+  /// token revocation at account deletion.
+  final bool appleNative;
+
+  /// Fires when the app comes back to the foreground (web flow).
+  final Stream<void> Function() _resumes;
+
+  /// Web flow: after coming back without a session, how long to wait for
+  /// the deep link's code exchange before treating it as cancelled; and
+  /// the overall limit.
+  final Duration appleWebGrace, appleWebTimeout;
+
+  /// Apple shares only the name and email (or a Hide My Email relay
+  /// address); nothing else is asked for.
+  static const appleScopes = 'name email';
 
   /// Last email used, for "Resend email" when there is no session yet.
   String? _pendingEmail;
@@ -173,10 +198,52 @@ class SupabaseAuthRepository implements AuthRepository {
         if (!providers.contains(AuthProvider.apple)) {
           throw const AuthFailure(AuthFailureKind.unavailable);
         }
+        if (!appleNative) return _session(await _appleWeb());
         final t = await _tokens.apple();
         return _session(await api.signInWithIdToken(sb.OAuthProvider.apple,
             idToken: t.idToken, nonce: t.rawNonce));
       }, AuthProvider.apple);
+
+  /// Supabase's OAuth page in the browser; the redirect deep link signs in
+  /// and arrives as an event. Coming back without one (the user closed the
+  /// browser) is a cancel, after [appleWebGrace] for the code exchange.
+  Future<ApiSession> _appleWeb() async {
+    final done = Completer<ApiSession>();
+    Timer? grace;
+    void cancel() {
+      if (!done.isCompleted) {
+        done.completeError(
+            const AuthFailure(AuthFailureKind.cancelled, AuthProvider.apple));
+      }
+    }
+
+    final events = api.events.listen((e) {
+      if (e.kind == ApiAuthEventKind.signedIn &&
+          e.session != null &&
+          !done.isCompleted) {
+        done.complete(e.session!);
+      }
+    });
+    final resumes = _resumes().listen((_) {
+      grace?.cancel();
+      grace = Timer(appleWebGrace, cancel);
+    });
+    try {
+      final opened = await api.signInWithOAuth(sb.OAuthProvider.apple,
+          redirectTo: redirectUrl, scopes: appleScopes);
+      if (!opened) {
+        throw const AuthFailure(
+            AuthFailureKind.providerFailed, AuthProvider.apple);
+      }
+      return await done.future.timeout(appleWebTimeout, onTimeout: () {
+        throw const AuthFailure(AuthFailureKind.cancelled, AuthProvider.apple);
+      });
+    } finally {
+      grace?.cancel();
+      await events.cancel();
+      await resumes.cancel();
+    }
+  }
 
   @override
   Future<AuthSession> signInWithGoogle() => _guard(() async {
@@ -236,6 +303,7 @@ class SupabaseAuthRepository implements AuthRepository {
         // sheet cancels the deletion; nothing is deleted.
         String? appleCode;
         if (session.user.provider == 'apple' &&
+            appleNative &&
             providers.contains(AuthProvider.apple)) {
           appleCode = await _tokens.appleAuthorizationCode();
         }
@@ -253,4 +321,16 @@ class SupabaseAuthRepository implements AuthRepository {
     _pendingEmail = null;
     await api.signOut();
   }
+}
+
+/// App resumes, from [AppLifecycleListener] (one listener per subscriber).
+Stream<void> appResumeStream() {
+  AppLifecycleListener? listener;
+  late final StreamController<void> c;
+  c = StreamController<void>(
+    onListen: () =>
+        listener = AppLifecycleListener(onResume: () => c.add(null)),
+    onCancel: () => listener?.dispose(),
+  );
+  return c.stream;
 }

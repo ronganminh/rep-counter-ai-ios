@@ -64,6 +64,15 @@ class FakeApi implements SupabaseAuthApi {
           () => session = ApiSession(
               apiUser('x@${provider.name}.example', provider: provider.name)));
 
+  /// What [signInWithOAuth] reports (the browser page opened).
+  bool oauthOpens = true;
+
+  @override
+  Future<bool> signInWithOAuth(sb.OAuthProvider provider,
+          {required String redirectTo, required String scopes}) =>
+      _call('signInWithOAuth ${provider.name} $redirectTo $scopes',
+          () => oauthOpens);
+
   @override
   Future<void> resendSignup(String email, {required String redirectTo}) =>
       _call('resendSignup $email $redirectTo', () {});

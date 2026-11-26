@@ -104,7 +104,7 @@ Done at developer.apple.com, in Certificates, Identifiers & Profiles.
 
 - No extra Supabase setting is needed. The `com.ronganminh.repcoach://login-callback` intent filter is already in `AndroidManifest.xml`.
 - Google needs the SHA-1 values from §3.
-- Apple on Android is **not offered** (no native sheet). It could be added later with the web flow and the Services ID.
+- Apple on Android uses Supabase's **web (OAuth) flow** (L-D47): it needs the Services ID in the Apple provider's Client IDs and the OAuth secret key. Checklist: `docs/qa/APPLE_SIGNIN_SETUP.md`.
 
 ## 7. Account deletion (server side)
 

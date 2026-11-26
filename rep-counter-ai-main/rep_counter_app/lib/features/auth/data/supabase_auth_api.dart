@@ -15,6 +15,13 @@ abstract interface class SupabaseAuthApi {
   Future<ApiSession> signInWithPassword(String email, String password);
   Future<ApiSession> signInWithIdToken(sb.OAuthProvider provider,
       {required String idToken, String? nonce});
+
+  /// Opens the provider's sign-in page in the browser (Sign in with Apple
+  /// on Android, where there is no native sheet). The session arrives later
+  /// as a [ApiAuthEventKind.signedIn] event, when the redirect deep link
+  /// brings the user back. False when the page could not be opened.
+  Future<bool> signInWithOAuth(sb.OAuthProvider provider,
+      {required String redirectTo, required String scopes});
   Future<void> resendSignup(String email, {required String redirectTo});
   Future<void> resetPasswordForEmail(String email,
       {required String redirectTo});
@@ -142,6 +149,14 @@ class GoTrueSupabaseAuthApi implements SupabaseAuthApi {
       _session((await _auth.signInWithIdToken(
               provider: provider, idToken: idToken, nonce: nonce))
           .session!);
+
+  @override
+  Future<bool> signInWithOAuth(sb.OAuthProvider provider,
+          {required String redirectTo, required String scopes}) =>
+      _auth.signInWithOAuth(provider,
+          redirectTo: redirectTo,
+          scopes: scopes,
+          authScreenLaunchMode: sb.LaunchMode.externalApplication);
 
   @override
   Future<void> resendSignup(String email, {required String redirectTo}) =>

@@ -16,6 +16,7 @@ import 'package:rep_counter_app/features/home/presentation/home_screen.dart';
 import 'package:rep_counter_app/features/profile/presentation/profile_page.dart';
 import 'package:rep_counter_app/theme/app_theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../support/fake_auth_repository.dart';
 import '../../support/l10n.dart';
@@ -95,6 +96,37 @@ void main() {
     final google = tester.getTopLeft(find.byKey(const Key('auth-google'))).dy;
     expect(apple, lessThan(google));
     expect(find.text('Continue as guest'), findsOneWidget);
+    // HIG: Apple's own button (logo, white on the dark theme), the same
+    // size as Google's, both at least 48 dp. (Wide enough that the test
+    // font keeps "Continue with Google" on one line, as on a phone.)
+    tester.view.physicalSize = const Size(900, 852);
+    await tester.pumpAndSettle();
+    final a = tester.getSize(find.byKey(const Key('auth-apple')));
+    final g = tester.getSize(find.byKey(const Key('auth-google')));
+    expect(a, g);
+    expect(a.height, greaterThanOrEqualTo(48));
+    expect(find.text('Continue with Apple'), findsOneWidget);
+    // Large text: Apple still never smaller than Google.
+    tester.platformDispatcher.textScaleFactorTestValue = 2;
+    addTearDown(tester.platformDispatcher.clearTextScaleFactorTestValue);
+    tester.view.physicalSize = const Size(393, 852);
+    await tester.pumpAndSettle();
+    final a2 = tester.getSize(find.byKey(const Key('auth-apple')));
+    final g2 = tester.getSize(find.byKey(const Key('auth-google')));
+    expect(a2.height, greaterThanOrEqualTo(g2.height));
+    expect(a2.width, g2.width);
+    expect(tester.takeException(), isNull);
+    expect(
+        tester
+            .widget<Material>(find.byKey(const Key('auth-apple-surface')))
+            .color,
+        Colors.white);
+    expect(
+        find.descendant(
+            of: find.byKey(const Key('auth-apple')),
+            matching: find.byWidgetPredicate(
+                (w) => w is CustomPaint && w.painter is AppleLogoPainter)),
+        findsOneWidget);
   });
 
   testWidgets('email sign-in: validation, wrong password, then success',

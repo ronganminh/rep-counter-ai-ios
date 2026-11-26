@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons_flutter/lucide_icons.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 import '../../../core/i18n/l10n.dart';
 import '../../../theme/app_colors.dart';
+import '../../../theme/app_spacing.dart';
 import '../../../theme/app_typography.dart';
 import '../../../widgets/app_button.dart';
 import '../../../widgets/app_feedback.dart';
@@ -71,8 +73,9 @@ class AuthFailureBanner extends StatelessWidget {
   }
 }
 
-/// Apple first (App Store guideline 4.8 equal prominence), then Google.
-/// Only providers the repository supports are shown.
+/// Apple first (App Store guideline 4.8 equal prominence), then Google,
+/// both full width and the same height. Only providers the repository
+/// supports are shown.
 class AuthProviderButtons extends StatelessWidget {
   const AuthProviderButtons(
       {super.key, required this.controller, required this.onFailure});
@@ -103,11 +106,12 @@ class AuthProviderButtons extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         if (providers.contains(AuthProvider.apple)) ...[
-          AppButton(
+          AppleSignInButton(
               key: const Key('auth-apple'),
               label: l.authContinueApple,
-              icon: LucideIcons.apple,
-              variant: AppButtonVariant.secondary,
+              matchLabel: providers.contains(AuthProvider.google)
+                  ? l.authContinueGoogle
+                  : null,
               onPressed: busy ? null : () => _run(context, AuthProvider.apple)),
           const SizedBox(height: 12),
         ],
@@ -122,6 +126,96 @@ class AuthProviderButtons extends StatelessWidget {
           const SizedBox(height: 12),
         ],
       ],
+    );
+  }
+}
+
+/// Sign in with Apple in Apple's HIG style: the Apple logo and "Continue
+/// with Apple", white on the dark theme (black on light), a pill like the
+/// other buttons. Laid out exactly like an [AppButton] (same padding, text
+/// style, 20 dp icon slot and minimum height), and [matchLabel] (the Google
+/// button's label) is laid out invisibly under its own, so it is never
+/// smaller than "Continue with Google", even when large text wraps it.
+class AppleSignInButton extends StatelessWidget {
+  const AppleSignInButton(
+      {super.key,
+      required this.label,
+      required this.onPressed,
+      this.matchLabel});
+
+  final String label;
+  final String? matchLabel;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final dark = Theme.of(context).brightness == Brightness.dark;
+    final enabled = onPressed != null;
+    final bg = dark ? Colors.white : Colors.black;
+    final fg = dark ? Colors.black : Colors.white;
+    final style = AppTypography.label16.copyWith(color: fg, height: 1.2);
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      onTap: onPressed,
+      excludeSemantics: true,
+      child: Opacity(
+        opacity: enabled ? 1 : 0.5,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+              minHeight: AppSpacing.buttonHeightSmall,
+              minWidth: AppSpacing.minTouch),
+          child: Material(
+            key: const Key('auth-apple-surface'),
+            color: bg,
+            shape: const StadiumBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: onPressed,
+              child: Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox.square(
+                      dimension: 20,
+                      child: Center(
+                        child: SizedBox(
+                          width: 16,
+                          height: 20,
+                          child:
+                              CustomPaint(painter: AppleLogoPainter(color: fg)),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Flexible(
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          if (matchLabel != null)
+                            Visibility(
+                              visible: false,
+                              maintainSize: true,
+                              maintainAnimation: true,
+                              maintainState: true,
+                              child: Text(matchLabel!,
+                                  textAlign: TextAlign.center, style: style),
+                            ),
+                          Text(label,
+                              textAlign: TextAlign.center, style: style),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
     );
   }
 }
