@@ -26,7 +26,7 @@ void main() {
   Map<String, dynamic> docs(DateTime now) {
     final day = '${now.year}-${_two(now.month)}-${_two(now.day)}';
     final r = Process.runSync(
-        python!, ['-I', script.path, '--print-docs', '--today', day],
+        python!, ['-I', '-B', script.path, '--print-docs', '--today', day],
         environment: {'DEMO_TIMEZONE': 'UTC'});
     expect(r.exitCode, 0, reason: '${r.stderr}');
     return jsonDecode(r.stdout as String) as Map<String, dynamic>;
@@ -34,7 +34,7 @@ void main() {
 
   test('the script\'s own tests pass (fake Supabase, no network)', () {
     final r = Process.runSync(
-        python!, ['-I', '../../tool/test_seed_demo_accounts.py']);
+        python!, ['-I', '-B', '../../tool/test_seed_demo_accounts.py']);
     expect(r.exitCode, 0, reason: '${r.stdout}\n${r.stderr}');
   }, skip: python == null ? 'python3 not installed' : false);
 
