@@ -4,3 +4,7 @@ rep-counter-ai-main.zip
 
 # Apple / signing keys must never be committed (D-12).
 *.p8
+
+# Python bytecode (tool/ scripts)
+__pycache__/
+*.pyc
