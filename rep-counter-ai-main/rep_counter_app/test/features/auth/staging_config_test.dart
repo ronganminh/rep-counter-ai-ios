@@ -165,9 +165,11 @@ void main() {
       expect(r.redirectUrl, AuthConfig.defaultRedirectUrl);
     });
 
-    test('Android offers email and Google (no native Apple sheet)', () async {
+    test('Android offers email, Apple (web flow) and Google', () async {
       final r = await _repo(FakeApi(), ios: false);
-      expect(r.providers, {AuthProvider.email, AuthProvider.google});
+      expect(r.providers,
+          {AuthProvider.email, AuthProvider.apple, AuthProvider.google});
+      expect(r.appleNative, isFalse);
     });
 
     test('accounts off: nothing is created even with staging values', () async {

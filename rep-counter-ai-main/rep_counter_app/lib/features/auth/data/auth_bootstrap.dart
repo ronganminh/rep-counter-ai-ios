@@ -36,7 +36,7 @@ Future<SupabaseAuthApi> connectSupabase(
 /// - accounts on but `SUPABASE_URL` / `SUPABASE_ANON_KEY` missing:
 ///   [UnconfiguredAuthRepository] ("sign-in isn't available");
 /// - otherwise [SupabaseAuthRepository]. Google and Apple are offered only
-///   when their client ids / capability are configured.
+///   when their client ids / `APPLE_SIGN_IN_ENABLED` are configured.
 Future<AuthRepository?> createAuthRepository({
   bool enabled = FeatureFlags.enableAccounts,
   AuthConfig? config,
@@ -55,21 +55,24 @@ Future<AuthRepository?> createAuthRepository({
   } catch (_) {
     return const UnconfiguredAuthRepository();
   }
-  // Apple's native sheet exists on iOS only; Android would need the web flow.
-  final apple = ios && c.appleSignInEnabled;
+  // Sign in with Apple: the native sheet on iOS, Supabase's web (OAuth)
+  // flow on Android (provider `apple` with a Services ID, see
+  // docs/qa/APPLE_SIGNIN_SETUP.md).
+  final apple = c.appleSignInEnabled;
   // App Store 4.8 (S-5, L-D42): on iOS a third-party login needs Sign in with
   // Apple next to it, so Google is hidden whenever Apple is off.
   final google = c.googleConfigured(ios: ios) && (!ios || apple);
   return SupabaseAuthRepository(
     api: api,
     redirectUrl: c.redirectUrl,
+    appleNative: ios,
     providers: {
       AuthProvider.email,
       if (apple) AuthProvider.apple,
       if (google) AuthProvider.google,
     },
     nativeTokens: nativeTokens ??
-        (apple || google
+        ((apple && ios) || google
             ? PlatformNativeIdTokens(
                 googleWebClientId: c.googleWebClientId,
                 googleIosClientId: ios ? c.googleIosClientId : null)

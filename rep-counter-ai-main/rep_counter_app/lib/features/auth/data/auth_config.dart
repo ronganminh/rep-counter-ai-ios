@@ -32,7 +32,9 @@ class AuthConfig {
   final String supabaseUrl, supabaseAnonKey, redirectUrl;
   final String googleWebClientId, googleIosClientId;
 
-  /// Needs the Sign in with Apple capability on the App ID first.
+  /// Sign in with Apple. iOS needs the capability on the App ID; Android
+  /// and iOS both need the Apple provider set up in Supabase
+  /// (docs/qa/APPLE_SIGNIN_SETUP.md).
   final bool appleSignInEnabled;
 
   bool get isConfigured {

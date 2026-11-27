@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
@@ -376,7 +377,7 @@ void main() {
       expect(connects, 1);
     });
 
-    test('Google needs the web id (and the iOS id on iOS); Apple iOS only',
+    test('Google needs the web id (and the iOS id on iOS); Apple everywhere',
         () async {
       const all = AuthConfig(
           supabaseUrl: 'https://project.supabase.co',
@@ -390,13 +391,16 @@ void main() {
           isIos: true,
           nativeTokens: FakeTokens());
       expect(ios!.providers, {AuthProvider.email, AuthProvider.apple});
+      expect((ios as SupabaseAuthRepository).appleNative, isTrue);
       final android = await createAuthRepository(
           enabled: true,
           config: all,
           connect: connect,
           isIos: false,
           nativeTokens: FakeTokens());
-      expect(android!.providers, {AuthProvider.email, AuthProvider.google});
+      expect(android!.providers,
+          {AuthProvider.email, AuthProvider.apple, AuthProvider.google});
+      expect((android as SupabaseAuthRepository).appleNative, isFalse);
     });
 
     test('4.8: iOS hides Google when Sign in with Apple is off (S-5)',
@@ -459,6 +463,81 @@ void main() {
       expect(await pkce.getItem(key: 'verifier'), 'v');
       await pkce.removeItem(key: 'verifier');
       expect(secrets.values, isEmpty);
+    });
+  });
+
+  group('Sign in with Apple, web flow (Android)', () {
+    late StreamController<void> resumes;
+    SupabaseAuthRepository web() => SupabaseAuthRepository(
+        api: api,
+        providers: const {AuthProvider.email, AuthProvider.apple},
+        redirectUrl: _redirect,
+        nativeTokens: tokens,
+        appleNative: false,
+        appResumes: () => resumes.stream,
+        appleWebGrace: const Duration(milliseconds: 50),
+        appleWebTimeout: const Duration(seconds: 2));
+    ApiSession apple(String email) =>
+        ApiSession(apiUser(email, provider: 'apple'));
+
+    setUp(() => resumes = StreamController<void>.broadcast());
+    tearDown(() => resumes.close());
+
+    test(
+        'opens Supabase\'s Apple page asking for name + email only, then '
+        'the deep link signs in', () async {
+      final r = web();
+      final signIn = r.signInWithApple();
+      await pumpEventQueue();
+      expect(api.calls, ['signInWithOAuth apple $_redirect name email']);
+      expect(tokens.calls, 0, reason: 'no native sheet on Android');
+      resumes.add(null); // back from the browser, code exchange running
+      api.events$.add(ApiAuthEvent(
+          ApiAuthEventKind.signedIn, apple('abc123@privaterelay.appleid.com')));
+      final s = await signIn;
+      // Hide My Email: the relay address is the account's email.
+      expect(s.user.email, 'abc123@privaterelay.appleid.com');
+      expect(s.user.provider, AuthProvider.apple);
+      expect(s.user.emailVerified, isTrue);
+    });
+
+    test('back without signing in: cancelled, nothing changes', () async {
+      final signIn = web().signInWithApple();
+      await pumpEventQueue();
+      resumes.add(null);
+      await expectLater(signIn, _fails(AuthFailureKind.cancelled));
+      expect(api.session, isNull);
+    });
+
+    test('the page cannot open: provider failed', () async {
+      api.oauthOpens = false;
+      await expectLater(
+          web().signInWithApple(), _fails(AuthFailureKind.providerFailed));
+    });
+
+    test('no answer at all: cancelled after the limit', () async {
+      await expectLater(
+          web().signInWithApple(), _fails(AuthFailureKind.cancelled));
+    });
+
+    test('Apple off: unavailable, no page opened', () async {
+      final r = SupabaseAuthRepository(
+          api: api,
+          providers: const {AuthProvider.email},
+          redirectUrl: _redirect,
+          appleNative: false,
+          appResumes: () => resumes.stream);
+      await expectLater(
+          r.signInWithApple(), _fails(AuthFailureKind.unavailable));
+      expect(api.calls, isEmpty);
+    });
+
+    test('account deletion does not open the native sheet', () async {
+      api.session = apple('a@privaterelay.appleid.com');
+      await web().deleteAccount();
+      expect(tokens.calls, 0);
+      expect(api.deletedWithAppleCode, isNull);
+      expect(api.calls, ['deleteAccount', 'signOut']);
     });
   });
 }
