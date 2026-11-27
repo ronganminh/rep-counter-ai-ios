@@ -4,6 +4,8 @@ Decision **L-D44**. These are the 54 lines of the ARB catalog (`lib/l10n/app_en.
 
 Variables: `{name}` (only when a name is known), `{exercise}` (the session's first exercise), `{time}` (reminder time), `{streak}` (days in a row), `{sets}` (sets in the session).
 
+VI: the exercise name is written in lower case inside a sentence ("Khởi động rồi hít đất") and keeps its capital at the start of the line or after `.`/`!`/`?` ("Hít đất đang chờ bạn…"); `ReminderCopy.text` does this, the ARB strings are unchanged. EN keeps the name as it is.
+
 Rules, enforced by tests:
 - one line of at most 110 characters, so it fits in 2 lines on a phone;
 - at most 1 emoji;

@@ -70,6 +70,35 @@ void main() {
       expect(ReminderCopy.text(en, 'reminderNudgeRegular02', vars),
           "Today's plan: 6 sets. Start whenever you're ready.");
     });
+
+    test('VI: exercise name lower case mid-sentence, capital at the start',
+        () {
+      const v = ReminderVars(
+          exercise: 'Hít đất', time: '17:30', streak: '9', sets: '6');
+      expect(ReminderCopy.text(vi, 'reminderNudgeFirstSession08', v),
+          'Hôm nay là ngày đầu. Khởi động rồi hít đất theo nhịp của bạn.');
+      expect(ReminderCopy.text(vi, 'reminderNudgeRegular03', v),
+          'Hôm nay có buổi tập. Khởi động rồi vào hít đất trước nhé.');
+      expect(ReminderCopy.text(vi, 'reminderNudgeRegular10', v),
+          'Hôm nay: hít đất và vài bài nữa. Chậm mà chắc.');
+      // Start of the line, or of a sentence: capital kept.
+      expect(ReminderCopy.text(vi, 'reminderNudgeRegular01', v),
+          'Hít đất đang chờ bạn lúc 17:30. Vài set nhẹ nhàng là xong.');
+      expect(ReminderCopy.text(vi, 'reminderNudgeEvening06', v),
+          'Buổi tập tối nay đã sẵn sàng. Hít đất trước, theo nhịp của bạn.');
+      // Every line: lower case unless it opens a sentence; English as is.
+      final opens = RegExp(r'[.!?…]$');
+      for (final line in ReminderCopy.lines) {
+        final t = ReminderCopy.text(vi, line.key, v);
+        for (final m in RegExp('hít đất', caseSensitive: false).allMatches(t)) {
+          final before = t.substring(0, m.start).trimRight();
+          final start = before.isEmpty || opens.hasMatch(before);
+          expect(t[m.start], start ? 'H' : 'h', reason: '${line.key}: $t');
+        }
+        final e = ReminderCopy.text(en, line.key, vars);
+        expect(e, isNot(contains('push-up')), reason: '${line.key}: $e');
+      }
+    });
   });
 
   group('situation', () {

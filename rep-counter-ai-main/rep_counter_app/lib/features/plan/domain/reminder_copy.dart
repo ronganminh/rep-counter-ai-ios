@@ -150,8 +150,39 @@ abstract final class ReminderCopy {
 
   static List<ReminderLine> get lines => _lines;
 
-  static String text(AppLocalizations l, String key, ReminderVars v) =>
-      _text(l, key, v);
+  /// In Vietnamese the exercise name ("Hít đất") is lower case inside a
+  /// sentence ("Khởi động rồi hít đất") and keeps its capital at the start
+  /// of one. English keeps the name as it is.
+  static String text(AppLocalizations l, String key, ReminderVars v) {
+    if (!l.localeName.startsWith('vi') || v.exercise.isEmpty) {
+      return _text(l, key, v);
+    }
+    const mark = '\u{E000}';
+    final raw = _text(
+        l,
+        key,
+        ReminderVars(
+            name: v.name,
+            exercise: mark,
+            time: v.time,
+            streak: v.streak,
+            sets: v.sets));
+    return raw.replaceAllMapped(RegExp(mark), (m) {
+      final before = raw.substring(0, m.start).trimRight();
+      final starts = before.isEmpty || _sentenceEnd.hasMatch(before);
+      return starts ? capitalized(v.exercise) : midSentence(v.exercise);
+    });
+  }
+
+  static final _sentenceEnd = RegExp(r'[.!?…]$');
+
+  /// [name] with its first letter in lower case.
+  static String midSentence(String name) =>
+      name.isEmpty ? name : name[0].toLowerCase() + name.substring(1);
+
+  /// [name] with its first letter in upper case.
+  static String capitalized(String name) =>
+      name.isEmpty ? name : name[0].toUpperCase() + name.substring(1);
 
   /// The situation of the reminder on [date] at [minuteOfDay]. Only the
   /// first upcoming reminder ([first]) can be "first session", "after
